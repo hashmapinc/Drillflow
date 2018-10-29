@@ -7,8 +7,8 @@ At the moment this project only runs in Java 8...it needs to be upgraded to run 
 
 # Building
 
-Execute 'mvn clean install'
+Execute `mvn clean install`
 
 # Running
 
-Execute 'java -jar target/server-0.0.1-SNAPSHOT.jar'
+Execute `java -jar target/server-0.0.1-SNAPSHOT.jar`
