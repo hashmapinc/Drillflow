@@ -4,12 +4,15 @@ import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.DataObject;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.ServerCap;
 import org.apache.catalina.Server;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import javax.jws.WebService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+@Service
 @WebService(serviceName = "StoreService", portName = "StoreSoapPort",
         targetNamespace = "http://www.witsml.org/wsdl/120",
         endpointInterface = "com.hashmapinc.tempus.witsml.server.api.IStore")
@@ -17,11 +20,14 @@ public class StoreImpl implements IStore {
 
     private static final Logger LOG = Logger.getLogger(StoreImpl.class.getName());
 
+    @Value("${wmls.version:7}")
+    private String version;
+
     @Override
     public String WMLS_GetVersion() {
         LOG.info("Executing GetVersion");
         //TODO: Dynamically set the version from properties set at deploy time.
-        return ("1.3.1.1,1.4.1.1");
+        return version;
     }
 
     @Override
