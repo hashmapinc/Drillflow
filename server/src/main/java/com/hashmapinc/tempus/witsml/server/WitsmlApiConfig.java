@@ -16,9 +16,12 @@ public class WitsmlApiConfig {
     @Autowired
     private Bus bus;
 
+    @Autowired
+    private StoreImpl storeImpl;
+
     @Bean
     public Endpoint endpoint() {
-        EndpointImpl endpoint = new EndpointImpl(bus, new StoreImpl());
+        EndpointImpl endpoint = new EndpointImpl(bus, storeImpl);
         endpoint.publish("/WMLS");
         return endpoint;
     }
