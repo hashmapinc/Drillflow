@@ -15,6 +15,10 @@
 
 language: java
 
+addons:
+  artifacts: true
+    s3_region: "us-east-2"
+
 env:
   - USER_LANGUAGE=en USER_REGION=US'
 
@@ -30,7 +34,3 @@ install: mvn clean install
 cache:
   directories:
     - $HOME/.m2
-    
-addons:
-  artifacts: true
-    s3_region: "us-east-2"
