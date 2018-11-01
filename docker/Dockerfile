@@ -1,5 +1,5 @@
 #
-# Copyright © 2018 Hashmap, Inc
+# Copyright © 2018-2018 Hashmap, Inc
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,6 +18,6 @@ FROM openjdk:11-jdk-slim
 
 RUN apt-get -y update \
     && apt-get -y install curl \
-    && curl -fSL https://s3.us-east-2.amazonaws.com/hm-witsml-server/server-0.0.1-SNAPSHOT.jar -o server-0.0.1-SNAPSHOT.jar \
+    && curl -fSL https://s3.us-east-2.amazonaws.com/hm-witsml-server/server-0.0.1-SNAPSHOT.jar -o server-0.0.1-SNAPSHOT.jar
 
 CMD java -jar server-0.0.1-SNAPSHOT.jar
