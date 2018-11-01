@@ -1,5 +1,6 @@
 # WitsmlApi-Server
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/1b2e8970193c426ab077ad29beb312c1)](https://app.codacy.com/app/cherrera2001/WitsmlApi-Server?utm_source=github.com&utm_medium=referral&utm_content=hashmapinc/WitsmlApi-Server&utm_campaign=Badge_Grade_Dashboard)
 [![Build Status](https://img.shields.io/travis/hashmapinc/WitsmlApi-Server.svg?logo=travis)](https://travis-ci.org/hashmapinc/WitsmlApi-Server)
 [![Documentation Status](https://readthedocs.org/projects/witsml-server-api/badge/?version=latest)](https://witsml-server-api.readthedocs.io/en/latest/?badge=latest)
 ![Docker Build Status](https://img.shields.io/docker/build/hashmapinc/witsmlapi-server.svg?logo=docker)
