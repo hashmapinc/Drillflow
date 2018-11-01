@@ -15,10 +15,6 @@
 
 language: java
 
-addons:
-  artifacts: true
-    s3_region: "us-east-2"
-
 env:
   - USER_LANGUAGE=en USER_REGION=US'
 
