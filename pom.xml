@@ -26,9 +26,9 @@
 	<packaging>jar</packaging>
 
 	<name>server</name>
-	<description>Witsml Server API</description>
-    <url>https://hashmapinc.com</url>
-    <inceptionYear>2018</inceptionYear>
+	<description>A dockerized WITSML API Server that is agnostic of the backend.</description>
+  <url>https://hashmapinc.com</url>
+  <inceptionYear>2018</inceptionYear>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
