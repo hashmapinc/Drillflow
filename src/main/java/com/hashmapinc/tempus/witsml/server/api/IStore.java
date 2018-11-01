@@ -30,16 +30,16 @@ public interface IStore {
 
     @WebMethod(action = "http://www.witsml.org/action/120/Store.WMLS_GetVersion")
     @RequestWrapper(targetNamespace = "http://www.witsml.org/message/120")
-    String WMLS_GetVersion();
+    String getVersion();
 
     @WebMethod(action = "http://www.witsml.org/action/120/Store.WMLS_GetCap")
     @RequestWrapper(targetNamespace = "http://www.witsml.org/message/120", localName = "Store.WMLS_GetCap")
     @ResponseWrapper(targetNamespace = "http://www.witsml.org/message/120",
                      className = "com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse")
-    WMLS_GetCapResponse WMLS_GetCap(@WebParam(partName = "OptionsIn") String OptionsIn);
+    WMLS_GetCapResponse getCap(@WebParam(partName = "OptionsIn") String OptionsIn);
 
 
     @WebMethod(action = "http://www.witsml.org/action/120/Store.WMLS_GetBaseMsg")
     @RequestWrapper(targetNamespace = "http://www.witsml.org/message/120")
-    String WMLS_GetBaseMsg(@WebParam(partName= "ReturnValueIn") Short ReturnValueIn);
+    String getBaseMsg(@WebParam(partName= "ReturnValueIn") Short ReturnValueIn);
 }

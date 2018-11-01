@@ -18,7 +18,6 @@ package com.hashmapinc.tempus.witsml.server.api;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.DataObject;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.ServerCap;
-import org.apache.catalina.Server;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -39,13 +38,13 @@ public class StoreImpl implements IStore {
     private String version;
 
     @Override
-    public String WMLS_GetVersion() {
+    public String getVersion() {
         LOG.info("Executing GetVersion");
         return version;
     }
 
     @Override
-    public WMLS_GetCapResponse WMLS_GetCap(String OptionsIn) {
+    public WMLS_GetCapResponse getCap(String OptionsIn) {
         LOG.info("Executing GetCap");
         String requestedVersion = OptionsIn.substring(OptionsIn.lastIndexOf("=") +1);
         WMLS_GetCapResponse resp = new WMLS_GetCapResponse();
@@ -74,7 +73,7 @@ public class StoreImpl implements IStore {
     }
 
     @Override
-    public String WMLS_GetBaseMsg(Short ReturnValueIn) {
+    public String getBaseMsg(Short ReturnValueIn) {
         LOG.info("Executing GetBaseMsg");
         //TODO: Implement the hash table of error codes that can be appended to at deploy time
         return "This is the return value for: " + ReturnValueIn;

@@ -26,6 +26,7 @@ public class WitsmlServerApplicationTests {
 
 	@Test
 	public void contextLoads() {
+
 	}
 
 }

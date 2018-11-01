@@ -41,13 +41,6 @@ public class ObjectFactory {
     private final static QName _CapServers_QNAME = new QName("http://www.witsml.org/api/141", "capServers");
 
     /**
-     * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: com.hashmapinc.tempus.witsml
-     * 
-     */
-    public ObjectFactory() {
-    }
-
-    /**
      * Create an instance of {@link ObjCapServers }
      * 
      */

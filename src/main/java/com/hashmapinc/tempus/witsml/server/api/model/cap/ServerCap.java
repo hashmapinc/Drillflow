@@ -245,11 +245,11 @@ public class ServerCap {
      * @return The XML as a string
      * @throws Exception If the version is not supported
      */
-    public String getWitsmlObject(String version) throws Exception {
-        if (!version.equals("1.3.1.1") && !version.equals("1.4.1.1")){
-            throw new Exception("Version not supported by the capabilites object");
+    public String getWitsmlObject(String version) throws JAXBException, UnsupportedOperationException {
+        if (!"1.3.1.1".equals(version) && !"1.4.1.1".equals(version)){
+            throw new UnsupportedOperationException("Version not supported by the capabilites object");
         }
-        if (version.equals("1.3.1.1")){
+        if ("1.3.1.1".equals(version)){
             return get1311Object();
         }
         else {
