@@ -9,6 +9,9 @@ install: mvn clean install
 cache:
   directories:
   - "$HOME/.m2"
+after_success:
+  - mkdir /out
+  - mv /target/*.jar /out
 deploy:
   provider: s3
   access_key_id: AKIAJAY37CUQHSZZRNUA
