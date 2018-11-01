@@ -1,4 +1,8 @@
 # WitsmlApi-Server
+
+[![Build Status](https://img.shields.io/travis/hashmapinc/WitsmlApi-Server.svg?logo=travis)](https://travis-ci.org/hashmapinc/WitsmlApi-Server)
+[![Documentation Status](https://readthedocs.org/projects/witsml-server-api/badge/?version=latest)](https://witsml-server-api.readthedocs.io/en/latest/?badge=latest)
+
 A dockerized WITSML API Server that is agnostic of the backend.
 
 # Notes 
