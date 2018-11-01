@@ -16,8 +16,6 @@
 
 FROM openjdk:11-jdk-slim
 
-ADD server-0.0.1-SNAPSHOT.jar /server-0.0.1-SNAPSHOT.jar
-
-RUN apt-get update
+RUN curl -fSL https://s3.us-east-2.amazonaws.com/hm-witsml-server/server-0.0.1-SNAPSHOT.jar -o server-0.0.1-SNAPSHOT.jar && apt-get update
 
 CMD java -jar server-0.0.1-SNAPSHOT.jar
