@@ -38,6 +38,47 @@ public class StoreImpl implements IStore {
     @Value("${wmls.version:7}")
     private String version;
 
+    @Value("${wmls.capserver.contact.name}")
+    private String contactName;
+
+    @Value("${wmls.capserver.contact.email}")
+    private String contactEmail;
+
+    @Value("${wmls.capserver.contact.phone}")
+    private String contactPhone;
+
+    //Server information
+    @Value("${wmls.capserver.description}")
+    private String description;
+
+    @Value("${wmls.capserver.name}")
+    private String name;
+
+    @Value("${wmls.capserver.vendor}")
+    private String vendor;
+
+    @Value("${wmls.capserver.version}")
+    private String capVersion;
+
+    @Value("${wmls.capserver.schemaVersion}")
+    private String schemaVersion;
+
+    @Value("${wmls.capserver.changeDetectionPeriod}")
+    private String changeDetectionPeriod;
+
+    @Value("${wmls.capserver.cascadedDelete:false}")
+    private String cascadedDelete;
+
+    @Value("${wmls.capserver.supportUomConversion:true}")
+    private String supportUomConversion;
+
+    @Value("${wmls.capserver.compressionMethod:gzip}")
+    private String compressionMethod;
+
+    @Value("${wmls.capserver}")
+    private String capServer;
+
+
     @Override
     public String WMLS_GetVersion() {
         LOG.info("Executing GetVersion");
@@ -51,12 +92,12 @@ public class StoreImpl implements IStore {
         WMLS_GetCapResponse resp = new WMLS_GetCapResponse();
         resp.setSuppMsgOut("");
         ServerCap cap = new ServerCap();
-        cap.setContactName("Chris");
-        cap.setServerName("Awesome");
+        cap.setContactName(contactName);
+        cap.setServerName(name);
         cap.addFunction("WMLS_GetBaseMsg", null);
         cap.addFunction("WMLS_GetVersion", null);
         DataObject object = new DataObject();
-        object.setName("capServer");
+        object.setName(capServer);
         List<DataObject> objects = new ArrayList<>();
         objects.add(object);
         cap.addFunction("WMLS_GetCap", objects);

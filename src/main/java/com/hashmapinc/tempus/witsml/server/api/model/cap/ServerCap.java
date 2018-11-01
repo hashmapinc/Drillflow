@@ -18,6 +18,10 @@ package com.hashmapinc.tempus.witsml.server.api.model.cap;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.v1311.*;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.v1411.GrowingTimeoutPeriod;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.v1411.ObjectWithConstraint;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 
 import javax.xml.bind.*;
 import java.io.StringWriter;
@@ -26,6 +30,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+@Configuration
+@PropertySource("classpath:servercap.properties")
+@ConfigurationProperties(prefix = "wmls")
 public class ServerCap {
 
     // Contact information
@@ -43,6 +50,7 @@ public class ServerCap {
     private Map<String, Integer> growingTimeouts = new HashMap<>();
     private Map<String, List<DataObject>> functions = new HashMap<>();
     private boolean cascadedDelete;
+
     private boolean supportUomConversion;
     private String compressionMethod;
 
