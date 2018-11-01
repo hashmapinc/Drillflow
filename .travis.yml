@@ -30,3 +30,7 @@ install: mvn clean install
 cache:
   directories:
     - $HOME/.m2
+    
+addons:
+  artifacts: true
+    s3_region: "us-east-2"
