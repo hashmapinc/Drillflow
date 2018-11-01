@@ -26,7 +26,6 @@ public class StoreImpl implements IStore {
     @Override
     public String WMLS_GetVersion() {
         LOG.info("Executing GetVersion");
-        //TODO: Dynamically set the version from properties set at deploy time.
         return version;
     }
 
