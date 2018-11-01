@@ -1,32 +1,21 @@
-# Licensed to the Apache Software Foundation (ASF) under one or more
-# contributor license agreements. See the NOTICE file distributed with
-# this work for additional information regarding copyright ownership.
-# The ASF licenses this file to You under the Apache License, Version 2.0
-# (the "License"); you may not use this file except in compliance with
-# the License. You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 language: java
-
 env:
-  - USER_LANGUAGE=en USER_REGION=US'
-
+- USER_LANGUAGE=en USER_REGION=US'
 os:
-  - linux
-
+- linux
 jdk:
-  - openjdk11
-
+- openjdk11
 install: mvn clean install
-
-# Caches mvn repository in order to speed upbuilds
 cache:
   directories:
-    - $HOME/.m2
+  - "$HOME/.m2"
+deploy:
+  provider: s3
+  access_key_id: AKIAJAY37CUQHSZZRNUA
+  secret_access_key:
+    secure: BlMDoer1kQ2GGTeaKFv4+VMDbF24jtB3DBe3FXX/gd0HvkP0aCgszEeI6euWvNtLR02gindzJhkVoMweYRzjJthKF5+GEqRfLgD0gg/3mp7A+gwiXT8cppLKGY7+SU2NfxMv++2JOu/xH/AD2QdhmW4pmA8/2/iY3nKrNYufn83KkP+4DF+na8FxFZPjtsPQoffJxZ0bdDjEsBEbb55ZNVIcWnxA/P/FxGBIC25S1DZ+KbM+iXffYJFVeGR8kTvSoaxN7LDMB0l94mZXfj3ugBbUwymFV97K2FWYgy3Lx5PChkIsdzZ0OLNYMUQpfi4zcx1VA6O9tikIUV0Qos/U53tYHWFShClNh+MZc+wrpfTwlJNcEFWZ7d4dgdvRWg0Pr6P/S5+YzoD7K/JhyuO6zmjuctaynQxRbjDbweHDhNBej6C5ygkrYi721/qF9R+IwnhlY7ygiDWGvieWTrHe52F4a2aglAlCrmC+Vez9HYhrQG4kxmmsDJ/48WqfFt20qPdt586HC9Qt63vnyl/FG1L9lXVvrTd/qGSzCFi7k4HSfwNz1MfcVbo3RKBeMYsRygD8VYis+WKKByDFhyQooNIqoO3vDZfnN9QegNpDGF1Yy3dzOfNf21/ySKbIrzJXBNJ537e+egehkrEmZJi+0K03jlaKGr2flZGKATlLj3w=
+  bucket: hm-witsml-server
+  local-dir: "/out"
+  acl: public_read
+  on:
+    repo: hashmapinc/WitsmlApi-Server
