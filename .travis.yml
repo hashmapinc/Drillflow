@@ -10,8 +10,8 @@ cache:
   directories:
   - "$HOME/.m2"
 after_success:
-  - mkdir TRAVIS_BUILD_DIR/out
-  - mv TRAVIS_BUILD_DIR/target/*.jar TRAVIS_BUILD_DIR/out
+  - mkdir $TRAVIS_BUILD_DIR/out
+  - mv $TRAVIS_BUILD_DIR/target/*.jar TRAVIS_BUILD_DIR/out
 deploy:
   provider: s3
   access_key_id: AKIAJAY37CUQHSZZRNUA
