@@ -13,6 +13,7 @@ after_success:
   - mkdir $TRAVIS_BUILD_DIR/out
   - mv $TRAVIS_BUILD_DIR/target/*.jar $TRAVIS_BUILD_DIR/out
 deploy:
+  skip_cleanup: true
   provider: s3
   access_key_id: AKIAJAY37CUQHSZZRNUA
   secret_access_key:
