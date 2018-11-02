@@ -33,16 +33,6 @@ import java.util.*;
 @ConfigurationProperties(prefix = "wmls")
 public class ServerCap {
 
-    public ServerCap(){
-        this.addFunction("WMLS_GetBaseMsg", null);
-        this.addFunction("WMLS_GetVersion", null);
-        DataObject object = new DataObject();
-        object.setName("capServer");
-        List<DataObject> objects = new ArrayList<>();
-        objects.add(object);
-        this.addFunction("WMLS_GetCap", objects);
-    }
-
     // Contact information
     private String contactName;
     private String contactEmail;
@@ -61,6 +51,16 @@ public class ServerCap {
     private boolean cascadedDelete;
     private boolean supportUomConversion;
     private String compressionMethod;
+
+    public ServerCap(){
+        this.addFunction("WMLS_GetBaseMsg", null);
+        this.addFunction("WMLS_GetVersion", null);
+        DataObject object = new DataObject();
+        object.setName("capServer");
+        List<DataObject> objects = new ArrayList<>();
+        objects.add(object);
+        this.addFunction("WMLS_GetCap", objects);
+    }
 
     /**
      * Add a Growing timeout period for a specific object (note: only applicable for 1.4.1.1)
