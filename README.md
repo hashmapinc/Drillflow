@@ -4,7 +4,6 @@
 [![Build Status](https://img.shields.io/travis/hashmapinc/WitsmlApi-Server.svg?logo=travis)](https://travis-ci.org/hashmapinc/WitsmlApi-Server)
 [![Documentation Status](https://readthedocs.org/projects/witsml-server-api/badge/?version=latest)](https://witsml-server-api.readthedocs.io/en/latest/?badge=latest)
 ![Docker Build Status](https://img.shields.io/docker/build/hashmapinc/witsmlapi-server.svg?logo=docker)
-![GitHub](https://img.shields.io/github/license/hashmapinc/witsmlapi-server.svg?logo=github)
 [![Waffle.io - Columns and their card count](https://badge.waffle.io/hashmapinc/WitsmlApi-Server.svg?columns=Backlog,Done,In%20progress)](https://waffle.io/hashmapinc/WitsmlApi-Server)
 
 A dockerized WITSML API Server that is agnostic of the backend.
