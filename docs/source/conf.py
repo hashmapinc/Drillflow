@@ -19,7 +19,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = u'Hashmap WITSML Server'
+project = u'DrillFlow'
 copyright = u'2018, Hashmap'
 author = u'Hashmap'
 
@@ -81,12 +81,14 @@ html_theme = 'sphinx_rtd_theme'
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {sphinx_rtd_theme}
+html_theme_options = {'logo_only': True}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['.static']
+
+html_logo='logo2.png'
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
