@@ -28,11 +28,19 @@ import javax.xml.ws.Endpoint;
 @Configuration
 public class WitsmlApiConfig {
 
-    @Autowired
     private Bus bus;
 
-    @Autowired
     private StoreImpl storeImpl;
+
+    @Autowired
+    private void getBus(Bus bus){
+        this.bus = bus;
+    }
+
+    @Autowired
+    private void getStoreImpl(StoreImpl storeImpl){
+        this.storeImpl = storeImpl;
+    }
 
     @Bean
     public Endpoint endpoint() {
