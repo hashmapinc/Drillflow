@@ -18,22 +18,30 @@ package com.hashmapinc.tempus.witsml.server.api.model.cap;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.v1311.*;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.v1411.GrowingTimeoutPeriod;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.v1411.ObjectWithConstraint;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
 import javax.xml.bind.*;
 import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Configuration
+@EnableConfigurationProperties
 @PropertySource("classpath:servercap.properties")
 @ConfigurationProperties(prefix = "wmls")
 public class ServerCap {
+
+    public ServerCap(){
+        this.addFunction("WMLS_GetBaseMsg", null);
+        this.addFunction("WMLS_GetVersion", null);
+        DataObject object = new DataObject();
+        object.setName("capServer");
+        List<DataObject> objects = new ArrayList<>();
+        objects.add(object);
+        this.addFunction("WMLS_GetCap", objects);
+    }
 
     // Contact information
     private String contactName;
@@ -49,8 +57,8 @@ public class ServerCap {
     private int changeDetectionPeriod;
     private Map<String, Integer> growingTimeouts = new HashMap<>();
     private Map<String, List<DataObject>> functions = new HashMap<>();
-    private boolean cascadedDelete;
 
+    private boolean cascadedDelete;
     private boolean supportUomConversion;
     private String compressionMethod;
 
@@ -69,8 +77,7 @@ public class ServerCap {
      * @param objectName The name of the object to remove the timeout for
      */
     public void removeGrowingTimeoutPeriod(String objectName){
-        if (growingTimeouts.containsKey(objectName))
-            growingTimeouts.remove(objectName);
+        growingTimeouts.remove(objectName);
     }
 
     /**
@@ -251,7 +258,7 @@ public class ServerCap {
      * Returns the WITSML object in the version specified
      * @param version The version of the XML that should be returned
      * @return The XML as a string
-     * @throws Exception If the version is not supported
+     * @throws UnsupportedOperationException If the version is not supported
      */
     public String getWitsmlObject(String version) throws JAXBException, UnsupportedOperationException {
         if (!"1.3.1.1".equals(version) && !"1.4.1.1".equals(version)){
@@ -357,6 +364,7 @@ public class ServerCap {
         server.setName(serverName);
         server.setVendor(vendor);
         server.setSchemaVersion("1.4.1.1");
+        server.setChangeDetectionPeriod(changeDetectionPeriod);
 
         // Add Timeout Periods
         List<GrowingTimeoutPeriod> timeoutPeriods = server.getGrowingTimeoutPeriod();
