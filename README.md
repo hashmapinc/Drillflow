@@ -1,4 +1,3 @@
-
 <img src="https://s3.us-east-2.amazonaws.com/hm-witsml-server/drillFlowLogo.png" alt="DrillFlow"/>
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/1b2e8970193c426ab077ad29beb312c1)](https://app.codacy.com/app/cherrera2001/WitsmlApi-Server?utm_source=github.com&utm_medium=referral&utm_content=hashmapinc/WitsmlApi-Server&utm_campaign=Badge_Grade_Dashboard)
