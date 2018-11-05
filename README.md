@@ -1,10 +1,10 @@
 <img src="https://s3.us-east-2.amazonaws.com/hm-witsml-server/drillFlowLogo.png" alt="DrillFlow"/>
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/1b2e8970193c426ab077ad29beb312c1)](https://app.codacy.com/app/cherrera2001/WitsmlApi-Server?utm_source=github.com&utm_medium=referral&utm_content=hashmapinc/WitsmlApi-Server&utm_campaign=Badge_Grade_Dashboard)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/90eb9da04f30402fb68f54c5225102e1)](https://www.codacy.com/app/cherrera2001/Drillflow?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=hashmapinc/Drillflow&amp;utm_campaign=Badge_Grade)
 [![Build Status](https://img.shields.io/travis/hashmapinc/WitsmlApi-Server.svg?logo=travis)](https://travis-ci.org/hashmapinc/WitsmlApi-Server)
-[![Documentation Status](https://readthedocs.org/projects/witsml-server-api/badge/?version=latest)](https://witsml-server-api.readthedocs.io/en/latest/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/drillflow/badge/?version=latest)](https://drillflow.readthedocs.io/en/latest/?badge=latest)
 ![Docker Build Status](https://img.shields.io/docker/build/hashmapinc/witsmlapi-server.svg?logo=docker)
-[![Waffle.io - Columns and their card count](https://badge.waffle.io/hashmapinc/WitsmlApi-Server.svg?columns=Backlog,Done,In%20progress)](https://waffle.io/hashmapinc/WitsmlApi-Server)
+[![Waffle.io - Columns and their card count](https://badge.waffle.io/hashmapinc/Drillflow.svg?columns=Backlog,Done,In%20progress)](https://waffle.io/hashmapinc/Drillflow)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fhashmapinc%2FWitsmlApi-Server.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fhashmapinc%2FWitsmlApi-Server?ref=badge_shield)
 
 A dockerized WITSML API Server that is agnostic of the backend.
