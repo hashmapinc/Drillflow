@@ -18,14 +18,18 @@
 *.zip
 *.tar.gz
 *.rar
-
 .travis.yml
 *.iml
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
-
 .idea/
-
 target/
 docs/build/
+
+# Things Randy ignored
+.java-version
+.classpath
+.factorypath
+.project
+.settings
