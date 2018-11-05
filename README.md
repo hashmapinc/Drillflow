@@ -5,7 +5,7 @@
 [![Documentation Status](https://readthedocs.org/projects/drillflow/badge/?version=latest)](https://drillflow.readthedocs.io/en/latest/?badge=latest)
 ![Docker Build Status](https://img.shields.io/docker/build/hashmapinc/witsmlapi-server.svg?logo=docker)
 [![Waffle.io - Columns and their card count](https://badge.waffle.io/hashmapinc/Drillflow.svg?columns=Backlog,Done,In%20progress)](https://waffle.io/hashmapinc/Drillflow)
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fhashmapinc%2FWitsmlApi-Server.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fhashmapinc%2FWitsmlApi-Server?ref=badge_shield)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fhashmapinc%2FDrillflow.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fhashmapinc%2FDrillflow?ref=badge_shield)
 
 A dockerized WITSML API Server that is agnostic of the backend.
 
@@ -105,7 +105,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fhashmapinc%2FWitsmlApi-Server.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fhashmapinc%2FWitsmlApi-Server?ref=badge_large)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fhashmapinc%2FDrillflow.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fhashmapinc%2FDrillflow?ref=badge_large)
 
 ## Export Control
 
