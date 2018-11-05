@@ -73,6 +73,16 @@ By default the server should return the following response:
   </soap:Envelope>
   ```
 
+### CVE Checking
+
+Drillflow includes the [OWASP Dependancy checker](https://github.com/jeremylong/DependencyCheck) Maven Plugin
+
+To check if any dependencies are subject to any current CVE's run
+
+```bash
+mvn verify
+```
+
 ### Building the Docker image
 
 Navigate to the docker directory
