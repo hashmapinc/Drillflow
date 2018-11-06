@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.tempus.witsml.server.api;
 
+import com.hashmapinc.tempus.witsml.server.WitsmlApiConfig;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.ServerCap;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,8 @@ public class StoreImpl implements IStore {
     private void setServerCap(ServerCap cap){
         this.cap = cap;
     }
+    @Autowired
+    private WitsmlApiConfig witsmlApiConfigUtil;
 
     @Value("${wmls.version:7}")
     private String version;
@@ -49,9 +52,9 @@ public class StoreImpl implements IStore {
     }
 
     @Override
-    public WMLS_GetCapResponse getCap(String OptionsIn) {
+    public WMLS_GetCapResponse getCap(String optionsIn) {
         LOG.info("Executing GetCap");
-        String requestedVersion = OptionsIn.substring(OptionsIn.lastIndexOf("=") +1);
+        String requestedVersion = optionsIn.substring(optionsIn.lastIndexOf("=") +1);
         WMLS_GetCapResponse resp = new WMLS_GetCapResponse();
         resp.setSuppMsgOut("");
         try {
@@ -66,9 +69,13 @@ public class StoreImpl implements IStore {
     }
 
     @Override
-    public String getBaseMsg(Short ReturnValueIn) {
+    public String getBaseMsg(Short returnValueIn) {
         LOG.info("Executing GetBaseMsg");
         //TODO: Implement the hash table of error codes that can be appended to at deploy time
-        return "This is the return value for: " + ReturnValueIn;
+        String baseMsg;
+        baseMsg= witsmlApiConfigUtil.getProperty("basemessages."+returnValueIn);
+
+    //    return "This is the return value for: " + ReturnValueIn;
+        return baseMsg;
     }
 }
