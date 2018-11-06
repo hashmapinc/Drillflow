@@ -43,12 +43,12 @@ public class WitsmlServerApplicationTests {
 
 	@Test
 	public void getBaseMsgShouldReturnATextualDescription(){
-		assertThat(this.witsmlServer.getBaseMsg((short)412)).contains("add");
+		assertThat(this.witsmlServer.getBaseMsg((short)412)).contains("update");
 	}
 
 	@Test
 	public void getBaseMsgShouldReturnATextualDescriptionForANegativeNumber(){
-		assertThat(this.witsmlServer.getBaseMsg((short)-412)).contains("add");
+		assertThat(this.witsmlServer.getBaseMsg((short)-412)).contains("update");
 	}
 
 	@Test
