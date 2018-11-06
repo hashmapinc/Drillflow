@@ -13,20 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.tempus.witsml.server;
+package com.hashmapinc.tempus.witsml.server.api.model.cap;
 
-import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.junit.runners.Suite;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-public class WitsmlServerApplicationTests {
-
-	@Test
-	public void contextLoads() {
-
-	}
+@RunWith(Suite.class)
+@Suite.SuiteClasses({
+        ServerCapTest.class,
+        DataObjectTest.class })
+public class WitsmlPojoTests {
 
 }
