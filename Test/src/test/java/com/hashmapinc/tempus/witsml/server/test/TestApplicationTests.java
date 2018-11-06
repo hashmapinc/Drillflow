@@ -1,4 +1,4 @@
-package cathyhome;
+package com.hashmapinc.tempus.witsml.server.test;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
