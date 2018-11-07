@@ -22,7 +22,7 @@ import static org.junit.Assert.assertNotNull;
 public class DataObjectTest {
 
     @Test
-    public void CreateDataObject(){
+    public void createDataObject(){
         DataObject dataObject = new DataObject();
         assertNotNull(dataObject);
     }

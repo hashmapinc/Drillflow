@@ -26,13 +26,13 @@ import static org.junit.Assert.*;
 public class ServerCapTest {
 
     @Test
-    public void CreateServerCapObject(){
+    public void createServerCapObject(){
         ServerCap sc = new ServerCap();
         assertNotNull(sc);
     }
 
     @Test
-    public void GenerateDefault1311Object() throws JAXBException {
+    public void generateDefault1311Object() throws JAXBException {
         ServerCap sc = new ServerCap();
         String obj = sc.getWitsmlObject("1.3.1.1");
         assertNotNull(obj);
@@ -41,7 +41,7 @@ public class ServerCapTest {
     }
 
     @Test
-    public void GenerateDefault1411Object() throws JAXBException {
+    public void generateDefault1411Object() throws JAXBException {
         ServerCap sc = new ServerCap();
         String obj = sc.getWitsmlObject("1.4.1.1");
         assertNotNull(obj);
@@ -50,7 +50,7 @@ public class ServerCapTest {
     }
 
     @Test
-    public void AddGrowingTimeout1411() throws JAXBException {
+    public void addGrowingTimeout1411() throws JAXBException {
         ServerCap sc = new ServerCap();
         sc.addGrowingTimeoutPeriod("log", 1000);
         String obj = sc.getWitsmlObject("1.4.1.1");
@@ -60,7 +60,7 @@ public class ServerCapTest {
     }
 
     @Test
-    public void RemoveGrowingTimeout1411() throws JAXBException {
+    public void removeGrowingTimeout1411() throws JAXBException {
         ServerCap sc = new ServerCap();
         sc.addGrowingTimeoutPeriod("log", 1000);
         String obj = sc.getWitsmlObject("1.4.1.1");
@@ -73,7 +73,7 @@ public class ServerCapTest {
     }
 
     @Test
-    public void AddGrowingTimeoutEnsureNotAppear1311() throws JAXBException {
+    public void addGrowingTimeoutEnsureNotAppear1311() throws JAXBException {
         ServerCap sc = new ServerCap();
         sc.addGrowingTimeoutPeriod("log", 1000);
         String obj = sc.getWitsmlObject("1.3.1.1");
