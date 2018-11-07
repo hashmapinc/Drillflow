@@ -20,8 +20,6 @@ import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.ServerCap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.couchbase.CouchbaseProperties;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import javax.jws.WebService;
@@ -36,17 +34,21 @@ public class StoreImpl implements IStore {
     private static final Logger LOG = Logger.getLogger(StoreImpl.class.getName());
 
     private ServerCap cap;
+    private WitsmlApiConfig witsmlApiConfigUtil;
 
     @Autowired
     private void setServerCap(ServerCap cap){
         this.cap = cap;
     }
 
+    @Autowired
+    private void setWitsmlApiConfig(WitsmlApiConfig witsmlApiConfigUtil){
+        this.witsmlApiConfigUtil = witsmlApiConfigUtil;
+    }
+
     @Value("${wmls.version:7}")
     private String version;
 
-    @Autowired
-    private WitsmlApiConfig witsmlApiConfigUtil;
 
     @Override
     public String getVersion() {
@@ -75,8 +77,6 @@ public class StoreImpl implements IStore {
     public String getBaseMsg(Short returnValueIn) {
         LOG.info("Executing GetBaseMsg");
 
-        String baseMsg = witsmlApiConfigUtil.getProperty("basemessages." + returnValueIn);
-
-        return baseMsg;
+        return witsmlApiConfigUtil.getProperty("basemessages." + returnValueIn);
     }
 }
