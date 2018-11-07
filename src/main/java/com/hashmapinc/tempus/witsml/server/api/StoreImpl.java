@@ -77,6 +77,10 @@ public class StoreImpl implements IStore {
     public String getBaseMsg(Short returnValueIn) {
         LOG.info("Executing GetBaseMsg");
 
-        return witsmlApiConfigUtil.getProperty("basemessages." + returnValueIn);
+        String errMsg = witsmlApiConfigUtil.getProperty("basemessages." + returnValueIn);
+        if (errMsg == null){
+            errMsg = witsmlApiConfigUtil.getProperty("basemessages.-999");
+        }
+        return errMsg;
     }
 }
