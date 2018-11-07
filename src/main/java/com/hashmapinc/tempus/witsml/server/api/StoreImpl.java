@@ -15,10 +15,13 @@
  */
 package com.hashmapinc.tempus.witsml.server.api;
 
+import com.hashmapinc.tempus.witsml.server.WitsmlApiConfig;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.ServerCap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.couchbase.CouchbaseProperties;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import javax.jws.WebService;
@@ -41,6 +44,9 @@ public class StoreImpl implements IStore {
 
     @Value("${wmls.version:7}")
     private String version;
+
+    @Autowired
+    private WitsmlApiConfig witsmlApiConfigUtil;
 
     @Override
     public String getVersion() {
@@ -66,9 +72,11 @@ public class StoreImpl implements IStore {
     }
 
     @Override
-    public String getBaseMsg(Short ReturnValueIn) {
+    public String getBaseMsg(Short returnValueIn) {
         LOG.info("Executing GetBaseMsg");
-        //TODO: Implement the hash table of error codes that can be appended to at deploy time
-        return "This is the return value for: " + ReturnValueIn;
+
+        String baseMsg = witsmlApiConfigUtil.getProperty("basemessages." + returnValueIn);
+
+        return baseMsg;
     }
 }
