@@ -3,7 +3,7 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/90eb9da04f30402fb68f54c5225102e1)](https://www.codacy.com/app/cherrera2001/Drillflow?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=hashmapinc/Drillflow&amp;utm_campaign=Badge_Grade)
 [![Build Status](https://travis-ci.org/hashmapinc/Drillflow.svg?branch=master)](https://travis-ci.org/hashmapinc/Drillflow)
 [![Documentation Status](https://readthedocs.org/projects/drillflow/badge/?version=latest)](https://drillflow.readthedocs.io/en/latest/?badge=latest)
-![Docker Build Status](https://img.shields.io/docker/build/hashmapinc/drillflow.svg?logo=docker)
+[![Docker Build Status](https://img.shields.io/docker/build/hashmapinc/drillflow.svg?logo=docker)](https://hub.docker.com/r/hashmapinc/drillflow/)
 [![Waffle.io - Columns and their card count](https://badge.waffle.io/hashmapinc/Drillflow.svg?columns=Backlog,Done,In%20progress)](https://waffle.io/hashmapinc/Drillflow)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fhashmapinc%2FDrillflow.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fhashmapinc%2FDrillflow?ref=badge_shield)
 
