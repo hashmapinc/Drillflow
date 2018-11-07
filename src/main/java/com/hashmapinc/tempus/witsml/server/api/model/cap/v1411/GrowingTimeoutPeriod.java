@@ -47,7 +47,7 @@ public class GrowingTimeoutPeriod {
 
     @XmlValue
     protected int value;
-    @XmlAttribute(name = "DDataObject", required = true)
+    @XmlAttribute(name = "dataObject", required = true)
     protected String dataObject;
 
     /**

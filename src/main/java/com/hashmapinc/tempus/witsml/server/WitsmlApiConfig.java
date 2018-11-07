@@ -22,6 +22,7 @@ import org.apache.cxf.jaxws.EndpointImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 
 import javax.xml.ws.Endpoint;
 
@@ -29,8 +30,13 @@ import javax.xml.ws.Endpoint;
 public class WitsmlApiConfig {
 
     private Bus bus;
-
+    private Environment env;
     private StoreImpl storeImpl;
+
+    @Autowired
+    private void setEnv(Environment env){
+        this.env = env;
+    }
 
     @Autowired
     private void getBus(Bus bus){
@@ -52,5 +58,9 @@ public class WitsmlApiConfig {
     @Bean(name = Bus.DEFAULT_BUS_ID)
     public SpringBus springBus() {
         return new SpringBus();
+    }
+
+    public String getProperty(String pPropertyKey) {
+        return env.getProperty(pPropertyKey);
     }
 }

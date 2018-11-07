@@ -5,11 +5,19 @@ os:
 - linux
 jdk:
 - openjdk11
-install: mvn clean install
+before_install:
+  - sudo apt-get install -y jq
+  - sudo apt-get install -y wget
+  - sudo apt-get install -y curl
+  - wget -O ~/codacy-coverage-reporter-assembly-latest.jar https://s3.us-east-2.amazonaws.com/hm-witsml-server/codacy-coverage-reporter-4.0.3-assembly.jar
+install: 
+  - mvn clean install
+  - mvn jacoco:report
 cache:
   directories:
   - "$HOME/.m2"
 after_success:
+  - java -jar ~/codacy-coverage-reporter-assembly-latest.jar report -l Java -r $TRAVIS_BUILD_DIR/target/site/jacoco/jacoco.xml
   - mkdir $TRAVIS_BUILD_DIR/out
   - mv $TRAVIS_BUILD_DIR/target/*.jar $TRAVIS_BUILD_DIR/out
 deploy:
@@ -23,4 +31,4 @@ deploy:
   region: us-east-2
   acl: public_read
   on:
-    repo: hashmapinc/WitsmlApi-Server
+    repo: hashmapinc/Drillflow
