@@ -28,6 +28,15 @@ import javax.xml.ws.ResponseWrapper;
 @SOAPBinding(style = SOAPBinding.Style.RPC)
 public interface IStore {
 
+    @WebMethod(action = "http://www.witsml.org/action/120/Store.WMLS_AddToStore")
+    @RequestWrapper(targetNamespace = "http://www.witsml.org/message/120")
+    int addToStore(
+        @WebParam(partName = "WMLtypeIn") String WMLtypeIn,
+        @WebParam(partName = "XMLin") String XMLin,
+        @WebParam(partName = "OptionsIn") String OptionsIn,
+        @WebParam(partName = "CapabilitiesIn") String CapabilitiesIn
+    );
+
     @WebMethod(action = "http://www.witsml.org/action/120/Store.WMLS_GetVersion")
     @RequestWrapper(targetNamespace = "http://www.witsml.org/message/120")
     String getVersion();

@@ -66,6 +66,17 @@ public class StoreImpl implements IStore {
 
 
     @Override
+    public int addToStore(
+        String WMLtypeIn,
+        String XMLin,
+        String OptionsIn,
+        String CapabilitiesIn
+    ) {
+        LOG.info("Executing addToStore");
+        return 1;
+    }
+
+    @Override
     public String getVersion() {
         LOG.info("Executing GetVersion");
         return version;
