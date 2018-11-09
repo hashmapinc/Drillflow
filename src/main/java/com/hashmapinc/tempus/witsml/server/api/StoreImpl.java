@@ -42,7 +42,7 @@ import javax.jws.WebService;
 import java.util.logging.Logger;
 
 @Service
-@WebService(serviceName = "StoreService", portName = "StoreSoapPort",
+@WebService(serviceName = "StoreSoapBinding", portName = "StoreSoapBindingSoap",
         targetNamespace = "http://www.witsml.org/wsdl/120",
         endpointInterface = "com.hashmapinc.tempus.witsml.server.api.IStore")
 public class StoreImpl implements IStore {
