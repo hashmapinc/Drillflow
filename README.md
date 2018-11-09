@@ -52,6 +52,7 @@ By default the service will be available at:
 
 `http://localhost:7070/Service/WMLS`
 
+#### Soap UI
 Execute the following SOAP query to get the version:
 ```xml
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tns="http://www.witsml.org/wsdl/120" xmlns:types="http://www.witsml.org/wsdl/120/encodedTypes" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -72,6 +73,23 @@ By default the server should return the following response:
     </soap:Body>
   </soap:Envelope>
   ```
+
+#### Postman
+
+[Follow the instructions for postman here.](https://www.getpostman.com/docs/v6/postman/sending_api_requests/making_soap_requests)
+
+Use this as the endpoint address: `http://localhost:7070/Service/WMLS?wsdl`
+
+Use the following as the xml body:
+
+```xml
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.witsml.org/wsdl/120">
+  <soapenv:Header/>
+  <soapenv:Body>
+     <ns:getVersion/>
+  </soapenv:Body>
+</soapenv:Envelope>
+```
 
 ### CVE Checking
 

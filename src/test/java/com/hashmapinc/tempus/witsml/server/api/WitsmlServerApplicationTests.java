@@ -37,6 +37,18 @@ public class WitsmlServerApplicationTests {
 	}
 
 	@Test
+	public void addToStore_shouldReturn1() {
+		assertThat(
+			this.witsmlServer.addToStore(
+				"WMLtypeIn",
+				"XMLin",
+				"OptionsIn",
+				"CapabilitiesIn"
+			)
+		).isEqualTo(1);
+	}
+
+	@Test
 	public void getVersionShouldReturnDefaultVersion(){
 		assertThat(this.witsmlServer.getVersion()).contains("1.3.1.1,1.4.1.1");
 	}
