@@ -20,7 +20,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name="WMLS_GetCapResponse)")
+@XmlRootElement(name="WMLS_GetCapResponse")
 public class WMLS_GetCapResponse {
 
     private Short Result;
