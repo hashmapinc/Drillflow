@@ -55,41 +55,30 @@ By default the service will be available at:
 #### Soap UI
 Execute the following SOAP query to get the version:
 ```xml
-<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tns="http://www.witsml.org/wsdl/120" xmlns:types="http://www.witsml.org/wsdl/120/encodedTypes" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-   <soap:Body soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
-     <q1:WMLS_GetVersion xmlns:q1="http://www.witsml.org/message/120" />
-   </soap:Body>
- </soap:Envelope>
+<soapenv:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.witsml.org/message/120">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ns:WMLS_GetVersion soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+   </soapenv:Body>
+</soapenv:Envelope>
 ```
  
 By default the server should return the following response:
  
  ```xml
- <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
     <soap:Body>
-      <ns1:WMLS_GetVersionResponse xmlns:ns1="http://www.witsml.org/wsdl/120">
-        <return xmlns:ns2="http://www.witsml.org/wsdl/120">1.3.1.1,1.4.1.1</return>
-      </ns1:WMLS_GetVersionResponse>
+        <ns1:WMLS_GetVersionResponse xmlns:ns1="http://www.witsml.org/wsdl/120">
+            <return xmlns:ns2="http://www.witsml.org/wsdl/120">1.3.1.1,1.4.1.1</return>
+        </ns1:WMLS_GetVersionResponse>
     </soap:Body>
-  </soap:Envelope>
+</soap:Envelope>
   ```
 
 #### Postman
 
-[Follow the instructions for postman here.](https://www.getpostman.com/docs/v6/postman/sending_api_requests/making_soap_requests)
-
-Use this as the endpoint address: `http://localhost:7070/Service/WMLS?wsdl`
-
-Use the following as the xml body:
-
-```xml
-<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.witsml.org/wsdl/120">
-  <soapenv:Header/>
-  <soapenv:Body>
-     <ns:getVersion/>
-  </soapenv:Body>
-</soapenv:Envelope>
-```
+For Postman, use a POST query to the same URL as stated above with encoding type as `text/xml` and add a header with key `SOAPAction`and the value 
+`http://www.witsml.org/action/120/Store.WMLS_GetVersion`. Then you can use the same query as above.
 
 ### CVE Checking
 
