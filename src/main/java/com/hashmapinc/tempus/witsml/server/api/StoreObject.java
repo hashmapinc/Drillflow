@@ -165,7 +165,8 @@ public class StoreObject {
         } catch (Exception e) {
             //TODO: handle exception
             empty();
-            LOG.warning("Could not parse xml: " + this.rawXML);
+            LOG.warning("Could not parse xml:");
+            e.printStackTrace();
             return true; // true = there was an error
         }
 
