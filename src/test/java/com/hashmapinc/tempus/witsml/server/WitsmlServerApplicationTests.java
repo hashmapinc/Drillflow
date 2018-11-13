@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.tempus.witsml.server.api;
+package com.hashmapinc.tempus.witsml.server;
 
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse;
+import com.hashmapinc.tempus.witsml.server.api.StoreImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
