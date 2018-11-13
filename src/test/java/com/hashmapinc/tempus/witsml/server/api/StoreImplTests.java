@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.tempus.witsml.server;
+package com.hashmapinc.tempus.witsml.server.api;
 
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse;
-import com.hashmapinc.tempus.witsml.server.api.StoreImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class WitsmlServerApplicationTests {
+public class StoreImplTests {
 
 	@Autowired
 	private StoreImpl witsmlServer;
