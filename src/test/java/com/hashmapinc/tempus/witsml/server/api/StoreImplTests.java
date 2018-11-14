@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class WitsmlServerApplicationTests {
+public class StoreImplTests {
 
 	@Autowired
 	private StoreImpl witsmlServer;

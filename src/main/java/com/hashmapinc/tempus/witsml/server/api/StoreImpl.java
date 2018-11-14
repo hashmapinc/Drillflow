@@ -34,6 +34,8 @@ import com.hashmapinc.tempus.witsml.server.WitsmlApiConfig;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetFromStoreResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.ServerCap;
+import com.hashmapinc.tempus.witsml.server.api.StoreObject;
+import com.hashmapinc.tempus.witsml.WitsmlUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -70,11 +72,31 @@ public class StoreImpl implements IStore {
     public int addToStore(
         String WMLtypeIn,
         String XMLin,
-        String OptionsIn,
+        String OptionsIn, 
         String CapabilitiesIn
     ) {
         LOG.info("Executing addToStore");
-        return 1;
+
+        StoreObject so = new StoreObject();
+        
+        // try to deserialize
+        try {
+            String version = WitsmlUtil.getVersionFromXML(XMLin);
+            so.parseInPlace(WMLtypeIn, XMLin, version);
+        } catch (Exception e) {
+            //TODO: handle exception
+            LOG.warning(
+                "could not deserialize witsml object: \n" + 
+                "WMLtypeIn: " + WMLtypeIn + " \n" + 
+                "XMLin: " + XMLin + " \n" + 
+                "OptionsIn: " + OptionsIn + " \n" + 
+                "CapabilitiesIn: " + CapabilitiesIn
+            );
+
+            return 1;
+        }
+
+        return 0;
     }
 
     @Override

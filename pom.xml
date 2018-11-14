@@ -106,6 +106,13 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<!-- used for witsml object ser/de -->
+		<dependency>
+			<groupId>com.hashmapinc.tempus</groupId>
+			<artifactId>WitsmlObjects</artifactId>
+			<version>1.0.13</version>
+		</dependency>
 	</dependencies>
 
 	<build>
