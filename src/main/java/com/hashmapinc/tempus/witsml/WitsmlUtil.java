@@ -44,8 +44,8 @@ public class WitsmlUtil {
          */
         // try to parse the version
         String version = null;
-        Boolean is1311candidate = rawXML.contains("version=\"1.3.1.1\"");
-        Boolean is1411candidate = rawXML.contains("version=\"1.4.1.1\"");
+        boolean is1311candidate = rawXML.contains("version=\"1.3.1.1\"");
+        boolean is1411candidate = rawXML.contains("version=\"1.4.1.1\"");
 
         if (is1311candidate && !is1411candidate) {
             version = "1.3.1.1";

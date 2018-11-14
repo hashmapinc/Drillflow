@@ -75,6 +75,78 @@ public class StoreObject {
     }
 
     /**
+     * this method handles log objects after instance fields are
+     * populated by the parseInPlace function
+     */
+    public void parseLogObject() throws Exception {
+        if (this.version.equals("1.3.1.1")) {
+            this.log1311 = WitsmlMarshal.deserialize(
+                this.rawXML, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLogs.class
+            );
+        } else if (this.version.equals("1.4.1.1")) {
+            this.log1411 = WitsmlMarshal.deserialize(
+                this.rawXML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLogs.class
+            );
+        } else {
+            throw new Exception("unsupported witsml version " + this.version);
+        }
+    }
+
+    /**
+     * this method handles trajectory objects after instance fields are
+     * populated by the parseInPlace function
+     */
+    public void parseTrajectoryObject() throws Exception {
+        if (this.version.equals("1.3.1.1")) {
+            this.trajectory1311 = WitsmlMarshal.deserialize(
+                this.rawXML, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectorys.class
+            );
+        } else if (this.version.equals("1.4.1.1")) {
+            this.trajectory1411 = WitsmlMarshal.deserialize(
+                this.rawXML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys.class
+            );
+        } else {
+            throw new Exception("unsupported witsml version " + this.version);
+        }
+    }
+
+    /**
+     * this method handles well objects after instance fields are
+     * populated by the parseInPlace function
+     */
+    public void parseWellObject() throws Exception {
+        if (this.version.equals("1.3.1.1")) {
+            this.well1311 = WitsmlMarshal.deserialize(
+                this.rawXML, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells.class
+            );
+        } else if (this.version.equals("1.4.1.1")) {
+            this.well1411 = WitsmlMarshal.deserialize(
+                this.rawXML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWells.class
+            );
+        } else {
+            throw new Exception("unsupported witsml version " + this.version);
+        }
+    }
+
+    /**
+     * this method handles wellbore objects after instance fields are
+     * populated by the parseInPlace function
+     */
+    public void parseWellboreObject() throws Exception {
+        if (this.version.equals("1.3.1.1")) {
+            this.wellbore1311 = WitsmlMarshal.deserialize(
+                this.rawXML, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores.class
+            );
+        } else if (this.version.equals("1.4.1.1")) {
+            this.wellbore1411 = WitsmlMarshal.deserialize(
+                this.rawXML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbores.class
+            );
+        } else {
+            throw new Exception("unsupported witsml version " + this.version);
+        }
+    }
+
+    /**
      * this method parses a WitsmlObjects object from the given params
      * and stores it in the corresponding class field.
      * 
@@ -83,14 +155,12 @@ public class StoreObject {
      * @param objectType_ - string, one of "well", "wellbore", "log", or "trajectory"
      * @param rawXML_ - string, contains the raw xml to parse
      * @param version_ - string, one of "1.3.1.1" or "1.4.1.1"
-     * 
-     * @return - boolean indicating error. True = there was an error (this is a C/Golang convention)
      */
-    boolean parseInPlace(
+    public void parseInPlace (
         String objectType_, 
         String rawXML_,
         String version_
-    ) {
+    ) throws Exception {
         // empty this object if it is not empty
         if (!this.isEmpty) {
             empty();
@@ -101,76 +171,24 @@ public class StoreObject {
         this.rawXML = rawXML_;
         this.version = version_;
 
-        // try to parse the object
+        //parse the object
         LOG.info("Parsing witsml object");
-        try {
-            // parse a log object
-            if (objectType_.equals("log")) {
-                if (this.version.equals("1.3.1.1")) {
-                    this.log1311 = WitsmlMarshal.deserialize(
-                        this.rawXML, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLogs.class
-                    );
-                } else if (this.version.equals("1.4.1.1")) {
-                    this.log1411 = WitsmlMarshal.deserialize(
-                        this.rawXML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLogs.class
-                    );
-                } else {
-                    throw new Exception("unsupported witsml version " + this.version);
-                }
-
-            // parse a trajectory object
-            } else if (objectType_.equals("trajectory")) {
-                if (this.version.equals("1.3.1.1")) {
-                    this.trajectory1311 = WitsmlMarshal.deserialize(
-                        this.rawXML, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectorys.class
-                    );
-                } else if (this.version.equals("1.4.1.1")) {
-                    this.trajectory1411 = WitsmlMarshal.deserialize(
-                        this.rawXML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys.class
-                    );
-                } else {
-                    throw new Exception("unsupported witsml version " + this.version);
-                }
-
-            // parse a well object
-            } else if (objectType_.equals("well")) {
-                if (this.version.equals("1.3.1.1")) {
-                    this.well1311 = WitsmlMarshal.deserialize(
-                        this.rawXML, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells.class
-                    );
-                } else if (this.version.equals("1.4.1.1")) {
-                    this.well1411 = WitsmlMarshal.deserialize(
-                        this.rawXML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWells.class
-                    );
-                } else {
-                    throw new Exception("unsupported witsml version " + this.version);
-                }
-
-            // parse a wellbore object
-            } else if (objectType_.equals("wellbore")) {
-                if (this.version.equals("1.3.1.1")) {
-                    this.wellbore1311 = WitsmlMarshal.deserialize(
-                        this.rawXML, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores.class
-                    );
-                } else if (this.version.equals("1.4.1.1")) {
-                    this.wellbore1411 = WitsmlMarshal.deserialize(
-                        this.rawXML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbores.class
-                    );
-                } else {
-                    throw new Exception("unsupported witsml version " + this.version);
-                }
-
-            // handle an unsupported witsml object
-            } else {
-                throw new Exception("unsupported witsml object type: " + this.objectType);
-            }
-        } catch (Exception e) {
-            //TODO: handle exception
-            empty();
-            LOG.warning("Could not parse xml:");
-            e.printStackTrace();
-            return true; // true = there was an error
-        }
+        switch(this.objectType) { 
+            case "log": 
+                parseLogObject();
+                break; 
+            case "trajectory": 
+                parseTrajectoryObject(); 
+                break; 
+            case "well": 
+                parseWellObject();
+                break; 
+            case "wellbore": 
+                parseWellboreObject();
+                break; 
+            default: 
+                throw new Exception("unsupported witsml object type: " + this.objectType); 
+        } 
 
         // parsing was successful.
         LOG.info(
@@ -179,6 +197,5 @@ public class StoreObject {
             " and version " + 
             this.version
         );
-        return false; // false = there was no error
     } 
 }

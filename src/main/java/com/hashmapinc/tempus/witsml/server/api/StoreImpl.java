@@ -81,10 +81,7 @@ public class StoreImpl implements IStore {
         // try to deserialize
         try {
             String version = WitsmlUtil.getVersionFromXML(XMLin);
-            if (so.parseInPlace(WMLtypeIn, XMLin, version)) {
-                // there was an error, throw exception
-                throw new Exception("could not parse object");
-            }
+            so.parseInPlace(WMLtypeIn, XMLin, version);
         } catch (Exception e) {
             //TODO: handle exception
             LOG.warning(

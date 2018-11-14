@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -47,10 +48,12 @@ public class StoreObjectTests {
         // clean the object first
         this.storeObject.empty();
 
-        // assert that the parsing happens without error
-        assertThat(
-            this.storeObject.parseInPlace(objectType, validXML, version)
-        ).isEqualTo(false);
+        // parse the object
+        try {
+            this.storeObject.parseInPlace(objectType, validXML, version);  
+        } catch (Exception e) {
+            fail(e.toString());
+        }
 
         // assert that the storeObject now contains the object
         assertThat(
@@ -67,10 +70,12 @@ public class StoreObjectTests {
         // clean the object first
         this.storeObject.empty();
 
-        // assert that the parsing happens without error
-        assertThat(
-            this.storeObject.parseInPlace(objectType, validXML, version)
-        ).isEqualTo(false);
+        // parse the object
+        try {
+            this.storeObject.parseInPlace(objectType, validXML, version);  
+        } catch (Exception e) {
+            fail(e.toString());
+        }
 
         // assert that the storeObject now contains the object
         assertThat(
@@ -87,10 +92,12 @@ public class StoreObjectTests {
         // clean the object first
         this.storeObject.empty();
 
-        // assert that the parsing happens without error
-        assertThat(
-            this.storeObject.parseInPlace(objectType, validXML, version)
-        ).isEqualTo(false);
+        // parse the object
+        try {
+            this.storeObject.parseInPlace(objectType, validXML, version);  
+        } catch (Exception e) {
+            fail(e.toString());
+        }
 
         // assert that the storeObject now contains the object
         assertThat(
@@ -107,10 +114,12 @@ public class StoreObjectTests {
         // clean the object first
         this.storeObject.empty();
 
-        // assert that the parsing happens without error
-        assertThat(
-            this.storeObject.parseInPlace(objectType, validXML, version)
-        ).isEqualTo(false);
+        // parse the object
+        try {
+            this.storeObject.parseInPlace(objectType, validXML, version);  
+        } catch (Exception e) {
+            fail(e.toString());
+        }
 
         // assert that the storeObject now contains the object
         assertThat(
@@ -127,10 +136,12 @@ public class StoreObjectTests {
         // clean the object first
         this.storeObject.empty();
 
-        // assert that the parsing happens without error
-        assertThat(
-            this.storeObject.parseInPlace(objectType, validXML, version)
-        ).isEqualTo(false);
+        // parse the object
+        try {
+            this.storeObject.parseInPlace(objectType, validXML, version);  
+        } catch (Exception e) {
+            fail(e.toString());
+        }
 
         // assert that the storeObject now contains the object
         assertThat(
@@ -147,10 +158,12 @@ public class StoreObjectTests {
         // clean the object first
         this.storeObject.empty();
 
-        // assert that the parsing happens without error
-        assertThat(
-            this.storeObject.parseInPlace(objectType, validXML, version)
-        ).isEqualTo(false);
+        // parse the object
+        try {
+            this.storeObject.parseInPlace(objectType, validXML, version);  
+        } catch (Exception e) {
+            fail(e.toString());
+        }
 
         // assert that the storeObject now contains the object
         assertThat(
@@ -167,10 +180,12 @@ public class StoreObjectTests {
         // clean the object first
         this.storeObject.empty();
 
-        // assert that the parsing happens without error
-        assertThat(
-            this.storeObject.parseInPlace(objectType, validXML, version)
-        ).isEqualTo(false);
+        // parse the object
+        try {
+            this.storeObject.parseInPlace(objectType, validXML, version);  
+        } catch (Exception e) {
+            fail(e.toString());
+        }
 
         // assert that the storeObject now contains the object
         assertThat(
@@ -187,10 +202,12 @@ public class StoreObjectTests {
         // clean the object first
         this.storeObject.empty();
 
-        // assert that the parsing happens without error
-        assertThat(
-            this.storeObject.parseInPlace(objectType, validXML, version)
-        ).isEqualTo(false);
+        // parse the object
+        try {
+            this.storeObject.parseInPlace(objectType, validXML, version);  
+        } catch (Exception e) {
+            fail(e.toString());
+        }
 
         // assert that the storeObject now contains the object
         assertThat(
