@@ -39,6 +39,86 @@ public class StoreObjectTests {
 	}
 
 	@Test
+	public void parseInPlace_shouldParseValidXML_log1311() throws IOException {
+        String version = "1.3.1.1";
+        String objectType = "log";
+        String validXML = new String(Files.readAllBytes(Paths.get("src/test/resources/log1311.xml")));
+
+        // clean the object first
+        this.storeObject.empty();
+
+        // assert that the parsing happens without error
+        assertThat(
+            this.storeObject.parseInPlace(objectType, validXML, version)
+        ).isEqualTo(false);
+
+        // assert that the storeObject now contains the object
+        assertThat(
+            this.storeObject.log1311
+        ).isNotNull();
+	}
+
+	@Test
+	public void parseInPlace_shouldParseValidXML_log1411() throws IOException {
+        String version = "1.4.1.1";
+        String objectType = "log";
+        String validXML = new String(Files.readAllBytes(Paths.get("src/test/resources/log1411.xml")));
+
+        // clean the object first
+        this.storeObject.empty();
+
+        // assert that the parsing happens without error
+        assertThat(
+            this.storeObject.parseInPlace(objectType, validXML, version)
+        ).isEqualTo(false);
+
+        // assert that the storeObject now contains the object
+        assertThat(
+            this.storeObject.log1411
+        ).isNotNull();
+	}
+
+	@Test
+	public void parseInPlace_shouldParseValidXML_trajectory1311() throws IOException {
+        String version = "1.3.1.1";
+        String objectType = "trajectory";
+        String validXML = new String(Files.readAllBytes(Paths.get("src/test/resources/trajectory1311.xml")));
+
+        // clean the object first
+        this.storeObject.empty();
+
+        // assert that the parsing happens without error
+        assertThat(
+            this.storeObject.parseInPlace(objectType, validXML, version)
+        ).isEqualTo(false);
+
+        // assert that the storeObject now contains the object
+        assertThat(
+            this.storeObject.trajectory1311
+        ).isNotNull();
+	}
+
+	@Test
+	public void parseInPlace_shouldParseValidXML_trajectory1411() throws IOException {
+        String version = "1.4.1.1";
+        String objectType = "trajectory";
+        String validXML = new String(Files.readAllBytes(Paths.get("src/test/resources/trajectory1411.xml")));
+
+        // clean the object first
+        this.storeObject.empty();
+
+        // assert that the parsing happens without error
+        assertThat(
+            this.storeObject.parseInPlace(objectType, validXML, version)
+        ).isEqualTo(false);
+
+        // assert that the storeObject now contains the object
+        assertThat(
+            this.storeObject.trajectory1411
+        ).isNotNull();
+	}
+
+	@Test
 	public void parseInPlace_shouldParseValidXML_well1311() throws IOException {
         String version = "1.3.1.1";
         String objectType = "well";
@@ -54,7 +134,67 @@ public class StoreObjectTests {
 
         // assert that the storeObject now contains the object
         assertThat(
+            this.storeObject.well1311
+        ).isNotNull();
+	}
+
+	@Test
+	public void parseInPlace_shouldParseValidXML_well1411() throws IOException {
+        String version = "1.4.1.1";
+        String objectType = "well";
+        String validXML = new String(Files.readAllBytes(Paths.get("src/test/resources/well1411.xml")));
+
+        // clean the object first
+        this.storeObject.empty();
+
+        // assert that the parsing happens without error
+        assertThat(
             this.storeObject.parseInPlace(objectType, validXML, version)
+        ).isEqualTo(false);
+
+        // assert that the storeObject now contains the object
+        assertThat(
+            this.storeObject.well1411
+        ).isNotNull();
+	}
+
+	@Test
+	public void parseInPlace_shouldParseValidXML_wellbore1311() throws IOException {
+        String version = "1.3.1.1";
+        String objectType = "wellbore";
+        String validXML = new String(Files.readAllBytes(Paths.get("src/test/resources/wellbore1311.xml")));
+
+        // clean the object first
+        this.storeObject.empty();
+
+        // assert that the parsing happens without error
+        assertThat(
+            this.storeObject.parseInPlace(objectType, validXML, version)
+        ).isEqualTo(false);
+
+        // assert that the storeObject now contains the object
+        assertThat(
+            this.storeObject.wellbore1311
+        ).isNotNull();
+	}
+
+	@Test
+	public void parseInPlace_shouldParseValidXML_wellbore1411() throws IOException {
+        String version = "1.4.1.1";
+        String objectType = "wellbore";
+        String validXML = new String(Files.readAllBytes(Paths.get("src/test/resources/wellbore1411.xml")));
+
+        // clean the object first
+        this.storeObject.empty();
+
+        // assert that the parsing happens without error
+        assertThat(
+            this.storeObject.parseInPlace(objectType, validXML, version)
+        ).isEqualTo(false);
+
+        // assert that the storeObject now contains the object
+        assertThat(
+            this.storeObject.wellbore1411
         ).isNotNull();
 	}
 }
