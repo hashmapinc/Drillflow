@@ -39,14 +39,14 @@ public class StoreObject {
     private boolean isEmpty = true; // true if a parsed object is stored
 
     // only 1 of these objects can ever be non-null
-    com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog log1311 = null;
-    com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog log1411 = null;
-    com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory trajectory1311 = null;
-    com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory trajectory1411 = null;
-    com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell well1311 = null;
-    com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell well1411 = null;
-    com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore wellbore1311 = null;
-    com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore wellbore1411 = null;
+    com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLogs log1311 = null;
+    com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLogs log1411 = null;
+    com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectorys trajectory1311 = null;
+    com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys trajectory1411 = null;
+    com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells well1311 = null;
+    com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWells well1411 = null;
+    com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores wellbore1311 = null;
+    com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbores wellbore1411 = null;
     //=========================================================================
 
     public StoreObject() {
@@ -108,11 +108,11 @@ public class StoreObject {
             if (objectType_.equals("log")) {
                 if (this.version.equals("1.3.1.1")) {
                     this.log1311 = WitsmlMarshal.deserialize(
-                        this.rawXML, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog.class
+                        this.rawXML, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLogs.class
                     );
                 } else if (this.version.equals("1.4.1.1")) {
                     this.log1411 = WitsmlMarshal.deserialize(
-                        this.rawXML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog.class
+                        this.rawXML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLogs.class
                     );
                 } else {
                     throw new Exception("unsupported witsml version " + this.version);
@@ -122,11 +122,11 @@ public class StoreObject {
             } else if (objectType_.equals("trajectory")) {
                 if (this.version.equals("1.3.1.1")) {
                     this.trajectory1311 = WitsmlMarshal.deserialize(
-                        this.rawXML, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory.class
+                        this.rawXML, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectorys.class
                     );
                 } else if (this.version.equals("1.4.1.1")) {
                     this.trajectory1411 = WitsmlMarshal.deserialize(
-                        this.rawXML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory.class
+                        this.rawXML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys.class
                     );
                 } else {
                     throw new Exception("unsupported witsml version " + this.version);
@@ -136,11 +136,11 @@ public class StoreObject {
             } else if (objectType_.equals("well")) {
                 if (this.version.equals("1.3.1.1")) {
                     this.well1311 = WitsmlMarshal.deserialize(
-                        this.rawXML, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell.class
+                        this.rawXML, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells.class
                     );
                 } else if (this.version.equals("1.4.1.1")) {
                     this.well1411 = WitsmlMarshal.deserialize(
-                        this.rawXML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell.class
+                        this.rawXML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWells.class
                     );
                 } else {
                     throw new Exception("unsupported witsml version " + this.version);
@@ -150,11 +150,11 @@ public class StoreObject {
             } else if (objectType_.equals("wellbore")) {
                 if (this.version.equals("1.3.1.1")) {
                     this.wellbore1311 = WitsmlMarshal.deserialize(
-                        this.rawXML, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore.class
+                        this.rawXML, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores.class
                     );
                 } else if (this.version.equals("1.4.1.1")) {
                     this.wellbore1411 = WitsmlMarshal.deserialize(
-                        this.rawXML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore.class
+                        this.rawXML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbores.class
                     );
                 } else {
                     throw new Exception("unsupported witsml version " + this.version);
