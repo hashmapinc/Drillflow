@@ -16,6 +16,10 @@ fastPackage:
 run: fastPackage
 	java -jar target/server-0.0.1-SNAPSHOT.jar
 
+# clean
+clean:
+	mvn -q clean
+
 # test
-test:
+test: clean
 	mvn test
