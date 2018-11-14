@@ -16,14 +16,16 @@
 package com.hashmapinc.tempus.witsml.server.api;
 
 import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
-
+import org.springframework.stereotype.Service;
 import java.util.logging.Logger;
+
 
 /** 
  * StoreObject is a wrapper class around the 4 possible store objects
  * supported by Drillflow right now: Well, WellBore, Trajectory, and 
  * Log (depth and time)
  */
+@Service
 public class StoreObject {
     // get logger
     private static final Logger LOG = Logger.getLogger(StoreObject.class.getName());
