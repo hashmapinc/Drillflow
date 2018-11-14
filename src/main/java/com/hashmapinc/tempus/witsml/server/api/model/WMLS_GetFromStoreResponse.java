@@ -20,34 +20,33 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name="WMLS_GetCapResponse")
-public class WMLS_GetCapResponse {
-
+@XmlRootElement(name="WMLS_GetFromStoreResponse)")
+public class WMLS_GetFromStoreResponse {
     private Short Result;
-    private String CapabilitiesOut;
+    private String XMLout;
     private String SuppMsgOut;
-
-    public String getSuppMsgOut() {
-        return SuppMsgOut;
-    }
-
-    public void setSuppMsgOut(String suppMsgOut) {
-        this.SuppMsgOut = suppMsgOut;
-    }
 
     public Short getResult() {
         return Result;
     }
 
     public void setResult(Short result) {
-        this.Result = result;
+        Result = result;
     }
 
-    public String getCapabilitiesOut() {
-        return CapabilitiesOut;
+    public String getXMLout() {
+        return XMLout;
     }
 
-    public void setCapabilitiesOut(String capabilitiesOut) {
-        this.CapabilitiesOut = capabilitiesOut;
+    public void setXMLout(String XMLout) {
+        this.XMLout = XMLout;
+    }
+
+    public String getSuppMsgOut() {
+        return SuppMsgOut;
+    }
+
+    public void setSuppMsgOut(String suppMsgOut) {
+        SuppMsgOut = suppMsgOut;
     }
 }

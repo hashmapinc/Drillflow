@@ -32,6 +32,7 @@ package com.hashmapinc.tempus.witsml.server.api;
 
 import com.hashmapinc.tempus.witsml.server.WitsmlApiConfig;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse;
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetFromStoreResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.ServerCap;
 import com.hashmapinc.tempus.witsml.server.api.StoreObject;
 import com.hashmapinc.tempus.witsml.WitsmlUtil;
@@ -43,7 +44,7 @@ import javax.jws.WebService;
 import java.util.logging.Logger;
 
 @Service
-@WebService(serviceName = "StoreService", portName = "StoreSoapPort",
+@WebService(serviceName = "StoreSoapBinding", portName = "StoreSoapBindingSoap",
         targetNamespace = "http://www.witsml.org/wsdl/120",
         endpointInterface = "com.hashmapinc.tempus.witsml.server.api.IStore")
 public class StoreImpl implements IStore {
@@ -131,4 +132,22 @@ public class StoreImpl implements IStore {
         }
         return errMsg;
     }
+
+    @Override
+    public WMLS_GetFromStoreResponse getFromStore(String WMLtypeIn, String QueryIn, String OptionsIn, String CapabilitiesIn) {
+        LOG.info("Executing GetFromStore");
+        WMLS_GetFromStoreResponse resp = new WMLS_GetFromStoreResponse();
+        resp.setSuppMsgOut("");
+        try {
+            String data = "test";
+            resp.setXMLout(data);
+            resp.setResult((short)1);
+        } catch (Exception e) {
+            resp.setResult((short)-425);
+            LOG.info("Exception in generating GetFromStore response: " + e.getMessage());
+        }
+        return resp;
+    }
+
 }
+
