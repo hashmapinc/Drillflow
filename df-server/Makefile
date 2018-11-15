@@ -14,7 +14,7 @@ fastPackage:
 
 # run
 run: fastPackage
-	java -jar target/server-0.0.1-SNAPSHOT.jar
+	java -jar target/*.jar
 
 # clean
 clean:
