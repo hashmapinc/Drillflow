@@ -19,11 +19,10 @@ import java.util.logging.Logger;
 import java.util.List;
 import java.util.ArrayList;
 
-import org.springframework.stereotype.Service;
-
 import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
+import com.hashmapinc.tempus.witsml.WitsmlException;
 
 /** 
  * WitsmlObjectParser is a class that provides
@@ -49,7 +48,7 @@ public class WitsmlObjectParser {
         List<AbstractWitsmlObject> witsmlObjects = new ArrayList<AbstractWitsmlObject>();
         
         // handle version 1.3.1.1
-        if (version.equals("1.3.1.1")) {
+        if ("1.3.1.1".equals(version)) {
             com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLogs objs = WitsmlMarshal.deserialize(
                 rawXML, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLogs.class
             );
@@ -58,7 +57,7 @@ public class WitsmlObjectParser {
             } 
 
         // handle version 1.4.1.1
-        } else if (version.equals("1.4.1.1")) {
+        } else if ("1.4.1.1".equals(version)) {
             com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLogs objs = WitsmlMarshal.deserialize(
                 rawXML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLogs.class
             );
@@ -67,7 +66,7 @@ public class WitsmlObjectParser {
             } 
 
         } else {
-            throw new Exception("unsupported witsml version " + version);
+            throw new WitsmlException("unsupported witsml version " + version);
         }
 
         // return the objects
@@ -219,7 +218,7 @@ public class WitsmlObjectParser {
             case "wellbore": 
                 return parseWellboreObject(rawXML, version);
             default: 
-                throw new Exception("unsupported witsml object type: " + objectType); 
+                throw new WitsmlException("unsupported witsml object type: " + objectType); 
         }
     } 
 }
