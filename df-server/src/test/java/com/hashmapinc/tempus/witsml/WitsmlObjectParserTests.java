@@ -13,205 +13,179 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.tempus.witsml.server.api;
+package com.hashmapinc.tempus.witsml;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-public class StoreObjectTests {
+import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 
-	@Autowired
-	private StoreObject storeObject;
+
+public class WitsmlObjectParserTests {
 
 	@Test
-	public void contextLoads() {
-		assertThat(storeObject).isNotNull();
-	}
-
-	@Test
-	public void parseInPlace_shouldParseValidXML_log1311() throws IOException {
+	public void parse_shouldParseValidXML_log1311() throws IOException {
         String version = "1.3.1.1";
         String objectType = "log";
         String validXML = new String(Files.readAllBytes(Paths.get("src/test/resources/log1311.xml")));
 
-        // clean the object first
-        this.storeObject.empty();
-
         // parse the object
+        List<AbstractWitsmlObject> parseResults = null;
         try {
-            this.storeObject.parseInPlace(objectType, validXML, version);  
+            parseResults = WitsmlObjectParser.parse(objectType, validXML, version);  
         } catch (Exception e) {
             fail(e.toString());
         }
 
-        // assert that the storeObject now contains the object
+        // assert that the object is not null
         assertThat(
-            this.storeObject.log1311
+            parseResults
         ).isNotNull();
 	}
 
 	@Test
-	public void parseInPlace_shouldParseValidXML_log1411() throws IOException {
+	public void parse_shouldParseValidXML_log1411() throws IOException {
         String version = "1.4.1.1";
         String objectType = "log";
         String validXML = new String(Files.readAllBytes(Paths.get("src/test/resources/log1411.xml")));
 
-        // clean the object first
-        this.storeObject.empty();
-
         // parse the object
+        List<AbstractWitsmlObject> parseResults = null;
         try {
-            this.storeObject.parseInPlace(objectType, validXML, version);  
+            parseResults = WitsmlObjectParser.parse(objectType, validXML, version);  
         } catch (Exception e) {
             fail(e.toString());
         }
 
-        // assert that the storeObject now contains the object
+        // assert that the object is not null
         assertThat(
-            this.storeObject.log1411
+            parseResults
         ).isNotNull();
 	}
 
 	@Test
-	public void parseInPlace_shouldParseValidXML_trajectory1311() throws IOException {
+	public void parse_shouldParseValidXML_trajectory1311() throws IOException {
         String version = "1.3.1.1";
         String objectType = "trajectory";
         String validXML = new String(Files.readAllBytes(Paths.get("src/test/resources/trajectory1311.xml")));
 
-        // clean the object first
-        this.storeObject.empty();
-
         // parse the object
+        List<AbstractWitsmlObject> parseResults = null;
         try {
-            this.storeObject.parseInPlace(objectType, validXML, version);  
+            parseResults = WitsmlObjectParser.parse(objectType, validXML, version);  
         } catch (Exception e) {
             fail(e.toString());
         }
 
-        // assert that the storeObject now contains the object
+        // assert that the object is not null
         assertThat(
-            this.storeObject.trajectory1311
+            parseResults
         ).isNotNull();
 	}
 
 	@Test
-	public void parseInPlace_shouldParseValidXML_trajectory1411() throws IOException {
+	public void parse_shouldParseValidXML_trajectory1411() throws IOException {
         String version = "1.4.1.1";
         String objectType = "trajectory";
         String validXML = new String(Files.readAllBytes(Paths.get("src/test/resources/trajectory1411.xml")));
 
-        // clean the object first
-        this.storeObject.empty();
-
         // parse the object
+        List<AbstractWitsmlObject> parseResults = null;
         try {
-            this.storeObject.parseInPlace(objectType, validXML, version);  
+            parseResults = WitsmlObjectParser.parse(objectType, validXML, version);  
         } catch (Exception e) {
             fail(e.toString());
         }
 
-        // assert that the storeObject now contains the object
+        // assert that the object is not null
         assertThat(
-            this.storeObject.trajectory1411
+            parseResults
         ).isNotNull();
 	}
 
 	@Test
-	public void parseInPlace_shouldParseValidXML_well1311() throws IOException {
+	public void parse_shouldParseValidXML_well1311() throws IOException {
         String version = "1.3.1.1";
         String objectType = "well";
         String validXML = new String(Files.readAllBytes(Paths.get("src/test/resources/well1311.xml")));
 
-        // clean the object first
-        this.storeObject.empty();
-
         // parse the object
+        List<AbstractWitsmlObject> parseResults = null;
         try {
-            this.storeObject.parseInPlace(objectType, validXML, version);  
+            parseResults = WitsmlObjectParser.parse(objectType, validXML, version);  
         } catch (Exception e) {
             fail(e.toString());
         }
 
-        // assert that the storeObject now contains the object
+        // assert that the object is not null
         assertThat(
-            this.storeObject.well1311
+            parseResults
         ).isNotNull();
 	}
 
 	@Test
-	public void parseInPlace_shouldParseValidXML_well1411() throws IOException {
+	public void parse_shouldParseValidXML_well1411() throws IOException {
         String version = "1.4.1.1";
         String objectType = "well";
         String validXML = new String(Files.readAllBytes(Paths.get("src/test/resources/well1411.xml")));
 
-        // clean the object first
-        this.storeObject.empty();
-
         // parse the object
+        List<AbstractWitsmlObject> parseResults = null;
         try {
-            this.storeObject.parseInPlace(objectType, validXML, version);  
+            parseResults = WitsmlObjectParser.parse(objectType, validXML, version);  
         } catch (Exception e) {
             fail(e.toString());
         }
 
-        // assert that the storeObject now contains the object
+        // assert that the object is not null
         assertThat(
-            this.storeObject.well1411
+            parseResults
         ).isNotNull();
 	}
 
 	@Test
-	public void parseInPlace_shouldParseValidXML_wellbore1311() throws IOException {
+	public void parse_shouldParseValidXML_wellbore1311() throws IOException {
         String version = "1.3.1.1";
         String objectType = "wellbore";
         String validXML = new String(Files.readAllBytes(Paths.get("src/test/resources/wellbore1311.xml")));
 
-        // clean the object first
-        this.storeObject.empty();
-
         // parse the object
+        List<AbstractWitsmlObject> parseResults = null;
         try {
-            this.storeObject.parseInPlace(objectType, validXML, version);  
+            parseResults = WitsmlObjectParser.parse(objectType, validXML, version);  
         } catch (Exception e) {
             fail(e.toString());
         }
 
-        // assert that the storeObject now contains the object
+        // assert that the object is not null
         assertThat(
-            this.storeObject.wellbore1311
+            parseResults
         ).isNotNull();
 	}
 
 	@Test
-	public void parseInPlace_shouldParseValidXML_wellbore1411() throws IOException {
+	public void parse_shouldParseValidXML_wellbore1411() throws IOException {
         String version = "1.4.1.1";
         String objectType = "wellbore";
         String validXML = new String(Files.readAllBytes(Paths.get("src/test/resources/wellbore1411.xml")));
 
-        // clean the object first
-        this.storeObject.empty();
-
         // parse the object
+        List<AbstractWitsmlObject> parseResults = null;
         try {
-            this.storeObject.parseInPlace(objectType, validXML, version);  
+            parseResults = WitsmlObjectParser.parse(objectType, validXML, version);  
         } catch (Exception e) {
             fail(e.toString());
         }
 
-        // assert that the storeObject now contains the object
+        // assert that the object is not null
         assertThat(
-            this.storeObject.wellbore1411
+            parseResults
         ).isNotNull();
 	}
 }

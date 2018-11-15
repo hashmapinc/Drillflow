@@ -34,13 +34,16 @@ import com.hashmapinc.tempus.witsml.server.WitsmlApiConfig;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetFromStoreResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.ServerCap;
+import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.WitsmlUtil;
+import com.hashmapinc.tempus.witsml.WitsmlObjectParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.jws.WebService;
 import java.util.logging.Logger;
+import java.util.List;
 
 @Service
 @WebService(serviceName = "StoreSoapBinding", portName = "StoreSoapBindingSoap",
@@ -75,13 +78,12 @@ public class StoreImpl implements IStore {
         String CapabilitiesIn
     ) {
         LOG.info("Executing addToStore");
-
-        StoreObject so = new StoreObject();
         
         // try to deserialize
+        List<AbstractWitsmlObject> parsedObjects = null;
         try {
             String version = WitsmlUtil.getVersionFromXML(XMLin);
-            so.parseInPlace(WMLtypeIn, XMLin, version);
+            parsedObjects = WitsmlObjectParser.parse(WMLtypeIn, XMLin, version);
         } catch (Exception e) {
             //TODO: handle exception
             LOG.warning(
