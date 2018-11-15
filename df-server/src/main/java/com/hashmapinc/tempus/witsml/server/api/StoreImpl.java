@@ -80,7 +80,7 @@ public class StoreImpl implements IStore {
         LOG.info("Executing addToStore");
         
         // try to deserialize
-        List<AbstractWitsmlObject> parsedObjects = null;
+        List<AbstractWitsmlObject> parsedObjects;
         try {
             String version = WitsmlUtil.getVersionFromXML(XMLin);
             parsedObjects = WitsmlObjectParser.parse(WMLtypeIn, XMLin, version);
@@ -96,6 +96,8 @@ public class StoreImpl implements IStore {
 
             return 1;
         }
+
+        LOG.info("Successfully parsed object: " + parsedObjects.toString());
 
         return 0;
     }
