@@ -15,7 +15,10 @@
  */
 package com.hashmapinc.tempus.witsml;
 
+import java.util.HashMap;
+import java.util.Arrays;
 import java.util.logging.Logger;
+
 
 /** 
  * StoreObject is a wrapper class around the 4 possible store objects
@@ -60,5 +63,27 @@ public class WitsmlUtil {
         // successfully parsed version. Return here
         LOG.info("version parsed from raw xml is " + version);
         return version;
+    }
+
+    /**
+     * this method parses a witsml optionsIn string into a String->String map
+     * 
+     * @param optionsIn - String with witsml optionsIn - see witsml spec for format
+     * 
+     * @return map - Map<String, String> containing Key-values parsed from options in
+     */
+    public static HashMap<String,String> parseOptionsIn(
+        String optionsIn
+    ) throws Exception {
+        LOG.info("trying to parse optionsIn...");
+
+        //parse the string
+        HashMap<String, String> map = new HashMap<>();
+        Arrays.stream(optionsIn.split(";")).forEach(optionString -> {
+            String[] option = optionString.split("=");
+            map.put(option[0], option[1]);
+        });
+
+        return map;
     }
 }
