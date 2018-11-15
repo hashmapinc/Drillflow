@@ -115,6 +115,46 @@ public class WitsmlObjectParser {
     }
 
     /**
+     * this method parses well objects
+     * 
+     * @param rawXML - string value with the raw xml to parse
+     * @param version - string value with witsml version of rawXML: 1.3.1.1 or 1.4.1.1
+     * 
+     * @return witsmlObjects - list of AbstractWitsmlObjects parsed from rawXml
+     */
+    public static List<AbstractWitsmlObject> parseWellObject(
+        String rawXML,
+        String version
+    ) throws Exception {
+        List<AbstractWitsmlObject> witsmlObjects = new ArrayList<AbstractWitsmlObject>();
+        
+        // handle version 1.3.1.1
+        if (version.equals("1.3.1.1")) {
+            com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells objs = WitsmlMarshal.deserialize(
+                rawXML, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells.class
+            );
+            for (com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell obj : objs.getWell()) {
+                witsmlObjects.add(obj);
+            } 
+
+        // handle version 1.4.1.1
+        } else if (version.equals("1.4.1.1")) {
+            com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWells objs = WitsmlMarshal.deserialize(
+                rawXML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWells.class
+            );
+            for (com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell obj : objs.getWell()) {
+                witsmlObjects.add(obj);
+            } 
+
+        } else {
+            throw new Exception("unsupported witsml version " + version);
+        }
+
+        // return the objects
+        return witsmlObjects;
+    }
+
+    /**
      * this method parses AbstractWitsmlObjects object from the given 
      * params and returns them as a list.
      * 
@@ -134,6 +174,8 @@ public class WitsmlObjectParser {
                 return parseLogObject(rawXML, version);
             case "trajectory": 
                 return parseTrajectoryObject(rawXML, version);
+            case "well": 
+                return parseWellObject(rawXML, version);
             default: 
                 throw new Exception("unsupported witsml object type: " + objectType); 
         }
