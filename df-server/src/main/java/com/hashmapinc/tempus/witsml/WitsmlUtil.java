@@ -21,9 +21,7 @@ import java.util.logging.Logger;
 
 
 /** 
- * StoreObject is a wrapper class around the 4 possible store objects
- * supported by Drillflow right now: Well, WellBore, Trajectory, and 
- * Log (depth and time)
+ * General static util methods for witsml stuff
  */
 public class WitsmlUtil {
     // get logger
