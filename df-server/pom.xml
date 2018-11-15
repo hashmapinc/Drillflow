@@ -120,7 +120,7 @@
         <dependency>
             <groupId>com.hashmapinc.tempus</groupId>
             <artifactId>WitsmlObjects</artifactId>
-            <version>1.0.13</version>
+            <version>1.1.1</version>
         </dependency>
     </dependencies>
 
