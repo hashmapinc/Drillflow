@@ -128,7 +128,7 @@ public class WitsmlObjectParser {
         List<AbstractWitsmlObject> witsmlObjects = new ArrayList<AbstractWitsmlObject>();
         
         // handle version 1.3.1.1
-        if (version.equals("1.3.1.1")) {
+        if ("1.3.1.1".equals(version)) {
             com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells objs = WitsmlMarshal.deserialize(
                 rawXML, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells.class
             );
@@ -137,7 +137,7 @@ public class WitsmlObjectParser {
             } 
 
         // handle version 1.4.1.1
-        } else if (version.equals("1.4.1.1")) {
+        } else if ("1.4.1.1".equals(version)) {
             com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWells objs = WitsmlMarshal.deserialize(
                 rawXML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWells.class
             );
@@ -168,7 +168,7 @@ public class WitsmlObjectParser {
         List<AbstractWitsmlObject> witsmlObjects = new ArrayList<AbstractWitsmlObject>();
         
         // handle version 1.3.1.1
-        if (version.equals("1.3.1.1")) {
+        if ("1.3.1.1".equals(version)) {
             com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores objs = WitsmlMarshal.deserialize(
                 rawXML, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores.class
             );
@@ -177,7 +177,7 @@ public class WitsmlObjectParser {
             } 
 
         // handle version 1.4.1.1
-        } else if (version.equals("1.4.1.1")) {
+        } else if ("1.4.1.1".equals(version)) {
             com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbores objs = WitsmlMarshal.deserialize(
                 rawXML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbores.class
             );
