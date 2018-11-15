@@ -72,7 +72,7 @@ public class WitsmlUtil {
      */
     public static HashMap<String,String> parseOptionsIn(
         String optionsIn
-    ) throws Exception {
+    ) {
         LOG.info("trying to parse optionsIn...");
 
         //parse the string
