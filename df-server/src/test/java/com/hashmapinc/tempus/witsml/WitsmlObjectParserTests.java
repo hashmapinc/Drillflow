@@ -38,7 +38,10 @@ public class WitsmlObjectParserTests {
         // parse the object
         List<AbstractWitsmlObject> parseResults = null;
         try {
-            parseResults = WitsmlObjectParser.parse(objectType, validXML, version);  
+            parseResults = WitsmlObjectParser.parse(objectType, validXML, version);
+            for (AbstractWitsmlObject parseResult: parseResults) {
+                assertThat(parseResult.getObjectType().toLowerCase()).isEqualTo(objectType);
+            }  
         } catch (Exception e) {
             fail(e.toString());
         }
@@ -58,7 +61,10 @@ public class WitsmlObjectParserTests {
         // parse the object
         List<AbstractWitsmlObject> parseResults = null;
         try {
-            parseResults = WitsmlObjectParser.parse(objectType, validXML, version);  
+            parseResults = WitsmlObjectParser.parse(objectType, validXML, version); 
+            for (AbstractWitsmlObject parseResult: parseResults) {
+                assertThat(parseResult.getObjectType().toLowerCase()).isEqualTo(objectType);
+            } 
         } catch (Exception e) {
             fail(e.toString());
         }
@@ -78,7 +84,10 @@ public class WitsmlObjectParserTests {
         // parse the object
         List<AbstractWitsmlObject> parseResults = null;
         try {
-            parseResults = WitsmlObjectParser.parse(objectType, validXML, version);  
+            parseResults = WitsmlObjectParser.parse(objectType, validXML, version);
+            for (AbstractWitsmlObject parseResult: parseResults) {
+                assertThat(parseResult.getObjectType().toLowerCase()).isEqualTo(objectType);
+            }  
         } catch (Exception e) {
             fail(e.toString());
         }
@@ -99,6 +108,9 @@ public class WitsmlObjectParserTests {
         List<AbstractWitsmlObject> parseResults = null;
         try {
             parseResults = WitsmlObjectParser.parse(objectType, validXML, version);  
+            for (AbstractWitsmlObject parseResult: parseResults) {
+                assertThat(parseResult.getObjectType().toLowerCase()).isEqualTo(objectType);
+            }
         } catch (Exception e) {
             fail(e.toString());
         }
@@ -118,7 +130,10 @@ public class WitsmlObjectParserTests {
         // parse the object
         List<AbstractWitsmlObject> parseResults = null;
         try {
-            parseResults = WitsmlObjectParser.parse(objectType, validXML, version);  
+            parseResults = WitsmlObjectParser.parse(objectType, validXML, version); 
+            for (AbstractWitsmlObject parseResult: parseResults) {
+                assertThat(parseResult.getObjectType().toLowerCase()).isEqualTo(objectType);
+            } 
         } catch (Exception e) {
             fail(e.toString());
         }
@@ -138,7 +153,10 @@ public class WitsmlObjectParserTests {
         // parse the object
         List<AbstractWitsmlObject> parseResults = null;
         try {
-            parseResults = WitsmlObjectParser.parse(objectType, validXML, version);  
+            parseResults = WitsmlObjectParser.parse(objectType, validXML, version);
+            for (AbstractWitsmlObject parseResult: parseResults) {
+                assertThat(parseResult.getObjectType().toLowerCase()).isEqualTo(objectType);
+            }  
         } catch (Exception e) {
             fail(e.toString());
         }
@@ -158,7 +176,10 @@ public class WitsmlObjectParserTests {
         // parse the object
         List<AbstractWitsmlObject> parseResults = null;
         try {
-            parseResults = WitsmlObjectParser.parse(objectType, validXML, version);  
+            parseResults = WitsmlObjectParser.parse(objectType, validXML, version); 
+            for (AbstractWitsmlObject parseResult: parseResults) {
+                assertThat(parseResult.getObjectType().toLowerCase()).isEqualTo(objectType);
+            } 
         } catch (Exception e) {
             fail(e.toString());
         }
@@ -179,6 +200,9 @@ public class WitsmlObjectParserTests {
         List<AbstractWitsmlObject> parseResults = null;
         try {
             parseResults = WitsmlObjectParser.parse(objectType, validXML, version);  
+            for (AbstractWitsmlObject parseResult: parseResults) {
+                assertThat(parseResult.getObjectType().toLowerCase()).isEqualTo(objectType);
+            }
         } catch (Exception e) {
             fail(e.toString());
         }
