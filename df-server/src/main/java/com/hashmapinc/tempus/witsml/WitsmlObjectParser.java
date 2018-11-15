@@ -155,6 +155,46 @@ public class WitsmlObjectParser {
     }
 
     /**
+     * this method parses wellbore objects
+     * 
+     * @param rawXML - string value with the raw xml to parse
+     * @param version - string value with witsml version of rawXML: 1.3.1.1 or 1.4.1.1
+     * 
+     * @return witsmlObjects - list of AbstractWitsmlObjects parsed from rawXml
+     */
+    public static List<AbstractWitsmlObject> parseWellboreObject(
+        String rawXML,
+        String version
+    ) throws Exception {
+        List<AbstractWitsmlObject> witsmlObjects = new ArrayList<AbstractWitsmlObject>();
+        
+        // handle version 1.3.1.1
+        if (version.equals("1.3.1.1")) {
+            com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores objs = WitsmlMarshal.deserialize(
+                rawXML, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores.class
+            );
+            for (com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore obj : objs.getWellbore()) {
+                witsmlObjects.add(obj);
+            } 
+
+        // handle version 1.4.1.1
+        } else if (version.equals("1.4.1.1")) {
+            com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbores objs = WitsmlMarshal.deserialize(
+                rawXML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbores.class
+            );
+            for (com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore obj : objs.getWellbore()) {
+                witsmlObjects.add(obj);
+            } 
+
+        } else {
+            throw new Exception("unsupported witsml version " + version);
+        }
+
+        // return the objects
+        return witsmlObjects;
+    }
+
+    /**
      * this method parses AbstractWitsmlObjects object from the given 
      * params and returns them as a list.
      * 
@@ -176,6 +216,8 @@ public class WitsmlObjectParser {
                 return parseTrajectoryObject(rawXML, version);
             case "well": 
                 return parseWellObject(rawXML, version);
+            case "wellbore": 
+                return parseWellboreObject(rawXML, version);
             default: 
                 throw new Exception("unsupported witsml object type: " + objectType); 
         }
