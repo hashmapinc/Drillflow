@@ -38,18 +38,21 @@
 
     <parent>
         <groupId>com.hashmapinc.tempus.witsml</groupId>
-        <artifactId>df-valve</artifactId>
+        <artifactId>df-auth</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>dot-valve</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>factory</artifactId>
+    <packaging>jar</packaging>
 
-    <name>DrillOps Town Valve</name>
+    <name>Drillflow Auth Factory</name>
     <url>https://hashmapinc.com</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <main.dir>${basedir}/../..</main.dir>
     </properties>
+
+    <dependencies>
+    </dependencies>
 </project>

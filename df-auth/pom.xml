@@ -55,5 +55,6 @@
 
     <modules>
         <module>dot-auth</module>
+        <module>factory</module>
     </modules>
 </project>

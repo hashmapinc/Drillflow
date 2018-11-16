@@ -15,6 +15,9 @@
  */
 package com.hashmapinc.tempus.witsml.valve.mock;
 
+import java.util.Map;
+
+import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.valve.AbstractValve;
 import com.hashmapinc.tempus.witsml.valve.AbstractDelegator;
 import com.hashmapinc.tempus.witsml.valve.AbstractTranslator;
@@ -27,7 +30,7 @@ public class MockValve extends AbstractValve {
     AbstractDelegator delegator;
     AbstractTranslator translator;
 
-    public DotValve() {
+    public MockValve() {
         this.delegator = new MockDelegator();
         this.translator = new MockTranslator();
     }
@@ -37,7 +40,7 @@ public class MockValve extends AbstractValve {
      * Retrieve the name of the valve
      * @return The name of the valve
      */
-    @override
+    @Override
     public String getName() {
         return this.NAME;
     }
@@ -46,7 +49,7 @@ public class MockValve extends AbstractValve {
      * Retrieve the description of the valve
      * @return The description of the valve
      */
-    @override
+    @Override
     public String getDescription() {
         return this.DESCRIPTION;
     }
@@ -57,7 +60,7 @@ public class MockValve extends AbstractValve {
      * @param options The options that were received as part of the query
      * @return The resultant object from the query
      */
-    @override
+    @Override
     public AbstractWitsmlObject getObject(AbstractWitsmlObject query, Map<String, String> options) {
         return null;
     }
@@ -67,7 +70,7 @@ public class MockValve extends AbstractValve {
      * @param query POJO representing the object that was received
      * @return the UID of the newly created object
      */
-    @override
+    @Override
     public String createObject(AbstractWitsmlObject query) {
         return null;
     }
@@ -76,17 +79,15 @@ public class MockValve extends AbstractValve {
      * Deletes an object
      * @param query POJO representing the object that was received
      */
-    @override
+    @Override
     public void deleteObject(AbstractWitsmlObject query) {
-        return null;
     }
 
     /**
      * Updates an already existing object
      * @param query POJO representing the object that was received
      */
-    @override
+    @Override
     public void updateObject(AbstractWitsmlObject query) {
-        return null;
     }
 }
