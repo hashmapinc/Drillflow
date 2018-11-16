@@ -18,12 +18,14 @@ package com.hashmapinc.tempus.witsml.valve;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.valve.AbstractTranslator;
 import com.hashmapinc.tempus.witsml.valve.AbstractDelegator;
+import com.hashmapinc.tempus.witsml.valve.AbstractAuth;
 
 import java.util.Map;
 
 public abstract class AbstractValve {
-    AbstractDelegator delegator;
-    AbstractTranslator translator;
+    private AbstractDelegator delegator;
+    private AbstractTranslator translator;
+    private AbstractAuth auth;
     
     /**
      * Retrieve the name of the valve

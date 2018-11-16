@@ -21,18 +21,22 @@ import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.valve.AbstractValve;
 import com.hashmapinc.tempus.witsml.valve.AbstractDelegator;
 import com.hashmapinc.tempus.witsml.valve.AbstractTranslator;
+import com.hashmapinc.tempus.witsml.valve.AbstractAuth;
 import com.hashmapinc.tempus.witsml.valve.dot.DotDelegator;
 import com.hashmapinc.tempus.witsml.valve.dot.DotTranslator;
+import com.hashmapinc.tempus.witsml.valve.dot.DotAuth;
 
 public class DotValve extends AbstractValve {
     final String NAME = "DoT"; // DoT = Drillops Town
     final String DESCRIPTION = "Valve for interaction with Drillops Town"; // DoT = Drillops Town
     AbstractDelegator delegator;
     AbstractTranslator translator;
+    AbstractAuth auth;
 
     public DotValve() {
         this.delegator = new DotDelegator();
         this.translator = new DotTranslator();
+        this.auth = new DotAuth();
     }
 
     /**

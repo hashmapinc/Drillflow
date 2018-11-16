@@ -13,23 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.tempus.witsml.auth;
+package com.hashmapinc.tempus.witsml.valve.dot;
 
-import com.hashmapinc.tempus.witsml.auth.AbstractAuth;
+import com.hashmapinc.tempus.witsml.valve.AbstractAuth;
 
-public class AuthFactory {
-    /**
-     * creates an auth object based on the authType requested
-     * 
-     * @param authType - String name of the auth implementation to use
-     * 
-     */
-    public static AbstractAuth buildValve(String valveType) {
-        switch (valveType) {
-            case "DoT":
-                return new com.hashmapinc.tempus.witsml.auth.dot.DotAuth();
-            default:
-                return null;
-        }
-    }
+public class DotAuth extends AbstractAuth {
 }

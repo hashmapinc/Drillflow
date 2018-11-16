@@ -21,18 +21,22 @@ import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.valve.AbstractValve;
 import com.hashmapinc.tempus.witsml.valve.AbstractDelegator;
 import com.hashmapinc.tempus.witsml.valve.AbstractTranslator;
+import com.hashmapinc.tempus.witsml.valve.AbstractAuth;
 import com.hashmapinc.tempus.witsml.valve.mock.MockDelegator;
 import com.hashmapinc.tempus.witsml.valve.mock.MockTranslator;
+import com.hashmapinc.tempus.witsml.valve.mock.MockAuth;
 
 public class MockValve extends AbstractValve {
     final String NAME = "Mock";
     final String DESCRIPTION = "Mock valve for unit testing things that interact with valves";
     AbstractDelegator delegator;
     AbstractTranslator translator;
+    AbstractAuth auth;
 
     public MockValve() {
         this.delegator = new MockDelegator();
         this.translator = new MockTranslator();
+        this.auth = new MockAuth();
     }
 
 

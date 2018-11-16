@@ -13,18 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.tempus.witsml.auth;
+package com.hashmapinc.tempus.witsml.valve;
 
 public abstract class AbstractAuth {
-    /**
-     * Retrieve the name of the valve
-     * @return The name of the valve
-     */
-    public abstract String getName();
-
-    /**
-     * Retrieve the name of the valve
-     * @return The name of the valve
-     */
-    public abstract String getDescription();
 }
