@@ -43,7 +43,7 @@
     </parent>
 
     <artifactId>factory</artifactId>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
 
     <name>DrillFlow Valve Factory</name>
     <url>https://hashmapinc.com</url>
