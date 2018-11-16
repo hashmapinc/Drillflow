@@ -16,11 +16,14 @@
 package com.hashmapinc.tempus.witsml.valve;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.witsml.valve.AbstractTranslator;
+import com.hashmapinc.tempus.witsml.valve.AbstractDelegator;
 
 import java.util.Map;
 
 public abstract class AbstractValve {
-
+    AbstractDelegator delegator;
+    AbstractTranslator translator;
     /**
      * Retrieve the name of the valve
      * @return The name of the valve
