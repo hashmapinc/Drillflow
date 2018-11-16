@@ -43,7 +43,7 @@
     </parent>
 
     <artifactId>df-auth</artifactId>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
 
     <name>DrillFlow Authentication Module</name>
     <url>https://hashmapinc.com</url>
@@ -53,8 +53,6 @@
         <main.dir>${basedir}/..</main.dir>
     </properties>
 
-    <modules>
-        <module>dot-auth</module>
-        <module>factory</module>
-    </modules>
+    <dependencies>
+    </dependencies>
 </project>

@@ -31,7 +31,7 @@ public class DotAuth extends AbstractAuth {
      * Retrieve the name of the auth
      * @return The name of the auth
      */
-    @override
+    @Override
     public String getName() {
         return this.NAME;
     }
@@ -40,7 +40,7 @@ public class DotAuth extends AbstractAuth {
      * Retrieve the description of the auth
      * @return The description of the auth
      */
-    @override
+    @Override
     public String getDescription() {
         return this.DESCRIPTION;
     }
