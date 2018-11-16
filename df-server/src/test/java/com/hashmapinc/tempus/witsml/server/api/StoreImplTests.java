@@ -49,6 +49,22 @@ public class StoreImplTests {
 	}
 
 	@Test
+	public void getFromStore_shouldGetMultipleWells() {
+	}
+
+	@Test
+	public void getFromStore_shouldGetSingleWell() {
+	}
+
+	@Test
+	public void getFromStore_shouldHandleGarbageInput() {
+	}
+
+	@Test
+	public void getFromStore_shouldHandleEmptyRequest() {
+	}
+
+	@Test
 	public void getVersionShouldReturnDefaultVersion(){
 		assertThat(this.witsmlServer.getVersion()).contains("1.3.1.1,1.4.1.1");
 	}

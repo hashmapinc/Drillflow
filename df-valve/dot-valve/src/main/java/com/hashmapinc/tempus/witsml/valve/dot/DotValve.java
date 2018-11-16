@@ -13,29 +13,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.tempus.witsml.valve;
+package com.hashmapinc.tempus.witsml.valve.dot;
 
-import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
-import com.hashmapinc.tempus.witsml.valve.AbstractTranslator;
+import com.hashmapinc.tempus.witsml.valve.AbstractValve;
 import com.hashmapinc.tempus.witsml.valve.AbstractDelegator;
+import com.hashmapinc.tempus.witsml.valve.AbstractTranslator;
+import com.hashmapinc.tempus.witsml.valve.dot.DotDelegator;
+import com.hashmapinc.tempus.witsml.valve.dot.DotTranslator;
 
-import java.util.Map;
-
-public abstract class AbstractValve {
+public class DotValve extends AbstractValve {
+    final String NAME = "DoT"; // DoT = Drillops Town
+    final String DESCRIPTION = "Valve for interaction with Drillops Town"; // DoT = Drillops Town
     AbstractDelegator delegator;
     AbstractTranslator translator;
-    
+
+    public DotValve() {
+        this.delegator = new DotDelegator();
+        this.translator = new DotTranslator();
+    }
+
+
     /**
      * Retrieve the name of the valve
      * @return The name of the valve
      */
-    public abstract String getName();
+    @override
+    public String getName() {
+        return this.NAME;
+    }
 
     /**
      * Retrieve the description of the valve
      * @return The description of the valve
      */
-    public abstract String getDescription();
+    @override
+    public String getDescription() {
+        return this.DESCRIPTION;
+    }
 
     /**
      * Gets the object based on the query from the WITSML STORE API
@@ -43,24 +57,36 @@ public abstract class AbstractValve {
      * @param options The options that were received as part of the query
      * @return The resultant object from the query
      */
-    public abstract AbstractWitsmlObject getObject(AbstractWitsmlObject query, Map<String, String> options);
+    @override
+    public AbstractWitsmlObject getObject(AbstractWitsmlObject query, Map<String, String> options) {
+        return null;
+    }
 
     /**
      * Creates an object
      * @param query POJO representing the object that was received
      * @return the UID of the newly created object
      */
-    public abstract String createObject(AbstractWitsmlObject query);
+    @override
+    public String createObject(AbstractWitsmlObject query) {
+        return null;
+    }
 
     /**
      * Deletes an object
      * @param query POJO representing the object that was received
      */
-    public abstract void deleteObject(AbstractWitsmlObject query);
+    @override
+    public void deleteObject(AbstractWitsmlObject query) {
+        return null;
+    }
 
     /**
      * Updates an already existing object
      * @param query POJO representing the object that was received
      */
-    public abstract void updateObject(AbstractWitsmlObject query);
+    @override
+    public void updateObject(AbstractWitsmlObject query) {
+        return null;
+    }
 }

@@ -13,18 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.tempus.witsml.valve;
+package com.hashmapinc.tempus.witsml.valve.dot;
 
-public class ValveFactory {
+import com.hashmapinc.tempus.witsml.valve.AbstractTranslator;
 
-    public static AbstractValve buildValve(String valveType) {
-        switch (valveType) {
-            case "Mock":
-                return new com.hashmapinc.tempus.witsml.valve.mock.MockValve();
-            case "DoT":
-                return new com.hashmapinc.tempus.witsml.valve.dot.DotValve();
-            default:
-                return null;
-        }
-    }
+public class DotTranslator extends AbstractTranslator {
+    
 }
