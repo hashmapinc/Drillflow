@@ -18,23 +18,13 @@ package com.hashmapinc.tempus.witsml.valve;
 public class ValveFactory {
 
     public static AbstractValve buildValve(String valveType) {
-
-        AbstractValve valve = null;
-
         switch (valveType) {
-            case "DrillTest":
-
-                break;
-
+            case "Mock":
+                return new com.hashmapinc.tempus.witsml.valve.mock.MockValve();
             case "DoT":
-
-                break;
-
+                return new com.hashmapinc.tempus.witsml.valve.dot.DotValve();
             default:
-
-                break;
+                return null;
         }
-
-        return valve;
     }
 }
