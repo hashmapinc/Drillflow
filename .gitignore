@@ -33,4 +33,5 @@ docs/build/
 .factorypath
 .project
 .settings
+.vscode
 **/.DS_Store
