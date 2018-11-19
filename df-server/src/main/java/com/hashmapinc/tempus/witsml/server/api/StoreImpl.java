@@ -137,7 +137,12 @@ public class StoreImpl implements IStore {
     }
 
     @Override
-    public WMLS_GetFromStoreResponse getFromStore(String WMLtypeIn, String QueryIn, String OptionsIn, String CapabilitiesIn) {
+    public WMLS_GetFromStoreResponse getFromStore(
+        String WMLtypeIn, 
+        String QueryIn, 
+        String OptionsIn, 
+        String CapabilitiesIn
+    ) {
         LOG.info("Executing GetFromStore");
         WMLS_GetFromStoreResponse resp = new WMLS_GetFromStoreResponse();
         resp.setSuppMsgOut("");
