@@ -16,12 +16,15 @@
 package com.hashmapinc.tempus.witsml.server.api;
 
 import com.hashmapinc.tempus.witsml.server.WitsmlApiConfig;
+import com.hashmapinc.tempus.witsml.server.api.QueryContext;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetFromStoreResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.ServerCap;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.WitsmlUtil;
 import com.hashmapinc.tempus.witsml.WitsmlObjectParser;
+import com.hashmapinc.tempus.witsml.valve.AbstractValve;
+import com.hashmapinc.tempus.witsml.valve.ValveFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -130,14 +133,27 @@ public class StoreImpl implements IStore {
     ) {
         LOG.info("Executing GetFromStore");
         WMLS_GetFromStoreResponse resp = new WMLS_GetFromStoreResponse();
-        resp.setSuppMsgOut("");
+
         try {
-            String data = "test";
-            resp.setXMLout(data);
+            // construct query context
+            String clientVersion = WitsmlUtil.getVersionFromXML(QueryIn);
+            QueryContext qc = new QueryContext(
+                clientVersion,
+                WMLtypeIn,
+                OptionsIn,
+                QueryIn
+            );
+
+            // execute query
+            AbstractValve valve = ValveFactory.buildValve("DoT"); //TODO: don't hard code this, don't access locally (need a class field for this)
+
+            // populate response
+            resp.setSuppMsgOut("");
             resp.setResult((short)1);
+            resp.setXMLout("");
         } catch (Exception e) {
             resp.setResult((short)-425);
-            LOG.info("Exception in generating GetFromStore response: " + e.getMessage());
+            LOG.warning("Exception in generating GetFromStore response: " + e.getMessage());
         }
         return resp;
     }

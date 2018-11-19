@@ -45,7 +45,7 @@ public class QueryContext {
         // instantiate values
         this.CLIENT_VERSION = clientVersion;
         this.OBJECT_TYPE = objectType;
-        this.OPTIONS_IN = WitsmlUtil.parseOptionsIn(optionsIn);
+        this.OPTIONS_IN = WitsmlUtil.parseOptionsIn(optionsIn); // parse this in the constructor to ensure it is immutable
         this.QUERY_XML = queryXML; 
     }
 }

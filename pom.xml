@@ -129,8 +129,8 @@
 	</build>
 
 	<modules>
-        <module>df-server</module>
         <module>df-valve</module>
+        <module>df-server</module>
 	</modules>
 
     <repositories>
