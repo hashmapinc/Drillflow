@@ -16,7 +16,7 @@
 package com.hashmapinc.tempus.witsml.server.api;
 
 import com.hashmapinc.tempus.witsml.server.WitsmlApiConfig;
-import com.hashmapinc.tempus.witsml.server.api.QueryContext;
+import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetFromStoreResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.ServerCap;
@@ -25,6 +25,7 @@ import com.hashmapinc.tempus.witsml.WitsmlUtil;
 import com.hashmapinc.tempus.witsml.WitsmlObjectParser;
 import com.hashmapinc.tempus.witsml.valve.AbstractValve;
 import com.hashmapinc.tempus.witsml.valve.ValveFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,7 @@ import org.springframework.stereotype.Service;
 import javax.jws.WebService;
 import java.util.logging.Logger;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @WebService(serviceName = "StoreSoapBinding", portName = "StoreSoapBindingSoap",
@@ -137,15 +139,16 @@ public class StoreImpl implements IStore {
         try {
             // construct query context
             String clientVersion = WitsmlUtil.getVersionFromXML(QueryIn);
+            Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
             QueryContext qc = new QueryContext(
                 clientVersion,
                 WMLtypeIn,
-                OptionsIn,
+                optionsMap,
                 QueryIn
             );
 
             // execute query
-            AbstractValve valve = ValveFactory.buildValve("DoT"); //TODO: don't hard code this, don't access locally (need a class field for this)
+            AbstractValve valve = ValveFactory.buildValve("DoT"); // TODO: don't hard code this, don't access locally (need a class field for this)
 
             // populate response
             resp.setSuppMsgOut("");

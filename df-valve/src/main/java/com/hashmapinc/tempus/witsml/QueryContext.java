@@ -13,11 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.tempus.witsml.server.api;
+package com.hashmapinc.tempus.witsml;
 
 import java.util.Map;
-
-import com.hashmapinc.tempus.witsml.WitsmlUtil;
 
 /**
  * QueryContext is used to hold the state of an individual query
@@ -33,19 +31,19 @@ public class QueryContext {
      * 
      * @param clientVersion - the WITSML version used by the client that sent the query
      * @param objectType - the type of WITSML object being queried for
-     * @param optionsIn - String holding the options in for the query per the WITSML 1.3/1.4 specs
+     * @param optionsIn - MAP of options_in key/value pairs
      * @param queryXML - String holding the raw xml query sent from the client
      */
     public QueryContext(
         String clientVersion,
         String objectType,
-        String optionsIn,
+        Map<String, String> optionsIn,
         String queryXML
     ) {
         // instantiate values
         this.CLIENT_VERSION = clientVersion;
         this.OBJECT_TYPE = objectType;
-        this.OPTIONS_IN = WitsmlUtil.parseOptionsIn(optionsIn); // parse this in the constructor to ensure it is immutable
+        this.OPTIONS_IN = optionsIn;
         this.QUERY_XML = queryXML; 
     }
 }
