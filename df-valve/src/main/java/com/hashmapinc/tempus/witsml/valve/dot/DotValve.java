@@ -13,31 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.tempus.witsml.valve.mock;
+package com.hashmapinc.tempus.witsml.valve.dot;
 
+import java.util.Map;
+
+import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.valve.AbstractValve;
 import com.hashmapinc.tempus.witsml.valve.AbstractDelegator;
 import com.hashmapinc.tempus.witsml.valve.AbstractTranslator;
-import com.hashmapinc.tempus.witsml.valve.mock.MockDelegator;
-import com.hashmapinc.tempus.witsml.valve.mock.MockTranslator;
+import com.hashmapinc.tempus.witsml.valve.AbstractAuth;
+import com.hashmapinc.tempus.witsml.valve.dot.DotDelegator;
+import com.hashmapinc.tempus.witsml.valve.dot.DotTranslator;
+import com.hashmapinc.tempus.witsml.valve.dot.DotAuth;
 
-public class MockValve extends AbstractValve {
-    final String NAME = "Mock";
-    final String DESCRIPTION = "Mock valve for unit testing things that interact with valves";
+public class DotValve extends AbstractValve {
+    final String NAME = "DoT"; // DoT = Drillops Town
+    final String DESCRIPTION = "Valve for interaction with Drillops Town"; // DoT = Drillops Town
     AbstractDelegator delegator;
     AbstractTranslator translator;
+    AbstractAuth auth;
 
     public DotValve() {
-        this.delegator = new MockDelegator();
-        this.translator = new MockTranslator();
+        this.delegator = new DotDelegator();
+        this.translator = new DotTranslator();
+        this.auth = new DotAuth();
     }
-
 
     /**
      * Retrieve the name of the valve
      * @return The name of the valve
      */
-    @override
+    @Override
     public String getName() {
         return this.NAME;
     }
@@ -46,7 +52,7 @@ public class MockValve extends AbstractValve {
      * Retrieve the description of the valve
      * @return The description of the valve
      */
-    @override
+    @Override
     public String getDescription() {
         return this.DESCRIPTION;
     }
@@ -57,7 +63,7 @@ public class MockValve extends AbstractValve {
      * @param options The options that were received as part of the query
      * @return The resultant object from the query
      */
-    @override
+    @Override
     public AbstractWitsmlObject getObject(AbstractWitsmlObject query, Map<String, String> options) {
         return null;
     }
@@ -67,7 +73,7 @@ public class MockValve extends AbstractValve {
      * @param query POJO representing the object that was received
      * @return the UID of the newly created object
      */
-    @override
+    @Override
     public String createObject(AbstractWitsmlObject query) {
         return null;
     }
@@ -76,17 +82,15 @@ public class MockValve extends AbstractValve {
      * Deletes an object
      * @param query POJO representing the object that was received
      */
-    @override
+    @Override
     public void deleteObject(AbstractWitsmlObject query) {
-        return null;
     }
 
     /**
      * Updates an already existing object
      * @param query POJO representing the object that was received
      */
-    @override
+    @Override
     public void updateObject(AbstractWitsmlObject query) {
-        return null;
     }
 }

@@ -129,7 +129,6 @@
 	</build>
 
 	<modules>
-		<module>df-auth</module>
         <module>df-server</module>
         <module>df-valve</module>
 	</modules>
@@ -171,6 +170,4 @@
             </snapshots>
         </pluginRepository>
     </pluginRepositories>
-
-
 </project>
