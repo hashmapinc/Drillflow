@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.tempus.witsml.valve;
+package com.hashmapinc.tempus.witsml.valve.dot;
 
-public class ObjectValve {
+import com.hashmapinc.tempus.witsml.valve.AbstractAuth;
 
+public class DotAuth extends AbstractAuth {
 }

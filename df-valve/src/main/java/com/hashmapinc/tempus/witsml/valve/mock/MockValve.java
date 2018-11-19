@@ -13,29 +13,50 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.tempus.witsml.valve;
-
-import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
-import com.hashmapinc.tempus.witsml.valve.AbstractTranslator;
-import com.hashmapinc.tempus.witsml.valve.AbstractDelegator;
+package com.hashmapinc.tempus.witsml.valve.mock;
 
 import java.util.Map;
 
-public abstract class AbstractValve {
+import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.witsml.valve.AbstractValve;
+import com.hashmapinc.tempus.witsml.valve.AbstractDelegator;
+import com.hashmapinc.tempus.witsml.valve.AbstractTranslator;
+import com.hashmapinc.tempus.witsml.valve.AbstractAuth;
+import com.hashmapinc.tempus.witsml.valve.mock.MockDelegator;
+import com.hashmapinc.tempus.witsml.valve.mock.MockTranslator;
+import com.hashmapinc.tempus.witsml.valve.mock.MockAuth;
+
+public class MockValve extends AbstractValve {
+    final String NAME = "Mock";
+    final String DESCRIPTION = "Mock valve for unit testing things that interact with valves";
     AbstractDelegator delegator;
     AbstractTranslator translator;
-    
+    AbstractAuth auth;
+
+    public MockValve() {
+        this.delegator = new MockDelegator();
+        this.translator = new MockTranslator();
+        this.auth = new MockAuth();
+    }
+
+
     /**
      * Retrieve the name of the valve
      * @return The name of the valve
      */
-    public abstract String getName();
+    @Override
+    public String getName() {
+        return this.NAME;
+    }
 
     /**
      * Retrieve the description of the valve
      * @return The description of the valve
      */
-    public abstract String getDescription();
+    @Override
+    public String getDescription() {
+        return this.DESCRIPTION;
+    }
 
     /**
      * Gets the object based on the query from the WITSML STORE API
@@ -43,24 +64,34 @@ public abstract class AbstractValve {
      * @param options The options that were received as part of the query
      * @return The resultant object from the query
      */
-    public abstract AbstractWitsmlObject getObject(AbstractWitsmlObject query, Map<String, String> options);
+    @Override
+    public AbstractWitsmlObject getObject(AbstractWitsmlObject query, Map<String, String> options) {
+        return null;
+    }
 
     /**
      * Creates an object
      * @param query POJO representing the object that was received
      * @return the UID of the newly created object
      */
-    public abstract String createObject(AbstractWitsmlObject query);
+    @Override
+    public String createObject(AbstractWitsmlObject query) {
+        return null;
+    }
 
     /**
      * Deletes an object
      * @param query POJO representing the object that was received
      */
-    public abstract void deleteObject(AbstractWitsmlObject query);
+    @Override
+    public void deleteObject(AbstractWitsmlObject query) {
+    }
 
     /**
      * Updates an already existing object
      * @param query POJO representing the object that was received
      */
-    public abstract void updateObject(AbstractWitsmlObject query);
+    @Override
+    public void updateObject(AbstractWitsmlObject query) {
+    }
 }
