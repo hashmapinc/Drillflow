@@ -19,6 +19,7 @@ import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.valve.AbstractTranslator;
 import com.hashmapinc.tempus.witsml.valve.AbstractDelegator;
 import com.hashmapinc.tempus.witsml.valve.AbstractAuth;
+import com.hashmapinc.tempus.witsml.QueryContext;
 
 import java.util.Map;
 
@@ -41,11 +42,10 @@ public abstract class AbstractValve {
 
     /**
      * Gets the object based on the query from the WITSML STORE API
-     * @param query POJO representing the query that was received
-     * @param options The options that were received as part of the query
+     * @param qc - QueryContext needed to execute the getObject querying
      * @return The resultant object from the query
      */
-    public abstract AbstractWitsmlObject getObject(AbstractWitsmlObject query, Map<String, String> options);
+    public abstract AbstractWitsmlObject getObject(QueryContext qc);
 
     /**
      * Creates an object
