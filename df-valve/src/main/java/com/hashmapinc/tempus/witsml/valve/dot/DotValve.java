@@ -18,6 +18,7 @@ package com.hashmapinc.tempus.witsml.valve.dot;
 import java.util.Map;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.valve.AbstractValve;
 import com.hashmapinc.tempus.witsml.valve.AbstractDelegator;
 import com.hashmapinc.tempus.witsml.valve.AbstractTranslator;
@@ -59,12 +60,12 @@ public class DotValve extends AbstractValve {
 
     /**
      * Gets the object based on the query from the WITSML STORE API
-     * @param query POJO representing the query that was received
-     * @param options The options that were received as part of the query
+     * 
+     * @param qc - QueryContext needed to execute the getObject querying
      * @return The resultant object from the query
      */
     @Override
-    public AbstractWitsmlObject getObject(AbstractWitsmlObject query, Map<String, String> options) {
+    public AbstractWitsmlObject getObject(QueryContext qc) {
         return null;
     }
 

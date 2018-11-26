@@ -13,30 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
-  Copyright © 2018-2018 Hashmap, Inc
-
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
- */
 package com.hashmapinc.tempus.witsml.server.api;
 
 import com.hashmapinc.tempus.witsml.server.WitsmlApiConfig;
+import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetFromStoreResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.ServerCap;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.WitsmlUtil;
 import com.hashmapinc.tempus.witsml.WitsmlObjectParser;
+import com.hashmapinc.tempus.witsml.valve.AbstractValve;
+import com.hashmapinc.tempus.witsml.valve.ValveFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -44,6 +33,7 @@ import org.springframework.stereotype.Service;
 import javax.jws.WebService;
 import java.util.logging.Logger;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @WebService(serviceName = "StoreSoapBinding", portName = "StoreSoapBindingSoap",
@@ -137,17 +127,36 @@ public class StoreImpl implements IStore {
     }
 
     @Override
-    public WMLS_GetFromStoreResponse getFromStore(String WMLtypeIn, String QueryIn, String OptionsIn, String CapabilitiesIn) {
+    public WMLS_GetFromStoreResponse getFromStore(
+        String WMLtypeIn, 
+        String QueryIn, 
+        String OptionsIn, 
+        String CapabilitiesIn
+    ) {
         LOG.info("Executing GetFromStore");
         WMLS_GetFromStoreResponse resp = new WMLS_GetFromStoreResponse();
-        resp.setSuppMsgOut("");
+
         try {
-            String data = "test";
-            resp.setXMLout(data);
+            // construct query context
+            String clientVersion = WitsmlUtil.getVersionFromXML(QueryIn);
+            Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
+            QueryContext qc = new QueryContext(
+                clientVersion,
+                WMLtypeIn,
+                optionsMap,
+                QueryIn
+            );
+
+            // execute query
+            AbstractValve valve = ValveFactory.buildValve("DoT"); // TODO: don't hard code this, don't access locally (need a class field for this)
+
+            // populate response
+            resp.setSuppMsgOut("");
             resp.setResult((short)1);
+            resp.setXMLout("");
         } catch (Exception e) {
             resp.setResult((short)-425);
-            LOG.info("Exception in generating GetFromStore response: " + e.getMessage());
+            LOG.warning("Exception in generating GetFromStore response: " + e.getMessage());
         }
         return resp;
     }
