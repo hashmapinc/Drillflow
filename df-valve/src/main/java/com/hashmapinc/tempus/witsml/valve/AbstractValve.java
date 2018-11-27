@@ -43,9 +43,9 @@ public abstract class AbstractValve {
     /**
      * Gets the object based on the query from the WITSML STORE API
      * @param qc - QueryContext needed to execute the getObject querying
-     * @return The resultant object from the query
+     * @return The resultant object from the query in XML string format
      */
-    public abstract AbstractWitsmlObject getObject(QueryContext qc);
+    public abstract String getObject(QueryContext qc);
 
     /**
      * Creates an object

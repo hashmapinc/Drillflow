@@ -62,11 +62,21 @@ public class DotValve extends AbstractValve {
      * Gets the object based on the query from the WITSML STORE API
      * 
      * @param qc - QueryContext needed to execute the getObject querying
-     * @return The resultant object from the query
+     * @return The resultant object from the query in xml string format
      */
     @Override
-    public AbstractWitsmlObject getObject(QueryContext qc) {
-        return null;
+    public String getObject(QueryContext qc) {
+        // call the translator to get the proper 1.4.1.1 JSON
+        JSON queryJSON = this.translator.getQueryJSON(qc);
+        qc.setQueryJSON(queryJSON);
+
+        // query for data
+        JSON populatedJSON = this.delegator.getPopulatedJSON(qc);
+        qc.setPopulatedJSON(populatedJSON);
+
+        // translate the results to proper WITSML version xml string
+        String resultXML = this.translator.getResultXML(qc);
+        return resultXML;
     }
 
     /**

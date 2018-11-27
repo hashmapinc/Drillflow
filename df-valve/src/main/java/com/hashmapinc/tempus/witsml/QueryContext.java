@@ -27,6 +27,10 @@ public class QueryContext {
     public final Map<String, String> OPTIONS_IN; // MAP of options_in key/value pairs
     public final String QUERY_XML; // the raw WITSML xml query sent from the client
 
+    // initial json object
+    public JSON queryJSON; // first parsing of input query XML
+    public JSON populatedJSON; // data-filled query JSON
+
     /**
      * 
      * @param clientVersion - the WITSML version used by the client that sent the query
@@ -37,7 +41,7 @@ public class QueryContext {
     public QueryContext(
         String clientVersion,
         String objectType,
-        Map<String, String> optionsIn,
+        Map<String, String> optionsIn, 
         String queryXML
     ) {
         // instantiate values
