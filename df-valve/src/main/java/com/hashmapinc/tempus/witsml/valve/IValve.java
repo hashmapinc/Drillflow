@@ -42,10 +42,10 @@ public interface IValve {
 
     /**
      * Creates an object
-     * @param query POJO representing the object that was received
+     * @param witsmlObject POJO representing the object that was received
      * @return the UID of the newly created object
      */
-    public String createObject(AbstractWitsmlObject query);
+    public String createObject(AbstractWitsmlObject witsmlObject);
 
     /**
      * Deletes an object

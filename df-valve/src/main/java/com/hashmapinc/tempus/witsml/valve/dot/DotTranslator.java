@@ -15,6 +15,8 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
+
 public class DotTranslator {
-    
 }
