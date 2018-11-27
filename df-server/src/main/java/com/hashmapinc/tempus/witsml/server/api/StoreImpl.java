@@ -136,18 +136,35 @@ public class StoreImpl implements IStore {
         LOG.info("Executing GetFromStore");
         WMLS_GetFromStoreResponse resp = new WMLS_GetFromStoreResponse();
 
+        // try to deserialize
+        List<AbstractWitsmlObject> witsmlObjects;
+        String clientVersion;
+        try {
+            clientVersion = WitsmlUtil.getVersionFromXML(QueryIn);
+            witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, QueryIn, clientVersion);
+        } catch (Exception e) {
+            // TODO: handle exception
+            LOG.warning("could not deserialize witsml object: \n" + 
+                        "WMLtypeIn: " + WMLtypeIn + " \n" + 
+                        "QueryIn: " + QueryIn + " \n" + 
+                        "OptionsIn: " + OptionsIn + " \n" + 
+                        "CapabilitiesIn: " + CapabilitiesIn
+            );
+            return resp; // TODO: proper error handling should go here
+        }
+
         try {
             // construct query context
-            String clientVersion = WitsmlUtil.getVersionFromXML(QueryIn);
             Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
             QueryContext qc = new QueryContext(
                 clientVersion,
                 WMLtypeIn,
                 optionsMap,
-                QueryIn
+                QueryIn,
+                witsmlObjects
             );
 
-            // execute query
+            // get valve
             IValve valve = ValveFactory.buildValve("DoT"); // TODO: don't hard code this, don't access locally (need a class field for this)
 
             // populate response

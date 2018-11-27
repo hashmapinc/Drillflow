@@ -68,18 +68,13 @@ public class DotValve implements IValve {
 
     /**
      * Creates an object
-     * @param witsmlObject POJO representing the object that was received
+     * 
+     * @param qc - QueryContext with the data needed to create an object
      * @return the UID of the newly created object
      */
     @Override
     public String createObject(QueryContext qc) {
-        // get object type
-        String objectType = witsmlObject.getObjectType().toLowerCase();
-
-        // handle a well
-        if ("well".equals(objectType)) {
-            
-        }
+        return null;
     }
 
     /**
