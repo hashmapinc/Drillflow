@@ -67,11 +67,11 @@ public class DotValve extends AbstractValve {
     @Override
     public String getObject(QueryContext qc) {
         // call the translator to get the proper 1.4.1.1 JSON
-        JSON queryJSON = this.translator.getQueryJSON(qc);
+        JSON queryJSON = this.translator.getQueryJSON(qc); // THIS ACCEPTS BOTH 1.3.1.1 AND 1.4.1.1
         qc.setQueryJSON(queryJSON);
 
         // query for data
-        JSON populatedJSON = this.delegator.getPopulatedJSON(qc);
+        JSON populatedJSON = this.delegator.getPopulatedJSON(qc); // BLOCKED UNTIL DRILLTEST IMPLEMENTS THIS API
         qc.setPopulatedJSON(populatedJSON);
 
         // translate the results to proper WITSML version xml string
