@@ -28,16 +28,6 @@ public class ValveFactoryTest
     @Autowired
     private ValveFactory valveFactory;
     @Test
-    public void buildValveTestWithParameterMock(){
-    	
-    	@SuppressWarnings("static-access")
-		Object testObject=valveFactory.buildValve("Mock");
-    	assertThat(
-    			testObject
-            ).isNotNull();
-    	
-    }
-    @Test
     public void buildValveTestWithParameterDoT(){
     	
     	@SuppressWarnings("static-access")
