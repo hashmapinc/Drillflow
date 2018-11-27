@@ -69,15 +69,28 @@ public class StoreImpl implements IStore {
     ) {
         LOG.info("Executing addToStore");
         
-        // try to deserialize
-        List<AbstractWitsmlObject> parsedObjects;
+        // try to add to store
+        List<AbstractWitsmlObject> witsmlObjects;
         try {
             String version = WitsmlUtil.getVersionFromXML(XMLin);
-            parsedObjects = WitsmlObjectParser.parse(WMLtypeIn, XMLin, version);
+            witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, XMLin, version);
+            QueryContext qc = new QueryContext(
+                version,
+                WMLtypeIn,
+                null,
+                XMLin,
+                witsmlObjects
+            );
+
+            // get valve
+            IValve valve = ValveFactory.buildValve("DoT"); // TODO: don't hard code this, don't access locally (need a class field for this)
+
+            String uid = valve.createObject(qc);
+
         } catch (Exception e) {
             //TODO: handle exception
             LOG.warning(
-                "could not deserialize witsml object: \n" + 
+                "could not add witsml object to store: \n" + 
                 "WMLtypeIn: " + WMLtypeIn + " \n" + 
                 "XMLin: " + XMLin + " \n" + 
                 "OptionsIn: " + OptionsIn + " \n" + 
@@ -87,7 +100,7 @@ public class StoreImpl implements IStore {
             return 1;
         }
 
-        LOG.info("Successfully parsed object: " + parsedObjects.toString());
+        LOG.info("Successfully parsed object: " + witsmlObjects.toString());
 
         return 0;
     }
@@ -153,6 +166,7 @@ public class StoreImpl implements IStore {
             return resp; // TODO: proper error handling should go here
         }
 
+        // try to query
         try {
             // construct query context
             Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
