@@ -140,20 +140,15 @@ public class StoreImpl implements IStore {
             // construct query context
             String clientVersion = WitsmlUtil.getVersionFromXML(QueryIn);
             Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
-            List<AbstractWitsmlObject> parsedObjects = WitsmlObjectParser.parse(WMLtypeIn, XMLin, version);
             QueryContext qc = new QueryContext(
                 clientVersion,
                 WMLtypeIn,
                 optionsMap,
-                QueryIn,
-                parsedObjects
+                QueryIn
             );
 
             // execute query
             IValve valve = ValveFactory.buildValve("DoT"); // TODO: don't hard code this, don't access locally (need a class field for this)
-
-            // get query results
-            String responseXML = valve.getFromStore(qc);
 
             // populate response
             resp.setSuppMsgOut("");

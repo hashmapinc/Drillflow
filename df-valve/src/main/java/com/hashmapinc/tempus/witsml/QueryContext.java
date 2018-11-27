@@ -26,11 +26,7 @@ public class QueryContext {
     public final String OBJECT_TYPE; // the type of WITSML object being queried for
     public final Map<String, String> OPTIONS_IN; // MAP of options_in key/value pairs
     public final String QUERY_XML; // the raw WITSML xml query sent from the client
-
-    // initial json object
-    public JSON queryJSON; // first parsing of input query XML
-    public JSON populatedJSON; // data-filled query JSON
-
+    
     /**
      * 
      * @param clientVersion - the WITSML version used by the client that sent the query
