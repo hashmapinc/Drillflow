@@ -15,7 +15,5 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
-import com.hashmapinc.tempus.witsml.valve.AbstractAuth;
-
-public class DotAuth extends AbstractAuth {
+public class DotAuth {
 }

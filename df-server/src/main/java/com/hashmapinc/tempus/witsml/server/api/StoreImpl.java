@@ -23,7 +23,7 @@ import com.hashmapinc.tempus.witsml.server.api.model.cap.ServerCap;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.WitsmlUtil;
 import com.hashmapinc.tempus.witsml.WitsmlObjectParser;
-import com.hashmapinc.tempus.witsml.valve.AbstractValve;
+import com.hashmapinc.tempus.witsml.valve.IValve;
 import com.hashmapinc.tempus.witsml.valve.ValveFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -150,7 +150,7 @@ public class StoreImpl implements IStore {
             );
 
             // execute query
-            AbstractValve valve = ValveFactory.buildValve("DoT"); // TODO: don't hard code this, don't access locally (need a class field for this)
+            IValve valve = ValveFactory.buildValve("DoT"); // TODO: don't hard code this, don't access locally (need a class field for this)
 
             // get query results
             String responseXML = valve.getFromStore(qc);

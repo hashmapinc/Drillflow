@@ -19,20 +19,17 @@ import java.util.Map;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.QueryContext;
-import com.hashmapinc.tempus.witsml.valve.AbstractValve;
-import com.hashmapinc.tempus.witsml.valve.AbstractDelegator;
-import com.hashmapinc.tempus.witsml.valve.AbstractTranslator;
-import com.hashmapinc.tempus.witsml.valve.AbstractAuth;
+import com.hashmapinc.tempus.witsml.valve.IValve;
 import com.hashmapinc.tempus.witsml.valve.dot.DotDelegator;
 import com.hashmapinc.tempus.witsml.valve.dot.DotTranslator;
 import com.hashmapinc.tempus.witsml.valve.dot.DotAuth;
 
-public class DotValve extends AbstractValve {
+public class DotValve implements IValve {
     final String NAME = "DoT"; // DoT = Drillops Town
     final String DESCRIPTION = "Valve for interaction with Drillops Town"; // DoT = Drillops Town
-    AbstractDelegator delegator;
-    AbstractTranslator translator;
-    AbstractAuth auth;
+    DotDelegator delegator;
+    DotTranslator translator;
+    DotAuth auth;
 
     public DotValve() {
         this.delegator = new DotDelegator();

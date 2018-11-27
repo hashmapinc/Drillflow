@@ -16,53 +16,46 @@
 package com.hashmapinc.tempus.witsml.valve;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
-import com.hashmapinc.tempus.witsml.valve.AbstractTranslator;
-import com.hashmapinc.tempus.witsml.valve.AbstractDelegator;
-import com.hashmapinc.tempus.witsml.valve.AbstractAuth;
 import com.hashmapinc.tempus.witsml.QueryContext;
 
 import java.util.Map;
 
-public abstract class AbstractValve {
-    private AbstractDelegator delegator;
-    private AbstractTranslator translator;
-    private AbstractAuth auth;
-    
+public interface IValve {
     /**
      * Retrieve the name of the valve
      * @return The name of the valve
      */
-    public abstract String getName();
+    public String getName();
 
     /**
      * Retrieve the description of the valve
      * @return The description of the valve
      */
-    public abstract String getDescription();
+    public String getDescription();
 
     /**
      * Gets the object based on the query from the WITSML STORE API
      * @param qc - QueryContext needed to execute the getObject querying
      * @return The resultant object from the query in XML string format
      */
-    public abstract String getObject(QueryContext qc);
+    public String getObject(QueryContext qc);
 
     /**
      * Creates an object
      * @param query POJO representing the object that was received
      * @return the UID of the newly created object
      */
-    public abstract String createObject(AbstractWitsmlObject query);
+    public String createObject(AbstractWitsmlObject query);
 
     /**
      * Deletes an object
      * @param query POJO representing the object that was received
      */
-    public abstract void deleteObject(AbstractWitsmlObject query);
+    public void deleteObject(AbstractWitsmlObject query);
 
     /**
      * Updates an already existing object
      * @param query POJO representing the object that was received
      */
-    public abstract void updateObject(AbstractWitsmlObject query);
+    public void updateObject(AbstractWitsmlObject query);
 }
