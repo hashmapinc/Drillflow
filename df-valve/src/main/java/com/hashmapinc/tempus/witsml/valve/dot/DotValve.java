@@ -16,6 +16,7 @@
 package com.hashmapinc.tempus.witsml.valve.dot;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.QueryContext;
@@ -25,6 +26,7 @@ import com.hashmapinc.tempus.witsml.valve.dot.DotTranslator;
 import com.hashmapinc.tempus.witsml.valve.dot.DotAuth;
 
 public class DotValve implements IValve {
+    private static final Logger LOG = Logger.getLogger(DotValve.class.getName());
     final String NAME = "DoT"; // DoT = Drillops Town
     final String DESCRIPTION = "Valve for interaction with Drillops Town"; // DoT = Drillops Town
     DotDelegator delegator;
@@ -74,6 +76,10 @@ public class DotValve implements IValve {
      */
     @Override
     public String createObject(QueryContext qc) {
+        // get a 1.4.1.1 json string
+        String objectJSON = this.translator.get1411JSONString(qc);
+
+        // get object UID and call PUT to create the object
         return null;
     }
 
