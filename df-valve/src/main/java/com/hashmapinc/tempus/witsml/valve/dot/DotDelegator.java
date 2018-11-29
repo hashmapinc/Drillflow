@@ -15,8 +15,6 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
-import com.hashmapinc.tempus.witsml.valve.AbstractDelegator;
-
-public class DotDelegator extends AbstractDelegator {
+public class DotDelegator {
     
 }

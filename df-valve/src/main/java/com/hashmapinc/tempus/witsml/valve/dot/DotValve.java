@@ -15,29 +15,22 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
-import java.util.Map;
-
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.QueryContext;
-import com.hashmapinc.tempus.witsml.valve.AbstractValve;
-import com.hashmapinc.tempus.witsml.valve.AbstractDelegator;
-import com.hashmapinc.tempus.witsml.valve.AbstractTranslator;
-import com.hashmapinc.tempus.witsml.valve.AbstractAuth;
-import com.hashmapinc.tempus.witsml.valve.dot.DotDelegator;
-import com.hashmapinc.tempus.witsml.valve.dot.DotTranslator;
-import com.hashmapinc.tempus.witsml.valve.dot.DotAuth;
+import com.hashmapinc.tempus.witsml.valve.IValve;
 
-public class DotValve extends AbstractValve {
+public class DotValve implements IValve {
     final String NAME = "DoT"; // DoT = Drillops Town
     final String DESCRIPTION = "Valve for interaction with Drillops Town"; // DoT = Drillops Town
-    AbstractDelegator delegator;
-    AbstractTranslator translator;
-    AbstractAuth auth;
+    DotDelegator delegator;
+    DotTranslator translator;
+    DotAuth auth;
 
     public DotValve() {
         this.delegator = new DotDelegator();
         this.translator = new DotTranslator();
-        this.auth = new DotAuth();
+        //please provide the authentication API here.
+        this.auth = new DotAuth("http://witsml-qa.hashmapinc.com:8080/");
     }
 
     /**
@@ -62,20 +55,21 @@ public class DotValve extends AbstractValve {
      * Gets the object based on the query from the WITSML STORE API
      * 
      * @param qc - QueryContext needed to execute the getObject querying
-     * @return The resultant object from the query
+     * @return The resultant object from the query in xml string format
      */
     @Override
-    public AbstractWitsmlObject getObject(QueryContext qc) {
+    public String getObject(QueryContext qc) {
         return null;
     }
 
     /**
      * Creates an object
-     * @param query POJO representing the object that was received
+     * 
+     * @param qc - QueryContext with the data needed to create an object
      * @return the UID of the newly created object
      */
     @Override
-    public String createObject(AbstractWitsmlObject query) {
+    public String createObject(QueryContext qc) {
         return null;
     }
 

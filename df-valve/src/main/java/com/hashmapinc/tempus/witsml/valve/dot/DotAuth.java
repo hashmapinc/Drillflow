@@ -15,7 +15,37 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
-import com.hashmapinc.tempus.witsml.valve.AbstractAuth;
+import org.json.JSONObject;
 
-public class DotAuth extends AbstractAuth {
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
+
+public class DotAuth {
+
+	public final String api;
+
+	public DotAuth(String api) {
+		this.api = api;
+	}
+
+	public DecodedJWT getJWT(String apiKey, String username, String password) throws UnirestException {
+
+		String userinfo = "{\"account\":\"" + username + "\", \"password\":\"" + password + "\"}";
+
+		HttpResponse<JsonNode> response = Unirest.post(api)
+				.header("accept", "application/json")
+				.header("Authorization", "")
+				.header("Ocp-Apim-Subscription-Key", apiKey)
+				.body(userinfo).asJson();
+
+		JSONObject getToken = response.getBody().getObject();
+
+		return JWT.decode(getToken.getString("jwt"));
+
+	}
+
 }

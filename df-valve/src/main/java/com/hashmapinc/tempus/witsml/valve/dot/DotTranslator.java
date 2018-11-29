@@ -15,8 +15,5 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
-import com.hashmapinc.tempus.witsml.valve.AbstractTranslator;
-
-public class DotTranslator extends AbstractTranslator {
-    
+public class DotTranslator {
 }

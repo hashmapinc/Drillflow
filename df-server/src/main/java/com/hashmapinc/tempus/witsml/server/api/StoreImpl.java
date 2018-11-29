@@ -23,7 +23,7 @@ import com.hashmapinc.tempus.witsml.server.api.model.cap.ServerCap;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.WitsmlUtil;
 import com.hashmapinc.tempus.witsml.WitsmlObjectParser;
-import com.hashmapinc.tempus.witsml.valve.AbstractValve;
+import com.hashmapinc.tempus.witsml.valve.IValve;
 import com.hashmapinc.tempus.witsml.valve.ValveFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,15 +69,28 @@ public class StoreImpl implements IStore {
     ) {
         LOG.info("Executing addToStore");
         
-        // try to deserialize
-        List<AbstractWitsmlObject> parsedObjects;
+        // try to add to store
+        List<AbstractWitsmlObject> witsmlObjects;
         try {
             String version = WitsmlUtil.getVersionFromXML(XMLin);
-            parsedObjects = WitsmlObjectParser.parse(WMLtypeIn, XMLin, version);
+            witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, XMLin, version);
+            QueryContext qc = new QueryContext(
+                version,
+                WMLtypeIn,
+                null,
+                XMLin,
+                witsmlObjects
+            );
+
+            // get valve
+            IValve valve = ValveFactory.buildValve("DoT"); // TODO: don't hard code this, don't access locally (need a class field for this)
+
+            String uid = valve.createObject(qc);
+
         } catch (Exception e) {
             //TODO: handle exception
             LOG.warning(
-                "could not deserialize witsml object: \n" + 
+                "could not add witsml object to store: \n" + 
                 "WMLtypeIn: " + WMLtypeIn + " \n" + 
                 "XMLin: " + XMLin + " \n" + 
                 "OptionsIn: " + OptionsIn + " \n" + 
@@ -87,7 +100,7 @@ public class StoreImpl implements IStore {
             return 1;
         }
 
-        LOG.info("Successfully parsed object: " + parsedObjects.toString());
+        LOG.info("Successfully parsed object: " + witsmlObjects.toString());
 
         return 0;
     }
@@ -136,19 +149,37 @@ public class StoreImpl implements IStore {
         LOG.info("Executing GetFromStore");
         WMLS_GetFromStoreResponse resp = new WMLS_GetFromStoreResponse();
 
+        // try to deserialize
+        List<AbstractWitsmlObject> witsmlObjects;
+        String clientVersion;
+        try {
+            clientVersion = WitsmlUtil.getVersionFromXML(QueryIn);
+            witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, QueryIn, clientVersion);
+        } catch (Exception e) {
+            // TODO: handle exception
+            LOG.warning("could not deserialize witsml object: \n" + 
+                        "WMLtypeIn: " + WMLtypeIn + " \n" + 
+                        "QueryIn: " + QueryIn + " \n" + 
+                        "OptionsIn: " + OptionsIn + " \n" + 
+                        "CapabilitiesIn: " + CapabilitiesIn
+            );
+            return resp; // TODO: proper error handling should go here
+        }
+
+        // try to query
         try {
             // construct query context
-            String clientVersion = WitsmlUtil.getVersionFromXML(QueryIn);
             Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
             QueryContext qc = new QueryContext(
                 clientVersion,
                 WMLtypeIn,
                 optionsMap,
-                QueryIn
+                QueryIn,
+                witsmlObjects
             );
 
-            // execute query
-            AbstractValve valve = ValveFactory.buildValve("DoT"); // TODO: don't hard code this, don't access locally (need a class field for this)
+            // get valve
+            IValve valve = ValveFactory.buildValve("DoT"); // TODO: don't hard code this, don't access locally (need a class field for this)
 
             // populate response
             resp.setSuppMsgOut("");

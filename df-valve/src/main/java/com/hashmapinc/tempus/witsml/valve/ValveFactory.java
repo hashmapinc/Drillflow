@@ -15,12 +15,12 @@
  */
 package com.hashmapinc.tempus.witsml.valve;
 
+import com.hashmapinc.tempus.witsml.valve.IValve;
+
 public class ValveFactory {
 
-    public static AbstractValve buildValve(String valveType) {
+    public static IValve buildValve(String valveType) {
         switch (valveType) {
-            case "Mock":
-                return new com.hashmapinc.tempus.witsml.valve.mock.MockValve();
             case "DoT":
                 return new com.hashmapinc.tempus.witsml.valve.dot.DotValve();
             default:
