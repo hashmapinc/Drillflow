@@ -15,14 +15,9 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
-import java.util.Map;
-
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.valve.IValve;
-import com.hashmapinc.tempus.witsml.valve.dot.DotDelegator;
-import com.hashmapinc.tempus.witsml.valve.dot.DotTranslator;
-import com.hashmapinc.tempus.witsml.valve.dot.DotAuth;
 
 public class DotValve implements IValve {
     final String NAME = "DoT"; // DoT = Drillops Town
@@ -34,7 +29,8 @@ public class DotValve implements IValve {
     public DotValve() {
         this.delegator = new DotDelegator();
         this.translator = new DotTranslator();
-        this.auth = new DotAuth();
+        //please provide the authentication API here.
+        this.auth = new DotAuth("http://witsml-qa.hashmapinc.com:8080/");
     }
 
     /**
