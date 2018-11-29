@@ -56,4 +56,6 @@ public interface IValve {
      * @param query POJO representing the object that was received
      */
     public void updateObject(AbstractWitsmlObject query);
+
+    public boolean authenticate(String userName, String password);
 }

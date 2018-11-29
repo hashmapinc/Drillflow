@@ -28,6 +28,7 @@ import com.hashmapinc.tempus.witsml.valve.ValveFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 
 import javax.jws.WebService;
@@ -45,6 +46,7 @@ public class StoreImpl implements IStore {
 
     private ServerCap cap;
     private WitsmlApiConfig witsmlApiConfigUtil;
+    private IValve valve;
 
     @Autowired
     private void setServerCap(ServerCap cap){
