@@ -17,7 +17,7 @@ cache:
   directories:
   - "$HOME/.m2"
 after_success:
-  - java -jar ~/codacy-coverage-reporter-assembly-latest.jar report -l Java -r $TRAVIS_BUILD_DIR/df-server⁩/target/site/jacoco/jacoco.xml
+  - java -jar ~/codacy-coverage-reporter-assembly-latest.jar report -l Java -r $TRAVIS_BUILD_DIR/df-server/target/site/jacoco/jacoco.xml
   - mkdir $TRAVIS_BUILD_DIR/out
   - mv $TRAVIS_BUILD_DIR/df-server/target/*.jar $TRAVIS_BUILD_DIR/out
 deploy:
