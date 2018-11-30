@@ -93,6 +93,7 @@ public class DotValve implements IValve {
         try {
             response = Unirest.put(endpoint)
 				.header("accept", "application/json")
+				.header("Authorization", this.auth.getJWT("admin", "12345").getToken()) // TODO: don't hardcode username/password
 				.header("Ocp-Apim-Subscription-Key", this.API_KEY)
 				.body(objectJSON).asJson();
         } catch (Exception e) {
