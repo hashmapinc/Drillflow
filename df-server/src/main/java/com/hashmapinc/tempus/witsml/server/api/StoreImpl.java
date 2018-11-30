@@ -27,6 +27,7 @@ import com.hashmapinc.tempus.witsml.valve.IValve;
 import com.hashmapinc.tempus.witsml.valve.ValveFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -77,14 +78,25 @@ public class StoreImpl implements IStore {
         LOG.info("Executing addToStore");
         
         // try to add to store
-        AbstractWitsmlObject witsmlObject;
+        List<AbstractWitsmlObject> witsmlObjects;
         String uid;
         try {
+            // build the query context
+            Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
             String version = WitsmlUtil.getVersionFromXML(XMLin);
-            witsmlObject = WitsmlObjectParser.parse(WMLtypeIn, XMLin, version).get(0);
+            witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, XMLin, version);
+            String username = SecurityContextHolder.getContext().getAuthentication().getName();
+            QueryContext qc = new QueryContext(
+                version, 
+                WMLtypeIn, 
+                optionsMap, 
+                XMLin, 
+                witsmlObjects, 
+                username
+            );
 
             // handle each object
-            uid = valve.createObject(witsmlObject);
+            uid = valve.createObject(qc);
         } catch (Exception e) {
             //TODO: handle exception
             LOG.warning(
@@ -98,7 +110,7 @@ public class StoreImpl implements IStore {
             return -1; // TODO: Proper error codes
         }
 
-        LOG.info("Successfully added object: " + witsmlObject.toString());
+        LOG.info("Successfully added object: " + witsmlObjects.get(0).toString());
 
         return 1; // TODO: Proper success codes
     }
@@ -170,12 +182,14 @@ public class StoreImpl implements IStore {
         try {
             // construct query context
             Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
+            String username = SecurityContextHolder.getContext().getAuthentication().getName();
             QueryContext qc = new QueryContext(
                 clientVersion,
                 WMLtypeIn,
                 optionsMap,
                 QueryIn,
-                witsmlObjects
+                witsmlObjects,
+                username
             );
 
             // populate response

@@ -41,10 +41,10 @@ public interface IValve {
     /**
      * Creates an object
      * 
-     * @param obj - AbstractWitsmlObject needed to execute createObject
+     * @param qc - QueryContext needed to execute the createObject querying
      * @return the UID of the newly created object
      */
-    public String createObject(AbstractWitsmlObject obj);
+    public String createObject(QueryContext qc);
 
     /**
      * Deletes an object

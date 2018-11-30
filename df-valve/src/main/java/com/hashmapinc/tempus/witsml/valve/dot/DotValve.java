@@ -36,8 +36,8 @@ public class DotValve implements IValve {
     DotAuth auth;
 
     public DotValve() {
-        this.URL = "http://localhost:8080/";
-        this.API_KEY = "RANDOMAPIKEY";
+        this.URL = "http://localhost:8080/"; // TODO: Don't hardcode this
+        this.API_KEY = "RANDOMAPIKEY"; // TODO: don't hardcode this
         this.translator = new DotTranslator();//please provide the authentication API here.
         this.auth = new DotAuth(this.URL, this.API_KEY);
     }
@@ -74,12 +74,13 @@ public class DotValve implements IValve {
     /**
      * Creates an object
      * 
-     * @param obj - AbstractWitsmlObject to create
+     * @param qc - query context to use for query execution
      * @return the UID of the newly created object
      */
     @Override
-    public String createObject(AbstractWitsmlObject obj) {
+    public String createObject(QueryContext qc) {
         // get a 1.4.1.1 json string
+        AbstractWitsmlObject obj = qc.WITSML_OBJECTS.get(0); // TODO: don't assume 1 object
         String objectJSON = this.translator.get1411JSONString(obj);
 
         // get the uid
@@ -89,19 +90,27 @@ public class DotValve implements IValve {
         String endpoint = this.URL + "/witsml/wells/" + uid;
 
         // send put 
-        HttpResponse<JsonNode> response;
         try {
-            response = Unirest.put(endpoint)
+            HttpResponse<JsonNode> response = Unirest.put(endpoint)
 				.header("accept", "application/json")
 				.header("Authorization", this.auth.getJWT("admin", "12345").getToken()) // TODO: don't hardcode username/password
 				.header("Ocp-Apim-Subscription-Key", this.API_KEY)
-				.body(objectJSON).asJson();
+                .body(objectJSON).asJson();
+            
+            int status = response.getStatus();
+            
+            if (201 == status) {
+                LOG.info("Succesfully put object: " + obj.toString());
+                return uid;
+            } else {
+                LOG.warning("Recieved status code: " + status );
+                return null;
+            }
         } catch (Exception e) {
             //TODO: handle exception
+            LOG.warning("Error while creating object in DoTValve: " + e);
             return null;
         }
-
-        return uid;
     }
 
     /**

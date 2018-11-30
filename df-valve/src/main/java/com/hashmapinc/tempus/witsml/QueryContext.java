@@ -30,6 +30,7 @@ public class QueryContext {
     public final Map<String, String> OPTIONS_IN; // MAP of options_in key/value pairs
     public final String QUERY_XML; // the raw WITSML xml query sent from the client
     public final List<AbstractWitsmlObject> WITSML_OBJECTS;
+    public final String USERNAME;
     
     /**
      * 
@@ -37,13 +38,42 @@ public class QueryContext {
      * @param objectType - the type of WITSML object being queried for
      * @param optionsIn - MAP of options_in key/value pairs
      * @param queryXML - String holding the raw xml query sent from the client
+     * @param username - String with the username to auth with
+     * @param password - String with password to auth with
      */
     public QueryContext(
         String clientVersion,
         String objectType,
         Map<String, String> optionsIn, 
         String queryXML,
-        List<AbstractWitsmlObject> witsmlObjects
+        String username
+    ) {
+        // instantiate values
+        this.CLIENT_VERSION = clientVersion;
+        this.OBJECT_TYPE = objectType;
+        this.OPTIONS_IN = optionsIn;
+        this.QUERY_XML = queryXML;
+        this.WITSML_OBJECTS = null;
+        this.USERNAME = username;
+    }
+
+    /**
+     * 
+     * @param clientVersion - the WITSML version used by the client that sent the query
+     * @param objectType - the type of WITSML object being queried for
+     * @param optionsIn - MAP of options_in key/value pairs
+     * @param queryXML - String holding the raw xml query sent from the client
+     * @param witsmlObjects - list of parsed witsml objects for the query to run
+     * @param username - String with the username to auth with
+     * @param password - String with password to auth with
+     */
+    public QueryContext(
+        String clientVersion,
+        String objectType,
+        Map<String, String> optionsIn, 
+        String queryXML,
+        List<AbstractWitsmlObject> witsmlObjects,
+        String username
     ) {
         // instantiate values
         this.CLIENT_VERSION = clientVersion;
@@ -51,5 +81,6 @@ public class QueryContext {
         this.OPTIONS_IN = optionsIn;
         this.QUERY_XML = queryXML;
         this.WITSML_OBJECTS = witsmlObjects;
+        this.USERNAME = username;
     }
 }

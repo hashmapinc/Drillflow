@@ -54,23 +54,6 @@ public class StoreImplTests {
 	}
 
 	@Test
-	public void addToStoreShouldHandleGoodInput() throws IOException {
-		String version = "1.3.1.1";
-		String objectType = "log";
-		String validXML;
-		validXML = new String(Files.readAllBytes(Paths.get("src/test/resources/log1311.xml")));
-
-		assertThat(
-			this.witsmlServer.addToStore(
-				objectType,
-				validXML,
-				"OptionsIn",
-				"CapabilitiesIn"
-			)
-		).isEqualTo(1);
-	}
-
-	@Test
 	public void getFromStore_shouldGetMultipleWells() {
 	}
 
