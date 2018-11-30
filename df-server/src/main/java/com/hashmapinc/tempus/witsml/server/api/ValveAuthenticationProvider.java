@@ -17,7 +17,6 @@ package com.hashmapinc.tempus.witsml.server.api;
 
 import com.hashmapinc.tempus.witsml.valve.IValve;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
