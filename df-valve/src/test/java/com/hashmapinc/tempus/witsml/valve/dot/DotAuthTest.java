@@ -39,7 +39,7 @@ public class DotAuthTest {
 		this.username = "admin";
 		this.password = "12345";
 		this.apiKey = "test";
-		this.url = "http://witsml-qa.hashmapinc.com:8080/";
+		this.url = "http://witsml-qa.hashmapinc.com:8080/"; // TODO: MOCK THIS
 		dotAuth = new DotAuth(this.url, this.apiKey);
 	}
 
