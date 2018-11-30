@@ -15,12 +15,17 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
+<<<<<<< HEAD
 import java.util.Map;
 import java.util.logging.Logger;
 
+=======
+import com.auth0.jwt.interfaces.DecodedJWT;
+>>>>>>> master
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.valve.IValve;
+import com.mashape.unirest.http.exceptions.UnirestException;
 
 public class DotValve implements IValve {
     private static final Logger LOG = Logger.getLogger(DotValve.class.getName());
@@ -32,9 +37,8 @@ public class DotValve implements IValve {
 
     public DotValve() {
         this.delegator = new DotDelegator();
-        this.translator = new DotTranslator();
-        //please provide the authentication API here.
-        this.auth = new DotAuth("http://witsml-qa.hashmapinc.com:8080/");
+        this.translator = new DotTranslator();//please provide the authentication API here.
+        this.auth = new DotAuth("http://localhost:8080/");
     }
 
     /**
@@ -95,5 +99,25 @@ public class DotValve implements IValve {
      */
     @Override
     public void updateObject(AbstractWitsmlObject query) {
+    }
+
+    /**
+     * Authenticates with the DotAuth class to get a JWT
+     * @param userName The user name to authenticate with
+     * @param password The password to authenticate with
+     * @return True if successful, false if not
+     */
+    //TODO: This should throw an exception not be a boolean value so that a descriptive message can be logged/returned
+    @Override
+    public boolean authenticate(String userName, String password) {
+        try {
+            //TODO: Remove the hardcoded apiKey
+            DecodedJWT jwt = auth.getJWT("test", userName, password);
+            return jwt != null;
+
+        } catch (UnirestException e) {
+            return false;
+        }
+
     }
 }
