@@ -21,17 +21,22 @@ import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.valve.IValve;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
-public class DotValve implements IValve {
-    final String NAME = "DoT"; // DoT = Drillops Town
-    final String DESCRIPTION = "Valve for interaction with Drillops Town"; // DoT = Drillops Town
-    DotDelegator delegator;
-    DotTranslator translator;
-    DotAuth auth;
+import java.util.Map;
 
-    public DotValve() {
+public class DotValve implements IValve {
+    private final String NAME = "DoT"; // DoT = Drillops Town
+    private final String DESCRIPTION = "Valve for interaction with Drillops Town"; // DoT = Drillops Town
+    private Map<String,String> config;
+    private DotDelegator delegator;
+    private DotTranslator translator;
+    private DotAuth auth;
+
+    public DotValve(Map<String,String> config) {
+
         this.delegator = new DotDelegator();
         this.translator = new DotTranslator();//please provide the authentication API here.
-        this.auth = new DotAuth("http://localhost:8080/");
+        this.config = config;
+        this.auth = new DotAuth(config.get("baseurl"));
     }
 
     /**
@@ -101,7 +106,7 @@ public class DotValve implements IValve {
     public boolean authenticate(String userName, String password) {
         try {
             //TODO: Remove the hardcoded apiKey
-            DecodedJWT jwt = auth.getJWT("test", userName, password);
+            DecodedJWT jwt = auth.getJWT(config.get("apikey"), userName, password);
             return jwt != null;
 
         } catch (UnirestException e) {

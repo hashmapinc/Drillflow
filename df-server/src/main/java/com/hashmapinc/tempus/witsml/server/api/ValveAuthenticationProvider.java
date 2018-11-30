@@ -28,18 +28,23 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
+import java.util.Map;
 
 @Component
 @ComponentScan(basePackages = "com.hashmapinc.tempus.witsml.valve")
 public class ValveAuthenticationProvider implements AuthenticationProvider {
 
     private IValve valve;
+
     @Value("${valve.name}")
     private String valveName;
 
+    @Value("#{${valveprop}}")
+    private Map<String,String> valveProps;
+
     @PostConstruct
     private void setValve(){
-        valve = ValveFactory.buildValve(valveName);
+        valve = ValveFactory.buildValve(valveName,valveProps);
     }
     
     @Override
