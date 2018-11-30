@@ -63,9 +63,12 @@ public class StoreImpl implements IStore {
     @Value("${wmls.version:7}")
     private String version;
 
+    @Value("#{${valveprop}}")
+    private Map<String,String> valveProps;
+
     @PostConstruct
     private void setValve(){
-        valve = ValveFactory.buildValve(valveName);
+        valve = ValveFactory.buildValve(valveName, valveProps);
     }
 
     @Override
@@ -95,8 +98,14 @@ public class StoreImpl implements IStore {
                 username
             );
 
+<<<<<<< HEAD
             // handle each object
             uid = valve.createObject(qc);
+=======
+
+            String uid = valve.createObject(qc);
+
+>>>>>>> master
         } catch (Exception e) {
             //TODO: handle exception
             LOG.warning(
@@ -118,7 +127,6 @@ public class StoreImpl implements IStore {
     @Override
     public String getVersion() {
         LOG.info("Executing GetVersion");
-        LOG.info(valve.getName());
         return version;
     }
 
