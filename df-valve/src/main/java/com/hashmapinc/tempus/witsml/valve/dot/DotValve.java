@@ -15,13 +15,10 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
-<<<<<<< HEAD
 import java.util.Map;
 import java.util.logging.Logger;
 
-=======
 import com.auth0.jwt.interfaces.DecodedJWT;
->>>>>>> master
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.valve.IValve;
