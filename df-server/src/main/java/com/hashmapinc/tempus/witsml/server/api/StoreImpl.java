@@ -98,14 +98,8 @@ public class StoreImpl implements IStore {
                 username
             );
 
-<<<<<<< HEAD
             // handle each object
             uid = valve.createObject(qc);
-=======
-
-            String uid = valve.createObject(qc);
-
->>>>>>> master
         } catch (Exception e) {
             //TODO: handle exception
             LOG.warning(

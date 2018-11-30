@@ -29,7 +29,6 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import java.util.Map;
 
 public class DotValve implements IValve {
-<<<<<<< HEAD
     private static final Logger LOG = Logger.getLogger(DotValve.class.getName());
     final String NAME = "DoT"; // DoT = Drillops Town
     final String DESCRIPTION = "Valve for interaction with Drillops Town"; // DoT = Drillops Town
@@ -37,27 +36,14 @@ public class DotValve implements IValve {
     final String API_KEY; // url endpoint for sending requests
     DotTranslator translator;
     DotAuth auth;
+    private Map<String, String> config;
 
-    public DotValve() {
-        this.URL = "http://localhost:8080/"; // TODO: Don't hardcode this
-        this.API_KEY = "RANDOMAPIKEY"; // TODO: don't hardcode this
-        this.translator = new DotTranslator();//please provide the authentication API here.
-        this.auth = new DotAuth(this.URL, this.API_KEY);
-=======
-    private final String NAME = "DoT"; // DoT = Drillops Town
-    private final String DESCRIPTION = "Valve for interaction with Drillops Town"; // DoT = Drillops Town
-    private Map<String,String> config;
-    private DotDelegator delegator;
-    private DotTranslator translator;
-    private DotAuth auth;
-
-    public DotValve(Map<String,String> config) {
-
-        this.delegator = new DotDelegator();
-        this.translator = new DotTranslator();//please provide the authentication API here.
+    public DotValve(Map<String, String> config) {
         this.config = config;
-        this.auth = new DotAuth(config.get("baseurl"));
->>>>>>> master
+        this.URL = config.get("baseurl"); 
+        this.API_KEY = config.get("apikey"); 
+        this.translator = new DotTranslator();
+        this.auth = new DotAuth(this.URL, this.API_KEY);
     }
 
     /**
@@ -157,12 +143,7 @@ public class DotValve implements IValve {
     @Override
     public boolean authenticate(String userName, String password) {
         try {
-<<<<<<< HEAD
             DecodedJWT jwt = auth.getJWT(userName, password);
-=======
-            //TODO: Remove the hardcoded apiKey
-            DecodedJWT jwt = auth.getJWT(config.get("apikey"), userName, password);
->>>>>>> master
             return jwt != null;
         } catch (UnirestException e) {
             return false;
