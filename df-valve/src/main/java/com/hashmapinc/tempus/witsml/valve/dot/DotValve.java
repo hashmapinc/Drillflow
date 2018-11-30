@@ -103,7 +103,7 @@ public class DotValve implements IValve {
             
             int status = response.getStatus();
             
-            if (201 == status) {
+            if (201 == status || 200 == status) {
                 LOG.info("Succesfully put object: " + obj.toString());
                 return uid;
             } else {

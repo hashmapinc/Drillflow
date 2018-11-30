@@ -67,7 +67,7 @@ public class DotValveTest {
         // create
         String uid = this.valve.createObject(qc);
         assertNotNull(uid);
-        assertEquals("", uid);
+        assertEquals("w-12", uid);
 	}
 
     @Test
@@ -88,7 +88,7 @@ public class DotValveTest {
         // create
         String uid = this.valve.createObject(qc);
         assertNotNull(uid);
-        assertEquals("", uid);
+        assertEquals("w-12", uid);
     }
 }
 
