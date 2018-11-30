@@ -23,6 +23,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -37,11 +42,28 @@ public class StoreImplTests {
 	}
 
 	@Test
-	public void addToStore_shouldReturn1() {
+	public void addToStoreShouldHandleBadInput() {
 		assertThat(
 			this.witsmlServer.addToStore(
 				"WMLtypeIn",
 				"XMLin",
+				"OptionsIn",
+				"CapabilitiesIn"
+			)
+		).isEqualTo(-1);
+	}
+
+	@Test
+	public void addToStoreShouldHandleGoodInput() throws IOException {
+		String version = "1.3.1.1";
+		String objectType = "log";
+		String validXML;
+		validXML = new String(Files.readAllBytes(Paths.get("src/test/resources/log1311.xml")));
+
+		assertThat(
+			this.witsmlServer.addToStore(
+				objectType,
+				validXML,
 				"OptionsIn",
 				"CapabilitiesIn"
 			)

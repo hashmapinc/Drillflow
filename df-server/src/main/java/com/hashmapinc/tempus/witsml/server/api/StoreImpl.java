@@ -78,12 +78,13 @@ public class StoreImpl implements IStore {
         
         // try to add to store
         AbstractWitsmlObject witsmlObject;
+        String uid;
         try {
             String version = WitsmlUtil.getVersionFromXML(XMLin);
             witsmlObject = WitsmlObjectParser.parse(WMLtypeIn, XMLin, version).get(0);
 
             // handle each object
-            String uid = valve.createObject(witsmlObject);
+            uid = valve.createObject(witsmlObject);
         } catch (Exception e) {
             //TODO: handle exception
             LOG.warning(
@@ -94,12 +95,12 @@ public class StoreImpl implements IStore {
                 "CapabilitiesIn: " + CapabilitiesIn
             );
 
-            return 1;
+            return -1; // TODO: Proper error codes
         }
 
-        LOG.info("Successfully parsed object: " + witsmlObject.toString());
+        LOG.info("Successfully added object: " + witsmlObject.toString());
 
-        return 0;
+        return 1; // TODO: Proper success codes
     }
 
     @Override

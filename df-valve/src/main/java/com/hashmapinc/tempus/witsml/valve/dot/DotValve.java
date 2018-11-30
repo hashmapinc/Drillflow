@@ -91,7 +91,7 @@ public class DotValve implements IValve {
         // send put 
         HttpResponse<JsonNode> response;
         try {
-            response = Unirest.post(endpoint)
+            response = Unirest.put(endpoint)
 				.header("accept", "application/json")
 				.header("Ocp-Apim-Subscription-Key", this.API_KEY)
 				.body(objectJSON).asJson();
@@ -99,7 +99,6 @@ public class DotValve implements IValve {
             //TODO: handle exception
             return null;
         }
-        
 
         return uid;
     }
