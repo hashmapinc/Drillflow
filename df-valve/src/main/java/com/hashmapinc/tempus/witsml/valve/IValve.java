@@ -18,8 +18,6 @@ package com.hashmapinc.tempus.witsml.valve;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.QueryContext;
 
-import java.util.Map;
-
 public interface IValve {
     /**
      * Retrieve the name of the valve
