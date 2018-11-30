@@ -53,13 +53,6 @@
 	</properties>
 
 	<dependencies>
-		<!-- used for witsml object ser/de -->
-		<dependency>
-			<groupId>com.hashmapinc.tempus</groupId>
-			<artifactId>WitsmlObjects</artifactId>
-			<version>1.1.1</version>
-		</dependency>
-
 		<!-- used for json interactions -->
 		<dependency>
 			<groupId>javax.json</groupId>
