@@ -15,25 +15,25 @@
  */
 package com.hashmapinc.tempus.witsml.server.api;
 
-import com.hashmapinc.tempus.witsml.server.WitsmlApiConfig;
+import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.QueryContext;
+import com.hashmapinc.tempus.witsml.WitsmlObjectParser;
+import com.hashmapinc.tempus.witsml.WitsmlUtil;
+import com.hashmapinc.tempus.witsml.server.WitsmlApiConfig;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetFromStoreResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.ServerCap;
-import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
-import com.hashmapinc.tempus.witsml.WitsmlUtil;
-import com.hashmapinc.tempus.witsml.WitsmlObjectParser;
 import com.hashmapinc.tempus.witsml.valve.IValve;
 import com.hashmapinc.tempus.witsml.valve.ValveFactory;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.jws.WebService;
-import java.util.logging.Logger;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 @Service
 @WebService(serviceName = "StoreSoapBinding", portName = "StoreSoapBindingSoap",
@@ -45,6 +45,9 @@ public class StoreImpl implements IStore {
 
     private ServerCap cap;
     private WitsmlApiConfig witsmlApiConfigUtil;
+    private IValve valve;
+    @Value("${valve.name}")
+    private String valveName;
 
     @Autowired
     private void setServerCap(ServerCap cap){
@@ -59,6 +62,10 @@ public class StoreImpl implements IStore {
     @Value("${wmls.version:7}")
     private String version;
 
+    @PostConstruct
+    private void setValve(){
+        valve = ValveFactory.buildValve(valveName);
+    }
 
     @Override
     public int addToStore(
@@ -81,9 +88,6 @@ public class StoreImpl implements IStore {
                 XMLin,
                 witsmlObjects
             );
-
-            // get valve
-            IValve valve = ValveFactory.buildValve("DoT"); // TODO: don't hard code this, don't access locally (need a class field for this)
 
             String uid = valve.createObject(qc);
 
@@ -108,6 +112,7 @@ public class StoreImpl implements IStore {
     @Override
     public String getVersion() {
         LOG.info("Executing GetVersion");
+        LOG.info(valve.getName());
         return version;
     }
 
@@ -148,6 +153,7 @@ public class StoreImpl implements IStore {
     ) {
         LOG.info("Executing GetFromStore");
         WMLS_GetFromStoreResponse resp = new WMLS_GetFromStoreResponse();
+        LOG.info(valve.getName());
 
         // try to deserialize
         List<AbstractWitsmlObject> witsmlObjects;
@@ -177,9 +183,6 @@ public class StoreImpl implements IStore {
                 QueryIn,
                 witsmlObjects
             );
-
-            // get valve
-            IValve valve = ValveFactory.buildValve("DoT"); // TODO: don't hard code this, don't access locally (need a class field for this)
 
             // populate response
             resp.setSuppMsgOut("");
