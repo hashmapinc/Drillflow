@@ -25,27 +25,41 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
 public class DotAuth {
+	public final String URL;
+	public final String API_KEY;
 
-	public final String api;
-
-	public DotAuth(String api) {
-		this.api = api;
+	public DotAuth(
+		String URL,
+		String API_KEY
+	) {
+		this.URL = URL;
+		this.API_KEY = API_KEY;
 	}
 
-	public DecodedJWT getJWT(String apiKey, String username, String password) throws UnirestException {
-
+	/**
+	 * This function gets a JWT from the auth endpoint of the DoT server
+	 * @param username - String username for basic auth
+	 * @param password - String password for basic auth
+	 * @return jwt - DecodedJWT obtained from the auth call
+	 * @throws UnirestException
+	 */
+	public DecodedJWT getJWT(String username, String password) throws UnirestException {
+		// build the userinfo string
 		String userinfo = "{\"account\":\"" + username + "\", \"password\":\"" + password + "\"}";
 
-		HttpResponse<JsonNode> response = Unirest.post(api)
+		// send the response
+		HttpResponse<JsonNode> response = Unirest.post(URL)
 				.header("accept", "application/json")
-				.header("Authorization", "")
-				.header("Ocp-Apim-Subscription-Key", apiKey)
+				.header("Ocp-Apim-Subscription-Key", this.API_KEY)
 				.body(userinfo).asJson();
 
-		JSONObject getToken = response.getBody().getObject();
+		// get the token string
+		String tokenString = response
+			.getBody()
+			.getObject()
+			.getString("jwt");
 
-		return JWT.decode(getToken.getString("jwt"));
-
+		// return the decoded tokenstring
+		return JWT.decode(tokenString);
 	}
-
 }

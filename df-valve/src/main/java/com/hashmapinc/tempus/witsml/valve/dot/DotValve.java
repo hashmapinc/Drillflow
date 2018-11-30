@@ -15,27 +15,31 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
-import java.util.Map;
 import java.util.logging.Logger;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.valve.IValve;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
 public class DotValve implements IValve {
     private static final Logger LOG = Logger.getLogger(DotValve.class.getName());
     final String NAME = "DoT"; // DoT = Drillops Town
     final String DESCRIPTION = "Valve for interaction with Drillops Town"; // DoT = Drillops Town
-    DotDelegator delegator;
+    final String URL; // url endpoint for sending requests
+    final String API_KEY; // url endpoint for sending requests
     DotTranslator translator;
     DotAuth auth;
 
     public DotValve() {
-        this.delegator = new DotDelegator();
+        this.URL = "http://localhost:8080/";
+        this.API_KEY = "RANDOMAPIKEY";
         this.translator = new DotTranslator();//please provide the authentication API here.
-        this.auth = new DotAuth("http://localhost:8080/");
+        this.auth = new DotAuth(this.URL, this.API_KEY);
     }
 
     /**
@@ -78,8 +82,26 @@ public class DotValve implements IValve {
         // get a 1.4.1.1 json string
         String objectJSON = this.translator.get1411JSONString(obj);
 
-        // get object UID and call PUT to create the object
-        return null;
+        // get the uid
+        String uid = obj.getUid();
+
+        // create endpoint
+        String endpoint = this.URL + "/witsml/wells/" + uid;
+
+        // send put 
+        HttpResponse<JsonNode> response;
+        try {
+            response = Unirest.post(endpoint)
+				.header("accept", "application/json")
+				.header("Ocp-Apim-Subscription-Key", this.API_KEY)
+				.body(objectJSON).asJson();
+        } catch (Exception e) {
+            //TODO: handle exception
+            return null;
+        }
+        
+
+        return uid;
     }
 
     /**
@@ -108,10 +130,8 @@ public class DotValve implements IValve {
     @Override
     public boolean authenticate(String userName, String password) {
         try {
-            //TODO: Remove the hardcoded apiKey
-            DecodedJWT jwt = auth.getJWT("test", userName, password);
+            DecodedJWT jwt = auth.getJWT(userName, password);
             return jwt != null;
-
         } catch (UnirestException e) {
             return false;
         }

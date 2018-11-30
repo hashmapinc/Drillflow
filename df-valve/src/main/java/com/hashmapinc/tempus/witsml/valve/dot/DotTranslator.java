@@ -18,7 +18,6 @@ package com.hashmapinc.tempus.witsml.valve.dot;
 import java.util.logging.Logger;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
-import com.hashmapinc.tempus.witsml.QueryContext;
 
 public class DotTranslator {
     private static final Logger LOG = Logger.getLogger(DotTranslator.class.getName());
@@ -31,6 +30,6 @@ public class DotTranslator {
      * @return jsonString - String serialization of a JSON version of the 1.4.1.1 witsml objecr
      */
     public String get1411JSONString(AbstractWitsmlObject obj) {
-        return null;
+        return obj.getJSONString("1.4.1.1");
     }
 }

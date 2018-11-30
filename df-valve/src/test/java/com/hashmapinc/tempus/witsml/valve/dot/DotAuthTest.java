@@ -19,42 +19,46 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
 public class DotAuthTest {
-
 	@Autowired
 	private DotAuth dotAuth;
 
 	private String username;
 	private String password;
 	private String apiKey;
+	private String url;
 
 	@Before
 	public void doSetup() {
 		this.username = "admin";
 		this.password = "12345";
 		this.apiKey = "test";
-		dotAuth = new DotAuth("http://witsml-qa.hashmapinc.com:8080/");
+		this.url = "http://witsml-qa.hashmapinc.com:8080/";
+		dotAuth = new DotAuth(this.url, this.apiKey);
 	}
 
 	@Test
 	public void authSuccessScenario() throws UnirestException, Exception {
-
-		DecodedJWT response = dotAuth.getJWT(apiKey, username, password);
-
-		org.junit.Assert.assertNotNull(response);
-
+		DecodedJWT response = dotAuth.getJWT(username, password);
+		assertNotNull(response);
 	}
 
 	@Test
 	public void authFailureScenario() throws UnirestException {
-
-		DecodedJWT response = dotAuth.getJWT(apiKey, "restricted", "6789");
-
-		org.junit.Assert.assertNotNull(response);
-
+		try {
+			String badPassword = this.password + "JUNK";
+			DecodedJWT response = dotAuth.getJWT(this.username, badPassword);
+			fail(); // fail if no error is thrown for badPassword
+		} catch (Exception e) {
+			assertNotNull(true);
+		}
+		
 	}
 
 }
