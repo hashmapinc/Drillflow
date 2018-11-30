@@ -16,7 +16,8 @@
 package com.hashmapinc.tempus.witsml.server.api;
 
 import com.hashmapinc.tempus.witsml.valve.IValve;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.hashmapinc.tempus.witsml.valve.ValveFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -25,6 +26,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 
 @Component
@@ -32,12 +34,14 @@ import java.util.ArrayList;
 public class ValveAuthenticationProvider implements AuthenticationProvider {
 
     private IValve valve;
+    @Value("${valve.name}")
+    private String valveName;
 
-    @Autowired
-    public void setValve(IValve valve){
-        this.valve = valve;
+    @PostConstruct
+    private void setValve(){
+        valve = ValveFactory.buildValve(valveName);
     }
-
+    
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 
