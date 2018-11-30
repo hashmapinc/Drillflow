@@ -77,20 +77,13 @@ public class StoreImpl implements IStore {
         LOG.info("Executing addToStore");
         
         // try to add to store
-        List<AbstractWitsmlObject> witsmlObjects;
+        AbstractWitsmlObject witsmlObject;
         try {
             String version = WitsmlUtil.getVersionFromXML(XMLin);
-            witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, XMLin, version);
-            QueryContext qc = new QueryContext(
-                version,
-                WMLtypeIn,
-                null,
-                XMLin,
-                witsmlObjects
-            );
+            witsmlObject = WitsmlObjectParser.parse(WMLtypeIn, XMLin, version).get(0);
 
-            String uid = valve.createObject(qc);
-
+            // handle each object
+            String uid = valve.createObject(witsmlObject);
         } catch (Exception e) {
             //TODO: handle exception
             LOG.warning(
@@ -104,7 +97,7 @@ public class StoreImpl implements IStore {
             return 1;
         }
 
-        LOG.info("Successfully parsed object: " + witsmlObjects.toString());
+        LOG.info("Successfully parsed object: " + witsmlObject.toString());
 
         return 0;
     }

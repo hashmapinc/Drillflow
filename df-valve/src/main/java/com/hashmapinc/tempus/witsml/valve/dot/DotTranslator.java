@@ -31,6 +31,6 @@ public class DotTranslator {
      * @return jsonString - String serialization of a JSON version of the 1.4.1.1 witsml objecr
      */
     public String get1411JSONString(AbstractWitsmlObject obj) {
-        return obj.
+        return null;
     }
 }
