@@ -70,13 +70,13 @@ public class DotValve implements IValve {
     /**
      * Creates an object
      * 
-     * @param qc - QueryContext with the data needed to create an object
+     * @param obj - AbstractWitsmlObject to create
      * @return the UID of the newly created object
      */
     @Override
-    public String createObject(QueryContext qc) {
+    public String createObject(AbstractWitsmlObject obj) {
         // get a 1.4.1.1 json string
-        String objectJSON = this.translator.get1411JSONString(qc);
+        String objectJSON = this.translator.get1411JSONString(obj);
 
         // get object UID and call PUT to create the object
         return null;
