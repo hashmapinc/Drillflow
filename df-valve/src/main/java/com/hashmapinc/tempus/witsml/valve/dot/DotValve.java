@@ -15,12 +15,9 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
-<<<<<<< HEAD
 import java.util.Map;
 import java.util.logging.Logger;
 
-=======
->>>>>>> master
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.valve.IValve;
