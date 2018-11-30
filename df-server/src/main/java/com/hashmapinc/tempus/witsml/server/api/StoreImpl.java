@@ -27,7 +27,6 @@ import com.hashmapinc.tempus.witsml.valve.IValve;
 import com.hashmapinc.tempus.witsml.valve.ValveFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -40,7 +39,6 @@ import java.util.logging.Logger;
 @WebService(serviceName = "StoreSoapBinding", portName = "StoreSoapBindingSoap",
         targetNamespace = "http://www.witsml.org/wsdl/120",
         endpointInterface = "com.hashmapinc.tempus.witsml.server.api.IStore")
-@EnableConfigurationProperties
 public class StoreImpl implements IStore {
 
     private static final Logger LOG = Logger.getLogger(StoreImpl.class.getName());
