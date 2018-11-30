@@ -117,8 +117,6 @@ public class StoreImpl implements IStore {
     @Override
     public String getVersion() {
         LOG.info("Executing GetVersion");
-        LOG.info(valve.getName());
-        LOG.info("The fucker be: " + SecurityContextHolder.getContext().getAuthentication().getName());
         return version;
     }
 
