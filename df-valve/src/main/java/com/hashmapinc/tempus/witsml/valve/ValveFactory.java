@@ -15,16 +15,18 @@
  */
 package com.hashmapinc.tempus.witsml.valve;
 
-import com.hashmapinc.tempus.witsml.valve.IValve;
+import java.util.Map;
 
 public class ValveFactory {
 
-    public static IValve buildValve(String valveType) {
+    public static IValve buildValve(String valveType, Map<String,String> config) {
         switch (valveType) {
             case "DoT":
-                return new com.hashmapinc.tempus.witsml.valve.dot.DotValve();
+                return new com.hashmapinc.tempus.witsml.valve.dot.DotValve(config);
             default:
                 return null;
         }
     }
+
+
 }

@@ -27,6 +27,7 @@ import com.hashmapinc.tempus.witsml.valve.IValve;
 import com.hashmapinc.tempus.witsml.valve.ValveFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -62,9 +63,12 @@ public class StoreImpl implements IStore {
     @Value("${wmls.version:7}")
     private String version;
 
+    @Value("#{${valveprop}}")
+    private Map<String,String> valveProps;
+
     @PostConstruct
     private void setValve(){
-        valve = ValveFactory.buildValve(valveName);
+        valve = ValveFactory.buildValve(valveName, valveProps);
     }
 
     @Override
@@ -88,6 +92,7 @@ public class StoreImpl implements IStore {
                 XMLin,
                 witsmlObjects
             );
+
 
             String uid = valve.createObject(qc);
 
@@ -113,6 +118,7 @@ public class StoreImpl implements IStore {
     public String getVersion() {
         LOG.info("Executing GetVersion");
         LOG.info(valve.getName());
+        LOG.info("The fucker be: " + SecurityContextHolder.getContext().getAuthentication().getName());
         return version;
     }
 
