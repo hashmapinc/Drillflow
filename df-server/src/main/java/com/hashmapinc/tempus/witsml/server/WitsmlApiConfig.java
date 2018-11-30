@@ -39,12 +39,12 @@ public class WitsmlApiConfig {
     }
 
     @Autowired
-    private void getBus(Bus bus){
+    private void setBus(Bus bus){
         this.bus = bus;
     }
 
     @Autowired
-    private void getStoreImpl(StoreImpl storeImpl){
+    private void setStoreImpl(StoreImpl storeImpl){
         this.storeImpl = storeImpl;
     }
 

@@ -22,7 +22,7 @@ import com.hashmapinc.tempus.witsml.valve.IValve;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import org.springframework.stereotype.Component;
 
-@Component(value = "valveDoT")
+@Component(value = "valveDot")
 public class DotValve implements IValve {
     final String NAME = "DoT"; // DoT = Drillops Town
     final String DESCRIPTION = "Valve for interaction with Drillops Town"; // DoT = Drillops Town
