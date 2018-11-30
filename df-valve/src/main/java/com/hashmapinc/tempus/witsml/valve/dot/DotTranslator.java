@@ -72,7 +72,6 @@ public class DotTranslator {
      * @return jsonString - String serialization of a JSON version of the 1.4.1.1 witsml objecr
      */
     public String get1411JSONString(QueryContext qc) {
-        String version = qc.CLIENT_VERSION;
         String objectType = qc.OBJECT_TYPE;
 
         // handle each object
@@ -85,7 +84,6 @@ public class DotTranslator {
                 return getTrajectoryJSON(qc);
             case "log":
                 return getLogJSON(qc);
-        
             default:
                 LOG.warning("Unsupported object type: " + objectType);
                 return null;
