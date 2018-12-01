@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.mashape.unirest.http.exceptions.UnirestException;
