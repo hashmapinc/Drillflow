@@ -74,7 +74,8 @@ public class WitsmlUtil {
         String optionsIn
     ) {
         LOG.info("trying to parse optionsIn...");
-
+        if (optionsIn.equals(""))
+            return new HashMap<>();
         //parse the string
         HashMap<String, String> map = new HashMap<>();
         Arrays.stream(optionsIn.split(";")).forEach(optionString -> {

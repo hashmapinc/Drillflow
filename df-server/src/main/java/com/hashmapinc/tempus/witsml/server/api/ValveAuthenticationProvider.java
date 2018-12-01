@@ -59,8 +59,13 @@ public class ValveAuthenticationProvider implements AuthenticationProvider {
         if (!authResult)
             throw new BadCredentialsException("Bad credentials for user");
 
+        ValveUser user = new ValveUser();
+        user.setUserName(name);
+        user.setPassword(password);
+        user.setToken("testToken");
+
         UsernamePasswordAuthenticationToken auth;
-        auth = new UsernamePasswordAuthenticationToken(name, password,new ArrayList<>());
+        auth = new UsernamePasswordAuthenticationToken(user, password, new ArrayList<>());
 
         return auth;
     }

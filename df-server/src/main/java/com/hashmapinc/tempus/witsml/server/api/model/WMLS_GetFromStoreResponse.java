@@ -20,7 +20,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name="WMLS_GetFromStoreResponse)")
+@XmlRootElement(name="WMLS_GetFromStoreResponse")
 public class WMLS_GetFromStoreResponse {
     private Short Result;
     private String XMLout;

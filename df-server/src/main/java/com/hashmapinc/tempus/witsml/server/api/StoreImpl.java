@@ -88,16 +88,15 @@ public class StoreImpl implements IStore {
             Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
             String version = WitsmlUtil.getVersionFromXML(XMLin);
             witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, XMLin, version);
-            String username = SecurityContextHolder.getContext().getAuthentication().getName();
-            String password = SecurityContextHolder.getContext().getAuthentication().getCredentials().toString();
+            ValveUser user = (ValveUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             QueryContext qc = new QueryContext(
                 version, 
                 WMLtypeIn, 
                 optionsMap, 
                 XMLin, 
                 witsmlObjects, 
-                username,
-                password
+                user.getUserName(),
+                user.getPassword()
             );
 
             // handle each object
