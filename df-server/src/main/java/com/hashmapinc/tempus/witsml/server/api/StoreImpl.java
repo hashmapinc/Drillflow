@@ -101,6 +101,10 @@ public class StoreImpl implements IStore {
 
             // handle each object
             uid = valve.createObject(qc);
+            LOG.info(
+                "Successfully added object of type: " + WMLtypeIn + 
+                " and with uid: " + uid
+            );
         } catch (Exception e) {
             //TODO: handle exception
             LOG.warning(

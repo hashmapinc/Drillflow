@@ -16,6 +16,9 @@
 package com.hashmapinc.tempus.witsml.server.api;
 
 public class ValveUser {
+    private String userName;
+    private String password;
+    private String token;
 
     public String getUserName() {
         return userName;
@@ -40,9 +43,4 @@ public class ValveUser {
     public void setToken(String token) {
         this.token = token;
     }
-
-    private String userName;
-    private String password;
-    private String token;
-
 }

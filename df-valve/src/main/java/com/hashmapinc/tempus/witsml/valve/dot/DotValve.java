@@ -30,20 +30,18 @@ import java.util.Map;
 
 public class DotValve implements IValve {
     private static final Logger LOG = Logger.getLogger(DotValve.class.getName());
-    final String NAME = "DoT"; // DoT = Drillops Town
-    final String DESCRIPTION = "Valve for interaction with Drillops Town"; // DoT = Drillops Town
-    final String URL; // url endpoint for sending requests
-    final String API_KEY; // url endpoint for sending requests
-    DotTranslator translator;
-    DotAuth auth;
-    private Map<String, String> config;
+    private final String NAME = "DoT"; // DoT = Drillops Town
+    private final String DESCRIPTION = "Valve for interaction with Drillops Town"; // DoT = Drillops Town
+    private final String URL; // url endpoint for sending requests
+    private final String API_KEY; // url endpoint for sending requests
+    private final DotTranslator TRANSLATOR;
+    private final DotAuth AUTH;
 
     public DotValve(Map<String, String> config) {
-        this.config = config;
         this.URL = config.get("baseurl"); 
         this.API_KEY = config.get("apikey"); 
-        this.translator = new DotTranslator();
-        this.auth = new DotAuth(this.URL, this.API_KEY);
+        this.TRANSLATOR = new DotTranslator();
+        this.AUTH = new DotAuth(this.URL, this.API_KEY);
     }
 
     /**
@@ -85,7 +83,7 @@ public class DotValve implements IValve {
     public String createObject(QueryContext qc) {
         // get a 1.4.1.1 json string
         AbstractWitsmlObject obj = qc.WITSML_OBJECTS.get(0); // TODO: don't assume 1 object
-        String objectJSON = this.translator.get1411JSONString(obj);
+        String objectJSON = this.TRANSLATOR.get1411JSONString(obj);
 
         // get the uid
         String uid = obj.getUid();
@@ -97,7 +95,7 @@ public class DotValve implements IValve {
         try {
             HttpResponse<JsonNode> response = Unirest.put(endpoint)
 				.header("accept", "application/json")
-				.header("Authorization", this.auth.getJWT(qc.USERNAME, qc.PASSWORD).getToken())
+				.header("Authorization", this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD).getToken())
 				.header("Ocp-Apim-Subscription-Key", this.API_KEY)
                 .body(objectJSON).asJson();
             
@@ -143,7 +141,7 @@ public class DotValve implements IValve {
     @Override
     public boolean authenticate(String userName, String password) {
         try {
-            DecodedJWT jwt = auth.getJWT(userName, password);
+            DecodedJWT jwt = AUTH.getJWT(userName, password);
             return jwt != null;
         } catch (UnirestException e) {
             return false;

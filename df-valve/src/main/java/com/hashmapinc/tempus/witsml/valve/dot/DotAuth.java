@@ -15,8 +15,6 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
-import org.json.JSONObject;
-
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.mashape.unirest.http.HttpResponse;

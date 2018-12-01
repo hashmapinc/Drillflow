@@ -74,7 +74,7 @@ public class WitsmlUtil {
         String optionsIn
     ) {
         LOG.info("trying to parse optionsIn...");
-        if (optionsIn.equals(""))
+        if (optionsIn.isEmpty())
             return new HashMap<>();
         //parse the string
         HashMap<String, String> map = new HashMap<>();

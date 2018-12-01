@@ -30,6 +30,7 @@ public class DotTranslator {
      * @return jsonString - String serialization of a JSON version of the 1.4.1.1 witsml objecr
      */
     public String get1411JSONString(AbstractWitsmlObject obj) {
+        LOG.info("Getting 1.4.1.1 json string for object: " + obj.toString());
         return obj.getJSONString("1.4.1.1");
     }
 }

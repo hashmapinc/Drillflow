@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
@@ -31,16 +32,14 @@ public class DotAuthTest {
 
 	private String username;
 	private String password;
-	private String apiKey;
-	private String url;
 
 	@Before
 	public void doSetup() {
 		this.username = "admin";
 		this.password = "12345";
-		this.apiKey = "test";
-		this.url = "http://witsml-qa.hashmapinc.com:8080/"; // TODO: MOCK THIS
-		dotAuth = new DotAuth(this.url, this.apiKey);
+		String apiKey = "test";
+		String url = "http://witsml-qa.hashmapinc.com:8080/"; // TODO: MOCK THIS
+		dotAuth = new DotAuth(url, apiKey);
 	}
 
 	@Test
@@ -54,7 +53,7 @@ public class DotAuthTest {
 		try {
 			String badPassword = this.password + "JUNK";
 			DecodedJWT response = dotAuth.getJWT(this.username, badPassword);
-			fail(); // fail if no error is thrown for badPassword
+			assertTrue(null == response);
 		} catch (Exception e) {
 			assertNotNull(true);
 		}
