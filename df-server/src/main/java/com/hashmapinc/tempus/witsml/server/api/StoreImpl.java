@@ -112,7 +112,8 @@ public class StoreImpl implements IStore {
                 "WMLtypeIn: " + WMLtypeIn + " \n" + 
                 "XMLin: " + XMLin + " \n" + 
                 "OptionsIn: " + OptionsIn + " \n" + 
-                "CapabilitiesIn: " + CapabilitiesIn
+                "CapabilitiesIn: " + CapabilitiesIn + "\n" +
+                "Error: " + e
             );
 
             return -1; // TODO: Proper error codes
