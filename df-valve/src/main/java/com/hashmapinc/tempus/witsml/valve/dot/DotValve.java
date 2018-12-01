@@ -15,28 +15,33 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
+import java.util.logging.Logger;
+
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.valve.IValve;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
 import java.util.Map;
 
 public class DotValve implements IValve {
+    private static final Logger LOG = Logger.getLogger(DotValve.class.getName());
     private final String NAME = "DoT"; // DoT = Drillops Town
     private final String DESCRIPTION = "Valve for interaction with Drillops Town"; // DoT = Drillops Town
-    private Map<String,String> config;
-    private DotDelegator delegator;
-    private DotTranslator translator;
-    private DotAuth auth;
+    private final String URL; // url endpoint for sending requests
+    private final String API_KEY; // url endpoint for sending requests
+    private final DotTranslator TRANSLATOR;
+    private final DotAuth AUTH;
 
-    public DotValve(Map<String,String> config) {
-
-        this.delegator = new DotDelegator();
-        this.translator = new DotTranslator();//please provide the authentication API here.
-        this.config = config;
-        this.auth = new DotAuth(config.get("baseurl"));
+    public DotValve(Map<String, String> config) {
+        this.URL = config.get("baseurl"); 
+        this.API_KEY = config.get("apikey"); 
+        this.TRANSLATOR = new DotTranslator();
+        this.AUTH = new DotAuth(this.URL, this.API_KEY);
     }
 
     /**
@@ -71,12 +76,43 @@ public class DotValve implements IValve {
     /**
      * Creates an object
      * 
-     * @param qc - QueryContext with the data needed to create an object
+     * @param qc - query context to use for query execution
      * @return the UID of the newly created object
      */
     @Override
     public String createObject(QueryContext qc) {
-        return null;
+        // get a 1.4.1.1 json string
+        AbstractWitsmlObject obj = qc.WITSML_OBJECTS.get(0); // TODO: don't assume 1 object
+        String objectJSON = this.TRANSLATOR.get1411JSONString(obj);
+
+        // get the uid
+        String uid = obj.getUid();
+
+        // create endpoint
+        String endpoint = this.URL + "/witsml/wells/" + uid;
+
+        // send put 
+        try {
+            HttpResponse<JsonNode> response = Unirest.put(endpoint)
+				.header("accept", "application/json")
+				.header("Authorization", this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD).getToken())
+				.header("Ocp-Apim-Subscription-Key", this.API_KEY)
+                .body(objectJSON).asJson();
+            
+            int status = response.getStatus();
+            
+            if (201 == status || 200 == status) {
+                LOG.info("Succesfully put object: " + obj.toString());
+                return uid;
+            } else {
+                LOG.warning("Recieved status code: " + status );
+                return null;
+            }
+        } catch (Exception e) {
+            //TODO: handle exception
+            LOG.warning("Error while creating object in DoTValve: " + e);
+            return null;
+        }
     }
 
     /**
@@ -105,10 +141,8 @@ public class DotValve implements IValve {
     @Override
     public boolean authenticate(String userName, String password) {
         try {
-            //TODO: Remove the hardcoded apiKey
-            DecodedJWT jwt = auth.getJWT(config.get("apikey"), userName, password);
+            DecodedJWT jwt = AUTH.getJWT(userName, password);
             return jwt != null;
-
         } catch (UnirestException e) {
             return false;
         }

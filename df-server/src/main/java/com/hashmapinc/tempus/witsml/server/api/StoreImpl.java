@@ -82,20 +82,29 @@ public class StoreImpl implements IStore {
         
         // try to add to store
         List<AbstractWitsmlObject> witsmlObjects;
+        String uid;
         try {
+            // build the query context
+            Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
             String version = WitsmlUtil.getVersionFromXML(XMLin);
             witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, XMLin, version);
+            ValveUser user = (ValveUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             QueryContext qc = new QueryContext(
-                version,
-                WMLtypeIn,
-                null,
-                XMLin,
-                witsmlObjects
+                version, 
+                WMLtypeIn, 
+                optionsMap, 
+                XMLin, 
+                witsmlObjects, 
+                user.getUserName(),
+                user.getPassword()
             );
 
-
-            String uid = valve.createObject(qc);
-
+            // handle each object
+            uid = valve.createObject(qc);
+            LOG.info(
+                "Successfully added object of type: " + WMLtypeIn + 
+                " and with uid: " + uid
+            );
         } catch (Exception e) {
             //TODO: handle exception
             LOG.warning(
@@ -106,12 +115,12 @@ public class StoreImpl implements IStore {
                 "CapabilitiesIn: " + CapabilitiesIn
             );
 
-            return 1;
+            return -1; // TODO: Proper error codes
         }
 
-        LOG.info("Successfully parsed object: " + witsmlObjects.toString());
+        LOG.info("Successfully added object: " + witsmlObjects.get(0).toString());
 
-        return 0;
+        return 1; // TODO: Proper success codes
     }
 
     @Override
@@ -180,12 +189,16 @@ public class StoreImpl implements IStore {
         try {
             // construct query context
             Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
+            String username = SecurityContextHolder.getContext().getAuthentication().getName();
+            String password = SecurityContextHolder.getContext().getAuthentication().getCredentials().toString();
             QueryContext qc = new QueryContext(
                 clientVersion,
                 WMLtypeIn,
                 optionsMap,
                 QueryIn,
-                witsmlObjects
+                witsmlObjects,
+                username,
+                password
             );
 
             // populate response

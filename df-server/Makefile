@@ -6,7 +6,8 @@ compile:
 
 # package the application into an uber-jar with tests
 package:  
-	mvn -q clean package
+	mvn -q clean
+	mvn package
 
 # package the application into an uber-jar without tests
 fastPackage:  

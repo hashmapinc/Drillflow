@@ -40,7 +40,8 @@ public interface IValve {
 
     /**
      * Creates an object
-     * @param qc - QueryContext needed to execute the getObject querying
+     * 
+     * @param qc - QueryContext needed to execute the createObject querying
      * @return the UID of the newly created object
      */
     public String createObject(QueryContext qc);

@@ -53,13 +53,6 @@
 	</properties>
 
 	<dependencies>
-		<!-- used for witsml object ser/de -->
-		<dependency>
-			<groupId>com.hashmapinc.tempus</groupId>
-			<artifactId>WitsmlObjects</artifactId>
-			<version>1.1.1</version>
-		</dependency>
-
 		<!-- used for json interactions -->
 		<dependency>
 			<groupId>javax.json</groupId>
@@ -85,13 +78,6 @@
 			<groupId>com.mashape.unirest</groupId>
 			<artifactId>unirest-java</artifactId>
 			<version>1.4.9</version>
-		</dependency>
-
-		<!-- used to convert witsml object POJOs to json -->
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-			<version>2.9.7</version>
 		</dependency>
 	</dependencies>
 </project>

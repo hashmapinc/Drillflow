@@ -37,7 +37,7 @@ public class StoreImplTests {
 	}
 
 	@Test
-	public void addToStore_shouldReturn1() {
+	public void addToStoreShouldHandleBadInput() {
 		assertThat(
 			this.witsmlServer.addToStore(
 				"WMLtypeIn",
@@ -45,7 +45,7 @@ public class StoreImplTests {
 				"OptionsIn",
 				"CapabilitiesIn"
 			)
-		).isEqualTo(1);
+		).isEqualTo(-1);
 	}
 
 	@Test
