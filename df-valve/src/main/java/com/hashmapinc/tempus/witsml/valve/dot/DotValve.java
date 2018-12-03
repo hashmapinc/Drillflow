@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
+import java.util.Map;
 import java.util.logging.Logger;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
@@ -25,8 +26,6 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-
-import java.util.Map;
 
 public class DotValve implements IValve {
     private static final Logger LOG = Logger.getLogger(DotValve.class.getName());
