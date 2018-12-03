@@ -82,6 +82,7 @@ public class DotValve implements IValve {
      */
     @Override
     public String createObject(QueryContext qc) {
+        // TODO: move this to a delegator and check types!!!!!
         // get a 1.4.1.1 json string
         AbstractWitsmlObject obj = qc.WITSML_OBJECTS.get(0); // TODO: don't assume 1 object
         String objectJSON = this.TRANSLATOR.get1411JSONString(obj);
