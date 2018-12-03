@@ -33,16 +33,16 @@ public class DotValve implements IValve {
     private static final Logger LOG = Logger.getLogger(DotValve.class.getName());
     private final String NAME = "DoT"; // DoT = Drillops Town
     private final String DESCRIPTION = "Valve for interaction with Drillops Town"; // DoT = Drillops Town
-    private final String URL; // url endpoint for sending requests
-    private final String API_KEY; // url endpoint for sending requests
     private final DotTranslator TRANSLATOR;
     private final DotAuth AUTH;
+    private final DotDelegator DELEGATOR;
 
     public DotValve(Map<String, String> config) {
-        this.URL = config.get("baseurl"); 
-        this.API_KEY = config.get("apikey"); 
+        String url = config.get("baseurl");
+        String apiKey = config.get("apikey"); 
         this.TRANSLATOR = new DotTranslator();
-        this.AUTH = new DotAuth(this.URL, this.API_KEY);
+        this.AUTH = new DotAuth(url, apiKey);
+        this.DELEGATOR = new DotDelegator(url, apiKey);
     }
 
     /**
@@ -82,38 +82,31 @@ public class DotValve implements IValve {
      */
     @Override
     public String createObject(QueryContext qc) {
-        // TODO: move this to a delegator and check types!!!!!
-        // get a 1.4.1.1 json string
+        // get object information
         AbstractWitsmlObject obj = qc.WITSML_OBJECTS.get(0); // TODO: don't assume 1 object
+        LOG.info("Trying to create object in valve: " + obj);
+        String objectType = obj.getObjectType();
+        String objectUid = obj.getUid();
         String objectJSON = this.TRANSLATOR.get1411JSONString(obj);
 
-        // get the uid
-        String uid = obj.getUid();
-
-        // create endpoint
-        String endpoint = this.URL + "/witsml/wells/" + uid;
-
-        // send put 
+        // get auth token
+        String tokenString;
         try {
-            HttpResponse<JsonNode> response = Unirest.put(endpoint)
-				.header("accept", "application/json")
-				.header("Authorization", this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD).getToken())
-				.header("Ocp-Apim-Subscription-Key", this.API_KEY)
-                .body(objectJSON).asJson();
-            
-            int status = response.getStatus();
-            
-            if (201 == status || 200 == status) {
-                LOG.info("Succesfully put object: " + obj.toString());
-                return uid;
-            } else {
-                LOG.warning("Recieved status code: " + status );
-                return null;
-            }
+            tokenString = this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD).getToken();
         } catch (Exception e) {
-            //TODO: handle exception
-            LOG.warning("Error while creating object in DoTValve: " + e);
+            LOG.warning("Error getting auth token in createObject: " + e.toString());
             return null;
+        }
+
+        // handle each supported object
+        switch (objectType) {
+            case "well":
+                return this.DELEGATOR.addWellToStore(objectUid, objectJSON, tokenString);
+            case "wellbore":
+                return this.DELEGATOR.addWellboreToStore(objectUid, objectJSON, tokenString);
+            default:
+                LOG.warning("Unsupported type encountered in createObject. Type = <" + objectType + ">");
+                return null;
         }
     }
 
