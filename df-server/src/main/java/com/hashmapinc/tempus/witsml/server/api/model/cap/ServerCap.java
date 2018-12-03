@@ -318,7 +318,6 @@ public class ServerCap {
 
             // Add function to list
             function.add(localFunction);
-            it.remove();
         }
 
         // Add server to plural element
