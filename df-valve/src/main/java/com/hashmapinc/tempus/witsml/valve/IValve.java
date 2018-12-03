@@ -58,5 +58,11 @@ public interface IValve {
      */
     public void updateObject(AbstractWitsmlObject query);
 
+    /**
+     * 
+     * @param userName - basic auth username for authentication
+     * @param password - basic auth password for authentication
+     * @return status - boolean value; true = success, false = failure
+     */
     public boolean authenticate(String userName, String password);
 }
