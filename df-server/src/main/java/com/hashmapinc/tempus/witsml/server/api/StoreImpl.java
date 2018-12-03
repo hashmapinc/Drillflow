@@ -162,12 +162,16 @@ public class StoreImpl implements IStore {
         try {
             // get cap string and populate response data
             String data = cap.getWitsmlObject(requestedVersion);
+            LOG.info("Returning cap: " + data);
+            LOG.info("Returning cap again: " + cap.getWitsmlObject(requestedVersion));
+
             resp.setCapabilitiesOut(data);
             resp.setResult((short)1);
         } catch (Exception e) {
             resp.setResult((short)-424);
             LOG.info("Exception in generating GetCap response: " + e.getMessage());
         }
+
         return resp;
     }
 
