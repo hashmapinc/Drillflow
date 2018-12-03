@@ -32,6 +32,7 @@ public class QueryContext {
     public final List<AbstractWitsmlObject> WITSML_OBJECTS;
     public final String USERNAME;
     public final String PASSWORD;
+
     
     /**
      * 
@@ -88,4 +89,7 @@ public class QueryContext {
         this.USERNAME = username;
         this.PASSWORD = password;
     }
+    
+    
+    
 }

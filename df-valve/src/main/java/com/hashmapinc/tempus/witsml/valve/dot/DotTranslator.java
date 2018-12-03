@@ -18,9 +18,18 @@ package com.hashmapinc.tempus.witsml.valve.dot;
 import java.util.logging.Logger;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.witsml.QueryContext;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 
 public class DotTranslator {
     private static final Logger LOG = Logger.getLogger(DotTranslator.class.getName());
+    
+    
+    private DotAuth dotAuth;
+  
 
     /**
      * This function takes the object, converts it to 
@@ -32,5 +41,16 @@ public class DotTranslator {
     public String get1411JSONString(AbstractWitsmlObject obj) {
         LOG.info("Getting 1.4.1.1 json string for object: " + obj.toString());
         return obj.getJSONString("1.4.1.1");
+    }
+    
+    public HttpResponse<JsonNode> getWellResponse(String UID, String JWT) throws UnirestException
+    {
+    	HttpResponse<JsonNode> getResponse = Unirest.get("http://witsml-qa.hashmapinc.com:8080/witsml/wells/"+UID+"")
+    	        .header("accept", "application/json")
+    	        .header("Content-Type", "application/json")
+    	        .header("Authorization", this.dotAuth.getJWT(username, password))
+    	        .asJson();
+    	
+    	return getResponse;
     }
 }
