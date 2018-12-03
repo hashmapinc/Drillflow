@@ -15,6 +15,9 @@
  */
 package com.hashmapinc.tempus.witsml.valve;
 
+import java.util.Map;
+import java.util.List;
+
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.QueryContext;
 
@@ -58,5 +61,19 @@ public interface IValve {
      */
     public void updateObject(AbstractWitsmlObject query);
 
+    /**
+     * Performs authentication
+     * 
+     * @param userName - basic auth username for authentication
+     * @param password - basic auth password for authentication
+     * @return status - boolean value; true = success, false = failure
+     */
     public boolean authenticate(String userName, String password);
+
+    /**
+     * Return a map of FUNCTION_NAME->ARRAY_OF_SUPPORTED_OBJECTS
+     * 
+     * @return capabilities - map of FUNCTION_NAME->ARRAY_OF_SUPPORTED_OBJECTS
+     */
+    public Map<String, AbstractWitsmlObject[]> getCap();
 }

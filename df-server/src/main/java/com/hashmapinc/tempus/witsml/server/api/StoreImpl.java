@@ -16,12 +16,14 @@
 package com.hashmapinc.tempus.witsml.server.api;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.Data;
 import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.WitsmlObjectParser;
 import com.hashmapinc.tempus.witsml.WitsmlUtil;
 import com.hashmapinc.tempus.witsml.server.WitsmlApiConfig;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetFromStoreResponse;
+import com.hashmapinc.tempus.witsml.server.api.model.cap.DataObject;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.ServerCap;
 import com.hashmapinc.tempus.witsml.valve.IValve;
 import com.hashmapinc.tempus.witsml.valve.ValveFactory;
@@ -32,9 +34,12 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.jws.WebService;
+
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @Service
 @WebService(serviceName = "StoreSoapBinding", portName = "StoreSoapBindingSoap",
@@ -68,7 +73,30 @@ public class StoreImpl implements IStore {
 
     @PostConstruct
     private void setValve(){
+        // get the valve
         valve = ValveFactory.buildValve(valveName, valveProps);
+
+        //=====================================================================
+        // update the cap with this valve's capabililies
+        //=====================================================================
+        // get the valve capabilities
+        Map<String, AbstractWitsmlObject[]> valveCaps = valve.getCap();
+        LOG.info("Got the following capabilities from valve: " + valveCaps.toString());
+
+        // populate the cap object from the valveCaps
+        for (String key : valveCaps.keySet()) {
+            // get list of data objects
+            List<AbstractWitsmlObject> supportedAbstractObjects = Arrays.asList(valveCaps.get(key));
+            List<DataObject> supportedDataObjects = supportedAbstractObjects.stream().map((awo) -> {
+                DataObject dataObject = new DataObject();
+                dataObject.setName(awo.getObjectType());
+                return dataObject;
+            }).collect(Collectors.toList());
+
+            // add function to cap
+            this.cap.addFunction(key, supportedDataObjects);
+        }
+        // =====================================================================
     }
 
     @Override
@@ -137,6 +165,7 @@ public class StoreImpl implements IStore {
         WMLS_GetCapResponse resp = new WMLS_GetCapResponse();
         resp.setSuppMsgOut("");
         try {
+            // get cap string and populate response data
             String data = cap.getWitsmlObject(requestedVersion);
             resp.setCapabilitiesOut(data);
             resp.setResult((short)1);
