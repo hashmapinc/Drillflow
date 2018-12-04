@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.tempus.witsml.server.api.model;
+package com.hashmapinc.tempus.witsml.valve.model;
 
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell;
 

@@ -18,137 +18,175 @@ package com.hashmapinc.tempus.witsml.valve.dot;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.xml.transform.TransformerConfigurationException;
+
+import org.json.JSONObject;
+
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlVersionTransformer;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell;
 import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.valve.IValve;
+import com.hashmapinc.tempus.witsml.valve.Util.WitsmUtilConvertor;
+import com.hashmapinc.tempus.witsml.valve.model.WMLS_WellObjectToObj;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
 public class DotValve implements IValve {
-    private static final Logger LOG = Logger.getLogger(DotValve.class.getName());
-    private final String NAME = "DoT"; // DoT = Drillops Town
-    private final String DESCRIPTION = "Valve for interaction with Drillops Town"; // DoT = Drillops Town
-    private final String URL; // url endpoint for sending requests
-    private final String API_KEY; // url endpoint for sending requests
-    private final DotTranslator TRANSLATOR;
-    private final DotAuth AUTH;
+    
+	private static final Logger LOG = Logger.getLogger(DotValve.class.getName());
+	private final String NAME = "DoT"; // DoT = Drillops Town
+	private final String DESCRIPTION = "Valve for interaction with Drillops Town"; // DoT = Drillops Town
+	private final String URL; // url endpoint for sending requests
+	private final String API_KEY; // url endpoint for sending requests
+	private final DotTranslator TRANSLATOR;
+	private final DotAuth AUTH;
+	private final WitsmUtilConvertor witsmlUtilConvertor;
+	private WitsmlVersionTransformer versionConvertor;
 
-    public DotValve(Map<String, String> config) {
-        this.URL = config.get("baseurl"); 
-        this.API_KEY = config.get("apikey"); 
-        this.TRANSLATOR = new DotTranslator();
-        this.AUTH = new DotAuth(this.URL, this.API_KEY);
-    }
+	public DotValve(Map<String, String> config) throws TransformerConfigurationException {
+		this.URL = config.get("baseurl");
+		this.API_KEY = config.get("apikey");
+		this.TRANSLATOR = new DotTranslator();
+		this.witsmlUtilConvertor = new WitsmUtilConvertor();
+		this.AUTH = new DotAuth(this.URL, this.API_KEY);
+		this.versionConvertor = new WitsmlVersionTransformer();
+	}
 
-    /**
-     * Retrieve the name of the valve
-     * @return The name of the valve
-     */
-    @Override
-    public String getName() {
-        return this.NAME;
-    }
+	/**
+	 * Retrieve the name of the valve
+	 * 
+	 * @return The name of the valve
+	 */
+	@Override
+	public String getName() {
+		return this.NAME;
+	}
 
-    /**
-     * Retrieve the description of the valve
-     * @return The description of the valve
-     */
-    @Override
-    public String getDescription() {
-        return this.DESCRIPTION;
-    }
+	/**
+	 * Retrieve the description of the valve
+	 * 
+	 * @return The description of the valve
+	 */
+	@Override
+	public String getDescription() {
+		return this.DESCRIPTION;
+	}
 
-    /**
-     * Gets the object based on the query from the WITSML STORE API
-     * 
-     * @param qc - QueryContext needed to execute the getObject querying
-     * @return The resultant object from the query in xml string format
-     */
-    @Override
-    public String getObject(QueryContext qc) {
+	/**
+	 * Gets the object based on the query from the WITSML STORE API
+	 * 
+	 * @param qc - QueryContext needed to execute the getObject querying
+	 * @return The resultant object from the query in xml string format
+	 */
+	@Override
+	public String getObject(QueryContext qc) {
 
-          
+		try {
+			AbstractWitsmlObject obj = qc.WITSML_OBJECTS.get(0); // converting witsml object to abstract object.
 
+			String populatedJsonString = witsmlUtilConvertor.populatedJSONFromResponseJSON(
+					new JSONObject(TRANSLATOR.get1411JSONString(obj)), TRANSLATOR.getWellResponse(qc));
 
-        return null;
-    }
+			ObjWell well = witsmlUtilConvertor.JsonStringToWellObjectConvert(populatedJsonString);
 
-    /**
-     * Creates an object
-     * 
-     * @param qc - query context to use for query execution
-     * @return the UID of the newly created object
-     */
-    @Override
-    public String createObject(QueryContext qc) {
-        // get a 1.4.1.1 json string
-        AbstractWitsmlObject obj = qc.WITSML_OBJECTS.get(0); // TODO: don't assume 1 object
-        String objectJSON = this.TRANSLATOR.get1411JSONString(obj);
+			// using well onject , witsml version, witsml type create a POJO.
 
-        // get the uid
-        String uid = obj.getUid();
+			WMLS_WellObjectToObj wmls_WellObjectToObj = new WMLS_WellObjectToObj(well, qc.CLIENT_VERSION,
+					qc.OBJECT_TYPE); // POJO
 
-        // create endpoint
-        String endpoint = this.URL + "/witsml/wells/" + uid;
+			String XMLOut = null;
+			if ("1.3.1.1".equals(qc.CLIENT_VERSION)) {
+				XMLOut = versionConvertor.convertVersion(witsmlUtilConvertor.ObjToXMLConvertor(wmls_WellObjectToObj));
+			} else {
+				XMLOut = witsmlUtilConvertor.ObjToXMLConvertor(wmls_WellObjectToObj);
+			}
+			return XMLOut;
+		} catch (Exception e) {
+			return e.getMessage();
+		}
 
-        // send put 
-        try {
-            HttpResponse<JsonNode> response = Unirest.put(endpoint)
-				.header("accept", "application/json")
-				.header("Authorization", this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD).getToken())
-				.header("Ocp-Apim-Subscription-Key", this.API_KEY)
-                .body(objectJSON).asJson();
-            
-            int status = response.getStatus();
-            
-            if (201 == status || 200 == status) {
-                LOG.info("Succesfully put object: " + obj.toString());
-                return uid;
-            } else {
-                LOG.warning("Recieved status code: " + status );
-                return null;
-            }
-        } catch (Exception e) {
-            //TODO: handle exception
-            LOG.warning("Error while creating object in DoTValve: " + e);
-            return null;
-        }
-    }
+	}
 
-    /**
-     * Deletes an object
-     * @param query POJO representing the object that was received
-     */
-    @Override
-    public void deleteObject(AbstractWitsmlObject query) {
-    }
+	/**
+	 * Creates an object
+	 * 
+	 * @param qc - query context to use for query execution
+	 * @return the UID of the newly created object
+	 */
+	@Override
+	public String createObject(QueryContext qc) {
+		// get a 1.4.1.1 json string
+		AbstractWitsmlObject obj = qc.WITSML_OBJECTS.get(0); // TODO: don't assume 1 object
+		String objectJSON = this.TRANSLATOR.get1411JSONString(obj);
 
-    /**
-     * Updates an already existing object
-     * @param query POJO representing the object that was received
-     */
-    @Override
-    public void updateObject(AbstractWitsmlObject query) {
-    }
+		// get the uid
+		String uid = obj.getUid();
 
-    /**
-     * Authenticates with the DotAuth class to get a JWT
-     * @param userName The user name to authenticate with
-     * @param password The password to authenticate with
-     * @return True if successful, false if not
-     */
-    //TODO: This should throw an exception not be a boolean value so that a descriptive message can be logged/returned
-    @Override
-    public boolean authenticate(String userName, String password) {
-        try {
-            DecodedJWT jwt = AUTH.getJWT(userName, password);
-            return jwt != null;
-        } catch (UnirestException e) {
-            return false;
-        }
+		// create endpoint
+		String endpoint = this.URL + "/witsml/wells/" + uid;
 
-    }
+		// send put
+		try {
+			HttpResponse<JsonNode> response = Unirest.put(endpoint).header("accept", "application/json")
+					.header("Authorization", this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD).getToken())
+					.header("Ocp-Apim-Subscription-Key", this.API_KEY).body(objectJSON).asJson();
+
+			int status = response.getStatus();
+
+			if (201 == status || 200 == status) {
+				LOG.info("Succesfully put object: " + obj.toString());
+				return uid;
+			} else {
+				LOG.warning("Recieved status code: " + status);
+				return null;
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			LOG.warning("Error while creating object in DoTValve: " + e);
+			return null;
+		}
+	}
+
+	/**
+	 * Deletes an object
+	 * 
+	 * @param query POJO representing the object that was received
+	 */
+	@Override
+	public void deleteObject(AbstractWitsmlObject query) {
+	}
+
+	/**
+	 * Updates an already existing object
+	 * 
+	 * @param query POJO representing the object that was received
+	 */
+	@Override
+	public void updateObject(AbstractWitsmlObject query) {
+	}
+
+	/**
+	 * Authenticates with the DotAuth class to get a JWT
+	 * 
+	 * @param userName The user name to authenticate with
+	 * @param password The password to authenticate with
+	 * @return True if successful, false if not
+	 */
+	// TODO: This should throw an exception not be a boolean value so that a
+	// descriptive message can be logged/returned
+	@Override
+	public boolean authenticate(String userName, String password) {
+		try {
+			DecodedJWT jwt = AUTH.getJWT(userName, password);
+			return jwt != null;
+		} catch (UnirestException e) {
+			return false;
+		}
+
+	}
+>>>>>>> shifted the logic from StoreImpl to Valve
 }

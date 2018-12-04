@@ -17,11 +17,8 @@ package com.hashmapinc.tempus.witsml.valve.dot;
 
 import java.util.logging.Logger;
 
-import javax.json.JsonObject;
-
 import org.json.JSONObject;
 
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.QueryContext;
 import com.mashape.unirest.http.HttpResponse;

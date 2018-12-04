@@ -29,7 +29,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
-import com.hashmapinc.tempus.WitsmlObjects.v1311.WitsmlObj;
+import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlVersionTransformer;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell;
 import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.WitsmlObjectParser;
@@ -57,17 +57,6 @@ public class StoreImpl implements IStore {
 	private String valveName;
 
 	@Autowired
-
-	
-
-	private WitsmUtilConvertor witsmlPojoToJsonConvertor;
-
-
-	@Autowired
-	private DotTranslator dotTranslator;
-
-	@Autowired
-
 	private void setServerCap(ServerCap cap) {
 		this.cap = cap;
 	}
@@ -175,6 +164,7 @@ public class StoreImpl implements IStore {
 
 
 
+
 		} catch (Exception e) {
 			// TODO: handle exception
 			LOG.warning("could not deserialize witsml object: \n" + "WMLtypeIn: " + WMLtypeIn + " \n" + "QueryIn: "
@@ -192,6 +182,10 @@ public class StoreImpl implements IStore {
 					password);
 
 			// populate response
+
+			
+			String XMLOut = valve.getObject(qc);
+
 			resp.setSuppMsgOut("");
 			resp.setResult((short) 1);
 			resp.setXMLout("");
