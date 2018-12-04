@@ -53,7 +53,7 @@ public interface IStore {
     @RequestWrapper(targetNamespace = "http://www.witsml.org/message/120")
     String getBaseMsg(@WebParam(partName= "ReturnValueIn") Short ReturnValueIn);
 
-    @WebMethod(action = "http://www.witsml.org/action/120/Store.WMLS_GetFromStore")
+    @WebMethod(action = "http://www.witsml.org/action/120/Store.WMLS_GetFromStore", operationName = "WMLS_GetFromStore")
     @RequestWrapper(targetNamespace = "http://www.witsml.org/message/120", localName = "Store.WMLS_GetFromStore")
     @ResponseWrapper(targetNamespace = "http://www.witsml.org/message/120",
             className = "com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetFromStoreResponse")

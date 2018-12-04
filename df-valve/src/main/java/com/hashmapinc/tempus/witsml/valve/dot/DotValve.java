@@ -85,7 +85,6 @@ public class DotValve implements IValve {
         String endpoint = this.URL + "/witsml/wells/" + uid;
 
         // send get
-        JSONObject responseJSON;
         try {
             HttpResponse<JsonNode> response = Unirest
                 .get(endpoint)
@@ -97,36 +96,19 @@ public class DotValve implements IValve {
             int status = response.getStatus();
 
             if (201 == status || 200 == status) {
-                responseJSON = response.getBody().getObject();
-                LOG.info("Got object: " + responseJSON.toString());
                 LOG.info("Succesfully executed GET object for query object=" + obj.toString());
+
+                // get an abstractWitsmlObject from merging the query and the result JSON objects
+                JSONObject queryJSON = new JSONObject(obj.getJSONString("1.4.1.1"));
+                JSONObject responseJSON = response.getBody().getObject();
+                AbstractWitsmlObject mergedResponse = this.TRANSLATOR.translateQueryResponse(queryJSON, responseJSON);
+
+                // return the proper xml string for the client version
+                return mergedResponse.getXMLString(qc.CLIENT_VERSION);
             } else {
                 LOG.warning("Recieved status code from GET object: " + status);
                 return null;
             }
-
-            // merge the responseJSON with the query
-            LOG.info("Merging query and response into single object");
-            String queryJSONstring = obj.getJSONString("1.4.1.1");
-            JSONObject queryJSON = new JSONObject(queryJSONstring);
-            for (Object key : queryJSON.keySet()) {
-                String keyString = (String) key;
-                if (null == queryJSON.get(keyString)) { // only fill in missing values
-                    Object val = responseJSON.get(keyString);
-                    queryJSON.put(keyString, val);
-                }
-            }
-
-            // convert the queryJSON back to valid xml
-            LOG.info("Converting merged query JSON to valid XML string");
-            ObjectMapper objectMapper = new ObjectMapper();
-            AbstractWitsmlObject queryObj = objectMapper.readValue(
-                responseJSON.toString(), 
-                com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell.class
-            );
-
-            // return the proper xml string for the client version
-            return queryObj.getXMLString(qc.CLIENT_VERSION);
         } catch (Exception e) {
             // TODO: handle exception
             LOG.warning("Error while getting object in DoTValve: " + e);

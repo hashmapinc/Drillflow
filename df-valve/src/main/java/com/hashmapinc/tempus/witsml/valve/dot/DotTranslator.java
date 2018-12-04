@@ -15,9 +15,14 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
+import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+
+import org.json.JSONObject;
 
 public class DotTranslator {
     private static final Logger LOG = Logger.getLogger(DotTranslator.class.getName());
@@ -32,5 +37,40 @@ public class DotTranslator {
     public String get1411JSONString(AbstractWitsmlObject obj) {
         LOG.info("Getting 1.4.1.1 json string for object: " + obj.toString());
         return obj.getJSONString("1.4.1.1");
+    }
+
+    /**
+     * merges response into query and returns the parsed 1.4.1.1 object
+     * 
+     * @param query    - JSON object representing the query
+     * @param response - JSON object representing the response from DoT
+     * @return obj - parsed abstract object
+     */
+    public AbstractWitsmlObject translateQueryResponse(
+        JSONObject query, 
+        JSONObject response
+    ) throws IOException {
+        LOG.info("Translating query response.");
+        LOG.info("Query => " + query.toString(2));
+        LOG.info("Response => " + response.toString(2));
+
+        // merge the responseJSON with the query
+        LOG.info("Merging query and response into single object");
+        for (Object key : query.keySet()) { // copy missing query fields from response
+            String keyString = (String) key;
+            LOG.info("Merging key <" + keyString + ">");
+            if (null != query.get(keyString)) { // only fill in missing values
+                Object val = response.get(keyString);
+                query.put(keyString, val);
+            }
+        }
+
+        // convert the queryJSON back to valid xml
+        LOG.info("Converting merged query JSON to valid XML string");
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.readValue(
+            query.toString(),
+            com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell.class
+        );
     }
 }
