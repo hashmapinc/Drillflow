@@ -71,7 +71,41 @@ public class DotValve implements IValve {
      */
     @Override
     public String getObject(QueryContext qc) {
-        return null;
+        // TODO: move this to a delegator and check types!!!!!
+        // get the object and uid
+        AbstractWitsmlObject obj = qc.WITSML_OBJECTS.get(0); //TODO: do not assume only one object
+        String uid = obj.getUid();
+
+        // create endpoint
+        String endpoint = this.URL + "/witsml/wells/" + uid;
+
+        // send get
+        String responseJSONString;
+        try {
+            HttpResponse<JsonNode> response = Unirest
+                .get(endpoint)
+                .header("accept", "application/json")
+                .header("Authorization", this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD).getToken())
+                .header("Ocp-Apim-Subscription-Key", this.API_KEY)
+                .asJson();
+            
+            int status = response.getStatus();
+
+            if (201 == status || 200 == status) {
+                responseJSONString = response.getBody().toString();
+                LOG.info("Got object: " + responseJSONString);
+                LOG.info("Succesfully executed GET object for query object=" + obj.toString());
+            } else {
+                LOG.warning("Recieved status code from GET object: " + status);
+                return null;
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
+            LOG.warning("Error while getting object in DoTValve: " + e);
+            return null;
+        }
+
+        return null; // TODO: don't return null, dummy
     }
 
     /**
@@ -99,7 +133,8 @@ public class DotValve implements IValve {
 				.header("accept", "application/json")
 				.header("Authorization", this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD).getToken())
 				.header("Ocp-Apim-Subscription-Key", this.API_KEY)
-                .body(objectJSON).asJson();
+                .body(objectJSON)
+                .asJson();
             
             int status = response.getStatus();
             
