@@ -231,14 +231,19 @@ public class StoreImpl implements IStore {
                 password
             );
 
+            // get query XML
+            String xmlOut = this.valve.getObject(qc);
+
             // populate response
             resp.setSuppMsgOut("");
             resp.setResult((short)1);
-            resp.setXMLout("");
+            resp.setXMLout(xmlOut);
         } catch (Exception e) {
             resp.setResult((short)-425);
             LOG.warning("Exception in generating GetFromStore response: " + e.getMessage());
         }
+
+        // return response
         return resp;
     }
 
