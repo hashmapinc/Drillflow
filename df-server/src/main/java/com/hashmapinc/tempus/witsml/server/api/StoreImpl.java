@@ -44,236 +44,148 @@ import com.hashmapinc.tempus.witsml.valve.ValveFactory;
 import com.hashmapinc.tempus.witsml.valve.dot.DotTranslator;
 
 @Service
-@WebService(serviceName = "StoreSoapBinding", portName = "StoreSoapBindingSoap",
-        targetNamespace = "http://www.witsml.org/wsdl/120",
-        endpointInterface = "com.hashmapinc.tempus.witsml.server.api.IStore")
+@WebService(serviceName = "StoreSoapBinding", portName = "StoreSoapBindingSoap", targetNamespace = "http://www.witsml.org/wsdl/120", endpointInterface = "com.hashmapinc.tempus.witsml.server.api.IStore")
 public class StoreImpl implements IStore {
 
-    private static final Logger LOG = Logger.getLogger(StoreImpl.class.getName());
+	private static final Logger LOG = Logger.getLogger(StoreImpl.class.getName());
 
-    private ServerCap cap;
-    private WitsmlApiConfig witsmlApiConfigUtil;
-    private IValve valve;
-    @Value("${valve.name}")
-    private String valveName;
-    
-    @Autowired
-    private WitsmlPojoToJsonConvertor witsmlPojoToJsonConvertor;
-    
-    @Autowired
-    private DotTranslator dotTranslator;
+	private ServerCap cap;
+	private WitsmlApiConfig witsmlApiConfigUtil;
+	private IValve valve;
+	@Value("${valve.name}")
+	private String valveName;
 
-    @Autowired
-    private void setServerCap(ServerCap cap){
-        this.cap = cap;
-    }
+	@Autowired
+	private void setServerCap(ServerCap cap) {
+		this.cap = cap;
+	}
 
-    @Autowired
-    private void setWitsmlApiConfig(WitsmlApiConfig witsmlApiConfigUtil){
-        this.witsmlApiConfigUtil = witsmlApiConfigUtil;
-    }
+	@Autowired
+	private void setWitsmlApiConfig(WitsmlApiConfig witsmlApiConfigUtil) {
+		this.witsmlApiConfigUtil = witsmlApiConfigUtil;
+	}
 
-    @Value("${wmls.version:7}")
-    private String version;
+	@Value("${wmls.version:7}")
+	private String version;
 
-    @Value("#{${valveprop}}")
-    private Map<String,String> valveProps;
+	@Value("#{${valveprop}}")
+	private Map<String, String> valveProps;
 
-    @PostConstruct
-    private void setValve(){
-        valve = ValveFactory.buildValve(valveName, valveProps);
-    }
+	@PostConstruct
+	private void setValve() {
+		valve = ValveFactory.buildValve(valveName, valveProps);
+	}
 
-    @Override
-    public int addToStore(
-        String WMLtypeIn,
-        String XMLin,
-        String OptionsIn, 
-        String CapabilitiesIn
-    ) {
-        LOG.info("Executing addToStore");
-        
-        // try to add to store
-        List<AbstractWitsmlObject> witsmlObjects;
-        String uid;
-        try {
-            // build the query context
-            Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
-            String version = WitsmlUtil.getVersionFromXML(XMLin);
-            witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, XMLin, version);
-            ValveUser user = (ValveUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            QueryContext qc = new QueryContext(
-                version, 
-                WMLtypeIn, 
-                optionsMap, 
-                XMLin, 
-                witsmlObjects, 
-                user.getUserName(),
-                user.getPassword()
-            );
+	@Override
+	public int addToStore(String WMLtypeIn, String XMLin, String OptionsIn, String CapabilitiesIn) {
+		LOG.info("Executing addToStore");
 
-            // handle each object
-            uid = valve.createObject(qc);
-            LOG.info(
-                "Successfully added object of type: " + WMLtypeIn + 
-                " and with uid: " + uid
-            );
-        } catch (Exception e) {
-            //TODO: handle exception
-            LOG.warning(
-                "could not add witsml object to store: \n" + 
-                "WMLtypeIn: " + WMLtypeIn + " \n" + 
-                "XMLin: " + XMLin + " \n" + 
-                "OptionsIn: " + OptionsIn + " \n" + 
-                "CapabilitiesIn: " + CapabilitiesIn + "\n" +
-                "Error: " + e
-            );
+		// try to add to store
+		List<AbstractWitsmlObject> witsmlObjects;
+		String uid;
+		try {
+			// build the query context
+			Map<String, String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
+			String version = WitsmlUtil.getVersionFromXML(XMLin);
+			witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, XMLin, version);
+			ValveUser user = (ValveUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			QueryContext qc = new QueryContext(version, WMLtypeIn, optionsMap, XMLin, witsmlObjects, user.getUserName(),
+					user.getPassword());
 
-            return -1; // TODO: Proper error codes
-        }
+			// handle each object
+			uid = valve.createObject(qc);
+			LOG.info("Successfully added object of type: " + WMLtypeIn + " and with uid: " + uid);
+		} catch (Exception e) {
+			// TODO: handle exception
+			LOG.warning("could not add witsml object to store: \n" + "WMLtypeIn: " + WMLtypeIn + " \n" + "XMLin: "
+					+ XMLin + " \n" + "OptionsIn: " + OptionsIn + " \n" + "CapabilitiesIn: " + CapabilitiesIn + "\n"
+					+ "Error: " + e);
 
-        LOG.info("Successfully added object: " + witsmlObjects.get(0).toString());
+			return -1; // TODO: Proper error codes
+		}
 
-        return 1; // TODO: Proper success codes
-    }
+		LOG.info("Successfully added object: " + witsmlObjects.get(0).toString());
 
-    @Override
-    public String getVersion() {
-        LOG.info("Executing GetVersion");
-        return version;
-    }
+		return 1; // TODO: Proper success codes
+	}
 
-    @Override
-    public WMLS_GetCapResponse getCap(String OptionsIn) {
-        LOG.info("Executing GetCap");
-        String requestedVersion = OptionsIn.substring(OptionsIn.lastIndexOf("=") +1);
-        WMLS_GetCapResponse resp = new WMLS_GetCapResponse();
-        resp.setSuppMsgOut("");
-        try {
-            String data = cap.getWitsmlObject(requestedVersion);
-            resp.setCapabilitiesOut(data);
-            resp.setResult((short)1);
-        } catch (Exception e) {
-            resp.setResult((short)-424);
-            LOG.info("Exception in generating GetCap response: " + e.getMessage());
-        }
-        return resp;
-    }
+	@Override
+	public String getVersion() {
+		LOG.info("Executing GetVersion");
+		return version;
+	}
 
-    @Override
-    public String getBaseMsg(Short returnValueIn) {
-        LOG.info("Executing GetBaseMsg");
+	@Override
+	public WMLS_GetCapResponse getCap(String OptionsIn) {
+		LOG.info("Executing GetCap");
+		String requestedVersion = OptionsIn.substring(OptionsIn.lastIndexOf("=") + 1);
+		WMLS_GetCapResponse resp = new WMLS_GetCapResponse();
+		resp.setSuppMsgOut("");
+		try {
+			String data = cap.getWitsmlObject(requestedVersion);
+			resp.setCapabilitiesOut(data);
+			resp.setResult((short) 1);
+		} catch (Exception e) {
+			resp.setResult((short) -424);
+			LOG.info("Exception in generating GetCap response: " + e.getMessage());
+		}
+		return resp;
+	}
 
-        String errMsg = witsmlApiConfigUtil.getProperty("basemessages." + returnValueIn);
-        if (errMsg == null){
-            errMsg = witsmlApiConfigUtil.getProperty("basemessages.-999");
-        }
-        return errMsg;
-    }
+	@Override
+	public String getBaseMsg(Short returnValueIn) {
+		LOG.info("Executing GetBaseMsg");
 
-    @Override
-    public WMLS_GetFromStoreResponse getFromStore(
-        String WMLtypeIn, 
-        String QueryIn, 
-        String OptionsIn, 
-        String CapabilitiesIn
-    ) {
-        LOG.info("Executing GetFromStore");
-        WMLS_GetFromStoreResponse resp = new WMLS_GetFromStoreResponse();
-        LOG.info(valve.getName());
+		String errMsg = witsmlApiConfigUtil.getProperty("basemessages." + returnValueIn);
+		if (errMsg == null) {
+			errMsg = witsmlApiConfigUtil.getProperty("basemessages.-999");
+		}
+		return errMsg;
+	}
 
-        // try to deserialize
-        List<AbstractWitsmlObject> witsmlObjects;
-        String clientVersion;
-        try {
-            clientVersion = WitsmlUtil.getVersionFromXML(QueryIn);
-            Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
-            witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, QueryIn, clientVersion);
-            ValveUser user = (ValveUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            QueryContext qc = new QueryContext(
-            	clientVersion, 
-                WMLtypeIn, 
-                optionsMap, 
-                QueryIn, 
-                witsmlObjects, 
-                user.getUserName(),
-                user.getPassword()
-            );
-            
-            AbstractWitsmlObject obj = qc.WITSML_OBJECTS.get(0); //converting witsml object to abstract object.
-            String requestJSONString = dotTranslator.get1411JSONString(obj); 
-            JSONObject requestedJsonObj = new JSONObject(requestJSONString); //Converting JSON string to JSON Object
-            JSONObject responseJSONString = dotTranslator.getWellResponse(qc); //response JSON object
-            
-            List<String> keyList = new ArrayList<>();
-            Iterator<?> iterator = requestedJsonObj.keys();
-            while (iterator.hasNext()) {
-                Object key = iterator.next();
-                Object value = responseJSONString.get(key.toString());
-                if(value.equals(null)&&value.equals(""))
-                {
-                	//taking empty keys and creating a array list.
-                	keyList.add(key.toString());
-                	
-                }
+	@Override
+	public WMLS_GetFromStoreResponse getFromStore(String WMLtypeIn, String QueryIn, String OptionsIn,
+			String CapabilitiesIn) {
+		LOG.info("Executing GetFromStore");
+		WMLS_GetFromStoreResponse resp = new WMLS_GetFromStoreResponse();
+		LOG.info(valve.getName());
 
-                
-            }
-            
-            //keyList contains all the keys from json1 whose value is either empty or null
-            
-            
-           
-			// iterating over json2 and looking for keys from json1 which are null or empty
-            for(String key : keyList) {
-            	
-            	String keyValue = responseJSONString.get(key).toString();
-            	//creating a new json with all the populated fields. 
-            }
-            
-            
-            //ObjWell well =	witsmlPojoToJsonConvertor.JsonStringToWellObjectConvert(responseJSONString); //
-            
-            
-		
-            
-        } catch (Exception e) {
-            // TODO: handle exception
-            LOG.warning("could not deserialize witsml object: \n" + 
-                        "WMLtypeIn: " + WMLtypeIn + " \n" + 
-                        "QueryIn: " + QueryIn + " \n" + 
-                        "OptionsIn: " + OptionsIn + " \n" + 
-                        "CapabilitiesIn: " + CapabilitiesIn
-            );
-            return resp; // TODO: proper error handling should go here
-        }
+		// try to deserialize
+		List<AbstractWitsmlObject> witsmlObjects;
+		String clientVersion;
+		try {
+			clientVersion = WitsmlUtil.getVersionFromXML(QueryIn);
+			Map<String, String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
+			witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, QueryIn, clientVersion);
+			ValveUser user = (ValveUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			QueryContext qc = new QueryContext(clientVersion, WMLtypeIn, optionsMap, QueryIn, witsmlObjects,
+					user.getUserName(), user.getPassword());
 
-        // try to query
-        try {
-            // construct query context
-            Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
-            String username = SecurityContextHolder.getContext().getAuthentication().getName();
-            String password = SecurityContextHolder.getContext().getAuthentication().getCredentials().toString();
-            QueryContext qc = new QueryContext(
-                clientVersion,
-                WMLtypeIn,
-                optionsMap,
-                QueryIn,
-                witsmlObjects,
-                username,
-                password
-            );
-           
-            
-            // populate response
-            resp.setSuppMsgOut("");
-            resp.setResult((short)1);
-            resp.setXMLout("");
-        } catch (Exception e) {
-            resp.setResult((short)-425);
-            LOG.warning("Exception in generating GetFromStore response: " + e.getMessage());
-        }
-        return resp;
-    }
+		} catch (Exception e) {
+			// TODO: handle exception
+			LOG.warning("could not deserialize witsml object: \n" + "WMLtypeIn: " + WMLtypeIn + " \n" + "QueryIn: "
+					+ QueryIn + " \n" + "OptionsIn: " + OptionsIn + " \n" + "CapabilitiesIn: " + CapabilitiesIn);
+			return resp; // TODO: proper error handling should go here
+		}
+
+		// try to query
+		try {
+			// construct query context
+			Map<String, String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
+			String username = SecurityContextHolder.getContext().getAuthentication().getName();
+			String password = SecurityContextHolder.getContext().getAuthentication().getCredentials().toString();
+			QueryContext qc = new QueryContext(clientVersion, WMLtypeIn, optionsMap, QueryIn, witsmlObjects, username,
+					password);
+
+			// populate response
+			resp.setSuppMsgOut("");
+			resp.setResult((short) 1);
+			resp.setXMLout("");
+		} catch (Exception e) {
+			resp.setResult((short) -425);
+			LOG.warning("Exception in generating GetFromStore response: " + e.getMessage());
+		}
+		return resp;
+	}
 
 }
