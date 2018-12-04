@@ -18,13 +18,17 @@ package com.hashmapinc.tempus.witsml.valve.dot;
 import java.util.logging.Logger;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
 import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.valve.IValve;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -81,7 +85,7 @@ public class DotValve implements IValve {
         String endpoint = this.URL + "/witsml/wells/" + uid;
 
         // send get
-        String responseJSONString;
+        JSONObject responseJSON;
         try {
             HttpResponse<JsonNode> response = Unirest
                 .get(endpoint)
@@ -93,14 +97,36 @@ public class DotValve implements IValve {
             int status = response.getStatus();
 
             if (201 == status || 200 == status) {
-                responseJSONString = response.getBody().toString();
-                LOG.info("Got object: " + responseJSONString);
+                responseJSON = response.getBody().getObject();
+                LOG.info("Got object: " + responseJSON.toString());
                 LOG.info("Succesfully executed GET object for query object=" + obj.toString());
-                return responseJSONString;
             } else {
                 LOG.warning("Recieved status code from GET object: " + status);
                 return null;
             }
+
+            // merge the responseJSON with the query
+            LOG.info("Merging query and response into single object");
+            String queryJSONstring = obj.getJSONString("1.4.1.1");
+            JSONObject queryJSON = new JSONObject(queryJSONstring);
+            for (Object key : queryJSON.keySet()) {
+                String keyString = (String) key;
+                if (null == queryJSON.get(keyString)) { // only fill in missing values
+                    Object val = responseJSON.get(keyString);
+                    queryJSON.put(keyString, val);
+                }
+            }
+
+            // convert the queryJSON back to valid xml
+            LOG.info("Converting merged query JSON to valid XML string");
+            ObjectMapper objectMapper = new ObjectMapper();
+            AbstractWitsmlObject queryObj = objectMapper.readValue(
+                responseJSON.toString(), 
+                com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell.class
+            );
+
+            // return the proper xml string for the client version
+            return queryObj.getXMLString(qc.CLIENT_VERSION);
         } catch (Exception e) {
             // TODO: handle exception
             LOG.warning("Error while getting object in DoTValve: " + e);

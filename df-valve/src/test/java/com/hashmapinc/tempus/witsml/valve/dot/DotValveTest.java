@@ -101,7 +101,7 @@ public class DotValveTest {
 
         // get
         String xmlOut = this.valve.getObject(qc);
-        assertEquals(xmlOut, well1311XML);
+        assertEquals(well1311XML, xmlOut);
     }
 
     @Test
@@ -114,7 +114,7 @@ public class DotValveTest {
 
         // get
         String xmlOut = this.valve.getObject(qc);
-        assertEquals(xmlOut, well1411XML);
+        assertEquals(well1411XML, xmlOut);
     }
 }
 
