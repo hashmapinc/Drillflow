@@ -30,38 +30,33 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
 public class DotTranslator {
-    private static final Logger LOG = Logger.getLogger(DotTranslator.class.getName());
-    
-    
-    private DotAuth dotAuth;
-    
-   
-  
+	private static final Logger LOG = Logger.getLogger(DotTranslator.class.getName());
 
-    /**
-     * This function takes the object, converts it to 
-     * WITSML 1.4.1.1 if needed, then returns a JSON string of that object
-     * for rest calls
-     * @param qc - Query context containing the object information needed
-     * @return jsonString - String serialization of a JSON version of the 1.4.1.1 witsml objecr
-     */
-    public String get1411JSONString(AbstractWitsmlObject obj) {
-        LOG.info("Getting 1.4.1.1 json string for object: " + obj.toString());
-        return obj.getJSONString("1.4.1.1");
-    }
-    
-    public JSONObject getWellResponse(QueryContext qc) throws UnirestException
-    {
-    	 AbstractWitsmlObject obj = qc.WITSML_OBJECTS.get(0); //converting witsml object to abstract object.
-         String objectJSON = get1411JSONString(obj); // converting Abstract Object to jsonString
-         String UID = obj.getUid();
-    	
-    	HttpResponse<JsonNode> getFromStoreResponse = Unirest.get("http://witsml-qa.hashmapinc.com:8080/witsml/wells/"+UID+"")
-    	        .header("accept", "application/json")
-    	        .header("Content-Type", "application/json")
-    	        .header("Authorization", this.dotAuth.getJWT(qc.USERNAME, qc.PASSWORD).getToken())
-    	        .asJson();
-    	
-    	return getFromStoreResponse.getBody().getObject();
-    }
+	private DotAuth dotAuth;
+
+	/**
+	 * This function takes the object, converts it to WITSML 1.4.1.1 if needed, then
+	 * returns a JSON string of that object for rest calls
+	 * 
+	 * @param qc - Query context containing the object information needed
+	 * @return jsonString - String serialization of a JSON version of the 1.4.1.1
+	 *         witsml objecr
+	 */
+	public String get1411JSONString(AbstractWitsmlObject obj) {
+		LOG.info("Getting 1.4.1.1 json string for object: " + obj.toString());
+		return obj.getJSONString("1.4.1.1");
+	}
+
+	public JSONObject getWellResponse(QueryContext qc) throws UnirestException {
+		AbstractWitsmlObject obj = qc.WITSML_OBJECTS.get(0); // converting witsml object to abstract object.
+		String objectJSON = get1411JSONString(obj); // converting Abstract Object to jsonString
+		String UID = obj.getUid();
+
+		HttpResponse<JsonNode> getFromStoreResponse = Unirest
+				.get("http://witsml-qa.hashmapinc.com:8080/witsml/wells/" + UID + "")
+				.header("accept", "application/json").header("Content-Type", "application/json")
+				.header("Authorization", this.dotAuth.getJWT(qc.USERNAME, qc.PASSWORD).getToken()).asJson();
+
+		return getFromStoreResponse.getBody().getObject();
+	}
 }

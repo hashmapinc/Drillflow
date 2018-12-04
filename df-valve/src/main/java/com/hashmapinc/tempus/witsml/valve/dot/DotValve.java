@@ -69,6 +69,10 @@ public class DotValve implements IValve {
      */
     @Override
     public String getObject(QueryContext qc) {
+
+          
+
+
         return null;
     }
 

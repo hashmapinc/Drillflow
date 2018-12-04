@@ -15,8 +15,6 @@
  */
 package com.hashmapinc.tempus.witsml.server.api;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -31,12 +29,15 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.WitsmlObj;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell;
 import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.WitsmlObjectParser;
 import com.hashmapinc.tempus.witsml.WitsmlUtil;
 import com.hashmapinc.tempus.witsml.server.WitsmlApiConfig;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetFromStoreResponse;
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_WellObjectToObj;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.ServerCap;
 import com.hashmapinc.tempus.witsml.util.WitsmlPojoToJsonConvertor;
 import com.hashmapinc.tempus.witsml.valve.IValve;
@@ -56,6 +57,15 @@ public class StoreImpl implements IStore {
 	private String valveName;
 
 	@Autowired
+<<<<<<< HEAD
+=======
+	private WitsmlPojoToJsonConvertor witsmlPojoToJsonConvertor;
+
+	@Autowired
+	private DotTranslator dotTranslator;
+
+	@Autowired
+>>>>>>> Implement filtered querying
 	private void setServerCap(ServerCap cap) {
 		this.cap = cap;
 	}
@@ -161,6 +171,7 @@ public class StoreImpl implements IStore {
 			QueryContext qc = new QueryContext(clientVersion, WMLtypeIn, optionsMap, QueryIn, witsmlObjects,
 					user.getUserName(), user.getPassword());
 
+
 		} catch (Exception e) {
 			// TODO: handle exception
 			LOG.warning("could not deserialize witsml object: \n" + "WMLtypeIn: " + WMLtypeIn + " \n" + "QueryIn: "
@@ -186,6 +197,7 @@ public class StoreImpl implements IStore {
 			LOG.warning("Exception in generating GetFromStore response: " + e.getMessage());
 		}
 		return resp;
+
 	}
 
 }
