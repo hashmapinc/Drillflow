@@ -21,6 +21,7 @@ import java.util.logging.Logger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
 
 import org.json.JSONObject;
 
@@ -51,8 +52,6 @@ public class DotTranslator {
         JSONObject response
     ) throws IOException {
         LOG.info("Translating query response.");
-        LOG.info("Query => " + query.toString(2));
-        LOG.info("Response => " + response.toString(2));
 
         // merge the responseJSON with the query
         LOG.info("Merging query and response into single object");
@@ -67,10 +66,6 @@ public class DotTranslator {
 
         // convert the queryJSON back to valid xml
         LOG.info("Converting merged query JSON to valid XML string");
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.readValue(
-            query.toString(),
-            com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell.class
-        );
+        return WitsmlMarshal.deserializeFromJSON(query.toString(), com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell.class);
     }
 }
