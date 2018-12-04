@@ -219,16 +219,15 @@ public class StoreImpl implements IStore {
         try {
             // construct query context
             Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
-            String username = SecurityContextHolder.getContext().getAuthentication().getName();
-            String password = SecurityContextHolder.getContext().getAuthentication().getCredentials().toString();
+            ValveUser user = (ValveUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             QueryContext qc = new QueryContext(
                 clientVersion,
                 WMLtypeIn,
                 optionsMap,
                 QueryIn,
                 witsmlObjects,
-                username,
-                password
+                user.getUserName(),
+                user.getPassword()
             );
 
             // get query XML
@@ -240,7 +239,8 @@ public class StoreImpl implements IStore {
             resp.setXMLout(xmlOut);
         } catch (Exception e) {
             resp.setResult((short)-425);
-            LOG.warning("Exception in generating GetFromStore response: " + e.getMessage());
+            LOG.warning("Exception in generating GetFromStore response: " + e.toString());
+            e.printStackTrace();
         }
 
         // return response
