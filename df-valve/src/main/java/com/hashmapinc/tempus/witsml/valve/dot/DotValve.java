@@ -74,6 +74,7 @@ public class DotValve implements IValve {
         // TODO: move this to a delegator and check types!!!!!
         // get the object and uid
         AbstractWitsmlObject obj = qc.WITSML_OBJECTS.get(0); //TODO: do not assume only one object
+        LOG.info("Getting object from store: " + obj.toString());
         String uid = obj.getUid();
 
         // create endpoint
@@ -95,6 +96,7 @@ public class DotValve implements IValve {
                 responseJSONString = response.getBody().toString();
                 LOG.info("Got object: " + responseJSONString);
                 LOG.info("Succesfully executed GET object for query object=" + obj.toString());
+                return responseJSONString;
             } else {
                 LOG.warning("Recieved status code from GET object: " + status);
                 return null;
@@ -104,8 +106,6 @@ public class DotValve implements IValve {
             LOG.warning("Error while getting object in DoTValve: " + e);
             return null;
         }
-
-        return null; // TODO: don't return null, dummy
     }
 
     /**
