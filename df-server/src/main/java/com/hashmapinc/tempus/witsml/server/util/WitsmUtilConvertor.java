@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.tempus.witsml.util;
+package com.hashmapinc.tempus.witsml.server.util;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -33,7 +33,7 @@ import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetFromStoreRequest;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_WellObjectToObj;
 
-public class WitsmlPojoToJsonConvertor {
+public class WitsmUtilConvertor {
 
 	public String pojotojsonConvertor(WMLS_GetFromStoreRequest wmls_GetFromStoreRequest) {
 
