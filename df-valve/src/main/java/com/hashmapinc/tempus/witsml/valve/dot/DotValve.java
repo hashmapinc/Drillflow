@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -87,9 +88,19 @@ public class DotValve implements IValve {
 
 		try {
 			AbstractWitsmlObject obj = qc.WITSML_OBJECTS.get(0); // converting witsml object to abstract object.
+			
+			//String objectJSON = TRANSLATOR.get1411JSONString(obj); // converting Abstract Object to jsonString
+			String UID = obj.getUid();
 
+			HttpResponse<JsonNode> getFromStoreResponse = Unirest
+					.get("http://witsml-qa.hashmapinc.com:8080/witsml/wells/" + UID + "")
+					.header("accept", "application/json").header("Content-Type", "application/json")
+					.header("Authorization", this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD).getToken())
+					.asJson();
+		
+			
 			String populatedJsonString = witsmlUtilConvertor.populatedJSONFromResponseJSON(
-					new JSONObject(TRANSLATOR.get1411JSONString(obj)), TRANSLATOR.getWellResponse(qc));
+					new JSONObject(TRANSLATOR.get1411JSONString(obj)),  getFromStoreResponse.getBody().getObject());
 
 			ObjWell well = witsmlUtilConvertor.JsonStringToWellObjectConvert(populatedJsonString);
 
@@ -188,5 +199,31 @@ public class DotValve implements IValve {
 		}
 
 	}
->>>>>>> shifted the logic from StoreImpl to Valve
+	/**
+     * Return a map of FUNCTION_NAME->LIST_OF_SUPPORTED_OBJECTS
+     * 
+     * @return capabilities - map of FUNCTION_NAME->LIST_OF_SUPPORTED_OBJECTS
+     */
+    public Map<String, AbstractWitsmlObject[]> getCap() {
+        // define capabilities map
+        Map<String, AbstractWitsmlObject[]> cap = new HashMap<>(); 
+
+        // array of supported functions
+        String[] funcs = {
+            "AddToStore"
+        }; 
+
+        // supported objects for each function
+        AbstractWitsmlObject well = new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell(); // 1311 is arbitrary
+        AbstractWitsmlObject[][] supportedObjects = {
+            {well} // ADD TO STORE OBJECTS
+        };
+
+        // populate cap
+        for (int i = 0; i < funcs.length; i++) {
+            cap.put(funcs[i], supportedObjects[i]);
+        }
+
+        return cap;
+    }
 }

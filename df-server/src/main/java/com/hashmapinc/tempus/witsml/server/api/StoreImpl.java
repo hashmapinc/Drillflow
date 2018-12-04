@@ -37,9 +37,9 @@ import com.hashmapinc.tempus.witsml.WitsmlUtil;
 import com.hashmapinc.tempus.witsml.server.WitsmlApiConfig;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetFromStoreResponse;
-import com.hashmapinc.tempus.witsml.server.api.model.WMLS_WellObjectToObj;
+
 import com.hashmapinc.tempus.witsml.server.api.model.cap.ServerCap;
-import com.hashmapinc.tempus.witsml.server.util.WitsmUtilConvertor;
+
 import com.hashmapinc.tempus.witsml.valve.IValve;
 import com.hashmapinc.tempus.witsml.valve.ValveFactory;
 import com.hashmapinc.tempus.witsml.valve.dot.DotTranslator;
@@ -73,7 +73,7 @@ public class StoreImpl implements IStore {
 	private Map<String, String> valveProps;
 
 	@PostConstruct
-	private void setValve() {
+	private void setValve() throws Exception {
 		valve = ValveFactory.buildValve(valveName, valveProps);
 	}
 
@@ -162,9 +162,6 @@ public class StoreImpl implements IStore {
 			QueryContext qc = new QueryContext(clientVersion, WMLtypeIn, optionsMap, QueryIn, witsmlObjects,
 					user.getUserName(), user.getPassword());
 
-
-
-
 		} catch (Exception e) {
 			// TODO: handle exception
 			LOG.warning("could not deserialize witsml object: \n" + "WMLtypeIn: " + WMLtypeIn + " \n" + "QueryIn: "
@@ -183,7 +180,6 @@ public class StoreImpl implements IStore {
 
 			// populate response
 
-			
 			String XMLOut = valve.getObject(qc);
 
 			resp.setSuppMsgOut("");

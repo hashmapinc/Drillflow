@@ -17,9 +17,11 @@ package com.hashmapinc.tempus.witsml.valve;
 
 import java.util.Map;
 
+import javax.xml.transform.TransformerConfigurationException;
+
 public class ValveFactory {
 
-    public static IValve buildValve(String valveType, Map<String,String> config) {
+    public static IValve buildValve(String valveType, Map<String,String> config) throws Exception {
         switch (valveType) {
             case "DoT":
                 return new com.hashmapinc.tempus.witsml.valve.dot.DotValve(config);

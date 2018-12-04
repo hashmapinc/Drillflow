@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.transform.TransformerConfigurationException;
 
 public class DotValveTest {
 	private String username;
@@ -40,7 +41,7 @@ public class DotValveTest {
     private DotValve valve;
 
 	@Before
-	public void doSetup() {
+	public void doSetup() throws Exception {
 		this.username = "admin";
         this.password = "12345";
         HashMap<String, String> config = new HashMap<>();

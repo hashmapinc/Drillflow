@@ -43,7 +43,7 @@ public class ValveAuthenticationProvider implements AuthenticationProvider {
     private Map<String,String> valveProps;
 
     @PostConstruct
-    private void setValve(){
+    private void setValve() throws Exception{
         valve = ValveFactory.buildValve(valveName,valveProps);
     }
     
