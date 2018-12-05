@@ -56,7 +56,7 @@ public class DotTranslator {
         for (Object key : query.keySet()) { // copy missing query fields from response
             String keyString = (String) key;
             LOG.info("Merging key <" + keyString + ">");
-            if (null == query.get(keyString)) { // only fill in missing values
+            if (query.get(keyString).equals("")) { // only fill in missing values
                 Object val = response.get(keyString);
                 query.put(keyString, val);
             }

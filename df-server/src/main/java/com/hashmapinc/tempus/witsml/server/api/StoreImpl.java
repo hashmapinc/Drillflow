@@ -21,8 +21,10 @@ import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.WitsmlObjectParser;
 import com.hashmapinc.tempus.witsml.WitsmlUtil;
 import com.hashmapinc.tempus.witsml.server.WitsmlApiConfig;
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_AddToStoreResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetFromStoreResponse;
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetVersionResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.DataObject;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.ServerCap;
 import com.hashmapinc.tempus.witsml.valve.IValve;
@@ -100,7 +102,7 @@ public class StoreImpl implements IStore {
     }
 
     @Override
-    public int addToStore(
+    public WMLS_AddToStoreResponse addToStore(
         String WMLtypeIn,
         String XMLin,
         String OptionsIn, 
@@ -111,6 +113,7 @@ public class StoreImpl implements IStore {
         // try to add to store
         List<AbstractWitsmlObject> witsmlObjects;
         String uid;
+        WMLS_AddToStoreResponse response = new WMLS_AddToStoreResponse();
         try {
             // build the query context
             Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
@@ -143,19 +146,22 @@ public class StoreImpl implements IStore {
                 "CapabilitiesIn: " + CapabilitiesIn + "\n" +
                 "Error: " + e
             );
-
-            return -1; // TODO: Proper error codes
+            response.setResult((short)-1);
+            return response;
         }
 
         LOG.info("Successfully added object: " + witsmlObjects.get(0).toString());
 
-        return 1; // TODO: Proper success codes
+        response.setResult((short)1);
+        return response;
     }
 
     @Override
-    public String getVersion() {
+    public WMLS_GetVersionResponse getVersion() {
         LOG.info("Executing GetVersion");
-        return version;
+        WMLS_GetVersionResponse resp = new WMLS_GetVersionResponse();
+        resp.setResult(version);
+        return resp;
     }
 
     @Override
