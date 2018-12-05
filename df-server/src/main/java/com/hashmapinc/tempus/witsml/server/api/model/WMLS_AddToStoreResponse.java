@@ -16,4 +16,22 @@
 package com.hashmapinc.tempus.witsml.server.api.model;
 
 public class WMLS_AddToStoreResponse {
+    private short Result;
+    private String SuppMsgOut;
+
+    public short getResult() {
+        return Result;
+    }
+
+    public void setResult(short result) {
+        Result = result;
+    }
+
+    public String getSuppMsgOut() {
+        return SuppMsgOut;
+    }
+
+    public void setSuppMsgOut(String suppMsgOut) {
+        SuppMsgOut = suppMsgOut;
+    }
 }

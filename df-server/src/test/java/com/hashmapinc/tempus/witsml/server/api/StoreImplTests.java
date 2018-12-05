@@ -44,8 +44,8 @@ public class StoreImplTests {
 				"XMLin",
 				"OptionsIn",
 				"CapabilitiesIn"
-			)
-		).isEqualTo(-1);
+			).getResult()
+		).isEqualTo((short)-1);
 	}
 
 	@Test
