@@ -66,7 +66,7 @@ public class StoreImplTests {
 
 	@Test
 	public void getVersionShouldReturnDefaultVersion(){
-		assertThat(this.witsmlServer.getVersion()).contains("1.3.1.1,1.4.1.1");
+		assertThat(this.witsmlServer.getVersion().getResult()).contains("1.3.1.1,1.4.1.1");
 	}
 
 	@Test

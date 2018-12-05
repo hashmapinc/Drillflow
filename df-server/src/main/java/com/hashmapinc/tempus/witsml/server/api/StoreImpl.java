@@ -23,6 +23,7 @@ import com.hashmapinc.tempus.witsml.WitsmlUtil;
 import com.hashmapinc.tempus.witsml.server.WitsmlApiConfig;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetFromStoreResponse;
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetVersionResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.DataObject;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.ServerCap;
 import com.hashmapinc.tempus.witsml.valve.IValve;
@@ -153,9 +154,11 @@ public class StoreImpl implements IStore {
     }
 
     @Override
-    public String getVersion() {
+    public WMLS_GetVersionResponse getVersion() {
         LOG.info("Executing GetVersion");
-        return version;
+        WMLS_GetVersionResponse resp = new WMLS_GetVersionResponse();
+        resp.setResult(version);
+        return resp;
     }
 
     @Override

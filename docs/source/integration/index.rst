@@ -12,3 +12,4 @@ These guides will help you integrate the WITSML Server API with your API impleme
    witsml_ver
    capabilities
    returnmsg.rst
+   valve\index.rst
