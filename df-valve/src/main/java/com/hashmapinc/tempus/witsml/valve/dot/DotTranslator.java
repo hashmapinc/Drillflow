@@ -64,6 +64,6 @@ public class DotTranslator {
 
         // convert the queryJSON back to valid xml
         LOG.info("Converting merged query JSON to valid XML string");
-        return WitsmlMarshal.deserializeFromJSON(query.toString(), com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell.class);
+        return WitsmlMarshal.deserializeFromJSON(query.toString(), com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell.class);
     }
 }
