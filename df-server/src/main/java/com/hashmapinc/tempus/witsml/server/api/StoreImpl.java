@@ -240,9 +240,14 @@ public class StoreImpl implements IStore {
             String xmlOut = this.valve.getObject(qc);
 
             // populate response
-            resp.setSuppMsgOut("");
-            resp.setResult((short)1);
-            resp.setXMLout(xmlOut);
+            if (null != xmlOut) {
+                resp.setSuppMsgOut("");
+                resp.setResult((short) 1);
+                resp.setXMLout(xmlOut);
+            } else {
+                resp.setSuppMsgOut("Error from REST backend");
+                resp.setResult((short) -1);
+            }
         } catch (Exception e) {
             resp.setResult((short)-425);
             LOG.warning("Exception in generating GetFromStore response: " + e.toString());
