@@ -16,10 +16,8 @@
 package com.hashmapinc.tempus.witsml.valve.dot;
 
 import java.io.IOException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
 

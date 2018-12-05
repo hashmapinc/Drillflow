@@ -18,9 +18,7 @@ package com.hashmapinc.tempus.witsml.valve.dot;
 import java.util.logging.Logger;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
-import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
 import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.valve.IValve;
 import com.mashape.unirest.http.HttpResponse;
