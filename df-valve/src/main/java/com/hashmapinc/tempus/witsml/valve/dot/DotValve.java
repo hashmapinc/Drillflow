@@ -133,9 +133,6 @@ public class DotValve implements IValve {
         AbstractWitsmlObject obj = qc.WITSML_OBJECTS.get(0); // TODO: don't assume 1 object
         String objectJSON = this.TRANSLATOR.get1411JSONString(obj);
 
-        // get the uid
-        String uid = obj.getUid();
-
         // create endpoint
         String endpoint = this.URL + "/witsml/wells/";
 
