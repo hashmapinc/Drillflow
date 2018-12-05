@@ -102,7 +102,13 @@ public class DotValve implements IValve {
                 AbstractWitsmlObject mergedResponse = this.TRANSLATOR.translateQueryResponse(queryJSON, responseJSON);
 
                 // return the proper xml string for the client version
-                return mergedResponse.getXMLString(qc.CLIENT_VERSION);
+                if ("1.4.1.1".equals(qc.CLIENT_VERSION)) {
+                    return mergedResponse.getXMLString(qc.CLIENT_VERSION); // no version translation required
+                } else if ("1.3.1.1".equals(qc.CLIENT_VERSION)) {
+                    return this.TRANSLATOR.get1311XMLString(mergedResponse); // version translation required
+                } else {
+                    return null;
+                }
             } else {
                 LOG.warning("Recieved status code from GET object: " + status);
                 return null;

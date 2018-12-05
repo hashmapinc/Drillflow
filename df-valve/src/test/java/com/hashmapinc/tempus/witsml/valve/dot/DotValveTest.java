@@ -23,9 +23,6 @@ import org.junit.Test;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -33,6 +30,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.xml.bind.JAXBException;
+
+import static org.junit.Assert.*;
 
 public class DotValveTest {
 	private String username;
@@ -102,6 +101,7 @@ public class DotValveTest {
         // get
         String xmlOut = this.valve.getObject(qc);
         assertNotNull(xmlOut);
+        assertFalse(xmlOut.contains("ns0:wells"));
     }
 
     @Test
@@ -115,6 +115,7 @@ public class DotValveTest {
         // get
         String xmlOut = this.valve.getObject(qc);
         assertNotNull(xmlOut);
+        assertFalse(xmlOut.contains("ns0:wells"));
     }
 }
 
