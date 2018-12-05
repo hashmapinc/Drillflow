@@ -202,13 +202,15 @@ public class DotValve implements IValve {
 
         // array of supported functions
         String[] funcs = {
-            "AddToStore"
+            "AddToStore",
+            "GetFromStore"
         }; 
 
         // supported objects for each function
         AbstractWitsmlObject well = new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell(); // 1311 is arbitrary
         AbstractWitsmlObject[][] supportedObjects = {
-            {well} // ADD TO STORE OBJECTS
+            {well}, // ADD TO STORE OBJECTS
+            {well}, // GET FROM STORE OBJECTS
         };
 
         // populate cap
