@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -147,4 +148,32 @@ public class DotValve implements IValve {
         }
 
     }
+    /**
+     * Return a map of FUNCTION_NAME->LIST_OF_SUPPORTED_OBJECTS
+     * 
+     * @return capabilities - map of FUNCTION_NAME->LIST_OF_SUPPORTED_OBJECTS
+     */
+    public Map<String, AbstractWitsmlObject[]> getCap() {
+        // define capabilities map
+        Map<String, AbstractWitsmlObject[]> cap = new HashMap<>(); 
+
+        // array of supported functions
+        String[] funcs = {
+            "AddToStore"
+        }; 
+
+        // supported objects for each function
+        AbstractWitsmlObject well = new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell(); // 1311 is arbitrary
+        AbstractWitsmlObject[][] supportedObjects = {
+            {well} // ADD TO STORE OBJECTS
+        };
+
+        // populate cap
+        for (int i = 0; i < funcs.length; i++) {
+            cap.put(funcs[i], supportedObjects[i]);
+        }
+
+        return cap;
+    }
+
 }

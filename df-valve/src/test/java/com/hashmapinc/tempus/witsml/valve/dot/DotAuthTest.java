@@ -19,6 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -44,7 +45,23 @@ public class DotAuthTest {
 	@Test
 	public void authSuccessScenario() throws UnirestException, Exception {
 		DecodedJWT response = dotAuth.getJWT(username, password);
+		System.out.println("decoded JWT is : "+response);
 		assertNotNull(response);
+	}
+	
+	@Test
+	public void authCacheSuccessScenario() throws UnirestException, Exception {
+		DecodedJWT response = dotAuth.getJWT(username, password);
+		assertNotNull(response);
+		System.out.println("decoded JWT is : "+response.getToken());
+		
+		// Second fetch from the cache for the same credentials.
+		DecodedJWT cacheResponse = dotAuth.getJWT(username, password);
+		assertNotNull(cacheResponse);
+		System.out.println("decoded JWT is : "+cacheResponse.getToken());
+		
+		assertEquals(cacheResponse.getToken(), response.getToken());
+		
 	}
 
 	@Test

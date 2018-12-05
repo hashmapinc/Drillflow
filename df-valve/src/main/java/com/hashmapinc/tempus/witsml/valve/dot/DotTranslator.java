@@ -17,17 +17,7 @@ package com.hashmapinc.tempus.witsml.valve.dot;
 
 import java.util.logging.Logger;
 
-import javax.json.JsonObject;
-
-import org.json.JSONObject;
-
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
-import com.hashmapinc.tempus.witsml.QueryContext;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
 
 public class DotTranslator {
     private static final Logger LOG = Logger.getLogger(DotTranslator.class.getName());
@@ -50,18 +40,5 @@ public class DotTranslator {
         return obj.getJSONString("1.4.1.1");
     }
     
-    public JSONObject getWellResponse(QueryContext qc) throws UnirestException
-    {
-    	 AbstractWitsmlObject obj = qc.WITSML_OBJECTS.get(0); //converting witsml object to abstract object.
-         String objectJSON = get1411JSONString(obj); // converting Abstract Object to jsonString
-         String UID = obj.getUid();
-    	
-    	HttpResponse<JsonNode> getFromStoreResponse = Unirest.get("http://witsml-qa.hashmapinc.com:8080/witsml/wells/"+UID+"")
-    	        .header("accept", "application/json")
-    	        .header("Content-Type", "application/json")
-    	        .header("Authorization", this.dotAuth.getJWT(qc.USERNAME, qc.PASSWORD).getToken())
-    	        .asJson();
-    	
-    	return getFromStoreResponse.getBody().getObject();
-    }
+   
 }

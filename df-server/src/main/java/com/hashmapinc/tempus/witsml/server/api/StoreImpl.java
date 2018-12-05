@@ -15,8 +15,6 @@
  */
 package com.hashmapinc.tempus.witsml.server.api;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -24,7 +22,6 @@ import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.jws.WebService;
 
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -38,10 +35,8 @@ import com.hashmapinc.tempus.witsml.server.WitsmlApiConfig;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetFromStoreResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.ServerCap;
-import com.hashmapinc.tempus.witsml.util.WitsmlPojoToJsonConvertor;
 import com.hashmapinc.tempus.witsml.valve.IValve;
 import com.hashmapinc.tempus.witsml.valve.ValveFactory;
-import com.hashmapinc.tempus.witsml.valve.dot.DotTranslator;
 
 @Service
 @WebService(serviceName = "StoreSoapBinding", portName = "StoreSoapBindingSoap", targetNamespace = "http://www.witsml.org/wsdl/120", endpointInterface = "com.hashmapinc.tempus.witsml.server.api.IStore")
