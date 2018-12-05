@@ -94,7 +94,7 @@ public class DotValve implements IValve {
             int status = response.getStatus();
 
             if (201 == status || 200 == status) {
-                LOG.info("Succesfully executed GET object for query object=" + obj.toString());
+                LOG.info("Successfully executed GET object for query object=" + obj.toString());
 
                 // get an abstractWitsmlObject from merging the query and the result JSON objects
                 JSONObject queryJSON = new JSONObject(obj.getJSONString("1.4.1.1"));
@@ -110,7 +110,7 @@ public class DotValve implements IValve {
                     return null;
                 }
             } else {
-                LOG.warning("Recieved status code from GET object: " + status);
+                LOG.warning("Received status code from GET object: " + status);
                 return null;
             }
         } catch (Exception e) {
@@ -137,11 +137,11 @@ public class DotValve implements IValve {
         String uid = obj.getUid();
 
         // create endpoint
-        String endpoint = this.URL + "/witsml/wells/" + uid;
+        String endpoint = this.URL + "/witsml/wells/";
 
         // send put 
         try {
-            HttpResponse<JsonNode> response = Unirest.put(endpoint)
+            HttpResponse<JsonNode> response = Unirest.post(endpoint)
 				.header("accept", "application/json")
 				.header("Authorization", this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD).getToken())
 				.header("Ocp-Apim-Subscription-Key", this.API_KEY)
@@ -151,15 +151,16 @@ public class DotValve implements IValve {
             int status = response.getStatus();
             
             if (201 == status || 200 == status) {
-                LOG.info("Succesfully put object: " + obj.toString());
-                return uid;
+                LOG.info("Successfully put object: " + obj.toString());
+                return response.getBody().getObject().getString("uid");
             } else {
-                LOG.warning("Recieved status code: " + status );
+                LOG.warning("Received status code: " + status );
                 return null;
             }
         } catch (Exception e) {
             //TODO: handle exception
             LOG.warning("Error while creating object in DoTValve: " + e);
+            e.printStackTrace();
             return null;
         }
     }
