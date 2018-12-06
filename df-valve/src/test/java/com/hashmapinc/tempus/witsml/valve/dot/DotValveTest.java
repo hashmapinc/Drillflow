@@ -91,6 +91,35 @@ public class DotValveTest {
     }
 
     @Test
+    public void createObjectWellbore1311() throws IOException, JAXBException {
+        // get query context
+        String wellbore1311XML = new String(Files.readAllBytes(Paths.get("src/test/resources/wellbore1311.xml")));
+        List<AbstractWitsmlObject> witsmlObjects = (List<AbstractWitsmlObject>) (List<?>) ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores) WitsmlMarshal
+                .deserialize(wellbore1311XML, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore.class)).getWellbore();
+        QueryContext qc = new QueryContext("1.3.1.1", "wellbore", null, wellbore1311XML, witsmlObjects, this.username,
+                this.password);
+
+        // create
+        String uid = this.valve.createObject(qc);
+        assertNotNull(uid);
+        assertEquals("B-001", uid);
+    }
+
+    @Test
+    public void createObjectWellbore1411() throws IOException, JAXBException {
+        // get query context
+        String wellbore1411XML = new String(Files.readAllBytes(Paths.get("src/test/resources/wellbore1411.xml")));
+        List<AbstractWitsmlObject> witsmlObjects = (List<AbstractWitsmlObject>) (List<?>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbores) WitsmlMarshal
+                .deserialize(wellbore1411XML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore.class)).getWellbore();
+        QueryContext qc = new QueryContext("1.4.1.1", "wellbore", null, wellbore1411XML, witsmlObjects, this.username,
+                this.password);
+
+        // create
+        String uid = this.valve.createObject(qc);
+        assertNotNull(uid);
+        assertEquals("B-01", uid);
+    }
+    
     public void getObjectWell1311() throws IOException, JAXBException {
         // get query context
         String well1311XML = new String(Files.readAllBytes(Paths.get("src/test/resources/well1311query.xml")));

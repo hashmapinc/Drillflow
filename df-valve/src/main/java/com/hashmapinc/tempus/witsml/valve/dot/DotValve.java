@@ -35,16 +35,18 @@ public class DotValve implements IValve {
     private static final Logger LOG = Logger.getLogger(DotValve.class.getName());
     private final String NAME = "DoT"; // DoT = Drillops Town
     private final String DESCRIPTION = "Valve for interaction with Drillops Town"; // DoT = Drillops Town
-    private final String URL; // url endpoint for sending requests
-    private final String API_KEY; // url endpoint for sending requests
     private final DotTranslator TRANSLATOR;
     private final DotAuth AUTH;
+    private final DotDelegator DELEGATOR;
+    private final String URL;
+    private final String API_KEY;
 
     public DotValve(Map<String, String> config) {
-        this.URL = config.get("baseurl"); 
+        this.URL = config.get("baseurl");
         this.API_KEY = config.get("apikey"); 
         this.TRANSLATOR = new DotTranslator();
         this.AUTH = new DotAuth(this.URL, this.API_KEY);
+        this.DELEGATOR = new DotDelegator(this.URL, this.API_KEY);
     }
 
     /**
@@ -73,7 +75,6 @@ public class DotValve implements IValve {
      */
     @Override
     public String getObject(QueryContext qc) {
-        // TODO: move this to a delegator and check types!!!!!
         // get the object and uid
         AbstractWitsmlObject obj = qc.WITSML_OBJECTS.get(0); //TODO: do not assume only one object
         LOG.info("Getting object from store: " + obj.toString());
@@ -128,37 +129,31 @@ public class DotValve implements IValve {
      */
     @Override
     public String createObject(QueryContext qc) {
-        // TODO: move this to a delegator and check types!!!!!
-        // get a 1.4.1.1 json string
+        // get object information
         AbstractWitsmlObject obj = qc.WITSML_OBJECTS.get(0); // TODO: don't assume 1 object
+        LOG.info("Creating object: " + obj.toString());
+        String objectType = obj.getObjectType();
         String objectJSON = this.TRANSLATOR.get1411JSONString(obj);
 
-        // create endpoint
-        String endpoint = this.URL + "/witsml/wells/";
-
-        // send put 
+        // get token
+        String tokenString;
         try {
-            HttpResponse<JsonNode> response = Unirest.post(endpoint)
-				.header("accept", "application/json")
-				.header("Authorization", this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD).getToken())
-				.header("Ocp-Apim-Subscription-Key", this.API_KEY)
-                .body(objectJSON)
-                .asJson();
-            
-            int status = response.getStatus();
-            
-            if (201 == status || 200 == status) {
-                LOG.info("Successfully put object: " + obj.toString());
-                return response.getBody().getObject().getString("uid");
-            } else {
-                LOG.warning("Received status code: " + status );
-                return null;
-            }
+            tokenString = this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD).getToken();
         } catch (Exception e) {
-            //TODO: handle exception
-            LOG.warning("Error while creating object in DoTValve: " + e);
+            LOG.warning("Received error getting token string for createObject: " + e);
             e.printStackTrace();
             return null;
+        }
+
+        // handle each supported object
+        switch (objectType) {
+            case "well":
+                return this.DELEGATOR.addWellToStore(objectJSON, tokenString);
+            case "wellbore":
+                return this.DELEGATOR.addWellboreToStore(objectJSON, tokenString);
+            default:
+                LOG.warning("Unsupported type encountered in createObject. Type = <" + objectType + ">");
+                return null;
         }
     }
 
@@ -212,8 +207,9 @@ public class DotValve implements IValve {
 
         // supported objects for each function
         AbstractWitsmlObject well = new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell(); // 1311 is arbitrary
+        AbstractWitsmlObject wellbore = new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore(); // 1311 is arbitrary
         AbstractWitsmlObject[][] supportedObjects = {
-            {well}, // ADD TO STORE OBJECTS
+            {well, wellbore}, // ADD TO STORE OBJECTS
             {well}, // GET FROM STORE OBJECTS
         };
 
