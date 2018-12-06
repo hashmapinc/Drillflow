@@ -411,7 +411,6 @@ public class ServerCap {
 
             // Add function to collection
             function.add(localFunction);
-            it.remove();
         }
 
         // Add server to root plural element

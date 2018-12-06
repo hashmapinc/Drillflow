@@ -21,8 +21,10 @@ import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.WitsmlObjectParser;
 import com.hashmapinc.tempus.witsml.WitsmlUtil;
 import com.hashmapinc.tempus.witsml.server.WitsmlApiConfig;
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_AddToStoreResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetFromStoreResponse;
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetVersionResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.DataObject;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.ServerCap;
 import com.hashmapinc.tempus.witsml.valve.IValve;
@@ -100,7 +102,7 @@ public class StoreImpl implements IStore {
     }
 
     @Override
-    public int addToStore(
+    public WMLS_AddToStoreResponse addToStore(
         String WMLtypeIn,
         String XMLin,
         String OptionsIn, 
@@ -111,6 +113,7 @@ public class StoreImpl implements IStore {
         // try to add to store
         List<AbstractWitsmlObject> witsmlObjects;
         String uid;
+        WMLS_AddToStoreResponse response = new WMLS_AddToStoreResponse();
         try {
             // build the query context
             Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
@@ -138,19 +141,22 @@ public class StoreImpl implements IStore {
                 "could not add witsml object to store: \n" +
                 "Error: " + e
             );
-
-            return -1; // TODO: Proper error codes
+            response.setResult((short)-1);
+            return response;
         }
 
         LOG.info("Successfully added object: " + witsmlObjects.get(0).toString());
 
-        return 1; // TODO: Proper success codes
+        response.setResult((short)1);
+        return response;
     }
 
     @Override
-    public String getVersion() {
+    public WMLS_GetVersionResponse getVersion() {
         LOG.info("Executing GetVersion");
-        return version;
+        WMLS_GetVersionResponse resp = new WMLS_GetVersionResponse();
+        resp.setResult(version);
+        return resp;
     }
 
     @Override
@@ -218,26 +224,36 @@ public class StoreImpl implements IStore {
         try {
             // construct query context
             Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
-            String username = SecurityContextHolder.getContext().getAuthentication().getName();
-            String password = SecurityContextHolder.getContext().getAuthentication().getCredentials().toString();
+            ValveUser user = (ValveUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             QueryContext qc = new QueryContext(
                 clientVersion,
                 WMLtypeIn,
                 optionsMap,
                 QueryIn,
                 witsmlObjects,
-                username,
-                password
+                user.getUserName(),
+                user.getPassword()
             );
 
+            // get query XML
+            String xmlOut = this.valve.getObject(qc);
+
             // populate response
-            resp.setSuppMsgOut("");
-            resp.setResult((short)1);
-            resp.setXMLout("");
+            if (null != xmlOut) {
+                resp.setSuppMsgOut("");
+                resp.setResult((short) 1);
+                resp.setXMLout(xmlOut);
+            } else {
+                resp.setSuppMsgOut("Error from REST backend");
+                resp.setResult((short) -1);
+            }
         } catch (Exception e) {
             resp.setResult((short)-425);
-            LOG.warning("Exception in generating GetFromStore response: " + e.getMessage());
+            LOG.warning("Exception in generating GetFromStore response: " + e.toString());
+            e.printStackTrace();
         }
+
+        // return response
         return resp;
     }
 

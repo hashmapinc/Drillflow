@@ -26,6 +26,8 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,13 +38,15 @@ public class DotValve implements IValve {
     private final DotTranslator TRANSLATOR;
     private final DotAuth AUTH;
     private final DotDelegator DELEGATOR;
+    private final String URL;
+    private final String API_KEY;
 
     public DotValve(Map<String, String> config) {
-        String url = config.get("baseurl");
-        String apiKey = config.get("apikey"); 
+        this.URL = config.get("baseurl");
+        this.API_KEY = config.get("apikey"); 
         this.TRANSLATOR = new DotTranslator();
-        this.AUTH = new DotAuth(url, apiKey);
-        this.DELEGATOR = new DotDelegator(url, apiKey);
+        this.AUTH = new DotAuth(this.URL, this.API_KEY);
+        this.DELEGATOR = new DotDelegator(this.URL, this.API_KEY);
     }
 
     /**
@@ -71,7 +75,50 @@ public class DotValve implements IValve {
      */
     @Override
     public String getObject(QueryContext qc) {
-        return null;
+        // get the object and uid
+        AbstractWitsmlObject obj = qc.WITSML_OBJECTS.get(0); //TODO: do not assume only one object
+        LOG.info("Getting object from store: " + obj.toString());
+        String uid = obj.getUid();
+
+        // create endpoint
+        String endpoint = this.URL + "/witsml/wells/" + uid;
+
+        // send get
+        try {
+            HttpResponse<JsonNode> response = Unirest
+                .get(endpoint)
+                .header("accept", "application/json")
+                .header("Authorization", this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD).getToken())
+                .header("Ocp-Apim-Subscription-Key", this.API_KEY)
+                .asJson();
+            
+            int status = response.getStatus();
+
+            if (201 == status || 200 == status) {
+                LOG.info("Successfully executed GET object for query object=" + obj.toString());
+
+                // get an abstractWitsmlObject from merging the query and the result JSON objects
+                JSONObject queryJSON = new JSONObject(obj.getJSONString("1.4.1.1"));
+                JSONObject responseJSON = response.getBody().getObject();
+                AbstractWitsmlObject mergedResponse = this.TRANSLATOR.translateQueryResponse(queryJSON, responseJSON);
+
+                // return the proper xml string for the client version
+                if ("1.4.1.1".equals(qc.CLIENT_VERSION)) {
+                    return mergedResponse.getXMLString(qc.CLIENT_VERSION); // no version translation required
+                } else if ("1.3.1.1".equals(qc.CLIENT_VERSION)) {
+                    return this.TRANSLATOR.get1311XMLString(mergedResponse); // version translation required
+                } else {
+                    return null;
+                }
+            } else {
+                LOG.warning("Received status code from GET object: " + status);
+                return null;
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
+            LOG.warning("Error while getting object in DoTValve: " + e);
+            return null;
+        }
     }
 
     /**
@@ -84,26 +131,26 @@ public class DotValve implements IValve {
     public String createObject(QueryContext qc) {
         // get object information
         AbstractWitsmlObject obj = qc.WITSML_OBJECTS.get(0); // TODO: don't assume 1 object
-        LOG.info("Trying to create object in valve: " + obj);
+        LOG.info("Creating object: " + obj.toString());
         String objectType = obj.getObjectType();
-        String objectUid = obj.getUid();
         String objectJSON = this.TRANSLATOR.get1411JSONString(obj);
 
-        // get auth token
+        // get token
         String tokenString;
         try {
-            tokenString = this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD).getToken();
+            tokenString = this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD).toString();
         } catch (Exception e) {
-            LOG.warning("Error getting auth token in createObject: " + e.toString());
+            LOG.warning("Received error getting token string for createObject: " + e);
+            e.printStackTrace();
             return null;
         }
 
         // handle each supported object
         switch (objectType) {
             case "well":
-                return this.DELEGATOR.addWellToStore(objectUid, objectJSON, tokenString);
+                return this.DELEGATOR.addWellToStore(objectJSON, tokenString);
             case "wellbore":
-                return this.DELEGATOR.addWellboreToStore(objectUid, objectJSON, tokenString);
+                return this.DELEGATOR.addWellboreToStore(objectJSON, tokenString);
             default:
                 LOG.warning("Unsupported type encountered in createObject. Type = <" + objectType + ">");
                 return null;
@@ -154,14 +201,16 @@ public class DotValve implements IValve {
 
         // array of supported functions
         String[] funcs = {
-            "AddToStore"
+            "AddToStore",
+            "GetFromStore"
         }; 
 
         // supported objects for each function
         AbstractWitsmlObject well = new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell(); // 1311 is arbitrary
         AbstractWitsmlObject wellbore = new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore(); // 1311 is arbitrary
         AbstractWitsmlObject[][] supportedObjects = {
-            {well, wellbore} // ADD TO STORE OBJECTS
+            {well, wellbore}, // ADD TO STORE OBJECTS
+            {well}, // GET FROM STORE OBJECTS
         };
 
         // populate cap

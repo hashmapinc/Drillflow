@@ -13,6 +13,14 @@ package:
 fastPackage:  
 	mvn -q clean package -DskipTests=true
 
+# install
+install:  
+	mvn -q clean install -DskipTests=true
+
+# run
+run: install
+	java -jar ./df-server/target/*.jar
+
 # clean
 clean:
 	mvn -q clean

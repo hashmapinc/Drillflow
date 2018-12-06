@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="../stylesheets/well.xsl" type="text/xsl" media="screen"?>
+<!--   		Example of Well data 		-->
+<wells 
+	xmlns="http://www.witsml.org/schemas/131" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://www.witsml.org/schemas/131  ../obj_well.xsd" 
+	version="1.3.1.1">
+	<documentInfo>
+		<DocumentName>well</DocumentName>
+		<FileCreationInformation>
+			<FileCreationDate>2001-10-31T08:15:00.000Z</FileCreationDate>
+			<SoftwareName>WITSML 1.3.0.0 Server</SoftwareName>
+			<FileCreator>John Smith</FileCreator>
+		</FileCreationInformation>
+	</documentInfo>
+	<well uid="w-123">
+		<name></name>
+	</well>
+</wells>

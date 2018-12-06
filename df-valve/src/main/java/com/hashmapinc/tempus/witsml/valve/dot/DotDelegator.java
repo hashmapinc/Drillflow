@@ -36,62 +36,18 @@ public class DotDelegator {
     /**
      * Submits the object to the DoT rest API for creation
      * 
-     * @param uid         - string uid of the object to create
      * @param objectJSON  - string json of the object to create
      * @param tokenString - string of the JWT to do auth with 
      * @return
      */
-    public String addWellToStore(String uid, String objectJSON, String tokenString) {
-        LOG.info("Adding well to store. UID=<" + uid + ">");
-
+    public String addWellToStore(String objectJSON, String tokenString) {
         // create endpoint
-        String endpoint = this.URL + "/witsml/wells/" + uid;
+        String endpoint = this.URL + "/witsml/wells/";
 
-        // send put
+        // send post
         try {
-            HttpResponse<JsonNode> response = Unirest.put(endpoint).header("accept", "application/json")
-                    .header("Authorization", tokenString)
-                    .header("Ocp-Apim-Subscription-Key", this.API_KEY).body(objectJSON).asJson();
-
-            int status = response.getStatus();
-
-            if (201 == status || 200 == status) {
-                LOG.info("Succesfully added well. UID=<" + uid + ">");
-                return uid;
-            } else {
-                LOG.warning(
-                    "Recieved status code from well put: " + status + "\n" + 
-                    "URL=" + this.URL + "\n" +
-                    "ObjectJSON=" + objectJSON + "\n"
-                );
-                return null;
-            }
-        } catch (Exception e) {
-            // TODO: handle exception
-            LOG.warning("Error while creating object in DoTValve: " + e);
-            return null;
-        }
-    }
-
-
-
-    /**
-     * Submits the object to the DoT rest API for creation
-     * 
-     * @param uid         - string uid of the object to create
-     * @param objectJSON  - string json of the object to create
-     * @param tokenString - string of the JWT to do auth with
-     * @return
-     */
-    public String addWellboreToStore(String uid, String objectJSON, String tokenString) {
-        LOG.info("Adding wellbore to store. UID=<" + uid + ">");
-
-        // create endpoint
-        String endpoint = this.URL + "/witsml/wellbores/" + uid;
-
-        // send put
-        try {
-            HttpResponse<JsonNode> response = Unirest.put(endpoint)
+            HttpResponse<JsonNode> response = Unirest.
+                post(endpoint)
                 .header("accept", "application/json")
                 .header("Authorization", tokenString)
                 .header("Ocp-Apim-Subscription-Key", this.API_KEY)
@@ -101,18 +57,55 @@ public class DotDelegator {
             int status = response.getStatus();
 
             if (201 == status || 200 == status) {
-                LOG.info("Succesfully added wellbore. UID=<" + uid + ">");
+                String uid = response.getBody().getObject().getString("uid");
+                LOG.info("Successfully put well object with uid=" + uid);
                 return uid;
             } else {
-                LOG.warning(
-                    "Recieved status code from wellbore put: " + status + "\n" +
-                    "URL=" + this.URL + "\n" + 
-                    "ObjectJSON=" + objectJSON + "\n");
+                LOG.warning("Received status code from Well POST: " + status);
                 return null;
             }
         } catch (Exception e) {
             // TODO: handle exception
-            LOG.warning("Error while creating object in DoTValve: " + e);
+            LOG.warning("Error while creating well in DoTValve: " + e);
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Submits the object to the DoT rest API for creation
+     * 
+     * @param objectJSON  - string json of the object to create
+     * @param tokenString - string of the JWT to do auth with
+     * @return
+     */
+    public String addWellboreToStore(String objectJSON, String tokenString) {
+        // create endpoint
+        String endpoint = this.URL + "/witsml/wellbores/";
+
+        // send post
+        try {
+            HttpResponse<JsonNode> response = Unirest
+                .post(endpoint)
+                .header("accept", "application/json")
+                .header("Authorization", tokenString)
+                .header("Ocp-Apim-Subscription-Key", this.API_KEY)
+                .body(objectJSON).asJson();
+
+            int status = response.getStatus();
+
+            if (201 == status || 200 == status) {
+                String uid = response.getBody().getObject().getString("uid");
+                LOG.info("Successfully put wellbore object with uid=" + uid);
+                return uid;
+            } else {
+                LOG.warning("Received status code from Wellbore POST: " + status);
+                return null;
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
+            LOG.warning("Error while creating wellbore in DoTValve: " + e);
+            e.printStackTrace();
             return null;
         }
     }
