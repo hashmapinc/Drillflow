@@ -152,6 +152,16 @@ public class StoreImpl implements IStore {
     }
 
     @Override
+    public String deleteFromStore(
+        String WMLtypeIn,
+        String QueryIn,
+        String OptionsIn,
+        String CapabilitiesIn
+    ) {
+        return "RANDY IS A COOL GUY";
+    }
+
+    @Override
     public WMLS_GetVersionResponse getVersion() {
         LOG.info("Executing GetVersion");
         WMLS_GetVersionResponse resp = new WMLS_GetVersionResponse();

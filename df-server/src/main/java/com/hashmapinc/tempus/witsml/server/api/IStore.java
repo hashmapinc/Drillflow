@@ -41,6 +41,16 @@ public interface IStore {
         @WebParam(partName = "CapabilitiesIn") String CapabilitiesIn
     );
 
+    @WebMethod(action = "http://www.witsml.org/action/120/Store.WMLS_DeleteFromStore", operationName = "WMLS_DeleteFromStore")
+    @RequestWrapper(targetNamespace = "http://www.witsml.org/message/120")
+    @SOAPBinding(style=SOAPBinding.Style.RPC, parameterStyle=SOAPBinding.ParameterStyle.BARE, use=SOAPBinding.Use.ENCODED)
+    String deleteFromStore(
+            @WebParam(partName = "WMLtypeIn") String WMLtypeIn,
+            @WebParam(partName = "QueryIn") String QueryIn,
+            @WebParam(partName = "OptionsIn") String OptionsIn,
+            @WebParam(partName = "CapabilitiesIn") String CapabilitiesIn
+    );
+
     @WebMethod(action = "http://www.witsml.org/action/120/Store.WMLS_GetVersion", operationName = "WMLS_GetVersion")
     @ResponseWrapper(className = "com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetVersionResponse")
     @SOAPBinding(style = SOAPBinding.Style.RPC, parameterStyle= SOAPBinding.ParameterStyle.BARE, use = SOAPBinding.Use.ENCODED)
