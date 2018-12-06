@@ -202,7 +202,8 @@ public class DotValve implements IValve {
         // array of supported functions
         String[] funcs = {
             "AddToStore",
-            "GetFromStore"
+            "GetFromStore",
+            "DeleteFromStore",
         }; 
 
         // supported objects for each function
@@ -211,6 +212,7 @@ public class DotValve implements IValve {
         AbstractWitsmlObject[][] supportedObjects = {
             {well, wellbore}, // ADD TO STORE OBJECTS
             {well}, // GET FROM STORE OBJECTS
+            {well}, // DELETE FROM STORE OBJECTS
         };
 
         // populate cap
