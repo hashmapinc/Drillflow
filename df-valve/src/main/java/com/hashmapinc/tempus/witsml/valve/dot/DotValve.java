@@ -15,12 +15,14 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.valve.IValve;
+import com.hashmapinc.tempus.witsml.valve.ValveException;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -159,18 +161,20 @@ public class DotValve implements IValve {
 
     /**
      * Deletes an object
-     * @param query POJO representing the object that was received
+     * @param witsmlObjects - list of AbstractWitsmlObjects to delete
      */
     @Override
-    public void deleteObject(AbstractWitsmlObject query) {
+    public void deleteObject(
+            List<AbstractWitsmlObject> witsmlObjects
+    ) throws ValveException {
     }
 
     /**
      * Updates an already existing object
-     * @param query POJO representing the object that was received
+     * @param witsmlObjects - list of AbstractWitsmlObjects to update
      */
     @Override
-    public void updateObject(AbstractWitsmlObject query) {
+    public void updateObject(List<AbstractWitsmlObject> witsmlObjects) {
     }
 
     /**

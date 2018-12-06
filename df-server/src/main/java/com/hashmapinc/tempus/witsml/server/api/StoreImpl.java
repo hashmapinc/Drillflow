@@ -16,7 +16,6 @@
 package com.hashmapinc.tempus.witsml.server.api;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
-import com.hashmapinc.tempus.WitsmlObjects.v1311.Data;
 import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.WitsmlObjectParser;
 import com.hashmapinc.tempus.witsml.WitsmlUtil;
@@ -25,6 +24,7 @@ import com.hashmapinc.tempus.witsml.server.api.model.WMLS_AddToStoreResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetFromStoreResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetVersionResponse;
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_DeleteFromStoreResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.DataObject;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.ServerCap;
 import com.hashmapinc.tempus.witsml.valve.IValve;
@@ -152,13 +152,45 @@ public class StoreImpl implements IStore {
     }
 
     @Override
-    public String deleteFromStore(
+    public WMLS_DeleteFromStoreResponse deleteFromStore(
         String WMLtypeIn,
         String QueryIn,
         String OptionsIn,
         String CapabilitiesIn
     ) {
-        return "RANDY IS A COOL GUY";
+        LOG.info("Deleting object from store.");
+        WMLS_DeleteFromStoreResponse resp = new WMLS_DeleteFromStoreResponse();
+
+        // set initial ERROR state for resp
+        resp.setResult((short) -1);
+
+        // try to deserialize
+        List<AbstractWitsmlObject> witsmlObjects;
+        try {
+            String clientVersion = WitsmlUtil.getVersionFromXML(QueryIn);
+            witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, QueryIn, clientVersion);
+        } catch (Exception e) {
+            // TODO: handle exception
+            LOG.warning("could not deserialize witsml object: \n" +
+                    "WMLtypeIn: " + WMLtypeIn + " \n" +
+                    "QueryIn: " + QueryIn + " \n" +
+                    "OptionsIn: " + OptionsIn + " \n" +
+                    "CapabilitiesIn: " + CapabilitiesIn
+            );
+            resp.setSuppMsgOut("Bad QueryIn. Got error message: " + e.getMessage());
+            return resp;
+        }
+
+        // try to delete
+        try {
+            this.valve.deleteObject(witsmlObjects);
+            resp.setResult((short) 1);
+        } catch (Exception e) {
+            resp.setSuppMsgOut("Error: " + e.getMessage());
+        }
+
+        // return response
+        return resp;
     }
 
     @Override
@@ -211,7 +243,6 @@ public class StoreImpl implements IStore {
     ) {
         LOG.info("Executing GetFromStore");
         WMLS_GetFromStoreResponse resp = new WMLS_GetFromStoreResponse();
-        LOG.info(valve.getName());
 
         // try to deserialize
         List<AbstractWitsmlObject> witsmlObjects;

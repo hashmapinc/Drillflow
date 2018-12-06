@@ -51,15 +51,15 @@ public interface IValve {
 
     /**
      * Deletes an object
-     * @param query POJO representing the object that was received
+     * @param witsmlObjects - list of AbstractWitsmlObjects to delete
      */
-    public void deleteObject(AbstractWitsmlObject query);
+    public void deleteObject(List<AbstractWitsmlObject> witsmlObjects) throws ValveException;
 
     /**
      * Updates an already existing object
-     * @param query POJO representing the object that was received
+     * @param witsmlObjects - list of AbstractWitsmlObjects to update
      */
-    public void updateObject(AbstractWitsmlObject query);
+    public void updateObject(List<AbstractWitsmlObject> witsmlObjects);
 
     /**
      * Performs authentication
