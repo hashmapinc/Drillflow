@@ -133,17 +133,12 @@ public class StoreImpl implements IStore {
             // handle each object
             uid = valve.createObject(qc);
             LOG.info(
-                "Successfully added object of type: " + WMLtypeIn + 
-                " and with uid: " + uid
+                "Successfully added object: " + witsmlObjects.toString()
             );
         } catch (Exception e) {
             //TODO: handle exception
             LOG.warning(
-                "could not add witsml object to store: \n" + 
-                "WMLtypeIn: " + WMLtypeIn + " \n" + 
-                "XMLin: " + XMLin + " \n" + 
-                "OptionsIn: " + OptionsIn + " \n" + 
-                "CapabilitiesIn: " + CapabilitiesIn + "\n" +
+                "could not add witsml object to store: \n" +
                 "Error: " + e
             );
             response.setResult((short)-1);
@@ -173,12 +168,16 @@ public class StoreImpl implements IStore {
         try {
             // get cap string and populate response data
             String data = cap.getWitsmlObject(requestedVersion);
+            LOG.info("Returning cap: " + data);
+            LOG.info("Returning cap again: " + cap.getWitsmlObject(requestedVersion));
+
             resp.setCapabilitiesOut(data);
             resp.setResult((short)1);
         } catch (Exception e) {
             resp.setResult((short)-424);
             LOG.info("Exception in generating GetCap response: " + e.getMessage());
         }
+
         return resp;
     }
 
