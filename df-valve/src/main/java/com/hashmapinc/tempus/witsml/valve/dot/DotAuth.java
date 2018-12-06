@@ -29,6 +29,7 @@ public class DotAuth {
 	public final String URL;
 	public final String API_KEY;
 	private Map<String, DecodedJWT> cache = new HashMap<String, DecodedJWT>();
+	
 	/**
 	 * DotAuth constructor
 	 * 
@@ -39,6 +40,7 @@ public class DotAuth {
 		this.URL = URL;
 		this.API_KEY = API_KEY;
 	}
+
 	/**
 	 * Generate Token for given creds and save the token in cache
 	 * 
@@ -49,15 +51,18 @@ public class DotAuth {
 	 */
 	public DecodedJWT refreshToken(String username, String password) throws UnirestException {
 		String userinfo = "{\"account\":\"" + username + "\", \"password\":\"" + password + "\"}";
+
 		// send the response
 		HttpResponse<JsonNode> response = Unirest.post(URL).header("accept", "application/json")
 				.header("Ocp-Apim-Subscription-Key", this.API_KEY).body(userinfo).asJson();
+
 		// get the token string
 		String tokenString = response.getBody().getObject().getString("jwt");
 		DecodedJWT decodedJwtToken = JWT.decode(tokenString);
 		cache.put(username, decodedJwtToken);
 		return decodedJwtToken;
 	}
+
 	/**
 	 * Request JWT token for the given creds. Return the token from cache if exists
 	 * else generate a new one.
