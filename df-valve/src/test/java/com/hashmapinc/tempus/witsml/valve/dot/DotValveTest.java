@@ -23,9 +23,6 @@ import org.junit.Test;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -33,6 +30,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.xml.bind.JAXBException;
+
+import static org.junit.Assert.*;
 
 public class DotValveTest {
 	private String username;
@@ -89,6 +88,34 @@ public class DotValveTest {
         String uid = this.valve.createObject(qc);
         assertNotNull(uid);
         assertEquals("w-12", uid);
+    }
+
+    @Test
+    public void getObjectWell1311() throws IOException, JAXBException {
+        // get query context
+        String well1311XML = new String(Files.readAllBytes(Paths.get("src/test/resources/well1311query.xml")));
+        List<AbstractWitsmlObject> witsmlObjects = (List<AbstractWitsmlObject>) (List<?>) ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells) WitsmlMarshal
+                .deserialize(well1311XML, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell.class)).getWell();
+        QueryContext qc = new QueryContext("1.3.1.1", "well", null, well1311XML, witsmlObjects, this.username, this.password);
+
+        // get
+        String xmlOut = this.valve.getObject(qc);
+        assertNotNull(xmlOut);
+        assertFalse(xmlOut.contains("ns0:wells"));
+    }
+
+    @Test
+    public void getObjectWell1411() throws IOException, JAXBException {
+        // get query context
+        String well1411XML = new String(Files.readAllBytes(Paths.get("src/test/resources/well1411query.xml")));
+        List<AbstractWitsmlObject> witsmlObjects = (List<AbstractWitsmlObject>) (List<?>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWells) WitsmlMarshal
+                .deserialize(well1411XML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell.class)).getWell();
+        QueryContext qc = new QueryContext("1.4.1.1", "well", null, well1411XML, witsmlObjects, this.username, this.password);
+
+        // get
+        String xmlOut = this.valve.getObject(qc);
+        assertNotNull(xmlOut);
+        assertFalse(xmlOut.contains("ns0:wells"));
     }
 }
 

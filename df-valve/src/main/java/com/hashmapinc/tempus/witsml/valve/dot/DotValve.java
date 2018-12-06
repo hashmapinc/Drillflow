@@ -26,6 +26,8 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -71,7 +73,51 @@ public class DotValve implements IValve {
      */
     @Override
     public String getObject(QueryContext qc) {
-        return null;
+        // TODO: move this to a delegator and check types!!!!!
+        // get the object and uid
+        AbstractWitsmlObject obj = qc.WITSML_OBJECTS.get(0); //TODO: do not assume only one object
+        LOG.info("Getting object from store: " + obj.toString());
+        String uid = obj.getUid();
+
+        // create endpoint
+        String endpoint = this.URL + "/witsml/wells/" + uid;
+
+        // send get
+        try {
+            HttpResponse<JsonNode> response = Unirest
+                .get(endpoint)
+                .header("accept", "application/json")
+                .header("Authorization", this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD).getToken())
+                .header("Ocp-Apim-Subscription-Key", this.API_KEY)
+                .asJson();
+            
+            int status = response.getStatus();
+
+            if (201 == status || 200 == status) {
+                LOG.info("Successfully executed GET object for query object=" + obj.toString());
+
+                // get an abstractWitsmlObject from merging the query and the result JSON objects
+                JSONObject queryJSON = new JSONObject(obj.getJSONString("1.4.1.1"));
+                JSONObject responseJSON = response.getBody().getObject();
+                AbstractWitsmlObject mergedResponse = this.TRANSLATOR.translateQueryResponse(queryJSON, responseJSON);
+
+                // return the proper xml string for the client version
+                if ("1.4.1.1".equals(qc.CLIENT_VERSION)) {
+                    return mergedResponse.getXMLString(qc.CLIENT_VERSION); // no version translation required
+                } else if ("1.3.1.1".equals(qc.CLIENT_VERSION)) {
+                    return this.TRANSLATOR.get1311XMLString(mergedResponse); // version translation required
+                } else {
+                    return null;
+                }
+            } else {
+                LOG.warning("Received status code from GET object: " + status);
+                return null;
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
+            LOG.warning("Error while getting object in DoTValve: " + e);
+            return null;
+        }
     }
 
     /**
@@ -87,32 +133,31 @@ public class DotValve implements IValve {
         AbstractWitsmlObject obj = qc.WITSML_OBJECTS.get(0); // TODO: don't assume 1 object
         String objectJSON = this.TRANSLATOR.get1411JSONString(obj);
 
-        // get the uid
-        String uid = obj.getUid();
-
         // create endpoint
-        String endpoint = this.URL + "/witsml/wells/" + uid;
+        String endpoint = this.URL + "/witsml/wells/";
 
         // send put 
         try {
-            HttpResponse<JsonNode> response = Unirest.put(endpoint)
+            HttpResponse<JsonNode> response = Unirest.post(endpoint)
 				.header("accept", "application/json")
 				.header("Authorization", this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD).getToken())
 				.header("Ocp-Apim-Subscription-Key", this.API_KEY)
-                .body(objectJSON).asJson();
+                .body(objectJSON)
+                .asJson();
             
             int status = response.getStatus();
             
             if (201 == status || 200 == status) {
-                LOG.info("Succesfully put object: " + obj.toString());
-                return uid;
+                LOG.info("Successfully put object: " + obj.toString());
+                return response.getBody().getObject().getString("uid");
             } else {
-                LOG.warning("Recieved status code: " + status );
+                LOG.warning("Received status code: " + status );
                 return null;
             }
         } catch (Exception e) {
             //TODO: handle exception
             LOG.warning("Error while creating object in DoTValve: " + e);
+            e.printStackTrace();
             return null;
         }
     }
@@ -161,13 +206,15 @@ public class DotValve implements IValve {
 
         // array of supported functions
         String[] funcs = {
-            "AddToStore"
+            "AddToStore",
+            "GetFromStore"
         }; 
 
         // supported objects for each function
         AbstractWitsmlObject well = new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell(); // 1311 is arbitrary
         AbstractWitsmlObject[][] supportedObjects = {
-            {well} // ADD TO STORE OBJECTS
+            {well}, // ADD TO STORE OBJECTS
+            {well}, // GET FROM STORE OBJECTS
         };
 
         // populate cap
