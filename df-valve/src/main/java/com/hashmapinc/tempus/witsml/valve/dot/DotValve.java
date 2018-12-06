@@ -138,7 +138,7 @@ public class DotValve implements IValve {
         // get token
         String tokenString;
         try {
-            tokenString = this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD).toString();
+            tokenString = this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD).getToken();
         } catch (Exception e) {
             LOG.warning("Received error getting token string for createObject: " + e);
             e.printStackTrace();

@@ -37,12 +37,12 @@ public class DotDelegator {
      * Submits the object to the DoT rest API for creation
      * 
      * @param objectJSON  - string json of the object to create
-     * @param tokenString - string of the JWT to do auth with 
+     * @param tokenString - string of the JWT to do auth with
      * @return
      */
     public String addWellToStore(String objectJSON, String tokenString) {
         // create endpoint
-        String endpoint = this.URL + "/witsml/wells/";
+        String endpoint = this.URL + "witsml/wells/";
 
         // send post
         try {
@@ -81,7 +81,7 @@ public class DotDelegator {
      */
     public String addWellboreToStore(String objectJSON, String tokenString) {
         // create endpoint
-        String endpoint = this.URL + "/witsml/wellbores/";
+        String endpoint = this.URL + "witsml/wellbores/";
 
         // send post
         try {

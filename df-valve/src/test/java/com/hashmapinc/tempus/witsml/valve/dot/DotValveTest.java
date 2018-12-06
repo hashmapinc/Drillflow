@@ -102,7 +102,7 @@ public class DotValveTest {
         // create
         String uid = this.valve.createObject(qc);
         assertNotNull(uid);
-        assertEquals("w-12", uid);
+        assertEquals("B-001", uid);
     }
 
     @Test
@@ -117,7 +117,7 @@ public class DotValveTest {
         // create
         String uid = this.valve.createObject(qc);
         assertNotNull(uid);
-        assertEquals("w-12", uid);
+        assertEquals("B-01", uid);
     }
     
     public void getObjectWell1311() throws IOException, JAXBException {
