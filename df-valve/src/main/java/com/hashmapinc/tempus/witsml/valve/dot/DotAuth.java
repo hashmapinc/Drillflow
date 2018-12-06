@@ -18,7 +18,6 @@ package com.hashmapinc.tempus.witsml.valve.dot;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.mashape.unirest.http.HttpResponse;
@@ -30,54 +29,52 @@ public class DotAuth {
 	public final String URL;
 	public final String API_KEY;
 	private Map<String, DecodedJWT> cache = new HashMap<String, DecodedJWT>();
-
+	/**
+	 * DotAuth constructor
+	 * 
+	 * @param URL
+	 * @param API_KEY
+	 */
 	public DotAuth(String URL, String API_KEY) {
 		this.URL = URL;
 		this.API_KEY = API_KEY;
-
 	}
-	/*
-	 * This method generates the Decoded JWT token based on username and password
-	 * passed by the getJWT method.
-	 * */
+	/**
+	 * Generate Token for given creds and save the token in cache
+	 * 
+	 * @param username
+	 * @param password
+	 * @return JWT Token
+	 * @throws UnirestException
+	 */
 	public DecodedJWT refreshToken(String username, String password) throws UnirestException {
-
 		String userinfo = "{\"account\":\"" + username + "\", \"password\":\"" + password + "\"}";
-
 		// send the response
 		HttpResponse<JsonNode> response = Unirest.post(URL).header("accept", "application/json")
 				.header("Ocp-Apim-Subscription-Key", this.API_KEY).body(userinfo).asJson();
-
 		// get the token string
 		String tokenString = response.getBody().getObject().getString("jwt");
-		
 		DecodedJWT decodedJwtToken = JWT.decode(tokenString);
-		
 		cache.put(username, decodedJwtToken);
-
 		return decodedJwtToken;
-
 	}
-
-	/*
-	 * This method checks for the JWT token in cache
-	 * if exists returns the cache else calls refresh token to generate the token
+	/**
+	 * Request JWT token for the given creds. Return the token from cache if exists
+	 * else generate a new one.
 	 * 
+	 * @param username
+	 * @param password
+	 * @return JWT Token from cache if exists else new generated token
+	 * @throws UnirestException
 	 */
 	public DecodedJWT getJWT(String username, String password) throws UnirestException {
-		//check if the Token exists in the Cache.
+		// check if the Token exists in the Cache.
 		if (cache.containsKey(username)) {
-
 			return cache.get(username);
-
 		} else {
-
 			DecodedJWT decodedJWTResponse = this.refreshToken(username, password);
-			
-
 			// return the decoded JWT Token.
 			return decodedJWTResponse;
 		}
 	}
-
 }

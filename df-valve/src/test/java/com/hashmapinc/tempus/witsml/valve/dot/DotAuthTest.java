@@ -18,18 +18,15 @@ package com.hashmapinc.tempus.witsml.valve.dot;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
 public class DotAuthTest {
 	@Autowired
 	private DotAuth dotAuth;
-
 	private String username;
 	private String password;
 
@@ -51,16 +48,12 @@ public class DotAuthTest {
 
 	@Test
 	public void authCacheSuccessScenario() throws UnirestException, Exception {
-
 		DecodedJWT response = dotAuth.getJWT(username, password);
 		assertNotNull(response);
-
 		// Second fetch from the cache for the same credentials.
 		DecodedJWT cacheResponse = dotAuth.getJWT(username, password);
 		assertNotNull(cacheResponse);
-
 		assertEquals(cacheResponse.getToken(), response.getToken());
-
 	}
 
 	@Test
@@ -72,7 +65,5 @@ public class DotAuthTest {
 		} catch (Exception e) {
 			assertNotNull(true);
 		}
-
 	}
-
 }
