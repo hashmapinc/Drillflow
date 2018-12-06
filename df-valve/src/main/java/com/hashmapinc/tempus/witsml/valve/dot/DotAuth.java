@@ -16,6 +16,7 @@
 
 package com.hashmapinc.tempus.witsml.valve.dot;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import com.auth0.jwt.JWT;
@@ -51,11 +52,9 @@ public class DotAuth {
 	 */
 	public DecodedJWT refreshToken(String username, String password) throws UnirestException {
 		String userinfo = "{\"account\":\"" + username + "\", \"password\":\"" + password + "\"}";
-
 		// send the response
 		HttpResponse<JsonNode> response = Unirest.post(URL).header("accept", "application/json")
 				.header("Ocp-Apim-Subscription-Key", this.API_KEY).body(userinfo).asJson();
-
 		// get the token string
 		String tokenString = response.getBody().getObject().getString("jwt");
 		DecodedJWT decodedJwtToken = JWT.decode(tokenString);
@@ -69,17 +68,36 @@ public class DotAuth {
 	 * 
 	 * @param username
 	 * @param password
-	 * @return JWT Token from cache if exists else new generated token
+	 * @return JWT Token from cache if exists and not expired else new generated
+	 *         token
 	 * @throws UnirestException
 	 */
 	public DecodedJWT getJWT(String username, String password) throws UnirestException {
 		// check if the Token exists in the Cache.
-		if (cache.containsKey(username)) {
+		if (cache.containsKey(username) && !isTokenExpired(username)) {
 			return cache.get(username);
 		} else {
-			DecodedJWT decodedJWTResponse = this.refreshToken(username, password);
+			DecodedJWT decodedJWTResponse = refreshToken(username, password);
 			// return the decoded JWT Token.
 			return decodedJWTResponse;
 		}
+	}
+
+	/**
+	 * Check if JWT Token expired for given username
+	 * 
+	 * @param username
+	 * @return true if token expired else false
+	 */
+	private boolean isTokenExpired(String username) {
+		boolean result = false;
+		DecodedJWT decodedJWT = cache.get(username);
+		Date tokenExpiredDate = decodedJWT.getExpiresAt();
+		Date now = new Date();
+
+		if (now.getTime() > tokenExpiredDate.getTime()) {
+			result = true;
+		}
+		return result;
 	}
 }
