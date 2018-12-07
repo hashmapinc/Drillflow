@@ -51,9 +51,9 @@ public interface IValve {
 
     /**
      * Deletes an object
-     * @param witsmlObjects - list of AbstractWitsmlObjects to delete
+     * @param qc - QueryContext needed to execute the deleteObject querying
      */
-    public void deleteObject(List<AbstractWitsmlObject> witsmlObjects) throws ValveException;
+    public void deleteObject(QueryContext qc) throws ValveException;
 
     /**
      * Updates an already existing object

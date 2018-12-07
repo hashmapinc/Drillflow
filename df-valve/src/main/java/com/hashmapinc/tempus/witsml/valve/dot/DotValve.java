@@ -161,12 +161,30 @@ public class DotValve implements IValve {
 
     /**
      * Deletes an object
-     * @param witsmlObjects - list of AbstractWitsmlObjects to delete
+     * @param qc - QueryContext with information needed to delete object
      */
     @Override
     public void deleteObject(
-            List<AbstractWitsmlObject> witsmlObjects
+            QueryContext qc
     ) throws ValveException {
+        // get auth token
+        String tokenString;
+        try {
+            tokenString = this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD).getToken();
+        } catch (Exception e) {
+            LOG.warning("Exception in deleteObject while authenticating: " + e.getMessage());
+            throw new ValveException(e.getMessage());
+        }
+
+        // delete each object
+        try {
+            for (AbstractWitsmlObject witsmlObject : qc.WITSML_OBJECTS)
+                this.DELEGATOR.deleteObject(witsmlObject, tokenString);
+        } catch (UnirestException ue) {
+            LOG.warning("Got UnirestException in DotValve delete object: " + ue.getMessage());
+            throw new ValveException("Delete error: " + ue.getMessage());
+        }
+
     }
 
     /**

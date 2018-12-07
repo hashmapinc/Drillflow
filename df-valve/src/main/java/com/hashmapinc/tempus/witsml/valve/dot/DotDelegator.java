@@ -17,9 +17,12 @@ package com.hashmapinc.tempus.witsml.valve.dot;
 
 import java.util.logging.Logger;
 
+import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.witsml.valve.ValveException;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 
 public class DotDelegator {
     private static final Logger LOG = Logger.getLogger(DotDelegator.class.getName());
@@ -30,6 +33,48 @@ public class DotDelegator {
     public DotDelegator(String url, String apiKey) {
         this.URL = url;
         this.API_KEY = apiKey;
+    }
+
+    /**
+     * deletes the object from DoT
+     *
+     * @param witsmlObj - object to delete
+     * @param tokenString - auth string for rest calls
+     */
+    public void deleteObject(
+        AbstractWitsmlObject witsmlObj,
+        String tokenString
+    ) throws ValveException, UnirestException {
+        LOG.info("DELETING " + witsmlObj.toString() + " in DotDelegator.");
+        String uid = witsmlObj.getUid(); // get uid for delete call
+        String objectType = witsmlObj.getObjectType(); // get obj type for exception handling
+        String endpoint; // endpoint to send the DELETE call to
+
+        // construct the endpoint for each object type
+        switch (objectType) { // TODO: add support for wellbore, log, and trajectory
+            case "well":
+                endpoint = this.URL + "witsml/wells/" + uid;
+                break;
+            default:
+                throw new ValveException("Unsupported object type<" + objectType + "> for DELETE");
+        }
+
+        // make the DELETE call.
+        HttpResponse<JsonNode> response = Unirest
+            .delete(endpoint)
+            .header("accept", "application/json")
+            .header("Authorization", tokenString)
+            .header("Ocp-Apim-Subscription-Key", this.API_KEY)
+            .asJson();
+
+        // check response status
+        int status = response.getStatus();
+        if (201 == status || 200 == status) {
+            LOG.info("Received successful status code from DoT DELETE call: " + status);
+        } else {
+            LOG.warning("Received failure status code from DoT DELETE: " + status);
+            throw new ValveException("DELETE DoT REST call failed with status code: " + status);
+        }
     }
 
     /**
@@ -45,8 +90,8 @@ public class DotDelegator {
 
         // send post
         try {
-            HttpResponse<JsonNode> response = Unirest.
-                post(endpoint)
+            HttpResponse<JsonNode> response = Unirest
+                .post(endpoint)
                 .header("accept", "application/json")
                 .header("Authorization", tokenString)
                 .header("Ocp-Apim-Subscription-Key", this.API_KEY)

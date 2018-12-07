@@ -183,7 +183,19 @@ public class StoreImpl implements IStore {
 
         // try to delete
         try {
-            this.valve.deleteObject(witsmlObjects);
+            // construct query context
+            Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
+            ValveUser user = (ValveUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            QueryContext qc = new QueryContext(
+                    null, // client version not needed
+                    WMLtypeIn,
+                    optionsMap,
+                    QueryIn,
+                    witsmlObjects,
+                    user.getUserName(),
+                    user.getPassword()
+            );
+            this.valve.deleteObject(qc);
             resp.setResult((short) 1);
         } catch (Exception e) {
             resp.setSuppMsgOut("Error: " + e.getMessage());
