@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.Map;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.hashmapinc.tempus.witsml.valve.constants.Constants;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -92,11 +91,12 @@ public class DotAuth {
 	 */
 	private boolean isTokenExpired(String username) {
 		boolean result = false;
+		long JWT_TOKEN_EXPIRY_BUFFER = 5 * 60 * 1000;
 		DecodedJWT decodedJWT = cache.get(username);
 		Date tokenExpiredDate = decodedJWT.getExpiresAt();
 		Date now = new Date();
 		long timeRemaining = tokenExpiredDate.getTime()-now.getTime();
-		if (timeRemaining <= Constants.JWT_TOKEN_EXPIRY_BUFFER) {
+		if (timeRemaining <= JWT_TOKEN_EXPIRY_BUFFER) {
 			result = true;
 		}
 		return result;
