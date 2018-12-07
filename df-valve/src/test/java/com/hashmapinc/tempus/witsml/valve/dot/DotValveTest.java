@@ -17,11 +17,13 @@ package com.hashmapinc.tempus.witsml.valve.dot;
 
 import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
 import com.hashmapinc.tempus.witsml.QueryContext;
+import com.mashape.unirest.http.exceptions.UnirestException;
 
 import com.hashmapinc.tempus.witsml.valve.ValveException;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 
 import java.io.IOException;
@@ -307,6 +309,11 @@ public class DotValveTest {
         }
     }
     //=========================================================================
+    @Test(expected = ValveAuthException.class)
+	public void authVerifyException() throws UnirestException, Exception {
+		String badPassword = this.password + "JUNK";
+		valve.authenticate(username, badPassword);
+	}
 }
 
 

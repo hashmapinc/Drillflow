@@ -30,7 +30,7 @@ public class DotAuth {
 	public final String URL;
 	public final String API_KEY;
 	private Map<String, DecodedJWT> cache = new HashMap<String, DecodedJWT>();
-	
+
 	/**
 	 * DotAuth constructor
 	 * 
@@ -56,10 +56,14 @@ public class DotAuth {
 		HttpResponse<JsonNode> response = Unirest.post(URL).header("accept", "application/json")
 				.header("Ocp-Apim-Subscription-Key", this.API_KEY).body(userinfo).asJson();
 		// get the token string
-		String tokenString = response.getBody().getObject().getString("jwt");
-		DecodedJWT decodedJwtToken = JWT.decode(tokenString);
-		cache.put(username, decodedJwtToken);
-		return decodedJwtToken;
+		if (response.getBody().getObject().has("jwt")) {
+			String tokenString = response.getBody().getObject().getString("jwt");
+			DecodedJWT decodedJwtToken = JWT.decode(tokenString);
+			cache.put(username, decodedJwtToken);
+			return decodedJwtToken;
+		}
+
+		return null;
 	}
 
 	/**
@@ -71,13 +75,18 @@ public class DotAuth {
 	 * @return JWT Token from cache if exists and not expired else new generated
 	 *         token
 	 * @throws UnirestException
+	 * @throws ValveAuthException
 	 */
-	public DecodedJWT getJWT(String username, String password) throws UnirestException {
+	public DecodedJWT getJWT(String username, String password) throws UnirestException, ValveAuthException {
 		// check if the Token exists in the Cache.
 		if (cache.containsKey(username) && !isTokenExpired(username)) {
 			return cache.get(username);
 		} else {
 			DecodedJWT decodedJWTResponse = refreshToken(username, password);
+			if (decodedJWTResponse == null) {
+				throw new ValveAuthException(
+						"Username : " + username + " could not be authenticated. Error in generating JWT token");
+			}
 			// return the decoded JWT Token.
 			return decodedJWTResponse;
 		}
