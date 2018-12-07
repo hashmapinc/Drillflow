@@ -60,12 +60,12 @@ public class DotDelegator {
         }
 
         // make the DELETE call.
-        HttpResponse<JsonNode> response = Unirest
+        HttpResponse<String> response = Unirest
             .delete(endpoint)
             .header("accept", "application/json")
             .header("Authorization", tokenString)
             .header("Ocp-Apim-Subscription-Key", this.API_KEY)
-            .asJson();
+            .asString();
 
         // check response status
         int status = response.getStatus();
@@ -73,6 +73,7 @@ public class DotDelegator {
             LOG.info("Received successful status code from DoT DELETE call: " + status);
         } else {
             LOG.warning("Received failure status code from DoT DELETE: " + status);
+            LOG.warning("DELETE response: " + response.getBody());
             throw new ValveException("DELETE DoT REST call failed with status code: " + status);
         }
     }
