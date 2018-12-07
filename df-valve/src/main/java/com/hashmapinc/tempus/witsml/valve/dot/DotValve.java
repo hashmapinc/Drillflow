@@ -197,6 +197,8 @@ public class DotValve implements IValve {
         QueryContext qc
     ) throws ValveException {
         LOG.info("Updating witsml objects" + qc.WITSML_OBJECTS.toString());
+
+        //
     }
 
     /**
@@ -230,6 +232,7 @@ public class DotValve implements IValve {
             "AddToStore",
             "GetFromStore",
             "DeleteFromStore",
+            "UpdateInStore"
         }; 
 
         // supported objects for each function
@@ -239,6 +242,7 @@ public class DotValve implements IValve {
             {well, wellbore}, // ADD TO STORE OBJECTS
             {well}, // GET FROM STORE OBJECTS
             {well}, // DELETE FROM STORE OBJECTS
+            {well}, // UPDATE IN STORE OBJECTS
         };
 
         // populate cap
