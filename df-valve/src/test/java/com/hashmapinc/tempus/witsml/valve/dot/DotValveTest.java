@@ -48,7 +48,7 @@ public class DotValveTest {
         this.well1311exists = false;
         this.well1411exists = false;
         HashMap<String, String> config = new HashMap<>();
-        config.put("baseurl", "http://localhost:8080/"); // TODO: MOCK THIS
+        config.put("baseurl", "http://witsml-qa.hashmapinc.com:8080/"); // TODO: MOCK THIS
         config.put("apikey", "COOLAPIKEY");
 		valve = new DotValve(config);
 	}
