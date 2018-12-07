@@ -183,7 +183,7 @@ public class DotValve implements IValve {
                 this.DELEGATOR.deleteObject(witsmlObject, tokenString);
         } catch (UnirestException ue) {
             LOG.warning("Got UnirestException in DotValve delete object: " + ue.getMessage());
-            throw new ValveException("Delete error: " + ue.getMessage());
+            throw new ValveException(ue.getMessage());
         }
 
     }
@@ -198,7 +198,23 @@ public class DotValve implements IValve {
     ) throws ValveException {
         LOG.info("Updating witsml objects" + qc.WITSML_OBJECTS.toString());
 
-        //
+        // get auth token
+        String tokenString;
+        try {
+            tokenString = this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD).getToken();
+        } catch (Exception e) {
+            LOG.warning("Exception in deleteObject while authenticating: " + e.getMessage());
+            throw new ValveException(e.getMessage());
+        }
+
+        // update each object
+        try {
+            for (AbstractWitsmlObject witsmlObject : qc.WITSML_OBJECTS)
+                this.DELEGATOR.updateObject(witsmlObject, tokenString);
+        } catch (UnirestException ue) {
+            LOG.warning("Got UnirestException in DotValve update object: " + ue.getMessage());
+            throw new ValveException(ue.getMessage());
+        }
     }
 
     /**
