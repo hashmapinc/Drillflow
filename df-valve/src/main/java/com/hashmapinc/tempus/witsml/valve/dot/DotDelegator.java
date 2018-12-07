@@ -53,7 +53,7 @@ public class DotDelegator {
         // construct the endpoint for each object type
         switch (objectType) { // TODO: add support for wellbore, log, and trajectory
             case "well":
-                endpoint = this.URL + "witsml/wells/" + uid;
+                endpoint = this.URL + "/witsml/wells/" + uid;
                 break;
             default:
                 throw new ValveException("Unsupported object type<" + objectType + "> for DELETE");
@@ -87,26 +87,28 @@ public class DotDelegator {
      */
     public String addWellToStore(String objectJSON, String tokenString) {
         // create endpoint
-        String endpoint = this.URL + "witsml/wells/";
+        String endpoint = this.URL + "/witsml/wells/";
 
         // send post
         try {
-            HttpResponse<JsonNode> response = Unirest
+            HttpResponse<String> response = Unirest
                 .post(endpoint)
                 .header("accept", "application/json")
                 .header("Authorization", tokenString)
                 .header("Ocp-Apim-Subscription-Key", this.API_KEY)
                 .body(objectJSON)
-                .asJson();
+                .asString();
 
             int status = response.getStatus();
 
             if (201 == status || 200 == status) {
-                String uid = response.getBody().getObject().getString("uid");
-                LOG.info("Successfully put well object with uid=" + uid);
+                JsonNode body = new JsonNode(response.getBody());
+                String uid = body.getObject().getString("uid");
+                LOG.info("Successfully posted well object with uid=" + uid);
                 return uid;
             } else {
                 LOG.warning("Received status code from Well POST: " + status);
+                LOG.warning("POST response: " + response.getBody());
                 return null;
             }
         } catch (Exception e) {
@@ -126,7 +128,7 @@ public class DotDelegator {
      */
     public String addWellboreToStore(String objectJSON, String tokenString) {
         // create endpoint
-        String endpoint = this.URL + "witsml/wellbores/";
+        String endpoint = this.URL + "/witsml/wellbores/";
 
         // send post
         try {

@@ -87,12 +87,12 @@ public class DotValve implements IValve {
 
         // send get
         try {
-            HttpResponse<JsonNode> response = Unirest
+            HttpResponse<String> response = Unirest
                 .get(endpoint)
                 .header("accept", "application/json")
                 .header("Authorization", this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD).getToken())
                 .header("Ocp-Apim-Subscription-Key", this.API_KEY)
-                .asJson();
+                .asString();
             
             int status = response.getStatus();
 
@@ -101,7 +101,7 @@ public class DotValve implements IValve {
 
                 // get an abstractWitsmlObject from merging the query and the result JSON objects
                 JSONObject queryJSON = new JSONObject(obj.getJSONString("1.4.1.1"));
-                JSONObject responseJSON = response.getBody().getObject();
+                JSONObject responseJSON = new JsonNode(response.getBody()).getObject();
                 AbstractWitsmlObject mergedResponse = this.TRANSLATOR.translateQueryResponse(queryJSON, responseJSON);
 
                 // return the proper xml string for the client version
@@ -114,6 +114,7 @@ public class DotValve implements IValve {
                 }
             } else {
                 LOG.warning("Received status code from GET object: " + status);
+                LOG.warning("GET response: " + response.getBody());
                 return null;
             }
         } catch (Exception e) {
