@@ -57,9 +57,9 @@ public interface IValve {
 
     /**
      * Updates an already existing object
-     * @param witsmlObjects - list of AbstractWitsmlObjects to update
+     * @param qc - QueryContext needed to execute the updateObject querying
      */
-    public void updateObject(List<AbstractWitsmlObject> witsmlObjects);
+    public void updateObject(QueryContext qc) throws ValveException;
 
     /**
      * Performs authentication

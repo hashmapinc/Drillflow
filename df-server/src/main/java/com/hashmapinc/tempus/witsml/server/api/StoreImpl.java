@@ -20,11 +20,7 @@ import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.WitsmlObjectParser;
 import com.hashmapinc.tempus.witsml.WitsmlUtil;
 import com.hashmapinc.tempus.witsml.server.WitsmlApiConfig;
-import com.hashmapinc.tempus.witsml.server.api.model.WMLS_AddToStoreResponse;
-import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse;
-import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetFromStoreResponse;
-import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetVersionResponse;
-import com.hashmapinc.tempus.witsml.server.api.model.WMLS_DeleteFromStoreResponse;
+import com.hashmapinc.tempus.witsml.server.api.model.*;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.DataObject;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.ServerCap;
 import com.hashmapinc.tempus.witsml.valve.IValve;
@@ -106,11 +102,11 @@ public class StoreImpl implements IStore {
     public WMLS_AddToStoreResponse addToStore(
         String WMLtypeIn,
         String XMLin,
-        String OptionsIn, 
+        String OptionsIn,
         String CapabilitiesIn
     ) {
         LOG.info("Executing addToStore");
-        
+
         // try to add to store
         List<AbstractWitsmlObject> witsmlObjects;
         String uid;
@@ -122,11 +118,11 @@ public class StoreImpl implements IStore {
             witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, XMLin, version);
             ValveUser user = (ValveUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             QueryContext qc = new QueryContext(
-                version, 
-                WMLtypeIn, 
-                optionsMap, 
-                XMLin, 
-                witsmlObjects, 
+                version,
+                WMLtypeIn,
+                optionsMap,
+                XMLin,
+                witsmlObjects,
                 user.getUserName(),
                 user.getPassword()
             );
@@ -154,6 +150,60 @@ public class StoreImpl implements IStore {
         }
 
         LOG.info("Successfully added object: " + witsmlObjects.get(0).toString());
+        response.setResult((short)1);
+        return response;
+    }
+
+    @Override
+    public WMLS_UpdateInStoreResponse updateInStore(
+        String WMLtypeIn,
+        String XMLin,
+        String OptionsIn,
+        String CapabilitiesIn
+    ) {
+        LOG.info("Executing updateInStore");
+
+        // try to update in store
+        List<AbstractWitsmlObject> witsmlObjects;
+        String uid;
+        WMLS_UpdateInStoreResponse response = new WMLS_UpdateInStoreResponse();
+        try {
+            // build the query context
+            Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
+            String version = WitsmlUtil.getVersionFromXML(XMLin);
+            witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, XMLin, version);
+            ValveUser user = (ValveUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            QueryContext qc = new QueryContext(
+                    version,
+                    WMLtypeIn,
+                    optionsMap,
+                    XMLin,
+                    witsmlObjects,
+                    user.getUserName(),
+                    user.getPassword()
+            );
+
+            // perform update
+            valve.updateObject(qc);
+            LOG.info("Successfully updated object: " + witsmlObjects.toString());
+        } catch (ValveException ve) {
+            //TODO: handle exception
+            LOG.warning("ValveException in updateInStore: " + ve.getMessage());
+            response.setSuppMsgOut(ve.getMessage());
+            response.setResult((short)-1);
+            return response;
+        } catch (Exception e) {
+            //TODO: handle exception
+            LOG.warning(
+                    "could not add witsml object to store: \n" +
+                            "Error: " + e
+            );
+            response.setSuppMsgOut("Error updating in store: " + e.getMessage());
+            response.setResult((short)-1);
+            return response;
+        }
+
+        LOG.info("Successfully updated object: " + witsmlObjects.get(0).toString()); // TODO: don't assume 1 object
         response.setResult((short)1);
         return response;
     }

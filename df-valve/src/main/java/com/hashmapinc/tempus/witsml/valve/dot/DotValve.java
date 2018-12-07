@@ -15,7 +15,6 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
-import java.util.List;
 import java.util.logging.Logger;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
@@ -191,11 +190,13 @@ public class DotValve implements IValve {
 
     /**
      * Updates an already existing object
-     * @param witsmlObjects - list of AbstractWitsmlObjects to update
+     * @param qc - QueryContext needed to execute the deleteObject querying
      */
     @Override
-    public void updateObject(List<AbstractWitsmlObject> witsmlObjects) {
-        LOG.info("Updating witsml objects" + witsmlObjects.toString());
+    public void updateObject(
+        QueryContext qc
+    ) throws ValveException {
+        LOG.info("Updating witsml objects" + qc.WITSML_OBJECTS.toString());
     }
 
     /**
