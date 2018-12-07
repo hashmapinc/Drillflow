@@ -57,7 +57,7 @@ public class DotValveTest {
     // WELL
     //=========================================================================
 	@Test
-	public void createObjectWell1311() throws IOException, JAXBException{
+	public void createObjectWell1311() throws IOException, JAXBException, ValveException {
 	    // don't execute if the well exists. This is buggy in DoT right now
         if (this.well1311exists)
             return;
@@ -85,7 +85,7 @@ public class DotValveTest {
 	}
 
     @Test
-    public void createObjectWell1411() throws IOException, JAXBException{
+    public void createObjectWell1411() throws IOException, JAXBException, ValveException{
         // don't execute if the well exists. This is buggy in DoT right now
         if (this.well1411exists)
             return;
@@ -113,7 +113,7 @@ public class DotValveTest {
     }
 
     @Test
-    public void getObjectWell1311() throws IOException, JAXBException {
+    public void getObjectWell1311() throws IOException, JAXBException, ValveException {
         // add the object first
         this.createObjectWell1311();;
 
@@ -124,13 +124,12 @@ public class DotValveTest {
         QueryContext qc = new QueryContext("1.3.1.1", "well", null, well1311XML, witsmlObjects, this.username, this.password);
 
         // get
-        String xmlOut = this.valve.getObject(qc);
-        assertNotNull(xmlOut);
+        String xmlOut = this.valve.getObject(qc);assertNotNull(xmlOut);
         assertFalse(xmlOut.contains("ns0:wells"));
     }
 
     @Test
-    public void getObjectWell1411() throws IOException, JAXBException {
+    public void getObjectWell1411() throws IOException, JAXBException, ValveException {
         // add the object first
         this.createObjectWell1411();;
 
@@ -197,7 +196,7 @@ public class DotValveTest {
     // WELLBORE
     //=========================================================================
     @Test
-    public void createObjectWellbore1311() throws IOException, JAXBException {
+    public void createObjectWellbore1311() throws IOException, JAXBException, ValveException {
         // get query context
         String wellbore1311XML = new String(Files.readAllBytes(Paths.get("src/test/resources/wellbore1311.xml")));
         List<AbstractWitsmlObject> witsmlObjects = (List<AbstractWitsmlObject>) (List<?>) ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores) WitsmlMarshal
@@ -212,7 +211,7 @@ public class DotValveTest {
     }
 
     @Test
-    public void createObjectWellbore1411() throws IOException, JAXBException {
+    public void createObjectWellbore1411() throws IOException, JAXBException, ValveException {
         // get query context
         String wellbore1411XML = new String(Files.readAllBytes(Paths.get("src/test/resources/wellbore1411.xml")));
         List<AbstractWitsmlObject> witsmlObjects = (List<AbstractWitsmlObject>) (List<?>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbores) WitsmlMarshal

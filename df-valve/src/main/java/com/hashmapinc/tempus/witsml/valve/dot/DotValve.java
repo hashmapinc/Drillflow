@@ -76,7 +76,9 @@ public class DotValve implements IValve {
      * @return The resultant object from the query in xml string format
      */
     @Override
-    public String getObject(QueryContext qc) {
+    public String getObject(
+            QueryContext qc
+    ) throws ValveException {
         // get the object and uid
         AbstractWitsmlObject obj = qc.WITSML_OBJECTS.get(0); //TODO: do not assume only one object
         LOG.info("Getting object from store: " + obj.toString());
@@ -110,17 +112,17 @@ public class DotValve implements IValve {
                 } else if ("1.3.1.1".equals(qc.CLIENT_VERSION)) {
                     return this.TRANSLATOR.get1311XMLString(mergedResponse); // version translation required
                 } else {
-                    return null;
+                    throw new ValveException("Unsupported client version: " + qc.CLIENT_VERSION);
                 }
             } else {
                 LOG.warning("Received status code from GET object: " + status);
                 LOG.warning("GET response: " + response.getBody());
-                return null;
+                throw new ValveException("Valve error from DoT GET call: " + response.getBody());
             }
         } catch (Exception e) {
             // TODO: handle exception
             LOG.warning("Error while getting object in DoTValve: " + e);
-            return null;
+            throw new ValveException("Error while getting object in DoTValve: " + e);
         }
     }
 
@@ -131,7 +133,9 @@ public class DotValve implements IValve {
      * @return the UID of the newly created object
      */
     @Override
-    public String createObject(QueryContext qc) {
+    public String createObject(
+            QueryContext qc
+    ) throws ValveException {
         // get object information
         AbstractWitsmlObject obj = qc.WITSML_OBJECTS.get(0); // TODO: don't assume 1 object
         LOG.info("Creating object: " + obj.toString());

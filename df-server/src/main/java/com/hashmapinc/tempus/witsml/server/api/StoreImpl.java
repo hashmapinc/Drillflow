@@ -28,6 +28,7 @@ import com.hashmapinc.tempus.witsml.server.api.model.WMLS_DeleteFromStoreRespons
 import com.hashmapinc.tempus.witsml.server.api.model.cap.DataObject;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.ServerCap;
 import com.hashmapinc.tempus.witsml.valve.IValve;
+import com.hashmapinc.tempus.witsml.valve.ValveException;
 import com.hashmapinc.tempus.witsml.valve.ValveFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -300,6 +301,11 @@ public class StoreImpl implements IStore {
                 resp.setSuppMsgOut("Error from REST backend");
                 resp.setResult((short) -1);
             }
+        } catch (ValveException ve) {
+            resp.setResult((short)-425);
+            LOG.warning("Valve Exception in GetFromStore: " + ve.getMessage());
+            resp.setSuppMsgOut("Error: " + ve.getMessage());
+            ve.printStackTrace();
         } catch (Exception e) {
             resp.setResult((short)-425);
             LOG.warning("Exception in generating GetFromStore response: " + e.toString());

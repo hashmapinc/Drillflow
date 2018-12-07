@@ -39,7 +39,7 @@ public interface IValve {
      * @param qc - QueryContext needed to execute the getObject querying
      * @return The resultant object from the query in XML string format
      */
-    public String getObject(QueryContext qc);
+    public String getObject(QueryContext qc) throws ValveException;
 
     /**
      * Creates an object
@@ -47,7 +47,7 @@ public interface IValve {
      * @param qc - QueryContext needed to execute the createObject querying
      * @return the UID of the newly created object
      */
-    public String createObject(QueryContext qc);
+    public String createObject(QueryContext qc) throws ValveException;
 
     /**
      * Deletes an object
