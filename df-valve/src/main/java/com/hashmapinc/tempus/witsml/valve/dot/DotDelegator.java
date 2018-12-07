@@ -85,7 +85,10 @@ public class DotDelegator {
      * @param tokenString - string of the JWT to do auth with
      * @return
      */
-    public String addWellToStore(String objectJSON, String tokenString) {
+    public String addWellToStore(
+        String objectJSON,
+        String tokenString
+    ) throws ValveException {
         // create endpoint
         String endpoint = this.URL + "/witsml/wells/";
 
@@ -109,13 +112,12 @@ public class DotDelegator {
             } else {
                 LOG.warning("Received status code from Well POST: " + status);
                 LOG.warning("POST response: " + response.getBody());
-                return null;
+                throw new ValveException("Error response from DoT server: " + response.getBody());
             }
         } catch (Exception e) {
             // TODO: handle exception
             LOG.warning("Error while creating well in DoTValve: " + e);
-            e.printStackTrace();
-            return null;
+            throw new ValveException(e.getMessage());
         }
     }
 
@@ -126,34 +128,38 @@ public class DotDelegator {
      * @param tokenString - string of the JWT to do auth with
      * @return
      */
-    public String addWellboreToStore(String objectJSON, String tokenString) {
+    public String addWellboreToStore(
+        String objectJSON,
+        String tokenString
+    ) throws ValveException {
         // create endpoint
         String endpoint = this.URL + "/witsml/wellbores/";
 
         // send post
         try {
-            HttpResponse<JsonNode> response = Unirest
+            HttpResponse<String> response = Unirest
                 .post(endpoint)
                 .header("accept", "application/json")
                 .header("Authorization", tokenString)
                 .header("Ocp-Apim-Subscription-Key", this.API_KEY)
-                .body(objectJSON).asJson();
+                .body(objectJSON)
+                .asString();
 
             int status = response.getStatus();
 
             if (201 == status || 200 == status) {
-                String uid = response.getBody().getObject().getString("uid");
+                String uid = new JsonNode(response.getBody()).getObject().getString("uid");
                 LOG.info("Successfully put wellbore object with uid=" + uid);
                 return uid;
             } else {
                 LOG.warning("Received status code from Wellbore POST: " + status);
-                return null;
+                throw new ValveException(response.getBody());
             }
         } catch (Exception e) {
             // TODO: handle exception
             LOG.warning("Error while creating wellbore in DoTValve: " + e);
             e.printStackTrace();
-            return null;
+            throw new ValveException(e.getMessage());
         }
     }
 }

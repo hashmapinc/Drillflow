@@ -117,12 +117,12 @@ public class DotValve implements IValve {
             } else {
                 LOG.warning("Received status code from GET object: " + status);
                 LOG.warning("GET response: " + response.getBody());
-                throw new ValveException("Valve error from DoT GET call: " + response.getBody());
+                throw new ValveException(response.getBody());
             }
         } catch (Exception e) {
             // TODO: handle exception
             LOG.warning("Error while getting object in DoTValve: " + e);
-            throw new ValveException("Error while getting object in DoTValve: " + e);
+            throw new ValveException(e.getMessage());
         }
     }
 
@@ -147,9 +147,7 @@ public class DotValve implements IValve {
         try {
             tokenString = this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD).getToken();
         } catch (Exception e) {
-            LOG.warning("Received error getting token string for createObject: " + e);
-            e.printStackTrace();
-            return null;
+            throw new ValveException("Token error: " + e.getMessage());
         }
 
         // handle each supported object
@@ -159,8 +157,7 @@ public class DotValve implements IValve {
             case "wellbore":
                 return this.DELEGATOR.addWellboreToStore(objectJSON, tokenString);
             default:
-                LOG.warning("Unsupported type encountered in createObject. Type = <" + objectType + ">");
-                return null;
+                throw new ValveException("Unsupported type encountered in createObject. Type = <" + objectType + ">");
         }
     }
 

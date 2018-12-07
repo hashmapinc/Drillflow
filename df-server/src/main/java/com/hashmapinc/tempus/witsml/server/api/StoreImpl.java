@@ -30,6 +30,7 @@ import com.hashmapinc.tempus.witsml.server.api.model.cap.ServerCap;
 import com.hashmapinc.tempus.witsml.valve.IValve;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
 import com.hashmapinc.tempus.witsml.valve.ValveFactory;
+import org.apache.catalina.Valve;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -136,18 +137,24 @@ public class StoreImpl implements IStore {
             LOG.info(
                 "Successfully added object: " + witsmlObjects.toString()
             );
+        } catch (ValveException ve) {
+            //TODO: handle exception
+            LOG.warning("ValveException in addToStore: " + ve.getMessage());
+            response.setSuppMsgOut(ve.getMessage());
+            response.setResult((short)-1);
+            return response;
         } catch (Exception e) {
             //TODO: handle exception
             LOG.warning(
                 "could not add witsml object to store: \n" +
                 "Error: " + e
             );
+            response.setSuppMsgOut("Error adding to store: " + e.getMessage());
             response.setResult((short)-1);
             return response;
         }
 
         LOG.info("Successfully added object: " + witsmlObjects.get(0).toString());
-
         response.setResult((short)1);
         return response;
     }
@@ -199,7 +206,7 @@ public class StoreImpl implements IStore {
             this.valve.deleteObject(qc);
             resp.setResult((short) 1);
         } catch (Exception e) {
-            resp.setSuppMsgOut("Error: " + e.getMessage());
+            resp.setSuppMsgOut(e.getMessage());
         }
 
         // return response
@@ -271,7 +278,10 @@ public class StoreImpl implements IStore {
                         "OptionsIn: " + OptionsIn + " \n" + 
                         "CapabilitiesIn: " + CapabilitiesIn
             );
-            return resp; // TODO: proper error handling should go here
+
+            resp.setSuppMsgOut("Error parsing input: " + e.getMessage());
+            resp.setResult((short) -1);
+            return resp;
         }
 
         // try to query
@@ -298,17 +308,17 @@ public class StoreImpl implements IStore {
                 resp.setResult((short) 1);
                 resp.setXMLout(xmlOut);
             } else {
-                resp.setSuppMsgOut("Error from REST backend");
+                resp.setSuppMsgOut("Unhandled error from REST backend.");
                 resp.setResult((short) -1);
             }
         } catch (ValveException ve) {
             resp.setResult((short)-425);
             LOG.warning("Valve Exception in GetFromStore: " + ve.getMessage());
-            resp.setSuppMsgOut("Error: " + ve.getMessage());
+            resp.setSuppMsgOut(ve.getMessage());
             ve.printStackTrace();
         } catch (Exception e) {
             resp.setResult((short)-425);
-            LOG.warning("Exception in generating GetFromStore response: " + e.toString());
+            LOG.warning("Exception in generating GetFromStore response: " + e.getMessage());
             e.printStackTrace();
         }
 
