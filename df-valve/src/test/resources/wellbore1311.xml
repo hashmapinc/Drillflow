@@ -14,7 +14,7 @@
 			<FileCreator>John Smith</FileCreator>
 		</FileCreationInformation>
 	</documentInfo>
-	<wellbore uidWell="W-12" uid="B-001">
+	<wellbore uidWell="w-1311" uid="b-1311-1">
 		<nameWell>6507/7-A-42</nameWell>
 		<name>A-42</name>
 		<number>1234-0987</number>
@@ -41,7 +41,7 @@
 			<comments>These are the comments associated with the Wellbore data object.</comments>
 		</commonData>
 	</wellbore>
-	<wellbore uidWell="W-12" uid="B-002">
+	<wellbore uidWell="w-1311" uid="b-1311-2">
 		<nameWell>6507/7-A-42</nameWell>
 		<name>A-43</name>
 		<parentWellbore uidRef="B-001">A-42</parentWellbore>
