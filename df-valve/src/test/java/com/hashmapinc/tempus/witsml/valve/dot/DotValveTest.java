@@ -104,7 +104,7 @@ public class DotValveTest {
     @Test
     public void getObjectWell1311() throws IOException, JAXBException, ValveException {
         // add the object first
-        this.createObjectWell1311();;
+        this.createObjectWell1311();
 
         // get query context
         String well1311XML = new String(Files.readAllBytes(Paths.get("src/test/resources/well1311query.xml")));
@@ -120,7 +120,7 @@ public class DotValveTest {
     @Test
     public void getObjectWell1411() throws IOException, JAXBException, ValveException {
         // add the object first
-        this.createObjectWell1411();;
+        this.createObjectWell1411();
 
         // get query context
         String well1411XML = new String(Files.readAllBytes(Paths.get("src/test/resources/well1411query.xml")));
@@ -156,7 +156,11 @@ public class DotValveTest {
         );
 
         // delete
-        this.valve.deleteObject(qc);
+        try {
+            this.valve.deleteObject(qc);
+        } catch (Exception e) {
+            fail();
+        }
     }
 
     @Test
@@ -182,7 +186,11 @@ public class DotValveTest {
         );
 
         // delete
-        this.valve.deleteObject(qc);
+        try {
+            this.valve.deleteObject(qc);
+        } catch (Exception e) {
+            fail();
+        }
     }
     //=========================================================================
 

@@ -195,6 +195,7 @@ public class DotValve implements IValve {
      */
     @Override
     public void updateObject(List<AbstractWitsmlObject> witsmlObjects) {
+        LOG.info("Updating witsml objects" + witsmlObjects.toString());
     }
 
     /**
