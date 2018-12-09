@@ -16,6 +16,7 @@
 package com.hashmapinc.tempus.witsml.valve.dot;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
@@ -91,5 +92,12 @@ public class DotTranslator {
         // convert the queryJSON back to valid xml
         LOG.info("Converting merged query JSON to valid XML string");
         return WitsmlMarshal.deserializeFromJSON(query.toString(), com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell.class);
+    }
+
+    public String consolidateObjectsToXML(
+        ArrayList<AbstractWitsmlObject> witsmlObjects,
+        String version
+    ) {
+        return null;
     }
 }
