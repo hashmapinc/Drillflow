@@ -165,7 +165,6 @@ public class StoreImpl implements IStore {
 
         // try to update in store
         List<AbstractWitsmlObject> witsmlObjects;
-        String uid;
         WMLS_UpdateInStoreResponse response = new WMLS_UpdateInStoreResponse();
         try {
             // build the query context
@@ -185,7 +184,6 @@ public class StoreImpl implements IStore {
 
             // perform update
             valve.updateObject(qc);
-            LOG.info("Successfully updated object: " + witsmlObjects.toString());
         } catch (ValveException ve) {
             //TODO: handle exception
             LOG.warning("ValveException in updateInStore: " + ve.getMessage());
@@ -203,7 +201,7 @@ public class StoreImpl implements IStore {
             return response;
         }
 
-        LOG.info("Successfully updated object: " + witsmlObjects.get(0).toString()); // TODO: don't assume 1 object
+        LOG.info("Successfully updated object: " + witsmlObjects.toString());
         response.setResult((short)1);
         return response;
     }
