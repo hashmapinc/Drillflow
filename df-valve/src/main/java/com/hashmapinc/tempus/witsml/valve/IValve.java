@@ -17,6 +17,7 @@ package com.hashmapinc.tempus.witsml.valve;
 
 import java.util.Map;
 import java.util.List;
+import java.util.function.Consumer;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.QueryContext;
