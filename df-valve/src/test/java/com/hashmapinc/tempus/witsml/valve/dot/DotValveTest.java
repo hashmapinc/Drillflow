@@ -159,7 +159,7 @@ public class DotValveTest {
         try {
             this.valve.deleteObject(qc);
         } catch (Exception e) {
-            fail();
+            fail(e.getMessage());
         }
     }
 
@@ -189,7 +189,7 @@ public class DotValveTest {
         try {
             this.valve.deleteObject(qc);
         } catch (Exception e) {
-            fail();
+            fail(e.getMessage());
         }
     }
     //=========================================================================
@@ -232,6 +232,73 @@ public class DotValveTest {
             assertEquals("b-1411-1", uid);
         } catch (ValveException ve) {
             assertTrue(ve.getMessage().contains("already exists")); // accept the "already exists" response as valid behavior
+        }
+    }
+
+    @Test
+    public void deleteObjectWellbore1311() throws IOException, JAXBException, ValveException {
+        // add the deletable object first
+        try {
+            this.createObjectWellbore1311();
+        } catch (Exception e) {}
+
+        // get query context
+        String wellbore1311XML = new String(Files.readAllBytes(Paths.get("src/test/resources/wellbore1311.xml")));
+        List<AbstractWitsmlObject> witsmlObjects = (List<AbstractWitsmlObject>) (List<?>) ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores) WitsmlMarshal
+                .deserialize(wellbore1311XML, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore.class)).getWellbore();
+        QueryContext qc = new QueryContext(
+                null,
+                "wellbore",
+                null,
+                wellbore1311XML,
+                witsmlObjects,
+                this.username,
+                this.password
+        );
+
+        // delete
+        try {
+            this.valve.deleteObject(qc);
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void deleteObjectWellbore1411() throws IOException, JAXBException, ValveException {
+        // add the deletable object first
+        try {
+            this.createObjectWellbore1411();
+        } catch (Exception e) {}
+
+
+        // get query context
+        String wellbore1411XML = new String(
+            Files.readAllBytes(
+                Paths.get("src/test/resources/wellbore1411.xml")
+            )
+        );
+        List<AbstractWitsmlObject> witsmlObjects = (List<AbstractWitsmlObject>) (List<?>) (
+            (com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbores)
+            WitsmlMarshal.deserialize(
+                wellbore1411XML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore.class
+            )
+        ).getWellbore();
+        QueryContext qc = new QueryContext(
+            "1.4.1.1",
+            "well",
+            null,
+            wellbore1411XML,
+            witsmlObjects,
+            this.username,
+            this.password
+        );
+
+        // delete
+        try {
+            this.valve.deleteObject(qc);
+        } catch (Exception e) {
+            fail(e.getMessage());
         }
     }
     //=========================================================================
