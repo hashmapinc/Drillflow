@@ -252,7 +252,7 @@ public class DotValve implements IValve {
         AbstractWitsmlObject wellbore = new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore(); // 1311 is arbitrary
         AbstractWitsmlObject[][] supportedObjects = {
             {well, wellbore}, // ADD TO STORE OBJECTS
-            {well}, // GET FROM STORE OBJECTS
+            {well, wellbore}, // GET FROM STORE OBJECTS
             {well, wellbore}, // DELETE FROM STORE OBJECTS
             {well, wellbore}, // UPDATE IN STORE OBJECTS
         };
