@@ -22,10 +22,12 @@ import java.util.logging.Logger;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
 
+import com.hashmapinc.tempus.witsml.valve.ValveException;
 import org.json.JSONObject;
 
-import javax.xml.bind.JAXBException;
-
+/**
+ * ABANDON ALL HOPE, YE WHO ENTER HERE
+ */
 public class DotTranslator {
     private static final Logger LOG = Logger.getLogger(DotTranslator.class.getName());
 
@@ -46,22 +48,26 @@ public class DotTranslator {
     // TODO: delete this method and use the AbstractWitsmlObject.getXMLString method when version 1.1.5 fixes the namespace bug.
     public String get1311XMLString(
         AbstractWitsmlObject obj1411
-    ) throws JAXBException {
+    ) throws ValveException {
         LOG.info("getting 1.3.1.1 XML string for object: " + obj1411.toString());
 
         // get 1311 string
         String xml1311 = obj1411.getXMLString("1.3.1.1");
 
         // convert to 1311 object
-        AbstractWitsmlObject obj1311;
-        switch (obj1411.getObjectType()) {
-            case "well":
-                obj1311 = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells) WitsmlMarshal.deserialize(
-                        xml1311, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells.class)
-                ).getWell().get(0);
-                return obj1311.getXMLString("1.3.1.1");
-            default:
-                return null;
+        try {
+            AbstractWitsmlObject obj1311;
+            switch (obj1411.getObjectType()) {
+                case "well":
+                    obj1311 = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells) WitsmlMarshal.deserialize(
+                            xml1311, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells.class)
+                    ).getWell().get(0);
+                    return obj1311.getXMLString("1.3.1.1");
+                default:
+                    throw new ValveException("unsupported object type: " + obj1411.getObjectType());
+            }
+        } catch (Exception e) {
+            throw new ValveException(e.getMessage());
         }
     }
 
@@ -94,10 +100,95 @@ public class DotTranslator {
         return WitsmlMarshal.deserializeFromJSON(query.toString(), com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell.class);
     }
 
+    /**
+     * Consolidates each object under 1 parent and serializes
+     * the consolidated object into an XML string in the proper
+     * WITSML version format
+     *
+     * @param witsmlObjects - list of objects to consolidate
+     * @param version - witsml version to serialize to
+     * @return = serialized parent object in requested WITSML version format
+     * @throws ValveException
+     */
     public String consolidateObjectsToXML(
         ArrayList<AbstractWitsmlObject> witsmlObjects,
         String version
-    ) {
-        return null;
+    ) throws ValveException {
+        // validate version
+        if(!"1.3.1.1".equals(version) && !"1.4.1.1".equals(version)) {
+            throw new ValveException("Unsupported client version <" + version + "> in DoT GET");
+        }
+
+        // makes if statements more legible
+        boolean is1411 = "1.4.1.1".equals(version);
+
+        // get xmlString
+        String xmlString;
+        switch (witsmlObjects.get(0).getObjectType()) {
+            case "well": // no consolidation needed for wells
+                xmlString = is1411 ? witsmlObjects.get(0).getXMLString("1.4.1.1") : this.get1311XMLString(witsmlObjects.get(0));
+                break;
+            case "wellbore": // no consolidation needed for wells
+                xmlString = is1411 ? consolidate1411WellboresToXML(witsmlObjects) : consolidate1311WellboresToXML(witsmlObjects);
+                break;
+            default:
+                throw new ValveException("Unsupported object type: " + witsmlObjects.get(0).getObjectType());
+        }
+
+        return xmlString;
+    }
+
+    private String consolidate1311WellboresToXML(
+        ArrayList<AbstractWitsmlObject> witsmlObjects
+    ) throws ValveException {
+        try {
+            // get parent object from first child
+            com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores parent;
+            parent = WitsmlMarshal.deserialize(
+                    witsmlObjects.get(0).getXMLString("1.3.1.1"),
+                    com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore.class
+            );
+
+            // consolidate children
+            if (witsmlObjects.size() > 1) {
+                for (int i = 1; i < witsmlObjects.size(); i++) {
+                    com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore child;
+                    child = (com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore) witsmlObjects.get(i);
+                    parent.addWellbore(child);
+                }
+            }
+
+            // return xml
+            return WitsmlMarshal.serialize(parent);
+        } catch (Exception e ) {
+            throw new ValveException(e.getMessage());
+        }
+    }
+
+    private String consolidate1411WellboresToXML(
+        ArrayList<AbstractWitsmlObject> witsmlObjects
+    ) throws ValveException {
+        try {
+            // get parent object from first child
+            com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbores parent;
+            parent = WitsmlMarshal.deserialize(
+                    witsmlObjects.get(0).getXMLString("1.4.1.1"),
+                    com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore.class
+            );
+
+            // consolidate children
+            if (witsmlObjects.size() > 1) {
+                for (int i = 1; i < witsmlObjects.size(); i++) {
+                    com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore child;
+                    child = (com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) witsmlObjects.get(i);
+                    parent.addWellbore(child);
+                }
+            }
+
+            // return xml
+            return WitsmlMarshal.serialize(parent);
+        } catch (Exception e ) {
+            throw new ValveException(e.getMessage());
+        }
     }
 }
