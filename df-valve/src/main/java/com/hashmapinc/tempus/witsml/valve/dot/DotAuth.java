@@ -19,17 +19,19 @@ package com.hashmapinc.tempus.witsml.valve.dot;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
+
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
 
 public class DotAuth {
-	public final String URL;
-	public final String API_KEY;
-	private Map<String, DecodedJWT> cache = new HashMap<String, DecodedJWT>();
+	private static final Logger LOG = Logger.getLogger(DotAuth.class.getName());
+	private final String URL;
+	private final String API_KEY;
+	private Map<String, DecodedJWT> cache;
 
 	/**
 	 * DotAuth constructor
@@ -40,6 +42,7 @@ public class DotAuth {
 	public DotAuth(String URL, String API_KEY) {
 		this.URL = URL;
 		this.API_KEY = API_KEY;
+		this.cache = new HashMap<String, DecodedJWT>();
 	}
 
 	/**
@@ -47,67 +50,68 @@ public class DotAuth {
 	 * 
 	 * @param username
 	 * @param password
-	 * @return JWT Token
-	 * @throws UnirestException
 	 */
-	public DecodedJWT refreshToken(String username, String password) throws UnirestException {
-		String userinfo = "{\"account\":\"" + username + "\", \"password\":\"" + password + "\"}";
-		// send the response
-		HttpResponse<JsonNode> response = Unirest.post(URL).header("accept", "application/json")
-				.header("Ocp-Apim-Subscription-Key", this.API_KEY).body(userinfo).asJson();
-		// get the token string
-		if (response.getBody().getObject().has("jwt")) {
-			String tokenString = response.getBody().getObject().getString("jwt");
-			DecodedJWT decodedJwtToken = JWT.decode(tokenString);
-			cache.put(username, decodedJwtToken);
-			return decodedJwtToken;
-		}
+	private void refreshToken(
+		String username,
+		String password
+	) throws ValveAuthException {
+		try {
+			// build payload for authentication
+			String payload = "{\"account\":\"" + username + "\", \"password\":\"" + password + "\"}";
 
-		return null;
+			// send request
+			HttpResponse<String> response = Unirest.post(URL)
+				.header("accept", "application/json")
+				.header("Ocp-Apim-Subscription-Key", this.API_KEY)
+				.body(payload)
+				.asString();
+
+			// validate response
+			int status = response.getStatus();
+			LOG.fine("refreshToken call for " + username + "returned REST status: " + status); // fine = debug I guess. Stupid JDK 11
+			if (201 == status || 200 == status) {
+				// get JWT from response
+				String tokenString = new JsonNode(response.getBody()).getObject().getString("jwt");
+				DecodedJWT decodedJwtToken = JWT.decode(tokenString);
+				cache.put(username, decodedJwtToken); // cache response
+			} else {
+				throw new ValveAuthException(response.getBody());
+			}
+		} catch (Exception e) {
+			throw new ValveAuthException("Error refreshing token: " + e.getMessage(), e);
+		}
 	}
 
 	/**
-	 * Request JWT token for the given creds. Return the token from cache if exists
-	 * else generate a new one.
+	 * Refresh the cache if necessary then return the JWT
 	 * 
 	 * @param username
 	 * @param password
-	 * @return JWT Token from cache if exists and not expired else new generated
-	 *         token
-	 * @throws UnirestException
+	 * @return JWT from auth endpoint
 	 * @throws ValveAuthException
 	 */
-	public DecodedJWT getJWT(String username, String password) throws UnirestException, ValveAuthException {
-		// check if the Token exists in the Cache.
-		if (cache.containsKey(username) && !isTokenExpired(username)) {
-			return cache.get(username);
-		} else {
-			DecodedJWT decodedJWTResponse = refreshToken(username, password);
-			if (decodedJWTResponse == null) {
-				throw new ValveAuthException(
-						"Username : " + username + " could not be authenticated. Error in generating JWT token");
-			}
-			// return the decoded JWT Token.
-			return decodedJWTResponse;
-		}
+	public DecodedJWT getJWT(String username, String password) throws ValveAuthException {
+		// refresh token if necessary
+		if (!cache.containsKey(username) || isTokenExpired(username))
+			refreshToken(username, password);
+
+		return cache.get(username);
 	}
 
 	/**
-	 * Check if JWT Token expired for given username
+	 * Check if JWT Token will expire in the next BUFFER milliseconds
 	 * 
 	 * @param username
-	 * @return true if token expired else false
+	 * @return true if token expires in the next BUFFER milliseconds
 	 */
 	private boolean isTokenExpired(String username) {
-		boolean result = false;
-		long JWT_TOKEN_EXPIRY_BUFFER = 5 * 60 * 1000;
-		DecodedJWT decodedJWT = cache.get(username);
-		Date tokenExpiredDate = decodedJWT.getExpiresAt();
-		Date now = new Date();
-		long timeRemaining = tokenExpiredDate.getTime()-now.getTime();
-		if (timeRemaining <= JWT_TOKEN_EXPIRY_BUFFER) {
-			result = true;
-		}
-		return result;
+		// create buffer
+		long JWT_TOKEN_EXPIRY_BUFFER = 5 * 60 * 1000; // 5 minute buffer
+
+		// get time until token expires
+		long timeUntilExpiration = cache.get(username).getExpiresAt().getTime() - (new Date()).getTime();
+
+		// return true if token expires within the BUFFER time
+		return timeUntilExpiration <= JWT_TOKEN_EXPIRY_BUFFER;
 	}
 }

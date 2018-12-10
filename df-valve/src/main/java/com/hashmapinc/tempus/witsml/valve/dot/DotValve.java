@@ -228,22 +228,18 @@ public class DotValve implements IValve {
     }
 
     /**
-	 * Authenticates with the DotAuth class to get a JWT
+	 * Authenticates with the DotAuth class
 	 * 
-	 * @param userName The user name to authenticate with
+	 * @param username The user name to authenticate with
 	 * @param password The password to authenticate with
 	 * @throws ValveAuthException
 	 */
 	@Override
-	public void authenticate(String userName, String password) throws ValveAuthException {
-		try {
-			AUTH.getJWT(userName, password);
-		} catch (UnirestException e) {
-			e.printStackTrace();
-		} catch (ValveAuthException e) {
-			throw new ValveAuthException(
-					"Username : " + userName + " could not be authenticated. Error in generating JWT token");
-		}
+	public void authenticate(
+        String username,
+        String password
+    ) throws ValveAuthException {
+        this.AUTH.getJWT(username, password);
 	}
 
     /**
