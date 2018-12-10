@@ -213,7 +213,7 @@ public class DotValve implements IValve {
         }
     }
 
-/**
+    /**
 	 * Authenticates with the DotAuth class to get a JWT
 	 * 
 	 * @param userName The user name to authenticate with
