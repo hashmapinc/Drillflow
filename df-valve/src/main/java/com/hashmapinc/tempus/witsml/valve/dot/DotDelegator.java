@@ -97,9 +97,12 @@ public class DotDelegator {
         String endpoint; // endpoint to send the UPDATE call to
 
         // construct the endpoint for each object type
-        switch (objectType) { // TODO: add support for wellbore, log, and trajectory
+        switch (objectType) { // TODO: add support for log and trajectory
             case "well":
                 endpoint = this.URL + "/witsml/wells/" + uid;
+                break;
+            case "wellbore":
+                endpoint = this.URL + "/witsml/wellbores/" + uid;
                 break;
             default:
                 throw new ValveException("Unsupported object type<" + objectType + "> for UPDATE");
