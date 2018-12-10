@@ -90,9 +90,33 @@ public class DotAuth {
 	 * @return JWT from auth endpoint
 	 * @throws ValveAuthException
 	 */
-	public DecodedJWT getJWT(String username, String password) throws ValveAuthException {
+	public DecodedJWT getJWT(
+		String username,
+		String password
+	) throws ValveAuthException {
 		// refresh token if necessary
 		if (!cache.containsKey(username) || isTokenExpired(username))
+			refreshToken(username, password);
+
+		return cache.get(username);
+	}
+
+	/**
+	 * Refresh the cache if necessary then return the JWT
+	 *
+	 * @param username
+	 * @param password
+	 * @param forceRefresh - boolean indicating if a refresh should be performed
+	 * @return JWT from auth endpoint
+	 * @throws ValveAuthException
+	 */
+	public DecodedJWT getJWT(
+		String username,
+		String password,
+		boolean forceRefresh
+	) throws ValveAuthException {
+		// refresh token if necessary
+		if (forceRefresh || !cache.containsKey(username) || isTokenExpired(username))
 			refreshToken(username, password);
 
 		return cache.get(username);
