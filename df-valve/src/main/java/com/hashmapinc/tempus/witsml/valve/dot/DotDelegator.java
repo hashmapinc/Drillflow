@@ -79,6 +79,51 @@ public class DotDelegator {
     }
 
     /**
+     * updates the object in DoT
+     *
+     * @param witsmlObj - object to delete
+     * @param tokenString - auth string for rest calls
+     */
+    public void updateObject(
+        AbstractWitsmlObject witsmlObj,
+        String tokenString
+    ) throws ValveException, UnirestException {
+        LOG.info("UPDATING " + witsmlObj.toString() + " in DotDelegator.");
+        String uid = witsmlObj.getUid(); // get uid for delete call
+        String objectType = witsmlObj.getObjectType(); // get obj type for exception handling
+        String endpoint; // endpoint to send the UPDATE call to
+
+        // construct the endpoint for each object type
+        switch (objectType) { // TODO: add support for wellbore, log, and trajectory
+            case "well":
+                endpoint = this.URL + "/witsml/wells/" + uid;
+                break;
+            default:
+                throw new ValveException("Unsupported object type<" + objectType + "> for UPDATE");
+        }
+
+        // make the UPDATE call.
+        String payload = witsmlObj.getJSONString("1.4.1.1");
+        HttpResponse<String> response = Unirest
+                .put(endpoint)
+                .header("accept", "application/json")
+                .header("Authorization", tokenString)
+                .header("Ocp-Apim-Subscription-Key", this.API_KEY)
+                .body(payload)
+                .asString();
+
+        // check response status
+        int status = response.getStatus();
+        if (201 == status || 200 == status) {
+            LOG.info("Received successful status code from DoT PUT call: " + status);
+        } else {
+            LOG.warning("Received failure status code from DoT PUT: " + status);
+            LOG.warning("PUT response: " + response.getBody());
+            throw new ValveException(response.getBody());
+        }
+    }
+
+    /**
      * Submits the object to the DoT rest API for creation
      * 
      * @param objectJSON  - string json of the object to create

@@ -15,7 +15,6 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
-import java.util.List;
 import java.util.logging.Logger;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
@@ -184,18 +183,38 @@ public class DotValve implements IValve {
                 this.DELEGATOR.deleteObject(witsmlObject, tokenString);
         } catch (UnirestException ue) {
             LOG.warning("Got UnirestException in DotValve delete object: " + ue.getMessage());
-            throw new ValveException("Delete error: " + ue.getMessage());
+            throw new ValveException(ue.getMessage());
         }
 
     }
 
     /**
      * Updates an already existing object
-     * @param witsmlObjects - list of AbstractWitsmlObjects to update
+     * @param qc - QueryContext needed to execute the deleteObject querying
      */
     @Override
-    public void updateObject(List<AbstractWitsmlObject> witsmlObjects) {
-        LOG.info("Updating witsml objects" + witsmlObjects.toString());
+    public void updateObject(
+        QueryContext qc
+    ) throws ValveException {
+        LOG.info("Updating witsml objects" + qc.WITSML_OBJECTS.toString());
+
+        // get auth token
+        String tokenString;
+        try {
+            tokenString = this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD).getToken();
+        } catch (Exception e) {
+            LOG.warning("Exception in deleteObject while authenticating: " + e.getMessage());
+            throw new ValveException(e.getMessage());
+        }
+
+        // update each object
+        try {
+            for (AbstractWitsmlObject witsmlObject : qc.WITSML_OBJECTS)
+                this.DELEGATOR.updateObject(witsmlObject, tokenString);
+        } catch (UnirestException ue) {
+            LOG.warning("Got UnirestException in DotValve update object: " + ue.getMessage());
+            throw new ValveException(ue.getMessage());
+        }
     }
 
     /**
@@ -229,6 +248,7 @@ public class DotValve implements IValve {
             "AddToStore",
             "GetFromStore",
             "DeleteFromStore",
+            "UpdateInStore"
         }; 
 
         // supported objects for each function
@@ -238,6 +258,7 @@ public class DotValve implements IValve {
             {well, wellbore}, // ADD TO STORE OBJECTS
             {well}, // GET FROM STORE OBJECTS
             {well}, // DELETE FROM STORE OBJECTS
+            {well}, // UPDATE IN STORE OBJECTS
         };
 
         // populate cap
