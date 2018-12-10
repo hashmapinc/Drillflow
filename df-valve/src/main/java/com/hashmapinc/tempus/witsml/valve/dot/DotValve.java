@@ -149,7 +149,8 @@ public class DotValve implements IValve {
     @Override
     public String createObject(
             QueryContext qc
-    ) throws ValveException { // get auth token
+    ) throws ValveException {
+        // get auth token
         String tokenString;
         try {
             tokenString = this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD).getToken();
@@ -161,8 +162,14 @@ public class DotValve implements IValve {
         // create each object
         ArrayList<String> uids = new ArrayList<>();
         try {
-            for (AbstractWitsmlObject witsmlObject: qc.WITSML_OBJECTS)
-                uids.add(this.DELEGATOR.createObject(witsmlObject, tokenString));
+            for (AbstractWitsmlObject witsmlObject: qc.WITSML_OBJECTS) {
+                try {
+                    uids.add(this.DELEGATOR.createObject(witsmlObject, tokenString));
+                } catch (ValveAuthException vae) { // retry once with refreshed token
+                    tokenString = this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD, true).getToken(); // force refresh token
+                    this.DELEGATOR.createObject(witsmlObject, tokenString);
+                }
+            }
         } catch (Exception e) {
             LOG.warning("Exception in DotValve create object: " + e.getMessage());
             throw new ValveException(e.getMessage());

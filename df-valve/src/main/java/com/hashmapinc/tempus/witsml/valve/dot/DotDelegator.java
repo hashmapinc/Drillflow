@@ -145,7 +145,7 @@ public class DotDelegator {
     public String createObject(
         AbstractWitsmlObject witsmlObj,
         String tokenString
-    ) throws ValveException, UnirestException {
+    ) throws ValveException, ValveAuthException, UnirestException {
         LOG.info("CREATING " + witsmlObj.toString() + " in DotDelegator.");
         String objectType = witsmlObj.getObjectType(); // get obj type for exception handling
         String endpoint; // endpoint to send the call to
@@ -162,7 +162,7 @@ public class DotDelegator {
                 throw new ValveException("Unsupported object type<" + objectType + "> for CREATE");
         }
 
-        // make the UPDATE call.
+        // make the create call.
         String payload = witsmlObj.getJSONString("1.4.1.1");
         HttpResponse<String> response = Unirest
             .post(endpoint)
@@ -177,6 +177,9 @@ public class DotDelegator {
         if (201 == status || 200 == status) {
             LOG.info("Received successful status code from DoT POST call: " + status);
             return new JsonNode(response.getBody()).getObject().getString("uid");
+        } else if (401 == status) {
+            LOG.warning("Bad auth token.");
+            throw new ValveAuthException("Bad JWT");
         } else {
             LOG.warning("Received failure status code from DoT POST: " + status);
             LOG.warning("POST response: " + response.getBody());
