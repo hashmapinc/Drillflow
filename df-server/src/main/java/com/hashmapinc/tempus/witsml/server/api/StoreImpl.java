@@ -291,14 +291,18 @@ public class StoreImpl implements IStore {
     }
 
     @Override
-    public String getBaseMsg(Short returnValueIn) {
+    public WMLS_GetBaseMsgResponse getBaseMsg(Short returnValueIn) {
         LOG.info("Executing GetBaseMsg");
 
         String errMsg = witsmlApiConfigUtil.getProperty("basemessages." + returnValueIn);
         if (errMsg == null){
             errMsg = witsmlApiConfigUtil.getProperty("basemessages.-999");
         }
-        return errMsg;
+
+        WMLS_GetBaseMsgResponse response = new WMLS_GetBaseMsgResponse();
+        response.setResult(errMsg);
+
+        return response;
     }
 
     @Override

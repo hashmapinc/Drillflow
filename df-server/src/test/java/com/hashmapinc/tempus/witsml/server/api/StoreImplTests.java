@@ -71,12 +71,12 @@ public class StoreImplTests {
 
 	@Test
 	public void getBaseMsgShouldReturnATextualDescription(){
-		assertThat(this.witsmlServer.getBaseMsg((short)412)).contains("add");
+		assertThat(this.witsmlServer.getBaseMsg((short)412).getResult()).contains("add");
 	}
 
 	@Test
 	public void getBaseMsgShouldReturnATextualDescriptionForANegativeNumber(){
-		assertThat(this.witsmlServer.getBaseMsg((short)-412)).contains("add");
+		assertThat(this.witsmlServer.getBaseMsg((short)-412).getResult()).contains("add");
 	}
 
 	@Test

@@ -17,27 +17,21 @@ package com.hashmapinc.tempus.witsml.server.api.model;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name="WMLS_UpdateInStoreResponse")
-public class WMLS_UpdateInStoreResponse {
-    private short Result;
-    private String SuppMsgOut;
+@XmlRootElement(name="WMLS_GetBaseMsgResponse")
+public class WMLS_GetBaseMsgResponse {
+    @XmlElement(name="Result")
+    private String result;
 
-    public short getResult() {
-        return Result;
+    public String getResult() {
+        return result;
     }
 
-    public void setResult(short result) {
-        Result = result;
+    public void setResult(String result) {
+        this.result = result;
     }
 
-    public String getSuppMsgOut() {
-        return SuppMsgOut;
-    }
-
-    public void setSuppMsgOut(String suppMsgOut) {
-        SuppMsgOut = suppMsgOut;
-    }
 }
