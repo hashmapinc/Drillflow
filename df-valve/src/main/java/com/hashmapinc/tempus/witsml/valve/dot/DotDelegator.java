@@ -17,9 +17,12 @@ package com.hashmapinc.tempus.witsml.valve.dot;
 
 import java.util.logging.Logger;
 
+import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.witsml.valve.ValveException;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 
 public class DotDelegator {
     private static final Logger LOG = Logger.getLogger(DotDelegator.class.getName());
@@ -33,41 +36,45 @@ public class DotDelegator {
     }
 
     /**
-     * Submits the object to the DoT rest API for creation
-     * 
-     * @param objectJSON  - string json of the object to create
-     * @param tokenString - string of the JWT to do auth with
-     * @return
+     * deletes the object from DoT
+     *
+     * @param witsmlObj - object to delete
+     * @param tokenString - auth string for rest calls
      */
-    public String addWellToStore(String objectJSON, String tokenString) {
-        // create endpoint
-        String endpoint = this.URL + "witsml/wells/";
+    public void deleteObject(
+        AbstractWitsmlObject witsmlObj,
+        String tokenString
+    ) throws ValveException, UnirestException {
+        LOG.info("DELETING " + witsmlObj.toString() + " in DotDelegator.");
+        String uid = witsmlObj.getUid(); // get uid for delete call
+        String objectType = witsmlObj.getObjectType(); // get obj type for exception handling
+        String endpoint; // endpoint to send the DELETE call to
 
-        // send post
-        try {
-            HttpResponse<JsonNode> response = Unirest.
-                post(endpoint)
-                .header("accept", "application/json")
-                .header("Authorization", tokenString)
-                .header("Ocp-Apim-Subscription-Key", this.API_KEY)
-                .body(objectJSON)
-                .asJson();
+        // construct the endpoint for each object type
+        switch (objectType) { // TODO: add support for wellbore, log, and trajectory
+            case "well":
+                endpoint = this.URL + "/witsml/wells/" + uid;
+                break;
+            default:
+                throw new ValveException("Unsupported object type<" + objectType + "> for DELETE");
+        }
 
-            int status = response.getStatus();
+        // make the DELETE call.
+        HttpResponse<String> response = Unirest
+            .delete(endpoint)
+            .header("accept", "application/json")
+            .header("Authorization", tokenString)
+            .header("Ocp-Apim-Subscription-Key", this.API_KEY)
+            .asString();
 
-            if (201 == status || 200 == status) {
-                String uid = response.getBody().getObject().getString("uid");
-                LOG.info("Successfully put well object with uid=" + uid);
-                return uid;
-            } else {
-                LOG.warning("Received status code from Well POST: " + status);
-                return null;
-            }
-        } catch (Exception e) {
-            // TODO: handle exception
-            LOG.warning("Error while creating well in DoTValve: " + e);
-            e.printStackTrace();
-            return null;
+        // check response status
+        int status = response.getStatus();
+        if (201 == status || 200 == status) {
+            LOG.info("Received successful status code from DoT DELETE call: " + status);
+        } else {
+            LOG.warning("Received failure status code from DoT DELETE: " + status);
+            LOG.warning("DELETE response: " + response.getBody());
+            throw new ValveException("DELETE DoT REST call failed with status code: " + status);
         }
     }
 
@@ -78,34 +85,81 @@ public class DotDelegator {
      * @param tokenString - string of the JWT to do auth with
      * @return
      */
-    public String addWellboreToStore(String objectJSON, String tokenString) {
+    public String addWellToStore(
+        String objectJSON,
+        String tokenString
+    ) throws ValveException {
         // create endpoint
-        String endpoint = this.URL + "witsml/wellbores/";
+        String endpoint = this.URL + "/witsml/wells/";
 
         // send post
         try {
-            HttpResponse<JsonNode> response = Unirest
+            HttpResponse<String> response = Unirest
                 .post(endpoint)
                 .header("accept", "application/json")
                 .header("Authorization", tokenString)
                 .header("Ocp-Apim-Subscription-Key", this.API_KEY)
-                .body(objectJSON).asJson();
+                .body(objectJSON)
+                .asString();
 
             int status = response.getStatus();
 
             if (201 == status || 200 == status) {
-                String uid = response.getBody().getObject().getString("uid");
+                JsonNode body = new JsonNode(response.getBody());
+                String uid = body.getObject().getString("uid");
+                LOG.info("Successfully posted well object with uid=" + uid);
+                return uid;
+            } else {
+                LOG.warning("Received status code from Well POST: " + status);
+                LOG.warning("POST response: " + response.getBody());
+                throw new ValveException("Error response from DoT server: " + response.getBody());
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
+            LOG.warning("Error while creating well in DoTValve: " + e);
+            throw new ValveException(e.getMessage());
+        }
+    }
+
+    /**
+     * Submits the object to the DoT rest API for creation
+     * 
+     * @param objectJSON  - string json of the object to create
+     * @param tokenString - string of the JWT to do auth with
+     * @return
+     */
+    public String addWellboreToStore(
+        String objectJSON,
+        String tokenString
+    ) throws ValveException {
+        // create endpoint
+        String endpoint = this.URL + "/witsml/wellbores/";
+
+        // send post
+        try {
+            HttpResponse<String> response = Unirest
+                .post(endpoint)
+                .header("accept", "application/json")
+                .header("Authorization", tokenString)
+                .header("Ocp-Apim-Subscription-Key", this.API_KEY)
+                .body(objectJSON)
+                .asString();
+
+            int status = response.getStatus();
+
+            if (201 == status || 200 == status) {
+                String uid = new JsonNode(response.getBody()).getObject().getString("uid");
                 LOG.info("Successfully put wellbore object with uid=" + uid);
                 return uid;
             } else {
                 LOG.warning("Received status code from Wellbore POST: " + status);
-                return null;
+                throw new ValveException(response.getBody());
             }
         } catch (Exception e) {
             // TODO: handle exception
             LOG.warning("Error while creating wellbore in DoTValve: " + e);
             e.printStackTrace();
-            return null;
+            throw new ValveException(e.getMessage());
         }
     }
 }

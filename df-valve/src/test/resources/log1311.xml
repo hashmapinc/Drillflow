@@ -15,7 +15,7 @@
 			<FileCreator>John Smith</FileCreator>
 		</FileCreationInformation>
 	</documentInfo>
-	<log uidWell="W-12" uidWellbore="B-01" uid="f34a">
+	<log uidWell="w-1311" uidWellbore="b-1311" uid="l-1311">
 		<nameWell>6507/7-A-42</nameWell>
 		<nameWellbore>A-42</nameWellbore>
 		<name>L001</name>

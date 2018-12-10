@@ -17,7 +17,7 @@ They totally artificial and are not intended to demonstrate best practices.
 			<fileCreator>John Smith</fileCreator>
 		</fileCreationInformation>
 	</documentInfo>
-	<log uidWell="W-12" uidWellbore="B-01" uid="f34a">
+	<log uidWell="w-1411" uidWellbore="b-1411" uid="l-1411">
 		<nameWell>6507/7-A-42</nameWell>
 		<nameWellbore>A-42</nameWellbore>
 		<name>L001</name>

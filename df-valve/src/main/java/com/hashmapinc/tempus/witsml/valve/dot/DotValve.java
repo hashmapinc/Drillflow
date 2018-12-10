@@ -15,12 +15,14 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.valve.IValve;
+import com.hashmapinc.tempus.witsml.valve.ValveException;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -74,7 +76,9 @@ public class DotValve implements IValve {
      * @return The resultant object from the query in xml string format
      */
     @Override
-    public String getObject(QueryContext qc) {
+    public String getObject(
+            QueryContext qc
+    ) throws ValveException {
         // get the object and uid
         AbstractWitsmlObject obj = qc.WITSML_OBJECTS.get(0); //TODO: do not assume only one object
         LOG.info("Getting object from store: " + obj.toString());
@@ -85,12 +89,12 @@ public class DotValve implements IValve {
 
         // send get
         try {
-            HttpResponse<JsonNode> response = Unirest
+            HttpResponse<String> response = Unirest
                 .get(endpoint)
                 .header("accept", "application/json")
                 .header("Authorization", this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD).getToken())
                 .header("Ocp-Apim-Subscription-Key", this.API_KEY)
-                .asJson();
+                .asString();
             
             int status = response.getStatus();
 
@@ -99,7 +103,7 @@ public class DotValve implements IValve {
 
                 // get an abstractWitsmlObject from merging the query and the result JSON objects
                 JSONObject queryJSON = new JSONObject(obj.getJSONString("1.4.1.1"));
-                JSONObject responseJSON = response.getBody().getObject();
+                JSONObject responseJSON = new JsonNode(response.getBody()).getObject();
                 AbstractWitsmlObject mergedResponse = this.TRANSLATOR.translateQueryResponse(queryJSON, responseJSON);
 
                 // return the proper xml string for the client version
@@ -108,16 +112,17 @@ public class DotValve implements IValve {
                 } else if ("1.3.1.1".equals(qc.CLIENT_VERSION)) {
                     return this.TRANSLATOR.get1311XMLString(mergedResponse); // version translation required
                 } else {
-                    return null;
+                    throw new ValveException("Unsupported client version: " + qc.CLIENT_VERSION);
                 }
             } else {
                 LOG.warning("Received status code from GET object: " + status);
-                return null;
+                LOG.warning("GET response: " + response.getBody());
+                throw new ValveException(response.getBody());
             }
         } catch (Exception e) {
             // TODO: handle exception
             LOG.warning("Error while getting object in DoTValve: " + e);
-            return null;
+            throw new ValveException(e.getMessage());
         }
     }
 
@@ -128,7 +133,9 @@ public class DotValve implements IValve {
      * @return the UID of the newly created object
      */
     @Override
-    public String createObject(QueryContext qc) {
+    public String createObject(
+            QueryContext qc
+    ) throws ValveException {
         // get object information
         AbstractWitsmlObject obj = qc.WITSML_OBJECTS.get(0); // TODO: don't assume 1 object
         LOG.info("Creating object: " + obj.toString());
@@ -140,9 +147,7 @@ public class DotValve implements IValve {
         try {
             tokenString = this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD).getToken();
         } catch (Exception e) {
-            LOG.warning("Received error getting token string for createObject: " + e);
-            e.printStackTrace();
-            return null;
+            throw new ValveException("Token error: " + e.getMessage());
         }
 
         // handle each supported object
@@ -152,25 +157,45 @@ public class DotValve implements IValve {
             case "wellbore":
                 return this.DELEGATOR.addWellboreToStore(objectJSON, tokenString);
             default:
-                LOG.warning("Unsupported type encountered in createObject. Type = <" + objectType + ">");
-                return null;
+                throw new ValveException("Unsupported type encountered in createObject. Type = <" + objectType + ">");
         }
     }
 
     /**
      * Deletes an object
-     * @param query POJO representing the object that was received
+     * @param qc - QueryContext with information needed to delete object
      */
     @Override
-    public void deleteObject(AbstractWitsmlObject query) {
+    public void deleteObject(
+            QueryContext qc
+    ) throws ValveException {
+        // get auth token
+        String tokenString;
+        try {
+            tokenString = this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD).getToken();
+        } catch (Exception e) {
+            LOG.warning("Exception in deleteObject while authenticating: " + e.getMessage());
+            throw new ValveException(e.getMessage());
+        }
+
+        // delete each object
+        try {
+            for (AbstractWitsmlObject witsmlObject : qc.WITSML_OBJECTS)
+                this.DELEGATOR.deleteObject(witsmlObject, tokenString);
+        } catch (UnirestException ue) {
+            LOG.warning("Got UnirestException in DotValve delete object: " + ue.getMessage());
+            throw new ValveException("Delete error: " + ue.getMessage());
+        }
+
     }
 
     /**
      * Updates an already existing object
-     * @param query POJO representing the object that was received
+     * @param witsmlObjects - list of AbstractWitsmlObjects to update
      */
     @Override
-    public void updateObject(AbstractWitsmlObject query) {
+    public void updateObject(List<AbstractWitsmlObject> witsmlObjects) {
+        LOG.info("Updating witsml objects" + witsmlObjects.toString());
     }
 
     /**
@@ -202,7 +227,8 @@ public class DotValve implements IValve {
         // array of supported functions
         String[] funcs = {
             "AddToStore",
-            "GetFromStore"
+            "GetFromStore",
+            "DeleteFromStore",
         }; 
 
         // supported objects for each function
@@ -211,6 +237,7 @@ public class DotValve implements IValve {
         AbstractWitsmlObject[][] supportedObjects = {
             {well, wellbore}, // ADD TO STORE OBJECTS
             {well}, // GET FROM STORE OBJECTS
+            {well}, // DELETE FROM STORE OBJECTS
         };
 
         // populate cap

@@ -14,7 +14,7 @@
 			<FileCreator>John Smith</FileCreator>
 		</FileCreationInformation>
 	</documentInfo>
-	<trajectory uidWell="W-12" uidWellbore="B-01" uid="pe84e">
+	<trajectory uidWell="w-1311" uidWellbore="b-1311" uid="t-1311">
 		<nameWell>6507/7-A-42</nameWell>
 		<nameWellbore>A-42</nameWellbore>
 		<name>Plan #2</name>

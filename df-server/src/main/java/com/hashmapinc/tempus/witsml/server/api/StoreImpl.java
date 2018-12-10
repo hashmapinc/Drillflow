@@ -16,7 +16,6 @@
 package com.hashmapinc.tempus.witsml.server.api;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
-import com.hashmapinc.tempus.WitsmlObjects.v1311.Data;
 import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.WitsmlObjectParser;
 import com.hashmapinc.tempus.witsml.WitsmlUtil;
@@ -25,9 +24,11 @@ import com.hashmapinc.tempus.witsml.server.api.model.WMLS_AddToStoreResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetFromStoreResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetVersionResponse;
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_DeleteFromStoreResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.DataObject;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.ServerCap;
 import com.hashmapinc.tempus.witsml.valve.IValve;
+import com.hashmapinc.tempus.witsml.valve.ValveException;
 import com.hashmapinc.tempus.witsml.valve.ValveFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -135,20 +136,80 @@ public class StoreImpl implements IStore {
             LOG.info(
                 "Successfully added object: " + witsmlObjects.toString()
             );
+        } catch (ValveException ve) {
+            //TODO: handle exception
+            LOG.warning("ValveException in addToStore: " + ve.getMessage());
+            response.setSuppMsgOut(ve.getMessage());
+            response.setResult((short)-1);
+            return response;
         } catch (Exception e) {
             //TODO: handle exception
             LOG.warning(
                 "could not add witsml object to store: \n" +
                 "Error: " + e
             );
+            response.setSuppMsgOut("Error adding to store: " + e.getMessage());
             response.setResult((short)-1);
             return response;
         }
 
         LOG.info("Successfully added object: " + witsmlObjects.get(0).toString());
-
         response.setResult((short)1);
         return response;
+    }
+
+    @Override
+    public WMLS_DeleteFromStoreResponse deleteFromStore(
+        String WMLtypeIn,
+        String QueryIn,
+        String OptionsIn,
+        String CapabilitiesIn
+    ) {
+        LOG.info("Deleting object from store.");
+        WMLS_DeleteFromStoreResponse resp = new WMLS_DeleteFromStoreResponse();
+
+        // set initial ERROR state for resp
+        resp.setResult((short) -1);
+
+        // try to deserialize
+        List<AbstractWitsmlObject> witsmlObjects;
+        try {
+            String clientVersion = WitsmlUtil.getVersionFromXML(QueryIn);
+            witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, QueryIn, clientVersion);
+        } catch (Exception e) {
+            // TODO: handle exception
+            LOG.warning("could not deserialize witsml object: \n" +
+                    "WMLtypeIn: " + WMLtypeIn + " \n" +
+                    "QueryIn: " + QueryIn + " \n" +
+                    "OptionsIn: " + OptionsIn + " \n" +
+                    "CapabilitiesIn: " + CapabilitiesIn
+            );
+            resp.setSuppMsgOut("Bad QueryIn. Got error message: " + e.getMessage());
+            return resp;
+        }
+
+        // try to delete
+        try {
+            // construct query context
+            Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
+            ValveUser user = (ValveUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            QueryContext qc = new QueryContext(
+                    null, // client version not needed
+                    WMLtypeIn,
+                    optionsMap,
+                    QueryIn,
+                    witsmlObjects,
+                    user.getUserName(),
+                    user.getPassword()
+            );
+            this.valve.deleteObject(qc);
+            resp.setResult((short) 1);
+        } catch (Exception e) {
+            resp.setSuppMsgOut(e.getMessage());
+        }
+
+        // return response
+        return resp;
     }
 
     @Override
@@ -201,7 +262,6 @@ public class StoreImpl implements IStore {
     ) {
         LOG.info("Executing GetFromStore");
         WMLS_GetFromStoreResponse resp = new WMLS_GetFromStoreResponse();
-        LOG.info(valve.getName());
 
         // try to deserialize
         List<AbstractWitsmlObject> witsmlObjects;
@@ -217,7 +277,10 @@ public class StoreImpl implements IStore {
                         "OptionsIn: " + OptionsIn + " \n" + 
                         "CapabilitiesIn: " + CapabilitiesIn
             );
-            return resp; // TODO: proper error handling should go here
+
+            resp.setSuppMsgOut("Error parsing input: " + e.getMessage());
+            resp.setResult((short) -1);
+            return resp;
         }
 
         // try to query
@@ -244,12 +307,17 @@ public class StoreImpl implements IStore {
                 resp.setResult((short) 1);
                 resp.setXMLout(xmlOut);
             } else {
-                resp.setSuppMsgOut("Error from REST backend");
+                resp.setSuppMsgOut("Unhandled error from REST backend.");
                 resp.setResult((short) -1);
             }
+        } catch (ValveException ve) {
+            resp.setResult((short)-425);
+            LOG.warning("Valve Exception in GetFromStore: " + ve.getMessage());
+            resp.setSuppMsgOut(ve.getMessage());
+            ve.printStackTrace();
         } catch (Exception e) {
             resp.setResult((short)-425);
-            LOG.warning("Exception in generating GetFromStore response: " + e.toString());
+            LOG.warning("Exception in generating GetFromStore response: " + e.getMessage());
             e.printStackTrace();
         }
 

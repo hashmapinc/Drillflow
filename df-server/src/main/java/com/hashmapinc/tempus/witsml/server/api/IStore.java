@@ -18,6 +18,7 @@ package com.hashmapinc.tempus.witsml.server.api;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_AddToStoreResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetFromStoreResponse;
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_DeleteFromStoreResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetVersionResponse;
 
 import javax.jws.WebMethod;
@@ -39,6 +40,16 @@ public interface IStore {
         @WebParam(partName = "XMLin") String XMLin,
         @WebParam(partName = "OptionsIn") String OptionsIn,
         @WebParam(partName = "CapabilitiesIn") String CapabilitiesIn
+    );
+
+    @WebMethod(action = "http://www.witsml.org/action/120/Store.WMLS_DeleteFromStore", operationName = "WMLS_DeleteFromStore")
+    @RequestWrapper(targetNamespace = "http://www.witsml.org/message/120")
+    @SOAPBinding(style=SOAPBinding.Style.RPC, parameterStyle=SOAPBinding.ParameterStyle.BARE, use=SOAPBinding.Use.ENCODED)
+    WMLS_DeleteFromStoreResponse deleteFromStore(
+            @WebParam(partName = "WMLtypeIn") String WMLtypeIn,
+            @WebParam(partName = "QueryIn") String QueryIn,
+            @WebParam(partName = "OptionsIn") String OptionsIn,
+            @WebParam(partName = "CapabilitiesIn") String CapabilitiesIn
     );
 
     @WebMethod(action = "http://www.witsml.org/action/120/Store.WMLS_GetVersion", operationName = "WMLS_GetVersion")
