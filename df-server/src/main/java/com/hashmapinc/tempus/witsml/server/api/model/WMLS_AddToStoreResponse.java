@@ -15,6 +15,12 @@
  */
 package com.hashmapinc.tempus.witsml.server.api.model;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name="WMLS_AddToStoreResponse")
 public class WMLS_AddToStoreResponse {
     private short Result;
     private String SuppMsgOut;

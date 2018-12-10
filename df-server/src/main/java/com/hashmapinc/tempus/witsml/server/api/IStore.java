@@ -75,7 +75,7 @@ public interface IStore {
     @WebMethod(action = "http://www.witsml.org/action/120/Store.WMLS_GetBaseMsg", operationName = "WMLS_GetBaseMsg")
     @RequestWrapper(targetNamespace = "http://www.witsml.org/message/120")
     @SOAPBinding(style = SOAPBinding.Style.RPC, parameterStyle= SOAPBinding.ParameterStyle.BARE, use = SOAPBinding.Use.ENCODED)
-    String getBaseMsg(@WebParam(partName= "ReturnValueIn") Short ReturnValueIn);
+    WMLS_GetBaseMsgResponse getBaseMsg(@WebParam(partName= "ReturnValueIn") Short ReturnValueIn);
 
     @WebMethod(action = "http://www.witsml.org/action/120/Store.WMLS_GetFromStore", operationName = "WMLS_GetFromStore")
     @RequestWrapper(targetNamespace = "http://www.witsml.org/message/120", localName = "Store.WMLS_GetFromStore")

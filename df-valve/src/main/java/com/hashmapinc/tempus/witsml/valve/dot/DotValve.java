@@ -257,10 +257,10 @@ public class DotValve implements IValve {
 
         // array of supported functions
         String[] funcs = {
-            "AddToStore",
-            "GetFromStore",
-            "DeleteFromStore",
-            "UpdateInStore"
+            "WMLS_AddToStore",
+            "WMLS_GetFromStore",
+            "WMLS_DeleteFromStore",
+            "WMLS_UpdateInStore"
         }; 
 
         // supported objects for each function
