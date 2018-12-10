@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
@@ -134,30 +135,26 @@ public class DotValve implements IValve {
     @Override
     public String createObject(
             QueryContext qc
-    ) throws ValveException {
-        // get object information
-        AbstractWitsmlObject obj = qc.WITSML_OBJECTS.get(0); // TODO: don't assume 1 object
-        LOG.info("Creating object: " + obj.toString());
-        String objectType = obj.getObjectType();
-        String objectJSON = this.TRANSLATOR.get1411JSONString(obj);
-
-        // get token
+    ) throws ValveException { // get auth token
         String tokenString;
         try {
             tokenString = this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD).getToken();
         } catch (Exception e) {
-            throw new ValveException("Token error: " + e.getMessage());
+            LOG.warning("Exception in createObject while authenticating: " + e.getMessage());
+            throw new ValveException(e.getMessage());
         }
 
-        // handle each supported object
-        switch (objectType) {
-            case "well":
-                return this.DELEGATOR.addWellToStore(objectJSON, tokenString);
-            case "wellbore":
-                return this.DELEGATOR.addWellboreToStore(objectJSON, tokenString);
-            default:
-                throw new ValveException("Unsupported type encountered in createObject. Type = <" + objectType + ">");
+        // create each object
+        ArrayList<String> uids = new ArrayList<>();
+        try {
+            for (AbstractWitsmlObject witsmlObject: qc.WITSML_OBJECTS)
+                uids.add(this.DELEGATOR.createObject(witsmlObject, tokenString));
+        } catch (Exception e) {
+            LOG.warning("Exception in DotValve create object: " + e.getMessage());
+            throw new ValveException(e.getMessage());
         }
+
+        return uids.get(0); // TODO: handle plural return for creation.
     }
 
     /**
@@ -185,7 +182,6 @@ public class DotValve implements IValve {
             LOG.warning("Got UnirestException in DotValve delete object: " + ue.getMessage());
             throw new ValveException(ue.getMessage());
         }
-
     }
 
     /**
@@ -257,7 +253,7 @@ public class DotValve implements IValve {
         AbstractWitsmlObject[][] supportedObjects = {
             {well, wellbore}, // ADD TO STORE OBJECTS
             {well}, // GET FROM STORE OBJECTS
-            {well}, // DELETE FROM STORE OBJECTS
+            {well, wellbore}, // DELETE FROM STORE OBJECTS
             {well}, // UPDATE IN STORE OBJECTS
         };
 

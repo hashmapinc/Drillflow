@@ -55,6 +55,9 @@ public class DotDelegator {
             case "well":
                 endpoint = this.URL + "/witsml/wells/" + uid;
                 break;
+            case "wellbore":
+                endpoint = this.URL + "/witsml/wellbores/" + uid;
+                break;
             default:
                 throw new ValveException("Unsupported object type<" + objectType + "> for DELETE");
         }
@@ -105,12 +108,12 @@ public class DotDelegator {
         // make the UPDATE call.
         String payload = witsmlObj.getJSONString("1.4.1.1");
         HttpResponse<String> response = Unirest
-                .put(endpoint)
-                .header("accept", "application/json")
-                .header("Authorization", tokenString)
-                .header("Ocp-Apim-Subscription-Key", this.API_KEY)
-                .body(payload)
-                .asString();
+            .put(endpoint)
+            .header("accept", "application/json")
+            .header("Authorization", tokenString)
+            .header("Ocp-Apim-Subscription-Key", this.API_KEY)
+            .body(payload)
+            .asString();
 
         // check response status
         int status = response.getStatus();
@@ -125,86 +128,50 @@ public class DotDelegator {
 
     /**
      * Submits the object to the DoT rest API for creation
-     * 
-     * @param objectJSON  - string json of the object to create
+     *
+     * @param witsmlObj - AbstractWitsmlObject to create
      * @param tokenString - string of the JWT to do auth with
      * @return
      */
-    public String addWellToStore(
-        String objectJSON,
+    public String createObject(
+        AbstractWitsmlObject witsmlObj,
         String tokenString
-    ) throws ValveException {
-        // create endpoint
-        String endpoint = this.URL + "/witsml/wells/";
+    ) throws ValveException, UnirestException {
+        LOG.info("CREATING " + witsmlObj.toString() + " in DotDelegator.");
+        String objectType = witsmlObj.getObjectType(); // get obj type for exception handling
+        String endpoint; // endpoint to send the call to
 
-        // send post
-        try {
-            HttpResponse<String> response = Unirest
-                .post(endpoint)
-                .header("accept", "application/json")
-                .header("Authorization", tokenString)
-                .header("Ocp-Apim-Subscription-Key", this.API_KEY)
-                .body(objectJSON)
-                .asString();
-
-            int status = response.getStatus();
-
-            if (201 == status || 200 == status) {
-                JsonNode body = new JsonNode(response.getBody());
-                String uid = body.getObject().getString("uid");
-                LOG.info("Successfully posted well object with uid=" + uid);
-                return uid;
-            } else {
-                LOG.warning("Received status code from Well POST: " + status);
-                LOG.warning("POST response: " + response.getBody());
-                throw new ValveException("Error response from DoT server: " + response.getBody());
-            }
-        } catch (Exception e) {
-            // TODO: handle exception
-            LOG.warning("Error while creating well in DoTValve: " + e);
-            throw new ValveException(e.getMessage());
+        // construct the endpoint for each object type
+        switch (objectType) { // TODO: add support for log and trajectory
+            case "well":
+                endpoint = this.URL + "/witsml/wells/";
+                break;
+            case "wellbore":
+                endpoint = this.URL + "/witsml/wellbores/";
+                break;
+            default:
+                throw new ValveException("Unsupported object type<" + objectType + "> for CREATE");
         }
-    }
 
-    /**
-     * Submits the object to the DoT rest API for creation
-     * 
-     * @param objectJSON  - string json of the object to create
-     * @param tokenString - string of the JWT to do auth with
-     * @return
-     */
-    public String addWellboreToStore(
-        String objectJSON,
-        String tokenString
-    ) throws ValveException {
-        // create endpoint
-        String endpoint = this.URL + "/witsml/wellbores/";
+        // make the UPDATE call.
+        String payload = witsmlObj.getJSONString("1.4.1.1");
+        HttpResponse<String> response = Unirest
+            .post(endpoint)
+            .header("accept", "application/json")
+            .header("Authorization", tokenString)
+            .header("Ocp-Apim-Subscription-Key", this.API_KEY)
+            .body(payload)
+            .asString();
 
-        // send post
-        try {
-            HttpResponse<String> response = Unirest
-                .post(endpoint)
-                .header("accept", "application/json")
-                .header("Authorization", tokenString)
-                .header("Ocp-Apim-Subscription-Key", this.API_KEY)
-                .body(objectJSON)
-                .asString();
-
-            int status = response.getStatus();
-
-            if (201 == status || 200 == status) {
-                String uid = new JsonNode(response.getBody()).getObject().getString("uid");
-                LOG.info("Successfully put wellbore object with uid=" + uid);
-                return uid;
-            } else {
-                LOG.warning("Received status code from Wellbore POST: " + status);
-                throw new ValveException(response.getBody());
-            }
-        } catch (Exception e) {
-            // TODO: handle exception
-            LOG.warning("Error while creating wellbore in DoTValve: " + e);
-            e.printStackTrace();
-            throw new ValveException(e.getMessage());
+        // check response status
+        int status = response.getStatus();
+        if (201 == status || 200 == status) {
+            LOG.info("Received successful status code from DoT POST call: " + status);
+            return new JsonNode(response.getBody()).getObject().getString("uid");
+        } else {
+            LOG.warning("Received failure status code from DoT POST: " + status);
+            LOG.warning("POST response: " + response.getBody());
+            throw new ValveException(response.getBody());
         }
     }
 }
