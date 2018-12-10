@@ -217,13 +217,18 @@ public class DotValve implements IValve {
             throw new ValveException(e.getMessage());
         }
 
-        // update each object
+        // update each object with 1 retry for bad tokens
         try {
-            for (AbstractWitsmlObject witsmlObject : qc.WITSML_OBJECTS)
-                this.DELEGATOR.updateObject(witsmlObject, tokenString);
-        } catch (UnirestException ue) {
-            LOG.warning("Got UnirestException in DotValve update object: " + ue.getMessage());
-            throw new ValveException(ue.getMessage());
+            for (AbstractWitsmlObject witsmlObject : qc.WITSML_OBJECTS) {
+                try {
+                    this.DELEGATOR.updateObject(witsmlObject, tokenString);
+                } catch (ValveAuthException vae) { // retry once with refreshed token
+                    tokenString = this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD, true).getToken(); // force refresh token
+                }
+            }
+        } catch (Exception e) {
+            LOG.warning("Exception in DotValve update object: " + e.getMessage());
+            throw new ValveException(e.getMessage());
         }
     }
 

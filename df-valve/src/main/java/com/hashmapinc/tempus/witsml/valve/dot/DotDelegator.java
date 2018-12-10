@@ -90,7 +90,7 @@ public class DotDelegator {
     public void updateObject(
         AbstractWitsmlObject witsmlObj,
         String tokenString
-    ) throws ValveException, UnirestException {
+    ) throws ValveException, ValveAuthException, UnirestException {
         LOG.info("UPDATING " + witsmlObj.toString() + " in DotDelegator.");
         String uid = witsmlObj.getUid(); // get uid for delete call
         String objectType = witsmlObj.getObjectType(); // get obj type for exception handling
@@ -121,7 +121,10 @@ public class DotDelegator {
         // check response status
         int status = response.getStatus();
         if (201 == status || 200 == status) {
-            LOG.info("Received successful status code from DoT PUT call: " + status);
+            LOG.info("UPDATE for " + witsmlObj + " was successful with REST status code: " + status);
+        } else if (401 == status) {
+            LOG.warning("Bad auth token.");
+            throw new ValveAuthException("Bad JWT");
         } else {
             LOG.warning("Received failure status code from DoT PUT: " + status);
             LOG.warning("PUT response: " + response.getBody());
