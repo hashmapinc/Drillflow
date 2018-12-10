@@ -241,6 +241,68 @@ public class DotValveTest {
     }
 
     @Test
+    public void getObjectWellbore1311() throws IOException, JAXBException, ValveException {
+        // add the deletable object first
+        try {
+            this.createObjectWellbore1311();
+        } catch (Exception e) {}
+
+        // get query context
+        String wellbore1311XML = new String(
+            Files.readAllBytes(Paths.get("src/test/resources/wellbore1311.xml"))
+        );
+        List<AbstractWitsmlObject> witsmlObjects = (List<AbstractWitsmlObject>) (List<?>) (
+            (com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores) WitsmlMarshal
+            .deserialize(wellbore1311XML, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore.class)
+        ).getWellbore();
+        QueryContext qc = new QueryContext(
+            "1.3.1.1",
+            "wellbore",
+            null,
+            wellbore1311XML,
+            witsmlObjects,
+            this.username,
+            this.password
+        );
+
+        // get
+        String xmlOut = this.valve.getObject(qc);
+        assertNotNull(xmlOut);
+        assertFalse(xmlOut.contains("ns0:wells"));
+    }
+
+    @Test
+    public void getObjectWellbore1411() throws IOException, JAXBException, ValveException {
+        // add the deletable object first
+        try {
+            this.createObjectWellbore1411();
+        } catch (Exception e) {}
+
+        // get query context
+        String well1bore411XML = new String(
+            Files.readAllBytes(Paths.get("src/test/resources/wellbore1411.xml"))
+        );
+        List<AbstractWitsmlObject> witsmlObjects = (List<AbstractWitsmlObject>) (List<?>) (
+            (com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbores) WitsmlMarshal
+            .deserialize(well1bore411XML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore.class)
+        ).getWellbore();
+        QueryContext qc = new QueryContext(
+            "1.4.1.1",
+            "wellbore",
+            null,
+            well1bore411XML,
+            witsmlObjects,
+            this.username,
+            this.password
+        );
+
+        // get
+        String xmlOut = this.valve.getObject(qc);
+        assertNotNull(xmlOut);
+        assertFalse(xmlOut.contains("ns0:wells"));
+    }
+
+    @Test
     public void deleteObjectWellbore1311() throws IOException, JAXBException, ValveException {
         // add the deletable object first
         try {
