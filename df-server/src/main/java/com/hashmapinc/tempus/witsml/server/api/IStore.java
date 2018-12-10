@@ -19,7 +19,6 @@ import com.hashmapinc.tempus.witsml.server.api.model.*;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
-import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.xml.ws.RequestWrapper;
@@ -67,7 +66,6 @@ public interface IStore {
     @WebMethod(action = "http://www.witsml.org/action/120/Store.WMLS_GetCap", operationName = "WMLS_GetCap")
     @RequestWrapper(localName = "Store.WMLS_GetCap")
     @ResponseWrapper(className = "com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse")
-    @WebResult(header = true)
     @SOAPBinding(style = SOAPBinding.Style.RPC, parameterStyle= SOAPBinding.ParameterStyle.BARE, use = SOAPBinding.Use.ENCODED)
     WMLS_GetCapResponse getCap(@WebParam(partName = "OptionsIn") String OptionsIn);
 
