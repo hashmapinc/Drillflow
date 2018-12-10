@@ -36,7 +36,7 @@ public class DotTranslator {
      * @param obj - object to serialize
      * @return jsonString - String serialization of a JSON version of the 1.4.1.1 witsml object
      */
-    public String get1411JSONString(AbstractWitsmlObject obj) {
+    public static String get1411JSONString(AbstractWitsmlObject obj) {
         LOG.info("Getting 1.4.1.1 json string for object: " + obj.toString());
         return obj.getJSONString("1.4.1.1");
     }
@@ -46,7 +46,7 @@ public class DotTranslator {
      * @param obj1411 - 1411 AbstractWitsmlObject to serialize to xml
      */
     // TODO: delete this method and use the AbstractWitsmlObject.getXMLString method when version 1.1.5 fixes the namespace bug.
-    public String get1311XMLString(
+    public static String get1311XMLString(
         AbstractWitsmlObject obj1411
     ) throws ValveException {
         LOG.info("getting 1.3.1.1 XML string for object: " + obj1411.toString());
@@ -78,7 +78,7 @@ public class DotTranslator {
      * @param response - JSON object representing the response from DoT
      * @return obj - parsed abstract object
      */
-    public AbstractWitsmlObject translateQueryResponse(
+    public static AbstractWitsmlObject translateQueryResponse(
         JSONObject query, 
         JSONObject response
     ) throws IOException {
@@ -110,7 +110,7 @@ public class DotTranslator {
      * @return = serialized parent object in requested WITSML version format
      * @throws ValveException
      */
-    public String consolidateObjectsToXML(
+    public static String consolidateObjectsToXML(
         ArrayList<AbstractWitsmlObject> witsmlObjects,
         String version
     ) throws ValveException {
@@ -126,7 +126,7 @@ public class DotTranslator {
         String xmlString;
         switch (witsmlObjects.get(0).getObjectType()) {
             case "well": // no consolidation needed for wells
-                xmlString = is1411 ? witsmlObjects.get(0).getXMLString("1.4.1.1") : this.get1311XMLString(witsmlObjects.get(0));
+                xmlString = is1411 ? witsmlObjects.get(0).getXMLString("1.4.1.1") : get1311XMLString(witsmlObjects.get(0));
                 break;
             case "wellbore": // no consolidation needed for wells
                 xmlString = is1411 ? consolidate1411WellboresToXML(witsmlObjects) : consolidate1311WellboresToXML(witsmlObjects);
@@ -138,7 +138,7 @@ public class DotTranslator {
         return xmlString;
     }
 
-    private String consolidate1311WellboresToXML(
+    private static String consolidate1311WellboresToXML(
         ArrayList<AbstractWitsmlObject> witsmlObjects
     ) throws ValveException {
         try {
@@ -160,7 +160,7 @@ public class DotTranslator {
         }
     }
 
-    private String consolidate1411WellboresToXML(
+    private static String consolidate1411WellboresToXML(
         ArrayList<AbstractWitsmlObject> witsmlObjects
     ) throws ValveException {
         try {

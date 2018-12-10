@@ -37,7 +37,6 @@ public class DotValve implements IValve {
     private static final Logger LOG = Logger.getLogger(DotValve.class.getName());
     private final String NAME = "DoT"; // DoT = Drillops Town
     private final String DESCRIPTION = "Valve for interaction with Drillops Town"; // DoT = Drillops Town
-    private final DotTranslator TRANSLATOR;
     private final DotAuth AUTH;
     private final DotDelegator DELEGATOR;
     private final String URL;
@@ -45,8 +44,7 @@ public class DotValve implements IValve {
 
     public DotValve(Map<String, String> config) {
         this.URL = config.get("baseurl");
-        this.API_KEY = config.get("apikey"); 
-        this.TRANSLATOR = new DotTranslator();
+        this.API_KEY = config.get("apikey");
         this.AUTH = new DotAuth(this.URL, this.API_KEY);
         this.DELEGATOR = new DotDelegator(this.URL, this.API_KEY);
     }
@@ -77,7 +75,7 @@ public class DotValve implements IValve {
      */
     @Override
     public String getObject(
-            QueryContext qc
+        QueryContext qc
     ) throws ValveException {
         // TODO: move a ton of this to the delegator.
         // handle each object
@@ -120,7 +118,7 @@ public class DotValve implements IValve {
                     JSONObject queryJSON = new JSONObject(witsmlObject.getJSONString("1.4.1.1"));
                     JSONObject responseJSON = new JsonNode(response.getBody()).getObject();
                     AbstractWitsmlObject mergedResponse =
-                        this.TRANSLATOR.translateQueryResponse(queryJSON, responseJSON);
+                        DotTranslator.translateQueryResponse(queryJSON, responseJSON);
 
                     // add the object to the response list
                     queryResponses.add(mergedResponse);
@@ -137,7 +135,7 @@ public class DotValve implements IValve {
         }
 
         // return consolidated XML response in proper version
-        return this.TRANSLATOR.consolidateObjectsToXML(queryResponses, qc.CLIENT_VERSION);
+        return DotTranslator.consolidateObjectsToXML(queryResponses, qc.CLIENT_VERSION);
     }
 
     /**
