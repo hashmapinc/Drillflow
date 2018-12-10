@@ -81,7 +81,7 @@ public class DotTranslator {
     public static AbstractWitsmlObject translateQueryResponse(
         JSONObject query, 
         JSONObject response
-    ) throws IOException {
+    ) throws ValveException {
         LOG.info("Translating query response.");
 
         // merge the responseJSON with the query
@@ -97,7 +97,11 @@ public class DotTranslator {
 
         // convert the queryJSON back to valid xml
         LOG.info("Converting merged query JSON to valid XML string");
-        return WitsmlMarshal.deserializeFromJSON(query.toString(), com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell.class);
+        try {
+            return WitsmlMarshal.deserializeFromJSON(query.toString(), com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell.class);
+        } catch (IOException ioe) {
+            throw new ValveException(ioe.getMessage());
+        }
     }
 
     /**

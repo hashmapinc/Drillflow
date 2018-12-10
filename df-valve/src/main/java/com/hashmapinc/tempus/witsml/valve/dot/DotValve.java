@@ -77,62 +77,31 @@ public class DotValve implements IValve {
     public String getObject(
         QueryContext qc
     ) throws ValveException {
-        // TODO: move a ton of this to the delegator.
+        // get auth token
+        String tokenString;
+        try {
+            tokenString = this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD).getToken();
+        } catch (Exception e) {
+            LOG.warning("Exception in getObject while authenticating: " + e.getMessage());
+            throw new ValveException(e.getMessage());
+        }
+
         // handle each object
         ArrayList<AbstractWitsmlObject> queryResponses = new ArrayList<AbstractWitsmlObject>();
-        for (AbstractWitsmlObject witsmlObject: qc.WITSML_OBJECTS) {
-            LOG.info("Getting object from store: " + witsmlObject.toString());
-            String uid = witsmlObject.getUid();
-            String objectType = witsmlObject.getObjectType();
-
-            // create endpoint
-            String endpoint = this.URL;
-            switch (objectType) {
-                case "well":
-                    endpoint += "/witsml/wells/" + uid;
-                    break;
-                case "wellbore":
-                    endpoint += "/witsml/wellbores/" + uid;
-                    break;
-                default:
-                    String msg = "Unsupported object type <" + objectType + "> for GET";
-                    LOG.warning(msg);
-                    throw new ValveException(msg);
-            }
-
-            // send get
-            try {
-                HttpResponse<String> response = Unirest
-                    .get(endpoint)
-                    .header("accept", "application/json")
-                    .header("Authorization", this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD).getToken())
-                    .header("Ocp-Apim-Subscription-Key", this.API_KEY)
-                    .asString();
-
-                int status = response.getStatus();
-
-                if (201 == status || 200 == status) {
-                    LOG.info("Successfully executed GET for query object=" + witsmlObject.toString());
-
-                    // get an abstractWitsmlObject from merging the query and the result JSON objects
-                    JSONObject queryJSON = new JSONObject(witsmlObject.getJSONString("1.4.1.1"));
-                    JSONObject responseJSON = new JsonNode(response.getBody()).getObject();
-                    AbstractWitsmlObject mergedResponse =
-                        DotTranslator.translateQueryResponse(queryJSON, responseJSON);
-
-                    // add the object to the response list
-                    queryResponses.add(mergedResponse);
-                } else {
-                    LOG.warning("Received status code from GET call to DoT: " + status);
-                    LOG.warning("GET response: " + response.getBody());
-                    throw new ValveException(response.getBody());
+        try {
+            for (AbstractWitsmlObject witsmlObject: qc.WITSML_OBJECTS) {
+                try {
+                    queryResponses.add(this.DELEGATOR.getObject(witsmlObject, tokenString));
+                } catch (ValveAuthException vae) { // retry once with refreshed token
+                    tokenString = this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD, true).getToken(); // force refresh token
+                    queryResponses.add(this.DELEGATOR.getObject(witsmlObject, tokenString));
                 }
-            } catch (Exception e) {
-                // TODO: handle exception
-                LOG.warning("Error while getting object in DoTValve: " + e);
-                throw new ValveException(e.getMessage());
             }
+        } catch (Exception e) {
+            LOG.warning("Exception in DotValve get object: " + e.getMessage());
+            throw new ValveException(e.getMessage());
         }
+
 
         // return consolidated XML response in proper version
         return DotTranslator.consolidateObjectsToXML(queryResponses, qc.CLIENT_VERSION);
@@ -165,7 +134,7 @@ public class DotValve implements IValve {
                     uids.add(this.DELEGATOR.createObject(witsmlObject, tokenString));
                 } catch (ValveAuthException vae) { // retry once with refreshed token
                     tokenString = this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD, true).getToken(); // force refresh token
-                    this.DELEGATOR.createObject(witsmlObject, tokenString);
+                    uids.add(this.DELEGATOR.createObject(witsmlObject, tokenString));
                 }
             }
         } catch (Exception e) {

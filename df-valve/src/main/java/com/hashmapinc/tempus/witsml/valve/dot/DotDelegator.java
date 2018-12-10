@@ -23,6 +23,7 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import org.json.JSONObject;
 
 public class DotDelegator {
     private static final Logger LOG = Logger.getLogger(DotDelegator.class.getName());
@@ -183,6 +184,61 @@ public class DotDelegator {
         } else {
             LOG.warning("Received failure status code from DoT POST: " + status);
             LOG.warning("POST response: " + response.getBody());
+            throw new ValveException(response.getBody());
+        }
+    }
+
+    /**
+     * Submits the query to the DoT rest API for object GETing
+     *
+     * @param witsmlObject - AbstractWitsmlObject to get
+     * @param tokenString - string of the JWT to do auth with
+     * @return get results AbstractWitsmlObject
+     */
+    public AbstractWitsmlObject getObject(
+            AbstractWitsmlObject witsmlObject,
+            String tokenString
+    ) throws ValveException, ValveAuthException, UnirestException {
+        LOG.info("GETing " + witsmlObject.toString() + " in DotDelegator.");
+        String uid = witsmlObject.getUid();
+        String objectType = witsmlObject.getObjectType();
+
+        // create endpoint
+        String endpoint = this.URL;
+        switch (objectType) {
+            case "well":
+                endpoint += "/witsml/wells/" + uid;
+                break;
+            case "wellbore":
+                endpoint += "/witsml/wellbores/" + uid;
+                break;
+            default:
+                String msg = "Unsupported object type <" + objectType + "> for GET";
+                LOG.warning(msg);
+                throw new ValveException(msg);
+        }
+
+        // send get
+        HttpResponse<String> response = Unirest.get(endpoint)
+            .header("accept", "application/json")
+            .header("Authorization", tokenString)
+            .header("Ocp-Apim-Subscription-Key", this.API_KEY)
+            .asString();
+
+        int status = response.getStatus();
+
+        if (201 == status || 200 == status) {
+            LOG.info("Successfully executed GET for query object=" + witsmlObject.toString());
+            // get an abstractWitsmlObject from merging the query and the result JSON objects
+            JSONObject queryJSON = new JSONObject(witsmlObject.getJSONString("1.4.1.1"));
+            JSONObject responseJSON = new JsonNode(response.getBody()).getObject();
+            return DotTranslator.translateQueryResponse(queryJSON, responseJSON);
+        } else if (401 == status) {
+            LOG.warning("Bad auth token.");
+            throw new ValveAuthException("Bad JWT");
+        } else {
+            LOG.warning("Received status code from GET call to DoT: " + status);
+            LOG.warning("GET response: " + response.getBody());
             throw new ValveException(response.getBody());
         }
     }
