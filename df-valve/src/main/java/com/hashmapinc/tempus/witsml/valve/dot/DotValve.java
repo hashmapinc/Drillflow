@@ -228,21 +228,23 @@ public class DotValve implements IValve {
     }
 
     /**
-     * Authenticates with the DotAuth class to get a JWT
-     * @param userName The user name to authenticate with
-     * @param password The password to authenticate with
-     * @return True if successful, false if not
-     */
-    //TODO: This should throw an exception not be a boolean value so that a descriptive message can be logged/returned
-    @Override
-    public boolean authenticate(String userName, String password) {
-        try {
-            DecodedJWT jwt = AUTH.getJWT(userName, password);
-            return jwt != null;
-        } catch (UnirestException e) {
-            return false;
-        }
-    }
+	 * Authenticates with the DotAuth class to get a JWT
+	 * 
+	 * @param userName The user name to authenticate with
+	 * @param password The password to authenticate with
+	 * @throws ValveAuthException
+	 */
+	@Override
+	public void authenticate(String userName, String password) throws ValveAuthException {
+		try {
+			AUTH.getJWT(userName, password);
+		} catch (UnirestException e) {
+			e.printStackTrace();
+		} catch (ValveAuthException e) {
+			throw new ValveAuthException(
+					"Username : " + userName + " could not be authenticated. Error in generating JWT token");
+		}
+	}
 
     /**
      * Return a map of FUNCTION_NAME->LIST_OF_SUPPORTED_OBJECTS

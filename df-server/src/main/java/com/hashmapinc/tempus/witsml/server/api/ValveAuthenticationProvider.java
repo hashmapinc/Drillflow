@@ -17,6 +17,8 @@ package com.hashmapinc.tempus.witsml.server.api;
 
 import com.hashmapinc.tempus.witsml.valve.IValve;
 import com.hashmapinc.tempus.witsml.valve.ValveFactory;
+import com.hashmapinc.tempus.witsml.valve.dot.ValveAuthException;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -54,10 +56,11 @@ public class ValveAuthenticationProvider implements AuthenticationProvider {
         UsernamePasswordAuthenticationToken account = (UsernamePasswordAuthenticationToken)authentication;
         String password = (String)account.getCredentials();
 
-        boolean authResult = valve.authenticate(name,password);
-
-        if (!authResult)
-            throw new BadCredentialsException("Bad credentials for user");
+        try {
+			valve.authenticate(name,password);
+		} catch (ValveAuthException e) {
+			throw new BadCredentialsException(e.getMessage());
+		}
 
         ValveUser user = new ValveUser();
         user.setUserName(name);

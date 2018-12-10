@@ -15,14 +15,11 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
-import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
-import com.hashmapinc.tempus.witsml.QueryContext;
-
-import com.hashmapinc.tempus.witsml.valve.ValveException;
-import org.junit.Before;
-import org.junit.Test;
-
-import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -32,8 +29,14 @@ import java.util.List;
 
 import javax.xml.bind.JAXBException;
 
-import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
 
+import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
+import com.hashmapinc.tempus.witsml.QueryContext;
+import com.hashmapinc.tempus.witsml.valve.ValveException;
+import com.mashape.unirest.http.exceptions.UnirestException;
 public class DotValveTest {
 	private String username;
     private String password;
@@ -369,6 +372,11 @@ public class DotValveTest {
         }
     }
     //=========================================================================
+    @Test(expected = ValveAuthException.class)
+	public void authVerifyException() throws UnirestException, Exception {
+		String badPassword = this.password + "JUNK";
+		valve.authenticate(username, badPassword);
+	}
 }
 
 

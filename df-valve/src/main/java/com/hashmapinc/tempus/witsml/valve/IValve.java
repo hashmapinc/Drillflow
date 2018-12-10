@@ -19,6 +19,7 @@ import java.util.Map;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.QueryContext;
+import com.hashmapinc.tempus.witsml.valve.dot.ValveAuthException;
 
 public interface IValve {
     /**
@@ -66,8 +67,9 @@ public interface IValve {
      * @param userName - basic auth username for authentication
      * @param password - basic auth password for authentication
      * @return status - boolean value; true = success, false = failure
+     * @throws ValveAuthException 
      */
-    public boolean authenticate(String userName, String password);
+    public void authenticate(String userName, String password) throws ValveAuthException;
 
     /**
      * Return a map of FUNCTION_NAME->ARRAY_OF_SUPPORTED_OBJECTS
