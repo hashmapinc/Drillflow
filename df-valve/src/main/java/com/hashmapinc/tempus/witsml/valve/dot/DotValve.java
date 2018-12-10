@@ -188,13 +188,19 @@ public class DotValve implements IValve {
             throw new ValveException(e.getMessage());
         }
 
-        // delete each object
+        // delete each object with 1 retry for bad token errors
         try {
-            for (AbstractWitsmlObject witsmlObject : qc.WITSML_OBJECTS)
-                this.DELEGATOR.deleteObject(witsmlObject, tokenString);
-        } catch (UnirestException ue) {
-            LOG.warning("Got UnirestException in DotValve delete object: " + ue.getMessage());
-            throw new ValveException(ue.getMessage());
+            for (AbstractWitsmlObject witsmlObject : qc.WITSML_OBJECTS) {
+                try {
+                    this.DELEGATOR.deleteObject(witsmlObject, tokenString);
+                } catch (ValveAuthException vae) { // retry once with refreshed token
+                    tokenString = this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD, true).getToken(); // force refresh token
+                    this.DELEGATOR.deleteObject(witsmlObject, tokenString);
+                }
+            }
+        } catch (Exception e) {
+            LOG.warning("Got exception in DotValve delete object: " + e.getMessage());
+            throw new ValveException(e.getMessage());
         }
     }
 
@@ -224,6 +230,7 @@ public class DotValve implements IValve {
                     this.DELEGATOR.updateObject(witsmlObject, tokenString);
                 } catch (ValveAuthException vae) { // retry once with refreshed token
                     tokenString = this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD, true).getToken(); // force refresh token
+                    this.DELEGATOR.updateObject(witsmlObject, tokenString);
                 }
             }
         } catch (Exception e) {

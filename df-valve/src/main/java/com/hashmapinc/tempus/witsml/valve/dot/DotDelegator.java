@@ -44,7 +44,7 @@ public class DotDelegator {
     public void deleteObject(
         AbstractWitsmlObject witsmlObj,
         String tokenString
-    ) throws ValveException, UnirestException {
+    ) throws ValveException, UnirestException, ValveAuthException {
         LOG.info("DELETING " + witsmlObj.toString() + " in DotDelegator.");
         String uid = witsmlObj.getUid(); // get uid for delete call
         String objectType = witsmlObj.getObjectType(); // get obj type for exception handling
@@ -74,6 +74,9 @@ public class DotDelegator {
         int status = response.getStatus();
         if (201 == status || 200 == status) {
             LOG.info("Received successful status code from DoT DELETE call: " + status);
+        } else if (401 == status) {
+            LOG.warning("Bad auth token.");
+            throw new ValveAuthException("Bad JWT");
         } else {
             LOG.warning("Received failure status code from DoT DELETE: " + status);
             LOG.warning("DELETE response: " + response.getBody());
