@@ -143,19 +143,14 @@ public class DotTranslator {
     ) throws ValveException {
         try {
             // get parent object from first child
-            com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores parent;
-            parent = WitsmlMarshal.deserialize(
-                    witsmlObjects.get(0).getXMLString("1.3.1.1"),
-                    com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore.class
-            );
+            com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores parent = 
+                new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores();
 
             // consolidate children
-            if (witsmlObjects.size() > 1) {
-                for (int i = 1; i < witsmlObjects.size(); i++) {
-                    com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore child;
-                    child = (com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore) witsmlObjects.get(i);
-                    parent.addWellbore(child);
-                }
+            for (AbstractWitsmlObject child : witsmlObjects) {
+                parent.addWellbore(
+                    (com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore) child
+                );
             }
 
             // return xml
@@ -170,19 +165,14 @@ public class DotTranslator {
     ) throws ValveException {
         try {
             // get parent object from first child
-            com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbores parent;
-            parent = WitsmlMarshal.deserialize(
-                    witsmlObjects.get(0).getXMLString("1.4.1.1"),
-                    com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore.class
-            );
+            com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbores parent = 
+                new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbores();
 
             // consolidate children
-            if (witsmlObjects.size() > 1) {
-                for (int i = 1; i < witsmlObjects.size(); i++) {
-                    com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore child;
-                    child = (com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) witsmlObjects.get(i);
-                    parent.addWellbore(child);
-                }
+            for (AbstractWitsmlObject child : witsmlObjects) {
+                parent.addWellbore(
+                    (com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) child
+                );
             }
 
             // return xml
