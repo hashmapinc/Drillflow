@@ -35,6 +35,7 @@ public class DotAuthTest {
 		this.username = "admin";
 		this.password = "12345";
 		String apiKey = "test";
+		//String url = "http://localhost:8080/";
 		String url = "http://witsml-qa.hashmapinc.com:8080/"; // TODO: MOCK THIS
 		dotAuth = new DotAuth(url, apiKey);
 	}

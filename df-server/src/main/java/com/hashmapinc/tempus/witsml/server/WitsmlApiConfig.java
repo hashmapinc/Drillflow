@@ -18,6 +18,7 @@ package com.hashmapinc.tempus.witsml.server;
 import com.hashmapinc.tempus.witsml.server.api.StoreImpl;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBus;
+import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -57,7 +58,8 @@ public class WitsmlApiConfig {
 
     @Bean(name = Bus.DEFAULT_BUS_ID)
     public SpringBus springBus() {
-        return new SpringBus();
+        SpringBus springBus = new SpringBus();
+        return springBus;
     }
 
     public String getProperty(String pPropertyKey) {
