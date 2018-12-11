@@ -84,21 +84,13 @@ public class DotTranslator {
     ) throws ValveException {
         LOG.info("Translating query response.");
 
-        // merge the responseJSON with the query
-        LOG.info("Merging query and response into single object");
-        for (Object key : query.keySet()) { // copy missing query fields from response
-            String keyString = (String) key;
-            LOG.info("Merging key <" + keyString + ">");
-            if (query.get(keyString).equals("")) { // only fill in missing values
-                Object val = response.get(keyString);
-                query.put(keyString, val);
-            }
-        }
+        // Merge the 2 objects
+        JSONObject result = Util.merge(query,response);
 
         // convert the queryJSON back to valid xml
         LOG.info("Converting merged query JSON to valid XML string");
         try {
-            return WitsmlMarshal.deserializeFromJSON(query.toString(), com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell.class);
+            return WitsmlMarshal.deserializeFromJSON(result.toString(), com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell.class);
         } catch (IOException ioe) {
             throw new ValveException(ioe.getMessage());
         }
