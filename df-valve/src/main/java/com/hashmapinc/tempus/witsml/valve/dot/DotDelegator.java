@@ -163,12 +163,26 @@ public class DotDelegator {
 
         // make the create call.
         String payload = witsmlObj.getJSONString("1.4.1.1");
-        HttpResponse<String> response = Unirest
-            .post(endpoint)
-            .header("Content-Type", "application/json")
-            .header("Authorization", "Bearer " + tokenString)
-            .body(payload)
-            .asString();
+
+        HttpResponse<String> response;
+
+        // Append the UID for the PUT call
+        if (!("").equals(witsmlObj.getUid())){
+            endpoint = endpoint + witsmlObj.getUid();
+            response = Unirest
+                    .put(endpoint)
+                    .header("Content-Type", "application/json")
+                    .header("Authorization", "Bearer " + tokenString)
+                    .body(payload)
+                    .asString();
+        } else{
+            response = Unirest
+                    .post(endpoint)
+                    .header("Content-Type", "application/json")
+                    .header("Authorization", "Bearer " + tokenString)
+                    .body(payload)
+                    .asString();
+        }
 
         // check response status
         int status = response.getStatus();

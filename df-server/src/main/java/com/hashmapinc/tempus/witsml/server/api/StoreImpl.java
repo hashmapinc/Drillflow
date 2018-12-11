@@ -150,6 +150,7 @@ public class StoreImpl implements IStore {
         }
 
         LOG.info("Successfully added object: " + witsmlObjects.get(0).toString());
+        response.setSuppMsgOut(uid);
         response.setResult((short)1);
         return response;
     }

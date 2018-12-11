@@ -28,6 +28,7 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -141,8 +142,8 @@ public class DotValve implements IValve {
             LOG.warning("Exception in DotValve create object: " + e.getMessage());
             throw new ValveException(e.getMessage());
         }
-
-        return uids.get(0); // TODO: handle plural return for creation.
+        return StringUtils.join(uids, ',');
+        //return uids.get(0); // TODO: handle plural return for creation.
     }
 
     /**
