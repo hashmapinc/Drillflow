@@ -218,7 +218,7 @@ public class DotValveTest {
             // create
             String uid = this.valve.createObject(qc);
             assertNotNull(uid);
-            assertEquals("b-1311-1", uid);
+            assertEquals("b-1311-1,b-1311-2", uid);
         } catch (ValveException ve) {
             assertTrue(ve.getMessage().contains("already exists")); // accept the "already exists" response as valid behavior
         }
@@ -237,7 +237,7 @@ public class DotValveTest {
             // create
             String uid = this.valve.createObject(qc);
             assertNotNull(uid);
-            assertEquals("b-1411-1", uid);
+            assertEquals("b-1411-1,b-1411-2", uid);
         } catch (ValveException ve) {
             assertTrue(ve.getMessage().contains("already exists")); // accept the "already exists" response as valid behavior
         }

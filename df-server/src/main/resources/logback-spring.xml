@@ -61,4 +61,13 @@
         <appender-ref ref="Console" />
     </logger>
 
+    <logger name="org.apache.cxf" level="warn" additivity="false">
+        <appender-ref ref="RollingFile" />
+        <appender-ref ref="Console" />
+    </logger>
+
+    <logger name="com.mashape.unirest" level="debug" additivity="false">
+        <appender-ref ref="RollingFile" />
+        <appender-ref ref="Console" />
+    </logger>
 </configuration>

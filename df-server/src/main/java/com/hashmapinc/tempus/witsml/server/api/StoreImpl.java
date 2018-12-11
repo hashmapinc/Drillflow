@@ -26,6 +26,7 @@ import com.hashmapinc.tempus.witsml.server.api.model.cap.ServerCap;
 import com.hashmapinc.tempus.witsml.valve.IValve;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
 import com.hashmapinc.tempus.witsml.valve.ValveFactory;
+import org.apache.cxf.feature.Features;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -44,6 +45,7 @@ import java.util.stream.Collectors;
 @WebService(serviceName = "StoreSoapBinding", portName = "StoreSoapBindingSoap",
         targetNamespace = "http://www.witsml.org/wsdl/120",
         endpointInterface = "com.hashmapinc.tempus.witsml.server.api.IStore")
+@Features(features = "org.apache.cxf.ext.logging.LoggingFeature")
 public class StoreImpl implements IStore {
 
     private static final Logger LOG = Logger.getLogger(StoreImpl.class.getName());
@@ -150,6 +152,7 @@ public class StoreImpl implements IStore {
         }
 
         LOG.info("Successfully added object: " + witsmlObjects.get(0).toString());
+        response.setSuppMsgOut(uid);
         response.setResult((short)1);
         return response;
     }
