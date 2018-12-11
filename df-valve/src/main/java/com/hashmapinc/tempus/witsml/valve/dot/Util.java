@@ -22,38 +22,49 @@ import java.util.Iterator;
 
 public class Util {
 
-    public static JSONObject merge(JSONObject query, JSONObject response, JSONObject result) {
-        if (result == null){
-            result = new JSONObject();
-        }
+    public static JSONObject merge (JSONObject query, JSONObject response){
+        return merge(query, response, new JSONObject());
+    }
+
+    private static JSONObject merge(JSONObject query, JSONObject response, JSONObject result) {
+
         Iterator<String> keys = query.keys();
 
-        Object obj1;
-        Object obj2;
+        Object queryObj;
+        Object respObj;
 
         while (keys.hasNext()) {
             String next = keys.next();
 
             if (query.isNull(next)) continue;
-            obj1 = query.get(next);
+            queryObj = query.get(next);
 
             if (!response.has(next)) continue;
-            obj2 = response.get(next);
+            respObj = response.get(next);
 
-            if (obj1 instanceof JSONObject && obj2 instanceof JSONObject) {
-                merge((JSONObject) obj1, (JSONObject) obj2, result);
-            } else if (obj1 instanceof String && obj2 instanceof String){
-                if (("").equals(obj1) && !("").equals(obj2)){
-                    result.put(next,obj2);
+            if (queryObj instanceof JSONObject && respObj instanceof JSONObject) {
+                merge((JSONObject) queryObj, (JSONObject) respObj, result);
+            } else if (queryObj instanceof String && respObj instanceof String){
+                if (("").equals(queryObj) && !("").equals(respObj)){
+                    result.put(next,respObj);
                 }
-            } else if (obj1 instanceof Float && obj2 instanceof Float){
-                if (obj1.equals(0.0) && !obj2.equals(0.0)){
-                    result.put(next, obj2);
+            } else if (queryObj instanceof Float && respObj instanceof Float){
+                //TODO: This is an issue, if there is legitimately 0.0 values, they will be filtered. This should be handled in WOL
+                if (queryObj.equals(0.0) && !respObj.equals(0.0)){
+                    result.put(next, respObj);
                 }
-            } else if (obj1 instanceof JSONArray && obj2 instanceof JSONArray) {
-                JSONArray arr2 = (JSONArray) obj2;
-                if (arr2.length() == 0) continue;
-                result.put(next, arr2);
+            } else if (queryObj instanceof JSONArray && respObj instanceof JSONArray) {
+                JSONArray queryArr = (JSONArray) queryObj;
+                JSONArray respArr = (JSONArray) respObj;
+                //TODO: This is a straight up hack, this should additionally merge sub-objects
+                if (respArr.length() == 0 || queryArr.length() == 0) continue;
+                if (queryArr.length() == 0) continue;
+
+                for (int i = 0; i < respArr.length(); i++) {
+                    respArr.getJSONObject(i);
+                }
+
+                result.put(next, respArr);
             }
         }
         return result;
