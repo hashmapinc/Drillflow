@@ -28,7 +28,8 @@ public class Util {
         }
         Iterator<String> keys = query.keys();
 
-        Object obj1, obj2;
+        Object obj1;
+        Object obj2;
 
         while (keys.hasNext()) {
             String next = keys.next();
@@ -42,7 +43,7 @@ public class Util {
             if (obj1 instanceof JSONObject && obj2 instanceof JSONObject) {
                 merge((JSONObject) obj1, (JSONObject) obj2, result);
             } else if (obj1 instanceof String && obj2 instanceof String){
-                if (obj1.equals("") && !obj2.equals("")){
+                if (("").equals(obj1) && !("").equals(obj2)){
                     result.put(next,obj2);
                 }
             } else if (obj1 instanceof Float && obj2 instanceof Float){
@@ -50,7 +51,6 @@ public class Util {
                     result.put(next, obj2);
                 }
             } else if (obj1 instanceof JSONArray && obj2 instanceof JSONArray) {
-                JSONArray arr1 = (JSONArray) obj1;
                 JSONArray arr2 = (JSONArray) obj2;
                 if (arr2.length() == 0) continue;
                 result.put(next, arr2);
