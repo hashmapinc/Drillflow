@@ -143,7 +143,6 @@ public class DotValve implements IValve {
             throw new ValveException(e.getMessage());
         }
         return StringUtils.join(uids, ',');
-        //return uids.get(0); // TODO: handle plural return for creation.
     }
 
     /**
