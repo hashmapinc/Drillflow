@@ -54,7 +54,7 @@ public class DotDelegator {
         // construct the endpoint for each object type
         switch (objectType) { // TODO: add support for wellbore, log, and trajectory
             case "well":
-                endpoint = this.URL + "/witsml/wells/" + uid;
+                endpoint = this.URL + "/democore/well/v2/witsml/wells/" + uid;
                 break;
             case "wellbore":
                 endpoint = this.URL + "/witsml/wellbores/" + uid;
@@ -66,14 +66,13 @@ public class DotDelegator {
         // make the DELETE call.
         HttpResponse<String> response = Unirest
             .delete(endpoint)
-            .header("accept", "application/json")
-            .header("Authorization", tokenString)
-            .header("Ocp-Apim-Subscription-Key", this.API_KEY)
+            .header("Content-Type", "application/json")
+            .header("Authorization", "Bearer " + tokenString)
             .asString();
 
         // check response status
         int status = response.getStatus();
-        if (201 == status || 200 == status) {
+        if (201 == status || 200 == status || 204 == status) {
             LOG.info("Received successful status code from DoT DELETE call: " + status);
         } else if (401 == status) {
             LOG.warning("Bad auth token.");
@@ -103,7 +102,7 @@ public class DotDelegator {
         // construct the endpoint for each object type
         switch (objectType) { // TODO: add support for log and trajectory
             case "well":
-                endpoint = this.URL + "/witsml/wells/" + uid;
+                endpoint = this.URL + "/democore/well/v2/witsml/wells/" + uid;
                 break;
             case "wellbore":
                 endpoint = this.URL + "/witsml/wellbores/" + uid;
@@ -116,9 +115,8 @@ public class DotDelegator {
         String payload = witsmlObj.getJSONString("1.4.1.1");
         HttpResponse<String> response = Unirest
             .put(endpoint)
-            .header("accept", "application/json")
-            .header("Authorization", tokenString)
-            .header("Ocp-Apim-Subscription-Key", this.API_KEY)
+            .header("Content-Type", "application/json")
+            .header("Authorization", "Bearer " + tokenString)
             .body(payload)
             .asString();
 
@@ -154,7 +152,7 @@ public class DotDelegator {
         // construct the endpoint for each object type
         switch (objectType) { // TODO: add support for log and trajectory
             case "well":
-                endpoint = this.URL + "/witsml/wells/";
+                endpoint = this.URL + "/democore/well/v2/witsml/wells/";
                 break;
             case "wellbore":
                 endpoint = this.URL + "/witsml/wellbores/";
@@ -167,9 +165,8 @@ public class DotDelegator {
         String payload = witsmlObj.getJSONString("1.4.1.1");
         HttpResponse<String> response = Unirest
             .post(endpoint)
-            .header("accept", "application/json")
-            .header("Authorization", tokenString)
-            .header("Ocp-Apim-Subscription-Key", this.API_KEY)
+            .header("Content-Type", "application/json")
+            .header("Authorization", "Bearer " + tokenString)
             .body(payload)
             .asString();
 
@@ -207,7 +204,7 @@ public class DotDelegator {
         String endpoint = this.URL;
         switch (objectType) {
             case "well":
-                endpoint += "/witsml/wells/" + uid;
+                endpoint += "/democore/well/v2/witsml/wells/" + uid;
                 break;
             case "wellbore":
                 endpoint += "/witsml/wellbores/" + uid;
@@ -221,8 +218,7 @@ public class DotDelegator {
         // send get
         HttpResponse<String> response = Unirest.get(endpoint)
             .header("accept", "application/json")
-            .header("Authorization", tokenString)
-            .header("Ocp-Apim-Subscription-Key", this.API_KEY)
+            .header("Authorization", "Bearer " + tokenString)
             .asString();
 
         int status = response.getStatus();
