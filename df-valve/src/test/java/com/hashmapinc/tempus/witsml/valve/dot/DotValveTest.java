@@ -36,17 +36,18 @@ import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
 import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
-import com.mashape.unirest.http.exceptions.UnirestException;
+
 public class DotValveTest {
 	private String username;
     private String password;
     private DotValve valve;
+
 	@Before
 	public void doSetup() {
 		this.username = "admin";
         this.password = "12345";
         HashMap<String, String> config = new HashMap<>();
-        config.put("baseurl", "http://witsml-qa.hashmapinc.com:8080/"); // TODO: MOCK THIS
+        config.put("baseurl", "https://witsml.hashmapinc.com:8443/"); // TODO: MOCK THIS
         //config.put("baseurl", "http://localhost:8080/"); // TODO: MOCK THIS
         config.put("apikey", "COOLAPIKEY");
 		valve = new DotValve(config);
@@ -372,8 +373,9 @@ public class DotValveTest {
         }
     }
     //=========================================================================
+
     @Test(expected = ValveAuthException.class)
-	public void authVerifyException() throws UnirestException, Exception {
+	public void authVerifyException() throws ValveAuthException {
 		String badPassword = this.password + "JUNK";
 		valve.authenticate(username, badPassword);
 	}

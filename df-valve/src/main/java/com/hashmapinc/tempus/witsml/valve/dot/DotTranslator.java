@@ -42,27 +42,29 @@ public class DotTranslator {
     }
 
     /**
-     * returns a valid 1311 XML string for the 1411 obj
-     * @param obj1411 - 1411 AbstractWitsmlObject to serialize to xml
+     * returns a valid 1311 AbstractWitsmlObject
+     * @param obj1411 - 1411 AbstractWitsmlObject to convert
      */
     // TODO: delete this method and use the AbstractWitsmlObject.getXMLString method when version 1.1.5 fixes the namespace bug.
-    public static String get1311XMLString(
+    public static AbstractWitsmlObject get1311WitsmlObject(
         AbstractWitsmlObject obj1411
     ) throws ValveException {
-        LOG.info("getting 1.3.1.1 XML string for object: " + obj1411.toString());
+        LOG.info("converting to 1311 from 1411 object" + obj1411.toString());
 
         // get 1311 string
         String xml1311 = obj1411.getXMLString("1.3.1.1");
 
         // convert to 1311 object
         try {
-            AbstractWitsmlObject obj1311;
-            switch (obj1411.getObjectType()) {
+            switch (obj1411.getObjectType()) { //TODO: support log and trajectory
                 case "well":
-                    obj1311 = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells) WitsmlMarshal.deserialize(
-                            xml1311, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells.class)
+                    return ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells) WitsmlMarshal.deserialize(
+                        xml1311, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells.class)
                     ).getWell().get(0);
-                    return obj1311.getXMLString("1.3.1.1");
+                case "wellbore":
+                    return ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores) WitsmlMarshal.deserialize(
+                        xml1311, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores.class)
+                    ).getWellbore().get(0);
                 default:
                     throw new ValveException("unsupported object type: " + obj1411.getObjectType());
             }
@@ -80,17 +82,27 @@ public class DotTranslator {
      */
     public static AbstractWitsmlObject translateQueryResponse(
         JSONObject query, 
-        JSONObject response
+        JSONObject response,
+        String objectType
     ) throws ValveException {
-        LOG.info("Translating query response.");
-
         // Merge the 2 objects
         JSONObject result = Util.merge(query,response);
 
         // convert the queryJSON back to valid xml
         LOG.info("Converting merged query JSON to valid XML string");
         try {
-            return WitsmlMarshal.deserializeFromJSON(result.toString(), com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell.class);
+            switch (objectType) { // TODO: support log and trajectory
+                case "well":
+                    return WitsmlMarshal.deserializeFromJSON(
+                        result.toString(), com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell.class
+                    );
+                case "wellbore":
+                    return WitsmlMarshal.deserializeFromJSON(
+                        result.toString(), com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore.class
+                    );
+                default:
+                    throw new ValveException("unsupported object type");
+            }
         } catch (IOException ioe) {
             throw new ValveException(ioe.getMessage());
         }
@@ -122,10 +134,14 @@ public class DotTranslator {
         String xmlString;
         switch (witsmlObjects.get(0).getObjectType()) {
             case "well": // no consolidation needed for wells
-                xmlString = is1411 ? witsmlObjects.get(0).getXMLString("1.4.1.1") : get1311XMLString(witsmlObjects.get(0));
+                xmlString = is1411 ?
+                    witsmlObjects.get(0).getXMLString("1.4.1.1") :
+                    get1311WitsmlObject(witsmlObjects.get(0)).getXMLString("1.3.1.1");
                 break;
             case "wellbore": // no consolidation needed for wells
-                xmlString = is1411 ? consolidate1411WellboresToXML(witsmlObjects) : consolidate1311WellboresToXML(witsmlObjects);
+                xmlString = is1411 ?
+                    consolidate1411WellboresToXML(witsmlObjects) :
+                    consolidate1311WellboresToXML(witsmlObjects);
                 break;
             default:
                 throw new ValveException("Unsupported object type: " + witsmlObjects.get(0).getObjectType());
@@ -145,7 +161,7 @@ public class DotTranslator {
             // consolidate children
             for (AbstractWitsmlObject child : witsmlObjects) {
                 parent.addWellbore(
-                    (com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore) child
+                    (com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore) get1311WitsmlObject(child)
                 );
             }
 
