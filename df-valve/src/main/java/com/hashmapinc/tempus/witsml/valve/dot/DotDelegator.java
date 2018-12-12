@@ -153,16 +153,17 @@ public class DotDelegator {
     ) throws ValveException, ValveAuthException, UnirestException {
         LOG.info("CREATING " + witsmlObj.toString() + " in DotDelegator.");
         String objectType = witsmlObj.getObjectType(); // get obj type for exception handling
+        String uid = witsmlObj.getUid();
         String endpoint = this.getEndpoint(objectType);
 
         // build the create request
         HttpRequestWithBody request;
-        if (witsmlObj.getUid().isEmpty()){
+        if (uid.isEmpty()){
             // create with POST and generate uid
             request = Unirest.post(endpoint);
         } else {
             // create with PUT using existing uid
-            request = Unirest.put(endpoint + witsmlObj.getUid());
+            request = Unirest.put(endpoint + uid);
 
             // for objects that need it, provide parent uid as param
             if ("wellbore".equals(objectType))
@@ -181,7 +182,7 @@ public class DotDelegator {
         int status = response.getStatus();
         if (201 == status || 200 == status) {
             LOG.info("Received successful status code from DoT create call: " + status);
-            return new JsonNode(response.getBody()).getObject().getString("uid");
+            return uid.isEmpty() ? new JsonNode(response.getBody()).getObject().getString("uid") : uid;
         } else if (401 == status) {
             LOG.warning("Bad auth token.");
             throw new ValveAuthException("Bad JWT");
@@ -226,7 +227,7 @@ public class DotDelegator {
             // get an abstractWitsmlObject from merging the query and the result JSON objects
             JSONObject queryJSON = new JSONObject(witsmlObject.getJSONString("1.4.1.1"));
             JSONObject responseJSON = new JsonNode(response.getBody()).getObject();
-            return DotTranslator.translateQueryResponse(queryJSON, responseJSON);
+            return DotTranslator.translateQueryResponse(queryJSON, responseJSON, objectType);
         } else if (401 == status) {
             LOG.warning("Bad auth token.");
             throw new ValveAuthException("Bad JWT");
