@@ -60,7 +60,7 @@ public class DotAuth {
 			String payload = "{\"account\":\"" + username + "\", \"password\":\"" + password + "\"}";
 
 			// send request
-			HttpResponse<String> response = Unirest.post(URL + "/token/jwt/v1/")
+			HttpResponse<String> response = Unirest.post(URL + "token/jwt/v1/")
 				.header("accept", "application/json")
 				.header("Ocp-Apim-Subscription-Key", this.API_KEY)
 				.body(payload)

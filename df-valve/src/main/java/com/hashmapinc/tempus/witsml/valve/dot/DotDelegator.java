@@ -23,6 +23,8 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import com.mashape.unirest.request.HttpRequest;
+import com.mashape.unirest.request.HttpRequestWithBody;
 import org.json.JSONObject;
 
 public class DotDelegator {
@@ -34,6 +36,31 @@ public class DotDelegator {
     public DotDelegator(String url, String apiKey) {
         this.URL = url;
         this.API_KEY = apiKey;
+    }
+
+    /**
+     * returns the endpoint for each supported object type
+     * @param objectType - well, wellbore, trajectory, or log
+     * @return endpoint - String value to send requests to
+     * @throws ValveException
+     */
+    private String getEndpoint(
+        String objectType
+    ) throws ValveException{
+        // TODO: these should be injected in the DotDelegator constructor and not rely on a shared this.URL
+        // get endpoint
+        String endpoint;
+        switch (objectType) { // TODO: add support for log and trajectory
+            case "well":
+                endpoint = this.URL + "/democore/well/v2/witsml/wells/";
+                break;
+            case "wellbore":
+                endpoint = this.URL + "/democore/wellbore/v1/witsml/wellbores/";
+                break;
+            default:
+                throw new ValveException("Unsupported object type<" + objectType + ">");
+        }
+        return endpoint;
     }
 
     /**
@@ -49,23 +76,15 @@ public class DotDelegator {
         LOG.info("DELETING " + witsmlObj.toString() + " in DotDelegator.");
         String uid = witsmlObj.getUid(); // get uid for delete call
         String objectType = witsmlObj.getObjectType(); // get obj type for exception handling
-        String endpoint; // endpoint to send the DELETE call to
+        String endpoint = this.getEndpoint(objectType) + uid; // add uid for delete call
 
-        // construct the endpoint for each object type
-        switch (objectType) { // TODO: add support for wellbore, log, and trajectory
-            case "well":
-                endpoint = this.URL + "/democore/well/v2/witsml/wells/" + uid;
-                break;
-            case "wellbore":
-                endpoint = this.URL + "/witsml/wellbores/" + uid;
-                break;
-            default:
-                throw new ValveException("Unsupported object type<" + objectType + "> for DELETE");
-        }
+        // create request
+        HttpRequest request = Unirest.delete(endpoint);
+        if ("wellbore".equals(objectType))
+            request.queryString("uidWell", witsmlObj.getParentUid()); // TODO: ensure parent uid exists?
 
         // make the DELETE call.
-        HttpResponse<String> response = Unirest
-            .delete(endpoint)
+        HttpResponse<String> response = request
             .header("Content-Type", "application/json")
             .header("Authorization", "Bearer " + tokenString)
             .asString();
@@ -97,24 +116,11 @@ public class DotDelegator {
         LOG.info("UPDATING " + witsmlObj.toString() + " in DotDelegator.");
         String uid = witsmlObj.getUid(); // get uid for delete call
         String objectType = witsmlObj.getObjectType(); // get obj type for exception handling
-        String endpoint; // endpoint to send the UPDATE call to
-
-        // construct the endpoint for each object type
-        switch (objectType) { // TODO: add support for log and trajectory
-            case "well":
-                endpoint = this.URL + "/democore/well/v2/witsml/wells/" + uid;
-                break;
-            case "wellbore":
-                endpoint = this.URL + "/witsml/wellbores/" + uid;
-                break;
-            default:
-                throw new ValveException("Unsupported object type<" + objectType + "> for UPDATE");
-        }
+        String endpoint = this.getEndpoint(objectType) + uid; // add uid for update call
 
         // make the UPDATE call.
         String payload = witsmlObj.getJSONString("1.4.1.1");
-        HttpResponse<String> response = Unirest
-            .put(endpoint)
+        HttpResponse<String> response = Unirest.put(endpoint)
             .header("Content-Type", "application/json")
             .header("Authorization", "Bearer " + tokenString)
             .body(payload)
@@ -147,47 +153,34 @@ public class DotDelegator {
     ) throws ValveException, ValveAuthException, UnirestException {
         LOG.info("CREATING " + witsmlObj.toString() + " in DotDelegator.");
         String objectType = witsmlObj.getObjectType(); // get obj type for exception handling
-        String endpoint; // endpoint to send the call to
+        String endpoint = this.getEndpoint(objectType);
 
-        // construct the endpoint for each object type
-        switch (objectType) { // TODO: add support for log and trajectory
-            case "well":
-                endpoint = this.URL + "/democore/well/v2/witsml/wells/";
-                break;
-            case "wellbore":
-                endpoint = this.URL + "/witsml/wellbores/";
-                break;
-            default:
-                throw new ValveException("Unsupported object type<" + objectType + "> for CREATE");
+        // build the create request
+        HttpRequestWithBody request;
+        if (witsmlObj.getUid().isEmpty()){
+            // create with POST and generate uid
+            request = Unirest.post(endpoint);
+        } else {
+            // create with PUT using existing uid
+            request = Unirest.put(endpoint + witsmlObj.getUid());
+
+            // for objects that need it, provide parent uid as param
+            if ("wellbore".equals(objectType))
+                request.queryString("uidWell", witsmlObj.getParentUid()); // TODO: error handle this?
         }
 
-        // make the create call.
+        // get the request response.
         String payload = witsmlObj.getJSONString("1.4.1.1");
-
-        HttpResponse<String> response;
-
-        // Append the UID for the PUT call
-        if (!("").equals(witsmlObj.getUid())){
-            endpoint = endpoint + witsmlObj.getUid();
-            response = Unirest
-                    .put(endpoint)
-                    .header("Content-Type", "application/json")
-                    .header("Authorization", "Bearer " + tokenString)
-                    .body(payload)
-                    .asString();
-        } else{
-            response = Unirest
-                    .post(endpoint)
-                    .header("Content-Type", "application/json")
-                    .header("Authorization", "Bearer " + tokenString)
-                    .body(payload)
-                    .asString();
-        }
+        HttpResponse<String> response = request
+            .header("Content-Type", "application/json")
+            .header("Authorization", "Bearer " + tokenString)
+            .body(payload)
+            .asString();
 
         // check response status
         int status = response.getStatus();
         if (201 == status || 200 == status) {
-            LOG.info("Received successful status code from DoT POST call: " + status);
+            LOG.info("Received successful status code from DoT create call: " + status);
             return new JsonNode(response.getBody()).getObject().getString("uid");
         } else if (401 == status) {
             LOG.warning("Bad auth token.");
@@ -213,24 +206,15 @@ public class DotDelegator {
         LOG.info("GETing " + witsmlObject.toString() + " in DotDelegator.");
         String uid = witsmlObject.getUid();
         String objectType = witsmlObject.getObjectType();
+        String endpoint = this.getEndpoint(objectType) + uid; // add uid for rest call
 
-        // create endpoint
-        String endpoint = this.URL;
-        switch (objectType) {
-            case "well":
-                endpoint += "/democore/well/v2/witsml/wells/" + uid;
-                break;
-            case "wellbore":
-                endpoint += "/witsml/wellbores/" + uid;
-                break;
-            default:
-                String msg = "Unsupported object type <" + objectType + "> for GET";
-                LOG.warning(msg);
-                throw new ValveException(msg);
-        }
+        // build request
+        HttpRequest request = Unirest.get(endpoint);
+        if ("wellbore".equals(objectType))
+            request.queryString("uidWell", witsmlObject.getParentUid()); // TODO: check that parent uid exists?
 
-        // send get
-        HttpResponse<String> response = Unirest.get(endpoint)
+        // get response
+        HttpResponse<String> response = request
             .header("accept", "application/json")
             .header("Authorization", "Bearer " + tokenString)
             .asString();
