@@ -57,7 +57,7 @@ public class StoreImpl implements IStore {
     private IValve valve;
     @Value("${valve.name}")
     private String valveName;
-
+    
     @Autowired
     private void setServerCap(ServerCap cap){
         this.cap = cap;
@@ -127,6 +127,8 @@ public class StoreImpl implements IStore {
             Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
             String version = WitsmlUtil.getVersionFromXML(XMLin);
             witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, XMLin, version);
+            //checking the input parameters for errorCode if not return 1 for success.
+           String errorMessgae = QueryValidation.validateAddToStore(WMLtypeIn, XMLin, OptionsIn, CapabilitiesIn, version);
             ValveUser user = (ValveUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             QueryContext qc = new QueryContext(
                 version,
