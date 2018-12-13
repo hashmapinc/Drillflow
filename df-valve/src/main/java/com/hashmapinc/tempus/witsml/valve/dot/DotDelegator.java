@@ -220,6 +220,8 @@ public class DotDelegator {
             .header("Authorization", "Bearer " + tokenString)
             .asString();
 
+        LOG.info("Response for GetObject: " + response.getBody());
+
         int status = response.getStatus();
 
         if (201 == status || 200 == status) {

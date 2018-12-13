@@ -26,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 import javax.xml.bind.JAXBException;
 
@@ -69,7 +70,8 @@ public class DotValveTest {
                     well1311XML,
                     witsmlObjects,
                     this.username,
-                    this.password
+                    this.password,
+                    UUID.randomUUID().toString()
             );
 
             // create
@@ -94,7 +96,8 @@ public class DotValveTest {
                     well1411XML,
                     witsmlObjects,
                     this.username,
-                    this.password
+                    this.password,
+                    UUID.randomUUID().toString()
             );
 
             // create
@@ -117,7 +120,7 @@ public class DotValveTest {
         String well1311XML = new String(Files.readAllBytes(Paths.get("src/test/resources/well1311query.xml")));
         List<AbstractWitsmlObject> witsmlObjects = (List<AbstractWitsmlObject>) (List<?>) ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells) WitsmlMarshal
                 .deserialize(well1311XML, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell.class)).getWell();
-        QueryContext qc = new QueryContext("1.3.1.1", "well", null, well1311XML, witsmlObjects, this.username, this.password);
+        QueryContext qc = new QueryContext("1.3.1.1", "well", null, well1311XML, witsmlObjects, this.username, this.password, UUID.randomUUID().toString());
 
         // get
         String xmlOut = this.valve.getObject(qc);assertNotNull(xmlOut);
@@ -135,7 +138,7 @@ public class DotValveTest {
         String well1411XML = new String(Files.readAllBytes(Paths.get("src/test/resources/well1411query.xml")));
         List<AbstractWitsmlObject> witsmlObjects = (List<AbstractWitsmlObject>) (List<?>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWells) WitsmlMarshal
                 .deserialize(well1411XML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell.class)).getWell();
-        QueryContext qc = new QueryContext("1.4.1.1", "well", null, well1411XML, witsmlObjects, this.username, this.password);
+        QueryContext qc = new QueryContext("1.4.1.1", "well", null, well1411XML, witsmlObjects, this.username, this.password, UUID.randomUUID().toString());
 
         // get
         String xmlOut = this.valve.getObject(qc);
@@ -161,7 +164,8 @@ public class DotValveTest {
             well1311XML,
             witsmlObjects,
             this.username,
-            this.password
+            this.password,
+            UUID.randomUUID().toString()
         );
 
         // delete
@@ -191,7 +195,8 @@ public class DotValveTest {
             well1411XML,
             witsmlObjects,
             this.username,
-            this.password
+            this.password,
+            UUID.randomUUID().toString()
         );
 
         // delete
@@ -214,7 +219,7 @@ public class DotValveTest {
             List<AbstractWitsmlObject> witsmlObjects = (List<AbstractWitsmlObject>) (List<?>) ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores) WitsmlMarshal
                     .deserialize(wellbore1311XML, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore.class)).getWellbore();
             QueryContext qc = new QueryContext("1.3.1.1", "wellbore", null, wellbore1311XML, witsmlObjects, this.username,
-                    this.password);
+                    this.password, UUID.randomUUID().toString());
 
             // create
             String uid = this.valve.createObject(qc);
@@ -233,7 +238,7 @@ public class DotValveTest {
             List<AbstractWitsmlObject> witsmlObjects = (List<AbstractWitsmlObject>) (List<?>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbores) WitsmlMarshal
                     .deserialize(wellbore1411XML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore.class)).getWellbore();
             QueryContext qc = new QueryContext("1.4.1.1", "wellbore", null, wellbore1411XML, witsmlObjects, this.username,
-                    this.password);
+                    this.password, UUID.randomUUID().toString());
 
             // create
             String uid = this.valve.createObject(qc);
@@ -266,7 +271,8 @@ public class DotValveTest {
             wellbore1311XML,
             witsmlObjects,
             this.username,
-            this.password
+            this.password,
+            UUID.randomUUID().toString()
         );
 
         // get
@@ -297,7 +303,8 @@ public class DotValveTest {
             well1bore411XML,
             witsmlObjects,
             this.username,
-            this.password
+            this.password,
+            UUID.randomUUID().toString()
         );
 
         // get
@@ -324,7 +331,8 @@ public class DotValveTest {
                 wellbore1311XML,
                 witsmlObjects,
                 this.username,
-                this.password
+                this.password,
+                UUID.randomUUID().toString()
         );
 
         // delete
@@ -362,7 +370,8 @@ public class DotValveTest {
             wellbore1411XML,
             witsmlObjects,
             this.username,
-            this.password
+            this.password,
+            UUID.randomUUID().toString()
         );
 
         // delete

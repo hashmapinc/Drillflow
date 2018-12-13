@@ -26,7 +26,12 @@ import com.hashmapinc.tempus.witsml.server.api.model.cap.ServerCap;
 import com.hashmapinc.tempus.witsml.valve.IValve;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
 import com.hashmapinc.tempus.witsml.valve.ValveFactory;
+import org.apache.cxf.ext.logging.event.LogEvent;
 import org.apache.cxf.feature.Features;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,6 +39,8 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.jws.WebService;
+import javax.servlet.http.HttpServletRequest;
+import javax.xml.ws.handler.MessageContext;
 
 import java.util.Arrays;
 import java.util.List;
@@ -47,7 +54,6 @@ import java.util.stream.Collectors;
         endpointInterface = "com.hashmapinc.tempus.witsml.server.api.IStore")
 @Features(features = "org.apache.cxf.ext.logging.LoggingFeature")
 public class StoreImpl implements IStore {
-
     private static final Logger LOG = Logger.getLogger(StoreImpl.class.getName());
 
     private ServerCap cap;
@@ -100,6 +106,14 @@ public class StoreImpl implements IStore {
         // =====================================================================
     }
 
+    private String getExchangeId(){
+        Message message = PhaseInterceptorChain.getCurrentMessage();
+        if (message == null){
+            return "99999999-9999-9999-9999-999999999999";
+        }
+        return message.getExchange().get(LogEvent.KEY_EXCHANGE_ID).toString();
+    }
+
     @Override
     public WMLS_AddToStoreResponse addToStore(
         String WMLtypeIn,
@@ -107,8 +121,7 @@ public class StoreImpl implements IStore {
         String OptionsIn,
         String CapabilitiesIn
     ) {
-        LOG.info("Executing addToStore");
-
+        LOG.info("Executing addToStore for query" + getExchangeId());
         // try to add to store
         List<AbstractWitsmlObject> witsmlObjects;
         String uid;
@@ -126,7 +139,8 @@ public class StoreImpl implements IStore {
                 XMLin,
                 witsmlObjects,
                 user.getUserName(),
-                user.getPassword()
+                user.getPassword(),
+                getExchangeId()
             );
 
             // handle each object
@@ -165,7 +179,6 @@ public class StoreImpl implements IStore {
         String CapabilitiesIn
     ) {
         LOG.info("Executing updateInStore");
-
         // try to update in store
         List<AbstractWitsmlObject> witsmlObjects;
         WMLS_UpdateInStoreResponse response = new WMLS_UpdateInStoreResponse();
@@ -182,7 +195,8 @@ public class StoreImpl implements IStore {
                     XMLin,
                     witsmlObjects,
                     user.getUserName(),
-                    user.getPassword()
+                    user.getPassword(),
+                    getExchangeId()
             );
 
             // perform update
@@ -218,7 +232,6 @@ public class StoreImpl implements IStore {
     ) {
         LOG.info("Deleting object from store.");
         WMLS_DeleteFromStoreResponse resp = new WMLS_DeleteFromStoreResponse();
-
         // set initial ERROR state for resp
         resp.setResult((short) -1);
 
@@ -251,7 +264,8 @@ public class StoreImpl implements IStore {
                     QueryIn,
                     witsmlObjects,
                     user.getUserName(),
-                    user.getPassword()
+                    user.getPassword(),
+                    getExchangeId()
             );
             this.valve.deleteObject(qc);
             resp.setResult((short) 1);
@@ -274,6 +288,7 @@ public class StoreImpl implements IStore {
     @Override
     public WMLS_GetCapResponse getCap(String OptionsIn) {
         LOG.info("Executing GetCap");
+
         String requestedVersion = OptionsIn.substring(OptionsIn.lastIndexOf("=") +1);
         WMLS_GetCapResponse resp = new WMLS_GetCapResponse();
         resp.setSuppMsgOut("");
@@ -317,7 +332,6 @@ public class StoreImpl implements IStore {
     ) {
         LOG.info("Executing GetFromStore");
         WMLS_GetFromStoreResponse resp = new WMLS_GetFromStoreResponse();
-
         // try to deserialize
         List<AbstractWitsmlObject> witsmlObjects;
         String clientVersion;
@@ -350,7 +364,8 @@ public class StoreImpl implements IStore {
                 QueryIn,
                 witsmlObjects,
                 user.getUserName(),
-                user.getPassword()
+                user.getPassword(),
+                getExchangeId()
             );
 
             // get query XML

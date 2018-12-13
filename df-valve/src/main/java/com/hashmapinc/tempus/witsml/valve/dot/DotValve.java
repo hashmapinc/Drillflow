@@ -86,7 +86,6 @@ public class DotValve implements IValve {
             LOG.warning("Exception in getObject while authenticating: " + e.getMessage());
             throw new ValveException(e.getMessage());
         }
-
         // handle each object
         ArrayList<AbstractWitsmlObject> queryResponses = new ArrayList<AbstractWitsmlObject>();
         try {
@@ -102,8 +101,6 @@ public class DotValve implements IValve {
             LOG.warning("Exception in DotValve get object: " + e.getMessage());
             throw new ValveException(e.getMessage());
         }
-
-
         // return consolidated XML response in proper version
         return DotTranslator.consolidateObjectsToXML(queryResponses, qc.CLIENT_VERSION);
     }
