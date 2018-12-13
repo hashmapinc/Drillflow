@@ -67,18 +67,17 @@ public class Util {
                 if (destArr.length() != 0 && srcArr.length() != 0)
                     dest.put(key, srcArr); // TODO: deep merging on sub objects
 
-            } else if ( // handle Doubles
-                destObj instanceof Double &&
+            } else if ( // handle numbers
+                destObj instanceof Number &&
                 srcObj  instanceof Number
             ) {
-                if(destObj.equals(0.0))
-                    dest.put(key, srcObj); // TODO: don't assume 0.0 means null
+                if (destObj.equals(0.0) || destObj.equals(0))
+                    dest.put(key, srcObj); // TODO: don't assume 0 means null
 
             } else if ( // handle all other types (treat them as strings)
-                dest.getString(key).isEmpty() &&
-                !src.getString(key).isEmpty()
+                destObj.toString().isEmpty()
             ) {
-                dest.put(key, src.getString(key)); // copy src into dest
+                dest.put(key, srcObj.toString()); // copy src into dest
             }
         }
 
