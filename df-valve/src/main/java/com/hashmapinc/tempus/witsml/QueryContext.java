@@ -32,6 +32,7 @@ public class QueryContext {
     public final List<AbstractWitsmlObject> WITSML_OBJECTS;
     public final String USERNAME;
     public final String PASSWORD;
+    public final String EXCHANGE_ID;
     
     /**
      * 
@@ -48,7 +49,8 @@ public class QueryContext {
         Map<String, String> optionsIn, 
         String queryXML,
         String username,
-        String password
+        String password,
+        String exchangeId
     ) {
         // instantiate values
         this.CLIENT_VERSION = clientVersion;
@@ -58,6 +60,7 @@ public class QueryContext {
         this.WITSML_OBJECTS = null;
         this.PASSWORD = password;
         this.USERNAME = username;
+        this.EXCHANGE_ID = exchangeId;
     }
 
     /**
@@ -77,7 +80,8 @@ public class QueryContext {
         String queryXML,
         List<AbstractWitsmlObject> witsmlObjects,
         String username,
-        String password
+        String password,
+        String exchangeId
     ) {
         // instantiate values
         this.CLIENT_VERSION = clientVersion;
@@ -87,5 +91,6 @@ public class QueryContext {
         this.WITSML_OBJECTS = witsmlObjects;
         this.USERNAME = username;
         this.PASSWORD = password;
+        this.EXCHANGE_ID = exchangeId;
     }
 }
