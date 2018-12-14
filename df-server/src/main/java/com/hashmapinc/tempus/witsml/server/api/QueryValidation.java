@@ -23,6 +23,8 @@ import java.util.logging.Logger;
 public class QueryValidation {
 	private static String witsml_version_1311 = "1.3.1.1";
 	private static String witsml_version_1411 = "1.4.1.1";
+	private static String errorCode;
+	private static String errorMessage;
 
 	private static final Logger LOG = Logger.getLogger(QueryValidation.class.getName());
 
@@ -36,13 +38,14 @@ public class QueryValidation {
 	 * @param CapabilitiesIn
 	 * @param version
 	 * @return an error code according to the specs after checking the parameters.
+	 * @throws IOException 
 	 */
 	public static String validateAddToStore(
 			String WMLtypeIn, 
 			String XMLin, 
 			String OptionsIn,
 			String CapabilitiesIn, 
-			String version) {
+			String version) throws IOException {
 		LOG.info("validating input for addToStore");
 		if(witsml_version_1311.equals(version))
 		{
@@ -51,6 +54,30 @@ public class QueryValidation {
 		else if(witsml_version_1411.equals(version))
 		{
 			//error checking for input parameters for version 1.4.1.1
+			if(WMLtypeIn.isEmpty())
+			{
+				errorCode="-407";
+				errorMessage=getErrorMessage(errorCode);
+				return errorCode;
+			}
+			else if(WMLtypeIn.equals(XMLin))
+			{
+				errorCode="-486";
+				errorMessage=getErrorMessage(errorCode);
+				return errorCode;
+			}
+			else if(XMLin.isEmpty())
+			{
+				errorCode="-408";
+				errorMessage=getErrorMessage(errorCode);
+				return errorCode;
+			}
+			else
+			{
+				errorCode="-999";
+				errorMessage=getErrorMessage(errorCode);
+				return errorCode;
+			}
 		}
 		else
 		{
@@ -170,7 +197,7 @@ public class QueryValidation {
 	 */
 	public static String getErrorMessage(String errorCode) throws IOException
 	{
-		
+		LOG.info("Checking the basemessage.properties file for errorMessages");
 		Properties prop = new Properties();
     	InputStream input = null;
     	String basemessages = "resources/basemessages.properties";
@@ -180,8 +207,8 @@ public class QueryValidation {
     		LOG.info("Error loading the basemessages.properties file");
     	}
     	prop.load(input);
-    	String errorMessage = prop.getProperty(errorCode);
-		
-		return errorMessage;
+    	String errorM = "basemessages."+errorCode;	
+    	LOG.info("The error Code is :"+errorM);
+		return prop.getProperty(errorM);
 	}
 }
