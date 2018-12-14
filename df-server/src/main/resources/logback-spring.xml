@@ -61,7 +61,7 @@
         <appender-ref ref="Console" />
     </logger>
 
-    <logger name="org.apache.cxf" level="warn" additivity="false">
+    <logger name="org.apache.cxf" level="info" additivity="false">
         <appender-ref ref="RollingFile" />
         <appender-ref ref="Console" />
     </logger>
