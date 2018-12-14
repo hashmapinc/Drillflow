@@ -29,9 +29,7 @@ import com.hashmapinc.tempus.witsml.valve.ValveFactory;
 import org.apache.cxf.ext.logging.event.LogEvent;
 import org.apache.cxf.feature.Features;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
-import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -39,8 +37,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.jws.WebService;
-import javax.servlet.http.HttpServletRequest;
-import javax.xml.ws.handler.MessageContext;
 
 import java.util.Arrays;
 import java.util.List;
@@ -109,7 +105,7 @@ public class StoreImpl implements IStore {
     private String getExchangeId(){
         Message message = PhaseInterceptorChain.getCurrentMessage();
         if (message == null){
-            return "99999999-9999-9999-9999-999999999999";
+            return "99999999-9999-9999-9999-999999999999"; // TODO: is this smart? (I don't know it isn't, just checking)
         }
         return message.getExchange().get(LogEvent.KEY_EXCHANGE_ID).toString();
     }
@@ -121,7 +117,7 @@ public class StoreImpl implements IStore {
         String OptionsIn,
         String CapabilitiesIn
     ) {
-        LOG.info("Executing addToStore for query" + getExchangeId());
+        LOG.info("Executing addToStore for query <" + getExchangeId() + ">");
         // try to add to store
         List<AbstractWitsmlObject> witsmlObjects;
         String uid;
