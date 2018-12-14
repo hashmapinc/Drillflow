@@ -8,3 +8,4 @@ These guides will help you get started as quickly as possible.
    :maxdepth: 1
 
    solution_arch
+   Authentication
