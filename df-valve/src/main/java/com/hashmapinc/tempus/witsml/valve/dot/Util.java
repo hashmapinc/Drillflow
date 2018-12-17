@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
+import com.hashmapinc.tempus.witsml.valve.ValveException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -22,51 +23,65 @@ import java.util.Iterator;
 
 public class Util {
 
-    public static JSONObject merge (JSONObject query, JSONObject response){
-        return merge(query, response, new JSONObject());
-    }
-
-    private static JSONObject merge(JSONObject query, JSONObject response, JSONObject result) {
-
-        Iterator<String> keys = query.keys();
-
-        Object queryObj;
-        Object respObj;
-
+    /**
+     * This function merges the fields from src that
+     * are missing from dest. Only fields that exist in dest
+     * but have an empty value are merged.
+     *
+     * @param dest - JSONObject to merge into. Existing values here are unchanged
+     * @param src - src to merge from for blank values in dest
+     * @return dest - fully merged dest
+     */
+    public static JSONObject merge (
+        JSONObject dest,
+        JSONObject src
+    ) throws ValveException {
+        // iterate through keys and merge in place
+        Iterator<String> keys = dest.keys();
+        String key;
         while (keys.hasNext()) {
-            String next = keys.next();
+            key = keys.next(); // get key
+            // check that the query has a value. This should never be true because keys is from dest
+            if (dest.isNull(key))
+                continue;
+            // check that the response has a value for this key.
+            if (!src.has(key))
+                continue;
 
-            if (query.isNull(next)) continue;
-            queryObj = query.get(next);
+            // do merging below for each possible value object type for this key
+            Object destObj = dest.get(key);
+            Object srcObj = src.get(key);
+            if ( // handle nested objects
+                destObj instanceof JSONObject &&
+                srcObj  instanceof JSONObject
+            ) {
+                merge((JSONObject) destObj, (JSONObject) srcObj); // recursively copy into destObj
+                dest.put(key, destObj); // update dest with the updated value for this key
 
-            if (!response.has(next)) continue;
-            respObj = response.get(next);
+            } else if ( // handle JSONArrays
+                destObj instanceof JSONArray &&
+                srcObj  instanceof JSONArray
+            ) {
+                JSONArray destArr = dest.getJSONArray(key);
+                JSONArray srcArr = src.getJSONArray(key);
+                if (destArr.length() != 0 && srcArr.length() != 0)
+                    dest.put(key, srcArr); // TODO: deep merging on sub objects
 
-            if (queryObj instanceof JSONObject && respObj instanceof JSONObject) {
-                merge((JSONObject) queryObj, (JSONObject) respObj, result);
-            } else if (queryObj instanceof String && respObj instanceof String){
-                if (("").equals(queryObj) && !("").equals(respObj)){
-                    result.put(next,respObj);
-                }
-            } else if (queryObj instanceof Float && respObj instanceof Float){
-                //TODO: This is an issue, if there is legitimately 0.0 values, they will be filtered. This should be handled in WOL
-                if (queryObj.equals(0.0) && !respObj.equals(0.0)){
-                    result.put(next, respObj);
-                }
-            } else if (queryObj instanceof JSONArray && respObj instanceof JSONArray) {
-                JSONArray queryArr = (JSONArray) queryObj;
-                JSONArray respArr = (JSONArray) respObj;
-                //TODO: This is a straight up hack, this should additionally merge sub-objects
-                if (respArr.length() == 0 || queryArr.length() == 0) continue;
-                if (queryArr.length() == 0) continue;
+            } else if ( // handle numbers
+                destObj instanceof Number &&
+                srcObj  instanceof Number
+            ) {
+                if (destObj.equals(0.0) || destObj.equals(0))
+                    dest.put(key, srcObj); // TODO: don't assume 0 means null
 
-                for (int i = 0; i < respArr.length(); i++) {
-                    respArr.getJSONObject(i);
-                }
-
-                result.put(next, respArr);
+            } else if ( // handle all other types (treat them as strings)
+                destObj.toString().isEmpty()
+            ) {
+                dest.put(key, srcObj.toString()); // copy src into dest
             }
         }
-        return result;
+
+        // return the dest
+        return dest;
     }
 }
