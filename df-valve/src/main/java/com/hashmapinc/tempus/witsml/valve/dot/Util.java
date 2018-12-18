@@ -45,9 +45,17 @@ public class Util {
             if (!src.has(key))
                 continue;
 
-            // do merging below for each possible value object type for this key
+            // if the dest is an empty string, replace with null for proper xml serialization behavior
+            if (dest.get(key) instanceof String && "".equals(dest.get(key))) {
+                dest.put(key, JSONObject.NULL); // overwrite empty strings with NULL
+            }
+
+            // get current objects
             Object destObj = dest.get(key);
             Object srcObj = src.get(key);
+
+
+            // do merging below for each possible value object type for this key
             if ( // handle nested objects
                 destObj instanceof JSONObject &&
                 srcObj  instanceof JSONObject
