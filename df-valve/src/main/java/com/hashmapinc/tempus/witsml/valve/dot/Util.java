@@ -64,9 +64,12 @@ public class Util {
                 if (destArr.length() != 0 && srcArr.length() != 0)
                     dest.put(key, srcArr); // TODO: deep merging on sub objects
 
-            } else { // handle all basic values (non array, non nested objects)
-                if (dest.isNull(key) || destObj.toString().isEmpty()) // check if dest is empty
-                    dest.put(key, srcObj); // put src value into dest if dest doesn't have a value for this key
+            } else if (
+                dest.isNull(key) || destObj.toString().isEmpty() // dest val is empty
+                && // and
+                !(src.isNull(key) || srcObj.toString().isEmpty()) // src val is not empty
+            ) { // handle all basic values (non array, non nested objects)
+                dest.put(key, srcObj);
             }
         }
 
