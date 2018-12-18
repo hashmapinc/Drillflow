@@ -45,7 +45,7 @@ public class DotTranslator {
      * returns a valid 1311 AbstractWitsmlObject
      * @param obj1411 - 1411 AbstractWitsmlObject to convert
      */
-    // TODO: delete this method and use the AbstractWitsmlObject.getXMLString method when version 1.1.5 fixes the namespace bug.
+    // TODO: delete this method and use the AbstractWitsmlObject.getXMLString method when WOL fixes the namespace bug.
     public static AbstractWitsmlObject get1311WitsmlObject(
         AbstractWitsmlObject obj1411
     ) throws ValveException {

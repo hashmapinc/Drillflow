@@ -15,7 +15,6 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
-import com.hashmapinc.tempus.witsml.valve.ValveException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -35,15 +34,13 @@ public class Util {
     public static JSONObject merge (
         JSONObject dest,
         JSONObject src
-    ) throws ValveException {
+    ) {
         // iterate through keys and merge in place
         Iterator<String> keys = dest.keys();
         String key;
         while (keys.hasNext()) {
             key = keys.next(); // get key
-            // check that the query has a value. This should never be true because keys is from dest
-            if (dest.isNull(key))
-                continue;
+
             // check that the response has a value for this key.
             if (!src.has(key))
                 continue;
@@ -67,17 +64,9 @@ public class Util {
                 if (destArr.length() != 0 && srcArr.length() != 0)
                     dest.put(key, srcArr); // TODO: deep merging on sub objects
 
-            } else if ( // handle numbers
-                destObj instanceof Number &&
-                srcObj  instanceof Number
-            ) {
-                if (destObj.equals(0.0) || destObj.equals(0))
-                    dest.put(key, srcObj); // TODO: don't assume 0 means null
-
-            } else if ( // handle all other types (treat them as strings)
-                destObj.toString().isEmpty()
-            ) {
-                dest.put(key, srcObj.toString()); // copy src into dest
+            } else { // handle all basic values (non array, non nested objects)
+                if (dest.isNull(key) || destObj.toString().isEmpty()) // check if dest is empty
+                    dest.put(key, srcObj); // put src value into dest if dest doesn't have a value for this key
             }
         }
 
