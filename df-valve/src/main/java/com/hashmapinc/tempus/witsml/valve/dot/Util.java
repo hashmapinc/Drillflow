@@ -18,6 +18,7 @@ package com.hashmapinc.tempus.witsml.valve.dot;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 public class Util {
@@ -37,17 +38,17 @@ public class Util {
     ) {
         // iterate through keys and merge in place
         Iterator<String> keys = dest.keys();
+        ArrayList<String> keysToRemove = new ArrayList<String>(); // tracks keys that should be removed in cleanup
         String key;
         while (keys.hasNext()) {
             key = keys.next(); // get key
 
             // check that the response has a value for this key.
-            if (!src.has(key))
+            if (!src.has(key)) {
+                // if the dest is empty, remember to remove this key in the cleanup
+                if (dest.isNull(key) || "".equals(dest.get(key)))
+                    keysToRemove.add(key);
                 continue;
-
-            // if the dest is an empty string, replace with null for proper xml serialization behavior
-            if (dest.get(key) instanceof String && "".equals(dest.get(key))) {
-                dest.put(key, JSONObject.NULL); // overwrite empty strings with NULL
             }
 
             // get current objects
@@ -73,15 +74,30 @@ public class Util {
                     dest.put(key, srcArr); // TODO: deep merging on sub objects
 
             } else if (
-                dest.isNull(key) || destObj.toString().isEmpty() // dest val is empty
-                && // and
-                !(src.isNull(key) || srcObj.toString().isEmpty()) // src val is not empty
+                dest.isNull(key) || "".equals(destObj) // dest val is empty
             ) { // handle all basic values (non array, non nested objects)
                 dest.put(key, srcObj);
             }
+
+            // if after all the merging the dest value is still empty, add the key to list of removable fields
+            if (dest.isNull(key) || "".equals(dest.get(key)))
+                keysToRemove.add(key);
         }
+
+        // cleanup fields
+        for (String removableKey : keysToRemove)
+            dest.remove(removableKey);
 
         // return the dest
         return dest;
+    }
+
+
+    boolean objectIsEmpty(Object obj) {
+        // check strings
+        if (obj instanceof String && obj.equals(""))
+            return true;
+
+        return false;
     }
 }
