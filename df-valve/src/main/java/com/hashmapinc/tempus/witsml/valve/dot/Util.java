@@ -37,14 +37,15 @@ public class Util {
         JSONObject src
     ) {
         // track keys that should be removed in cleanup
-        ArrayList<String> keysToRemove = new ArrayList<String>();
+        ArrayList<String> keysToRemove = new ArrayList<>();
 
         // iterate through keys and merge in place
         Set<String> keyset = dest.keySet();
         for (String key : keyset) {
             // check that the response has a value for this key.
             if (!src.has(key)) {
-                if (isEmpty(dest.get(key))) keysToRemove.add(key); // remove this key if it's empty
+                if (isEmpty(dest.get(key)))
+                    keysToRemove.add(key); // remove this key if it's empty
                 continue;
             }
 
@@ -58,14 +59,16 @@ public class Util {
                 dest.put(key, destObj); // update dest with the updated value for this key
 
             } else if (destObj instanceof JSONArray && srcObj instanceof JSONArray ) {
-                if (!isEmpty(destObj) && !isEmpty(srcObj)) dest.put(key, srcObj); // TODO: deep merging on sub objects
-
-            } else if (isEmpty(destObj)) { // handle all basic values (non array, non nested objects)
+                if (!isEmpty(destObj) && !isEmpty(srcObj)) {
+                    dest.put(key, srcObj); // TODO: deep merging on sub objects
+                }
+            } else { // handle all basic values (non array, non nested objects)
                 dest.put(key, srcObj);
             }
 
             // if after all the merging the dest value is still empty, add the key to list of removable fields
-            if (isEmpty(dest.get(key))) keysToRemove.add(key);
+            if (isEmpty(dest.get(key)))
+                keysToRemove.add(key);
         }
 
         // cleanup fields
