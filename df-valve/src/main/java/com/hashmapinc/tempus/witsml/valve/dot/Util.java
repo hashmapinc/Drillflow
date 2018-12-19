@@ -94,13 +94,4 @@ public class Util {
         // return the dest
         return dest;
     }
-
-
-    boolean objectIsEmpty(Object obj) {
-        // check strings
-        if (obj instanceof String && obj.equals(""))
-            return true;
-
-        return false;
-    }
 }
