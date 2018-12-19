@@ -17,6 +17,8 @@ package com.hashmapinc.tempus.witsml.server.api;
 
 import com.hashmapinc.tempus.witsml.server.api.model.*;
 
+import java.io.IOException;
+
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
@@ -35,7 +37,7 @@ public interface IStore {
         @WebParam(partName = "XMLin") String XMLin,
         @WebParam(partName = "OptionsIn") String OptionsIn,
         @WebParam(partName = "CapabilitiesIn") String CapabilitiesIn
-    );
+    ) throws IOException;
 
     @WebMethod(action = "http://www.witsml.org/action/120/Store.WMLS_UpdateInStore", operationName = "WMLS_UpdateInStore")
     @RequestWrapper(targetNamespace = "http://www.witsml.org/message/120")
@@ -45,7 +47,7 @@ public interface IStore {
         @WebParam(partName = "XMLin") String XMLin,
         @WebParam(partName = "OptionsIn") String OptionsIn,
         @WebParam(partName = "CapabilitiesIn") String CapabilitiesIn
-    );
+    ) throws IOException;
 
     @WebMethod(action = "http://www.witsml.org/action/120/Store.WMLS_DeleteFromStore", operationName = "WMLS_DeleteFromStore")
     @RequestWrapper(targetNamespace = "http://www.witsml.org/message/120")
@@ -55,7 +57,7 @@ public interface IStore {
             @WebParam(partName = "QueryIn") String QueryIn,
             @WebParam(partName = "OptionsIn") String OptionsIn,
             @WebParam(partName = "CapabilitiesIn") String CapabilitiesIn
-    );
+    ) throws Exception;
 
     @WebMethod(action = "http://www.witsml.org/action/120/Store.WMLS_GetVersion", operationName = "WMLS_GetVersion")
     @ResponseWrapper(className = "com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetVersionResponse")
@@ -80,6 +82,6 @@ public interface IStore {
     @ResponseWrapper(targetNamespace = "http://www.witsml.org/message/120",
             className = "com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetFromStoreResponse")
     @SOAPBinding(style = SOAPBinding.Style.RPC, parameterStyle= SOAPBinding.ParameterStyle.BARE, use = SOAPBinding.Use.ENCODED)
-    WMLS_GetFromStoreResponse getFromStore(@WebParam(partName = "WMLtypeIn") String WMLtypeIn, @WebParam(partName = "QueryIn") String QueryIn, @WebParam(partName = "OptionsIn") String OptionsIn, @WebParam(partName = "CapabilitiesIn") String CapabilitiesIn);
+    WMLS_GetFromStoreResponse getFromStore(@WebParam(partName = "WMLtypeIn") String WMLtypeIn, @WebParam(partName = "QueryIn") String QueryIn, @WebParam(partName = "OptionsIn") String OptionsIn, @WebParam(partName = "CapabilitiesIn") String CapabilitiesIn) throws Exception;
 
 }

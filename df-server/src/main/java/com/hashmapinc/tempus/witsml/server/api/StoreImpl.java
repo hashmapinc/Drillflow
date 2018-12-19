@@ -117,7 +117,7 @@ public class StoreImpl implements IStore {
         String XMLin,
         String OptionsIn,
         String CapabilitiesIn
-    ) {
+    ) throws IOException {
         LOG.info("Executing addToStore for query <" + getExchangeId() + ">");
         // try to add to store
         List<AbstractWitsmlObject> witsmlObjects;
@@ -127,13 +127,7 @@ public class StoreImpl implements IStore {
             // build the query context
             Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
             String version = WitsmlUtil.getVersionFromXML(XMLin);
-            //checking the input parameters for errorCode if not return 1 for success.
-            String errorMessgae = QueryValidation.validateAddToStore(
-         		   WMLtypeIn, 
-         		   XMLin, 
-         		   OptionsIn, 
-         		   CapabilitiesIn, 
-         		   version);
+         
             witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, XMLin, version);
            
             ValveUser user = (ValveUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -165,8 +159,15 @@ public class StoreImpl implements IStore {
                 "could not add witsml object to store: \n" +
                 "Error: " + e
             );
-            response.setSuppMsgOut("Error adding to store: " + e.getMessage());
-            response.setResult((short)-1);
+            //checking the input parameters for errorCode if not return 1 for success.
+            Short errorCode = QueryValidation.validateAddToStore(
+         		   WMLtypeIn, 
+         		   XMLin, 
+         		   OptionsIn, 
+         		   CapabilitiesIn, 
+         		   version);
+            response.setSuppMsgOut("Error adding to store: " + QueryValidation.getErrorMessage(errorCode));
+            response.setResult((short)errorCode);
             return response;
         }
 
@@ -182,7 +183,7 @@ public class StoreImpl implements IStore {
         String XMLin,
         String OptionsIn,
         String CapabilitiesIn
-    ) {
+    ) throws IOException {
         LOG.info("Executing updateInStore");
         // try to update in store
         List<AbstractWitsmlObject> witsmlObjects;
@@ -191,13 +192,7 @@ public class StoreImpl implements IStore {
             // build the query context
             Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
             String version = WitsmlUtil.getVersionFromXML(XMLin);
-          //checking the input parameters for errorCode if not return 1 for success.
-            String errorMessgae = QueryValidation.validateUpdateInStore(
-         		   WMLtypeIn, 
-         		   XMLin, 
-         		   OptionsIn, 
-         		   CapabilitiesIn, 
-         		   version);
+        
             witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, XMLin, version);
           
             ValveUser user = (ValveUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -226,8 +221,15 @@ public class StoreImpl implements IStore {
                     "could not add witsml object to store: \n" +
                             "Error: " + e
             );
-            response.setSuppMsgOut("Error updating in store: " + e.getMessage());
-            response.setResult((short)-1);
+            //checking the input parameters for errorCode if not return 1 for success.
+            Short errorCode = QueryValidation.validateUpdateInStore(
+         		   WMLtypeIn, 
+         		   XMLin, 
+         		   OptionsIn, 
+         		   CapabilitiesIn, 
+         		   version);
+            response.setSuppMsgOut("Error updating in store: " + QueryValidation.getErrorMessage(errorCode));
+            response.setResult((short)errorCode);
             return response;
         }
 
@@ -242,7 +244,7 @@ public class StoreImpl implements IStore {
         String QueryIn,
         String OptionsIn,
         String CapabilitiesIn
-    ) {
+    ) throws Exception {
         LOG.info("Deleting object from store.");
         WMLS_DeleteFromStoreResponse resp = new WMLS_DeleteFromStoreResponse();
         // set initial ERROR state for resp
@@ -252,13 +254,7 @@ public class StoreImpl implements IStore {
         List<AbstractWitsmlObject> witsmlObjects;
         try {
             String clientVersion = WitsmlUtil.getVersionFromXML(QueryIn);
-          //checking the input parameters for errorCode, if not return 1 for success.
-            String errorMessgae = QueryValidation.validateDeleteFromStore(
-            		WMLtypeIn, 
-            		QueryIn, 
-            		OptionsIn, 
-            		CapabilitiesIn, 
-            		clientVersion);
+          
             witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, QueryIn, clientVersion);
           
         } catch (Exception e) {
@@ -269,7 +265,15 @@ public class StoreImpl implements IStore {
                     "OptionsIn: " + OptionsIn + " \n" +
                     "CapabilitiesIn: " + CapabilitiesIn
             );
-            resp.setSuppMsgOut("Bad QueryIn. Got error message: " + e.getMessage());
+          //checking the input parameters for errorCode, if not return 1 for success.
+            String clientVersion = WitsmlUtil.getVersionFromXML(QueryIn);
+            Short errorCode = QueryValidation.validateDeleteFromStore(
+            		WMLtypeIn, 
+            		QueryIn, 
+            		OptionsIn, 
+            		CapabilitiesIn, 
+            		clientVersion);
+            resp.setSuppMsgOut("Bad QueryIn. Got error message: " + QueryValidation.getErrorMessage(errorCode));
             return resp;
         }
 
@@ -341,7 +345,6 @@ public class StoreImpl implements IStore {
 
         WMLS_GetBaseMsgResponse response = new WMLS_GetBaseMsgResponse();
         response.setResult(errMsg);
-
         return response;
     }
 
@@ -351,7 +354,7 @@ public class StoreImpl implements IStore {
         String QueryIn, 
         String OptionsIn, 
         String CapabilitiesIn
-    ) {
+    ) throws Exception {
         LOG.info("Executing GetFromStore");
         WMLS_GetFromStoreResponse resp = new WMLS_GetFromStoreResponse();
         // try to deserialize
@@ -359,13 +362,7 @@ public class StoreImpl implements IStore {
         String clientVersion;
         try {
             clientVersion = WitsmlUtil.getVersionFromXML(QueryIn);
-          //checking the input parameters for errorCode, if not return 1 for success.
-            String errorMessgae = QueryValidation.validateGetFromStore(
-            		WMLtypeIn, 
-            		QueryIn, 
-            		OptionsIn, 
-            		CapabilitiesIn, 
-            		clientVersion);
+          
             witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, QueryIn, clientVersion);
         } catch (Exception e) {
             // TODO: handle exception
@@ -375,9 +372,16 @@ public class StoreImpl implements IStore {
                         "OptionsIn: " + OptionsIn + " \n" + 
                         "CapabilitiesIn: " + CapabilitiesIn
             );
-
-            resp.setSuppMsgOut("Error parsing input: " + e.getMessage());
-            resp.setResult((short) -1);
+          //checking the input parameters for errorCode, if not return 1 for success.
+            clientVersion = WitsmlUtil.getVersionFromXML(QueryIn);
+            Short errorCode = QueryValidation.validateGetFromStore(
+            		WMLtypeIn, 
+            		QueryIn, 
+            		OptionsIn, 
+            		CapabilitiesIn, 
+            		clientVersion);
+            resp.setSuppMsgOut("Error parsing input: " + QueryValidation.getErrorMessage(errorCode));
+            resp.setResult((short) errorCode);
             return resp;
         }
 
