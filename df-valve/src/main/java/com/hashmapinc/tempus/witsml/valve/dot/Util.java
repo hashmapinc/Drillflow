@@ -37,53 +37,40 @@ public class Util {
         JSONObject dest,
         JSONObject src
     ) {
-        // iterate through keys and merge in place
-        Iterator<String> keys = dest.keys();
-        ArrayList<String> keysToRemove = new ArrayList<String>(); // tracks keys that should be removed in cleanup
-        String key;
-        while (keys.hasNext()) {
-            key = keys.next(); // get key
+        // track keys that should be removed in cleanup
+        ArrayList<String> keysToRemove = new ArrayList<String>();
 
+        // iterate through keys and merge in place
+        Set<String> keyset = dest.keySet();
+        for (String key : keyset) {
             // check that the response has a value for this key.
             if (!src.has(key)) {
-                // if the dest is empty, remember to remove this key in the cleanup
-                if (dest.isNull(key) || isEmpty(dest.get(key)))
-                    keysToRemove.add(key);
+                if (isEmpty(dest.get(key))) keysToRemove.add(key); // remove this key if it's empty
                 continue;
             }
 
-            // get current objects
+            // get values in src and dest as objects for this key
             Object destObj = dest.get(key);
             Object srcObj = src.get(key);
 
-
-            // do merging below for each possible value object type for this key
-            if ( // handle nested objects
-                destObj instanceof JSONObject &&
-                srcObj  instanceof JSONObject
-            ) {
+            // do merging below for each possible type
+            if (destObj instanceof JSONObject && srcObj instanceof JSONObject ) {
                 merge((JSONObject) destObj, (JSONObject) srcObj); // recursively copy into destObj
                 dest.put(key, destObj); // update dest with the updated value for this key
 
-            } else if ( // handle JSONArrays
-                destObj instanceof JSONArray &&
-                srcObj  instanceof JSONArray
-            ) {
-                if (!isEmpty(destObj) && !isEmpty(srcObj))
-                    dest.put(key, srcObj); // TODO: deep merging on sub objects
+            } else if (destObj instanceof JSONArray && srcObj instanceof JSONArray ) {
+                if (!isEmpty(destObj) && !isEmpty(srcObj)) dest.put(key, srcObj); // TODO: deep merging on sub objects
 
-            } else if (dest.isNull(key) || isEmpty(destObj)) { // handle all basic values (non array, non nested objects)
+            } else if (isEmpty(destObj)) { // handle all basic values (non array, non nested objects)
                 dest.put(key, srcObj);
             }
 
             // if after all the merging the dest value is still empty, add the key to list of removable fields
-            if (dest.isNull(key) || isEmpty(dest.get(key)))
-                keysToRemove.add(key);
+            if (isEmpty(dest.get(key))) keysToRemove.add(key);
         }
 
         // cleanup fields
-        for (String removableKey : keysToRemove)
-            dest.remove(removableKey);
+        for (String removableKey : keysToRemove) dest.remove(removableKey);
 
         // return the dest
         return dest;
@@ -96,16 +83,13 @@ public class Util {
      */
     private static boolean isEmpty(Object obj) {
         // handle nulls
-        if (JSONObject.NULL.equals(obj))
-            return true;
+        if (JSONObject.NULL.equals(obj)) return true;
 
         // handle strings
-        if (obj instanceof String)
-            return ((String) obj).isEmpty();
+        if (obj instanceof String) return ((String) obj).isEmpty();
 
         // handle json array
-        if (obj instanceof JSONArray)
-            return ((JSONArray) obj).length() == 0;
+        if (obj instanceof JSONArray) return ((JSONArray) obj).length() == 0;
 
         // handle json objects
         if (obj instanceof JSONObject) {
