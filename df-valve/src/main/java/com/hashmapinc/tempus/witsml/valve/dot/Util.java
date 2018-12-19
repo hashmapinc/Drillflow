@@ -46,7 +46,7 @@ public class Util {
             // check that the response has a value for this key.
             if (!src.has(key)) {
                 // if the dest is empty, remember to remove this key in the cleanup
-                if (dest.isNull(key) || "".equals(dest.get(key)))
+                if (dest.has(key))
                     keysToRemove.add(key);
                 continue;
             }
@@ -70,6 +70,9 @@ public class Util {
             ) {
                 JSONArray destArr = dest.getJSONArray(key);
                 JSONArray srcArr = src.getJSONArray(key);
+                if (srcArr.length() == 0)
+                    keysToRemove.add(key);
+
                 if (destArr.length() != 0 && srcArr.length() != 0)
                     dest.put(key, srcArr); // TODO: deep merging on sub objects
 
