@@ -46,7 +46,7 @@ public class Util {
             // check that the response has a value for this key.
             if (!src.has(key)) {
                 // if the dest is empty, remember to remove this key in the cleanup
-                if (dest.has(key))
+                if (dest.isNull(key) || isEmpty(dest.get(key)))
                     keysToRemove.add(key);
                 continue;
             }
@@ -68,13 +68,8 @@ public class Util {
                 destObj instanceof JSONArray &&
                 srcObj  instanceof JSONArray
             ) {
-                JSONArray destArr = dest.getJSONArray(key);
-                JSONArray srcArr = src.getJSONArray(key);
-                if (srcArr.length() == 0)
-                    keysToRemove.add(key);
-
-                if (destArr.length() != 0 && srcArr.length() != 0)
-                    dest.put(key, srcArr); // TODO: deep merging on sub objects
+                if (!isEmpty(destObj) && !isEmpty(srcObj))
+                    dest.put(key, srcObj); // TODO: deep merging on sub objects
 
             } else if (
                 dest.isNull(key) || "".equals(destObj) // dest val is empty
@@ -83,7 +78,7 @@ public class Util {
             }
 
             // if after all the merging the dest value is still empty, add the key to list of removable fields
-            if (dest.isNull(key) || "".equals(dest.get(key)))
+            if (dest.isNull(key) || isEmpty(dest.get(key)))
                 keysToRemove.add(key);
         }
 
@@ -93,5 +88,26 @@ public class Util {
 
         // return the dest
         return dest;
+    }
+
+    /**
+     * Checks if either a string, JSONArray, or JSONObject are empty
+     * @param obj - object to examine
+     * @return boolean - true if emptiness is confirmed, else false
+     */
+    private static boolean isEmpty(Object obj) {
+        // handle strings
+        if (obj instanceof String)
+            return ((String) obj).isEmpty();
+
+        // handle json array
+        if (obj instanceof JSONArray)
+            return ((JSONArray) obj).length() == 0;
+
+        // handle json objects
+        if (obj instanceof JSONObject)
+            return ((JSONObject) obj).length() == 0;
+
+        return false;
     }
 }
