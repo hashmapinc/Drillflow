@@ -15,11 +15,11 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
-import com.hashmapinc.tempus.witsml.valve.ValveException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.Set;
 
 public class Util {
 
@@ -35,53 +35,78 @@ public class Util {
     public static JSONObject merge (
         JSONObject dest,
         JSONObject src
-    ) throws ValveException {
-        // iterate through keys and merge in place
-        Iterator<String> keys = dest.keys();
-        String key;
-        while (keys.hasNext()) {
-            key = keys.next(); // get key
-            // check that the query has a value. This should never be true because keys is from dest
-            if (dest.isNull(key))
-                continue;
-            // check that the response has a value for this key.
-            if (!src.has(key))
-                continue;
+    ) {
+        // track keys that should be removed in cleanup
+        ArrayList<String> keysToRemove = new ArrayList<>();
 
-            // do merging below for each possible value object type for this key
+        // iterate through keys and merge in place
+        Set<String> keyset = dest.keySet();
+        for (String key : keyset) {
+            // check that the response has a value for this key.
+            if (!src.has(key)) {
+                if (isEmpty(dest.get(key)))
+                    keysToRemove.add(key); // remove this key if it's empty
+                continue;
+            }
+
+            // get values in src and dest as objects for this key
             Object destObj = dest.get(key);
             Object srcObj = src.get(key);
-            if ( // handle nested objects
-                destObj instanceof JSONObject &&
-                srcObj  instanceof JSONObject
-            ) {
+
+            // do merging below for each possible type
+            if (destObj instanceof JSONObject && srcObj instanceof JSONObject ) {
                 merge((JSONObject) destObj, (JSONObject) srcObj); // recursively copy into destObj
                 dest.put(key, destObj); // update dest with the updated value for this key
 
-            } else if ( // handle JSONArrays
-                destObj instanceof JSONArray &&
-                srcObj  instanceof JSONArray
-            ) {
-                JSONArray destArr = dest.getJSONArray(key);
-                JSONArray srcArr = src.getJSONArray(key);
-                if (destArr.length() != 0 && srcArr.length() != 0)
-                    dest.put(key, srcArr); // TODO: deep merging on sub objects
-
-            } else if ( // handle numbers
-                destObj instanceof Number &&
-                srcObj  instanceof Number
-            ) {
-                if (destObj.equals(0.0) || destObj.equals(0))
-                    dest.put(key, srcObj); // TODO: don't assume 0 means null
-
-            } else if ( // handle all other types (treat them as strings)
-                destObj.toString().isEmpty()
-            ) {
-                dest.put(key, srcObj.toString()); // copy src into dest
+            } else if (destObj instanceof JSONArray && srcObj instanceof JSONArray ) {
+                if (!isEmpty(destObj) && !isEmpty(srcObj)) {
+                    dest.put(key, srcObj); // TODO: deep merging on sub objects
+                }
+            } else { // handle all basic values (non array, non nested objects)
+                dest.put(key, srcObj);
             }
+
+            // if after all the merging the dest value is still empty, add the key to list of removable fields
+            if (isEmpty(dest.get(key)))
+                keysToRemove.add(key);
         }
+
+        // cleanup fields
+        for (String removableKey : keysToRemove) dest.remove(removableKey);
 
         // return the dest
         return dest;
+    }
+
+    /**
+     * Checks if either a string, JSONArray, or JSONObject are empty
+     * @param obj - object to examine
+     * @return boolean - true if emptiness is confirmed, else false
+     */
+    private static boolean isEmpty(Object obj) {
+        // handle nulls
+        if (JSONObject.NULL.equals(obj)) return true;
+
+        // handle strings
+        if (obj instanceof String) return ((String) obj).isEmpty();
+
+        // handle json array
+        if (obj instanceof JSONArray) return ((JSONArray) obj).length() == 0;
+
+        // handle json objects
+        if (obj instanceof JSONObject) {
+            // get json obj for easy inspection
+            JSONObject jsonObj = (JSONObject) obj;
+
+            // recurse over all children. 1 false results in false for overall check
+            boolean jsonObjIsEmpty = true; // true until proven false
+            Set<String> keyset = jsonObj.keySet();
+            for(String key: keyset)
+                jsonObjIsEmpty = jsonObjIsEmpty && isEmpty(jsonObj.get(key));
+
+            return jsonObjIsEmpty;
+        }
+
+        return false;
     }
 }
