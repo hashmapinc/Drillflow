@@ -20,6 +20,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Set;
 
 public class Util {
 
@@ -71,9 +72,7 @@ public class Util {
                 if (!isEmpty(destObj) && !isEmpty(srcObj))
                     dest.put(key, srcObj); // TODO: deep merging on sub objects
 
-            } else if (
-                dest.isNull(key) || "".equals(destObj) // dest val is empty
-            ) { // handle all basic values (non array, non nested objects)
+            } else if (dest.isNull(key) || isEmpty(destObj)) { // handle all basic values (non array, non nested objects)
                 dest.put(key, srcObj);
             }
 
@@ -96,6 +95,10 @@ public class Util {
      * @return boolean - true if emptiness is confirmed, else false
      */
     private static boolean isEmpty(Object obj) {
+        // handle nulls
+        if (JSONObject.NULL.equals(obj))
+            return true;
+
         // handle strings
         if (obj instanceof String)
             return ((String) obj).isEmpty();
@@ -105,8 +108,18 @@ public class Util {
             return ((JSONArray) obj).length() == 0;
 
         // handle json objects
-        if (obj instanceof JSONObject)
-            return ((JSONObject) obj).length() == 0;
+        if (obj instanceof JSONObject) {
+            // get json obj for easy inspection
+            JSONObject jsonObj = (JSONObject) obj;
+
+            // recurse over all children. 1 false results in false for overall check
+            boolean jsonObjIsEmpty = true; // true until proven false
+            Set<String> keyset = jsonObj.keySet();
+            for(String key: keyset)
+                jsonObjIsEmpty = jsonObjIsEmpty && isEmpty(jsonObj.get(key));
+
+            return jsonObjIsEmpty;
+        }
 
         return false;
     }
