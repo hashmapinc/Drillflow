@@ -378,7 +378,8 @@ static Validation error487() {
 	}
 
 	static ValidationResult invalid(String message) {
-		return new Invalid(message);
+		//return new Invalid(message);
+		return null;
 	}
 
 	static ValidationResult valid() {
