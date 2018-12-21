@@ -35,7 +35,7 @@ public class TestXMLValidate {
 		Document doc = dBuilder.parse(file);
 		doc.getDocumentElement().normalize();
 		NodeList nList = doc.getElementsByTagName("well");
-		
+		System.out.println("the well size is :" +nList.getLength());
 		for (int temp = 0; temp < nList.getLength(); temp++) {
 
 			Node nNode = nList.item(temp);	

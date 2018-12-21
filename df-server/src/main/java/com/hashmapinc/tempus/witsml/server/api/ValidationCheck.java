@@ -21,8 +21,9 @@ import org.xml.sax.SAXException;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetFromStoreResponse;
 
 public class ValidationCheck {
-	
+
 	private StoreImpl store;
+
 	public NodeList parseXML(String XMLin) throws SAXException, IOException, ParserConfigurationException {
 		ClassLoader classLoader = getClass().getClassLoader();
 		File file = new File(classLoader.getResource("well1411.xml").getFile());
@@ -34,7 +35,66 @@ public class ValidationCheck {
 		NodeList nList = doc.getElementsByTagName("well");
 		return nList;
 	}
+	
+	public boolean checkWMLTypeEmpty(String WMLType) {
+		if(WMLType.trim().isEmpty())
+		{
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean checkXMLEmpty(String XMLin) {
+		if(XMLin.trim().isEmpty())
+		{
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean checkXMLwMLObject(String XMLin, String WMLType)
+	{
+		if(XMLin.equals(WMLType))
+		{
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean checkWellforDelete(String XMLin)
+			throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
+		ClassLoader classLoader = getClass().getClassLoader();
+		File file = new File(classLoader.getResource("well1411.xml").getFile());
 
+		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+		Document doc = dBuilder.parse(file);
+		doc.getDocumentElement().normalize();
+		NodeList nodeList = doc.getElementsByTagName("well");
+		if(nodeList.getLength()>1)
+		{
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean checkWell(String XMLin)
+			throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
+		ClassLoader classLoader = getClass().getClassLoader();
+		File file = new File(classLoader.getResource("well1411.xml").getFile());
+
+		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+		Document doc = dBuilder.parse(file);
+		doc.getDocumentElement().normalize();
+		NodeList nodeList = doc.getElementsByTagName("well");
+		if(nodeList.getLength()<2)
+		{
+			return true;
+		}
+		return false;
+	}
+	
 	public boolean checkNotNullUid(String XMLin)
 			throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
 		ClassLoader classLoader = getClass().getClassLoader();
@@ -44,7 +104,6 @@ public class ValidationCheck {
 		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 		Document doc = dBuilder.parse(file);
 		doc.getDocumentElement().normalize();
-		NodeList nList1 = doc.getElementsByTagName("well");
 		XPathFactory factory = XPathFactory.newInstance();
 
 		XPath xpath = factory.newXPath();
@@ -71,7 +130,6 @@ public class ValidationCheck {
 		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 		Document doc = dBuilder.parse(file);
 		doc.getDocumentElement().normalize();
-		NodeList nList = doc.getElementsByTagName("well");
 		XPathFactory factory = XPathFactory.newInstance();
 		Set<String> uids = new HashSet<String>();
 		XPath xpath = factory.newXPath();
@@ -90,22 +148,17 @@ public class ValidationCheck {
 		}
 		return false;
 	}
-	
-	public boolean checkExistingUID(
-			String WMLtypeIn, 
-	        String QueryIn, 
-	        String OptionsIn, 
-	        String CapabilitiesIn) throws Exception
-	{
+
+	public boolean checkExistingUID(String WMLtypeIn, String QueryIn, String OptionsIn, String CapabilitiesIn)
+			throws Exception {
 		WMLS_GetFromStoreResponse resp = new WMLS_GetFromStoreResponse();
-		resp=store.getFromStore(WMLtypeIn, QueryIn, OptionsIn, CapabilitiesIn);
-		if(resp.getResult()==1)
-		{
+		resp = store.getFromStore(WMLtypeIn, QueryIn, OptionsIn, CapabilitiesIn);
+		if (resp.getResult() == 1) {
 			return true;
 		}
 		return false;
 	}
-	
+
 	public boolean checkNotNullUOM(String XMLin)
 			throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
 		ClassLoader classLoader = getClass().getClassLoader();
@@ -115,7 +168,6 @@ public class ValidationCheck {
 		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 		Document doc = dBuilder.parse(file);
 		doc.getDocumentElement().normalize();
-		NodeList nList1 = doc.getElementsByTagName("well");
 		XPathFactory factory = XPathFactory.newInstance();
 
 		XPath xpath = factory.newXPath();
@@ -142,9 +194,7 @@ public class ValidationCheck {
 		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 		Document doc = dBuilder.parse(file);
 		doc.getDocumentElement().normalize();
-		NodeList nList = doc.getElementsByTagName("well");
 		XPathFactory factory = XPathFactory.newInstance();
-		Set<String> uoms = new HashSet<String>();
 		XPath xpath = factory.newXPath();
 
 		String expression = "//*[@uom]";
@@ -153,10 +203,9 @@ public class ValidationCheck {
 		for (int i = 0; i < nodeList.getLength(); i++) {
 			Element eElement = (Element) nodeList.item(i);
 			String uom = eElement.getAttribute("uom");
-			//check uom with witsml unit
+			// check uom with witsml unit
 		}
 		return false;
 	}
-	
-	
+
 }
