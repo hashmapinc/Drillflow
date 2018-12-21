@@ -48,6 +48,7 @@ public class DotValve implements IValve {
         this.API_KEY = config.get("apikey");
         this.AUTH = new DotAuth(this.URL, this.API_KEY);
         this.DELEGATOR = new DotDelegator(this.URL, this.API_KEY);
+        LOG.info("Creating valve pointing to url: " + this.URL);
     }
 
     /**

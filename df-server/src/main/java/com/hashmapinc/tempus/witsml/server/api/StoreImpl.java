@@ -32,6 +32,8 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +41,7 @@ import javax.annotation.PostConstruct;
 import javax.jws.WebService;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -55,8 +58,7 @@ public class StoreImpl implements IStore {
     private ServerCap cap;
     private WitsmlApiConfig witsmlApiConfigUtil;
     private IValve valve;
-    @Value("${valve.name}")
-    private String valveName;
+    private ValveConfig config;
 
     @Autowired
     private void setServerCap(ServerCap cap){
@@ -68,16 +70,21 @@ public class StoreImpl implements IStore {
         this.witsmlApiConfigUtil = witsmlApiConfigUtil;
     }
 
-    @Value("${wmls.version:7}")
+    @Autowired
+    private void setValveConfig(ValveConfig config){
+        this.config = config;
+    }
+
+    @Value("${wmls.version}")
     private String version;
 
-    @Value("#{${valveprop}}")
-    private Map<String,String> valveProps;
+    @Value("${valve.name}")
+    private String valveName;
 
     @PostConstruct
     private void setValve(){
         // get the valve
-        valve = ValveFactory.buildValve(valveName, valveProps);
+        valve = ValveFactory.buildValve(valveName, config.getConfiguration());
 
         //=====================================================================
         // update the cap with this valve's capabililies

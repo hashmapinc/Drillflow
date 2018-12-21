@@ -19,6 +19,7 @@ import com.hashmapinc.tempus.witsml.valve.IValve;
 import com.hashmapinc.tempus.witsml.valve.ValveFactory;
 import com.hashmapinc.tempus.witsml.valve.dot.ValveAuthException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -37,16 +38,19 @@ import java.util.Map;
 public class ValveAuthenticationProvider implements AuthenticationProvider {
 
     private IValve valve;
+    private ValveConfig config;
 
     @Value("${valve.name}")
     private String valveName;
 
-    @Value("#{${valveprop}}")
-    private Map<String,String> valveProps;
+    @Autowired
+    private void setValveConfig(ValveConfig config){
+        this.config = config;
+    }
 
     @PostConstruct
     private void setValve(){
-        valve = ValveFactory.buildValve(valveName,valveProps);
+        valve = ValveFactory.buildValve(valveName,config.getConfiguration());
     }
     
     @Override
