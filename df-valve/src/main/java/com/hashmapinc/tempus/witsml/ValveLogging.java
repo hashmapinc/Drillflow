@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /**
  * Copyright © 2018-2018 Hashmap, Inc
  *
@@ -13,6 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+=======
+>>>>>>> created a logging object with id, message and abstractwitsmlObject as parameters
 package com.hashmapinc.tempus.witsml;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
@@ -21,16 +24,29 @@ public class ValveLogging {
 	private String id;
 	private String message;
 	private AbstractWitsmlObject abstObject;
+<<<<<<< HEAD
 
 	public ValveLogging(String id, String message, AbstractWitsmlObject abstObject) {
+=======
+	
+	public ValveLogging() {}
+	public ValveLogging(String id, String message, AbstractWitsmlObject abstObject)
+	{
+>>>>>>> created a logging object with id, message and abstractwitsmlObject as parameters
 		this.abstObject = abstObject;
 		this.message = message;
 		this.id = id;
 	}
+<<<<<<< HEAD
 
 	@Override
 	public String toString() {
 		return "id is - " + id + " Message is - " + message + " for object " + abstObject.toString();
+=======
+	@Override
+	public String toString() {
+		return "id is - "+id+" Message is - "+message+" for object "+abstObject;
+>>>>>>> created a logging object with id, message and abstractwitsmlObject as parameters
 	}
 
 }
