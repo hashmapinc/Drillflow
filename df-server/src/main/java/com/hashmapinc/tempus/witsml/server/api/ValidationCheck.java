@@ -22,190 +22,262 @@ import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetFromStoreResponse;
 
 public class ValidationCheck {
 
-	private StoreImpl store;
+    public static StoreImpl store = new StoreImpl();
 
-	public NodeList parseXML(String XMLin) throws SAXException, IOException, ParserConfigurationException {
-		ClassLoader classLoader = getClass().getClassLoader();
-		File file = new File(classLoader.getResource("well1411.xml").getFile());
+    public static String uidExpression = "//*[@uid]";
+    public static String uomExpression = "//*[@uom]";
+    public static String WELL_XML_TAG = "well";
+    public static String uidAttribute = "uid";
+    public static String uomAttribute = "uom";
 
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-		Document doc = dBuilder.parse(file);
-		doc.getDocumentElement().normalize();
-		NodeList nList = doc.getElementsByTagName("well");
-		return nList;
-	}
-	
-	public boolean checkWMLTypeEmpty(String WMLType) {
-		if(WMLType.trim().isEmpty())
-		{
-			return true;
-		}
-		return false;
-	}
-	
-	public boolean checkXMLEmpty(String XMLin) {
-		if(XMLin.trim().isEmpty())
-		{
-			return true;
-		}
-		return false;
-	}
-	
-	public boolean checkXMLwMLObject(String XMLin, String WMLType)
-	{
-		if(XMLin.equals(WMLType))
-		{
-			return true;
-		}
-		return false;
-	}
-	
-	public boolean checkWellforDelete(String XMLin)
-			throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
-		ClassLoader classLoader = getClass().getClassLoader();
-		File file = new File(classLoader.getResource("well1411.xml").getFile());
+    /**
+     * Get XML Document
+     * 
+     * @param XMLin
+     * @return XML Document object
+     * @throws SAXException
+     * @throws IOException
+     * @throws ParserConfigurationException
+     */
+    private static Document getXMLDocument(String XMLin)
+            throws SAXException, IOException, ParserConfigurationException {
+        ClassLoader classLoader = ValidationCheck.class.getClassLoader();
+        File file = new File(classLoader.getResource("well1411.xml").getFile());
 
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-		Document doc = dBuilder.parse(file);
-		doc.getDocumentElement().normalize();
-		NodeList nodeList = doc.getElementsByTagName("well");
-		if(nodeList.getLength()>1)
-		{
-			return true;
-		}
-		return false;
-	}
-	
-	public boolean checkWell(String XMLin)
-			throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
-		ClassLoader classLoader = getClass().getClassLoader();
-		File file = new File(classLoader.getResource("well1411.xml").getFile());
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+        Document doc = dBuilder.parse(file);
+        doc.getDocumentElement().normalize();
+        return doc;
+    }
 
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-		Document doc = dBuilder.parse(file);
-		doc.getDocumentElement().normalize();
-		NodeList nodeList = doc.getElementsByTagName("well");
-		if(nodeList.getLength()<2)
-		{
-			return true;
-		}
-		return false;
-	}
-	
-	public boolean checkNotNullUid(String XMLin)
-			throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
-		ClassLoader classLoader = getClass().getClassLoader();
-		File file = new File(classLoader.getResource("well1411.xml").getFile());
+    /**
+     * Check if WML type empty
+     * 
+     * @param WMLType
+     * @return true if empty else false
+     */
+    public static boolean checkWMLTypeEmpty(String WMLType) {
+        boolean result = false;
+        if (WMLType.trim().isEmpty()) {
+            result = true;
+        }
+        return result;
+    }
 
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-		Document doc = dBuilder.parse(file);
-		doc.getDocumentElement().normalize();
-		XPathFactory factory = XPathFactory.newInstance();
+    /**
+     * Check if XML empty
+     * 
+     * @param XMLin
+     * @return true if empty else false
+     */
+    public static boolean checkXMLEmpty(String XMLin) {
+        boolean result = false;
+        if (XMLin.trim().isEmpty()) {
+            result = true;
+        }
+        return result;
+    }
 
-		XPath xpath = factory.newXPath();
+    /**
+     * Check if XML equals WML Object
+     * 
+     * @param XMLin
+     * @param WMLType
+     * @return true if equal else false
+     */
+    public static boolean checkIfXMLEqualsWMLObj(String XMLin, String WMLType) {
+        boolean result = false;
+        if (XMLin.equals(WMLType)) {
+            result = true;
+        }
+        return result;
+    }
 
-		String expression = "//*[@uid]";
-		NodeList nodeList = (NodeList) xpath.evaluate(expression, doc, XPathConstants.NODESET);
+    /**
+     * Check well tag in XML document if available
+     * 
+     * @param XMLin
+     * @return true if available else false
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     * @throws XPathExpressionException
+     */
+    public static boolean checkWellforDelete(String XMLin)
+            throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
+        boolean result = false;
+        Document doc = getXMLDocument(XMLin);
+        NodeList nodeList = doc.getElementsByTagName(WELL_XML_TAG);
+        if (nodeList.getLength() > 1) {
+            result = true;
+        }
+        return result;
+    }
 
-		for (int i = 0; i < nodeList.getLength(); i++) {
-			Element eElement = (Element) nodeList.item(i);
-			if (eElement.getAttribute("uid").equalsIgnoreCase("")
-					&& eElement.getAttribute("uid").equalsIgnoreCase(null)) {
-				return true;
-			}
-		}
-		return false;
-	}
+    /**
+     * Check well tag in XML document
+     * 
+     * @param XMLin
+     * @return true if exists else false
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     * @throws XPathExpressionException
+     */
+    public static boolean checkWell(String XMLin)
+            throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
+        boolean result = false;
+        Document doc = getXMLDocument(XMLin);
+        NodeList nodeList = doc.getElementsByTagName(WELL_XML_TAG);
+        if (nodeList.getLength() < 2) {
+            result = true;
+        }
+        return result;
+    }
 
-	public boolean checkUniqueUid(String XMLin)
-			throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
-		ClassLoader classLoader = getClass().getClassLoader();
-		File file = new File(classLoader.getResource("well1411.xml").getFile());
+    /**
+     * Check if uid is null
+     * 
+     * @param XMLin
+     * @return true if uid is null else false
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     * @throws XPathExpressionException
+     */
+    public static boolean checkNotNullUid(String XMLin)
+            throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
+        boolean result = false;
+        Document doc = getXMLDocument(XMLin);
+        XPathFactory factory = XPathFactory.newInstance();
 
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-		Document doc = dBuilder.parse(file);
-		doc.getDocumentElement().normalize();
-		XPathFactory factory = XPathFactory.newInstance();
-		Set<String> uids = new HashSet<String>();
-		XPath xpath = factory.newXPath();
+        XPath xpath = factory.newXPath();
+        NodeList nodeList = (NodeList) xpath.evaluate(uidExpression, doc, XPathConstants.NODESET);
 
-		String expression = "//*[@uid]";
-		NodeList nodeList = (NodeList) xpath.evaluate(expression, doc, XPathConstants.NODESET);
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Element eElement = (Element) nodeList.item(i);
+            if (eElement.getAttribute(uidAttribute).equalsIgnoreCase("")
+                    && eElement.getAttribute(uidAttribute).equalsIgnoreCase(null)) {
+                result = true;
+            }
+        }
+        return result;
+    }
 
-		for (int i = 0; i < nodeList.getLength(); i++) {
-			Element eElement = (Element) nodeList.item(i);
-			String uid = eElement.getAttribute("uid");
-			if (uids.contains(uid)) {
-				return true;
-			} else {
-				uids.add(uid);
-			}
-		}
-		return false;
-	}
+    /**
+     * Get node list for given document and expression
+     * 
+     * @param doc
+     * @param expression
+     * @return nodelist
+     * @throws XPathExpressionException
+     */
+    private static NodeList getNodeListForExpression(Document doc, String expression) throws XPathExpressionException {
+        XPathFactory factory = XPathFactory.newInstance();
+        XPath xpath = factory.newXPath();
+        NodeList nodeList = (NodeList) xpath.evaluate(expression, doc, XPathConstants.NODESET);
+        return nodeList;
+    }
 
-	public boolean checkExistingUID(String WMLtypeIn, String QueryIn, String OptionsIn, String CapabilitiesIn)
-			throws Exception {
-		WMLS_GetFromStoreResponse resp = new WMLS_GetFromStoreResponse();
-		resp = store.getFromStore(WMLtypeIn, QueryIn, OptionsIn, CapabilitiesIn);
-		if (resp.getResult() == 1) {
-			return true;
-		}
-		return false;
-	}
+    /**
+     * Check unique uid
+     * 
+     * @param XMLin
+     * @return true if unique else false
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     * @throws XPathExpressionException
+     */
+    public static boolean checkUniqueUid(String XMLin)
+            throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
+        boolean result = false;
+        Document doc = getXMLDocument(XMLin);
+        NodeList nodeList = getNodeListForExpression(doc, uidExpression);
+        Set<String> uids = new HashSet<String>();
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Element eElement = (Element) nodeList.item(i);
+            String uid = eElement.getAttribute(uidAttribute);
+            if (uids.contains(uid)) {
+                result = true;
+                break;
+            } else {
+                uids.add(uid);
+            }
+        }
+        return result;
+    }
 
-	public boolean checkNotNullUOM(String XMLin)
-			throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
-		ClassLoader classLoader = getClass().getClassLoader();
-		File file = new File(classLoader.getResource("well1411.xml").getFile());
+    /**
+     * Check existing UID
+     * 
+     * @param WMLtypeIn
+     * @param QueryIn
+     * @param OptionsIn
+     * @param CapabilitiesIn
+     * @return true if exists else false
+     * @throws Exception
+     */
+    public static boolean checkExistingUID(String WMLtypeIn, String QueryIn, String OptionsIn, String CapabilitiesIn)
+            throws Exception {
+        boolean result = false;
+        WMLS_GetFromStoreResponse resp = new WMLS_GetFromStoreResponse();
+        resp = store.getFromStore(WMLtypeIn, QueryIn, OptionsIn, CapabilitiesIn);
+        if (resp.getResult() == 1) {
+            result = true;
+        }
+        return result;
+    }
 
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-		Document doc = dBuilder.parse(file);
-		doc.getDocumentElement().normalize();
-		XPathFactory factory = XPathFactory.newInstance();
+    /**
+     * Check if uom attribute is null
+     * 
+     * @param XMLin
+     * @return true if null else false
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     * @throws XPathExpressionException
+     */
+    public static boolean checkNotNullUOM(String XMLin)
+            throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
+        boolean result = false;
+        Document doc = getXMLDocument(XMLin);
+        NodeList nodeList = getNodeListForExpression(doc, uomExpression);
 
-		XPath xpath = factory.newXPath();
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Element eElement = (Element) nodeList.item(i);
+            if (eElement.getAttribute(uomAttribute).equalsIgnoreCase("")
+                    && eElement.getAttribute(uomAttribute).equalsIgnoreCase(null)) {
+                result = true;
+                break;
+            }
+        }
+        return result;
+    }
 
-		String expression = "//*[@uom]";
-		NodeList nodeList = (NodeList) xpath.evaluate(expression, doc, XPathConstants.NODESET);
+    /**
+     * Check uom attribute with witsml
+     * 
+     * @param XMLin
+     * @return
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     * @throws XPathExpressionException
+     */
+    public static boolean checkUOMWithWitsml(String XMLin)
+            throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
+        boolean result = false;
+        Document doc = getXMLDocument(XMLin);
+        NodeList nodeList = getNodeListForExpression(doc, uomExpression);
 
-		for (int i = 0; i < nodeList.getLength(); i++) {
-			Element eElement = (Element) nodeList.item(i);
-			if (eElement.getAttribute("uom").equalsIgnoreCase("")
-					&& eElement.getAttribute("uom").equalsIgnoreCase(null)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public boolean checkUOMWithWitsml(String XMLin)
-			throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
-		ClassLoader classLoader = getClass().getClassLoader();
-		File file = new File(classLoader.getResource("well1411.xml").getFile());
-
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-		Document doc = dBuilder.parse(file);
-		doc.getDocumentElement().normalize();
-		XPathFactory factory = XPathFactory.newInstance();
-		XPath xpath = factory.newXPath();
-
-		String expression = "//*[@uom]";
-		NodeList nodeList = (NodeList) xpath.evaluate(expression, doc, XPathConstants.NODESET);
-
-		for (int i = 0; i < nodeList.getLength(); i++) {
-			Element eElement = (Element) nodeList.item(i);
-			String uom = eElement.getAttribute("uom");
-			// check uom with witsml unit
-		}
-		return false;
-	}
-
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Element eElement = (Element) nodeList.item(i);
+            String uom = eElement.getAttribute(uomAttribute);
+            // check uom with witsml unit
+        }
+        return result;
+    }
 }
