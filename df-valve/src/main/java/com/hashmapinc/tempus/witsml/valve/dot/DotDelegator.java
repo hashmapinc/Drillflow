@@ -30,8 +30,8 @@ import org.json.JSONObject;
 public class DotDelegator {
     private static final Logger LOG = Logger.getLogger(DotDelegator.class.getName());
 
-    public final String URL;
-    public final String API_KEY;
+    private final String URL;
+    private final String API_KEY;
 
     public DotDelegator(String url, String apiKey) {
         this.URL = url;
@@ -67,13 +67,16 @@ public class DotDelegator {
      * deletes the object from DoT
      *
      * @param witsmlObj - object to delete
-     * @param tokenString - auth string for rest calls
+     * @param username - auth username
+     * @param password - auth password
+     * @param client - DotClient to execute requests with
      */
     public void deleteObject(
         AbstractWitsmlObject witsmlObj,
-        String tokenString
+        String username,
+        String password,
+        DotClient client
     ) throws ValveException, UnirestException, ValveAuthException {
-        LOG.info("DELETING " + witsmlObj.toString() + " in DotDelegator.");
         String uid = witsmlObj.getUid(); // get uid for delete call
         String objectType = witsmlObj.getObjectType(); // get obj type for exception handling
         String endpoint = this.getEndpoint(objectType) + uid; // add uid for delete call
@@ -107,13 +110,16 @@ public class DotDelegator {
      * updates the object in DoT
      *
      * @param witsmlObj - object to delete
-     * @param tokenString - auth string for rest calls
+     * @param username - auth username
+     * @param password - auth password
+     * @param client - DotClient to execute requests with
      */
     public void updateObject(
         AbstractWitsmlObject witsmlObj,
-        String tokenString
+        String username,
+        String password,
+        DotClient client
     ) throws ValveException, ValveAuthException, UnirestException {
-        LOG.info("UPDATING " + witsmlObj.toString() + " in DotDelegator.");
         String uid = witsmlObj.getUid(); // get uid for delete call
         String objectType = witsmlObj.getObjectType(); // get obj type for exception handling
         String endpoint = this.getEndpoint(objectType) + uid; // add uid for update call
@@ -144,14 +150,17 @@ public class DotDelegator {
      * Submits the object to the DoT rest API for creation
      *
      * @param witsmlObj - AbstractWitsmlObject to create
-     * @param tokenString - string of the JWT to do auth with
+     * @param username - auth username
+     * @param password - auth password
+     * @param client - DotClient to execute requests with
      * @return
      */
     public String createObject(
         AbstractWitsmlObject witsmlObj,
-        String tokenString
+        String username,
+        String password,
+        DotClient client
     ) throws ValveException, ValveAuthException, UnirestException {
-        LOG.info("CREATING " + witsmlObj.toString() + " in DotDelegator.");
         String objectType = witsmlObj.getObjectType(); // get obj type for exception handling
         String uid = witsmlObj.getUid();
         String endpoint = this.getEndpoint(objectType);
@@ -170,13 +179,14 @@ public class DotDelegator {
                 request.queryString("uidWell", witsmlObj.getParentUid()); // TODO: error handle this?
         }
 
+        // add the header and payload
+        request
+            .header("Content-Type", "application/json")
+            .body(payload);
+
         // get the request response.
         String payload = witsmlObj.getJSONString("1.4.1.1");
-        HttpResponse<String> response = request
-            .header("Content-Type", "application/json")
-            .header("Authorization", "Bearer " + tokenString)
-            .body(payload)
-            .asString();
+        HttpResponse<String> response =
 
         // check response status
         int status = response.getStatus();
@@ -197,14 +207,17 @@ public class DotDelegator {
      * Submits the query to the DoT rest API for object GETing
      *
      * @param witsmlObject - AbstractWitsmlObject to get
-     * @param tokenString - string of the JWT to do auth with
+     * @param username - auth username
+     * @param password - auth password
+     * @param client - DotClient to execute requests with
      * @return get results AbstractWitsmlObject
      */
     public AbstractWitsmlObject getObject(
-            AbstractWitsmlObject witsmlObject,
-            String tokenString
+        AbstractWitsmlObject witsmlObject,
+        String username,
+        String password,
+        DotClient client
     ) throws ValveException, ValveAuthException, UnirestException {
-        LOG.info("GETing " + witsmlObject.toString() + " in DotDelegator.");
         String uid = witsmlObject.getUid();
         String objectType = witsmlObject.getObjectType();
         String endpoint = this.getEndpoint(objectType) + uid; // add uid for rest call

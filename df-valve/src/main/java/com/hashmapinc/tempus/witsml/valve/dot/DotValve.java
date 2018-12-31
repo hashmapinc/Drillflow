@@ -75,8 +75,16 @@ public class DotValve implements IValve {
         // handle each object
         ArrayList<AbstractWitsmlObject> queryResponses = new ArrayList<AbstractWitsmlObject>();
         try {
-            for (AbstractWitsmlObject witsmlObject: qc.WITSML_OBJECTS)
-                queryResponses.add(this.DELEGATOR.getObject(witsmlObject, qc.USERNAME, qc.PASSWORD));
+            for (AbstractWitsmlObject witsmlObject: qc.WITSML_OBJECTS) {
+                queryResponses.add(
+                    this.DELEGATOR.getObject(
+                        witsmlObject,
+                        qc.USERNAME,
+                        qc.PASSWORD,
+                        this.CLIENT
+                    )
+                );
+            }
         } catch (Exception e) {
             LOG.warning("Exception in DotValve get object: " + e.getMessage());
             throw new ValveException(e.getMessage());
@@ -98,8 +106,16 @@ public class DotValve implements IValve {
         // create each object
         ArrayList<String> uids = new ArrayList<>();
         try {
-            for (AbstractWitsmlObject witsmlObject: qc.WITSML_OBJECTS)
-                uids.add(this.DELEGATOR.createObject(witsmlObject, qc.USERNAME, qc.PASSWORD));
+            for (AbstractWitsmlObject witsmlObject: qc.WITSML_OBJECTS) {
+                uids.add(
+                    this.DELEGATOR.createObject(
+                        witsmlObject,
+                        qc.USERNAME,
+                        qc.PASSWORD,
+                        this.CLIENT
+                    )
+                );
+            }
         } catch (Exception e) {
             LOG.warning("Exception in DotValve create object: " + e.getMessage());
             throw new ValveException(e.getMessage());
@@ -117,8 +133,14 @@ public class DotValve implements IValve {
     ) throws ValveException {
         // delete each object with 1 retry for bad token errors
         try {
-            for (AbstractWitsmlObject witsmlObject : qc.WITSML_OBJECTS)
-                this.DELEGATOR.deleteObject(witsmlObject, qc.USERNAME, qc.PASSWORD);
+            for (AbstractWitsmlObject witsmlObject : qc.WITSML_OBJECTS) {
+                this.DELEGATOR.deleteObject(
+                    witsmlObject,
+                    qc.USERNAME,
+                    qc.PASSWORD,
+                    this.CLIENT
+                );
+            }
         } catch (Exception e) {
             LOG.warning("Got exception in DotValve delete object: " + e.getMessage());
             throw new ValveException(e.getMessage());
@@ -135,8 +157,13 @@ public class DotValve implements IValve {
     ) throws ValveException {
         // update each object with 1 retry for bad tokens
         try {
-            for (AbstractWitsmlObject witsmlObject : qc.WITSML_OBJECTS)
-            this.DELEGATOR.updateObject(witsmlObject, qc.USERNAME, qc.PASSWORD);
+            for (AbstractWitsmlObject witsmlObject : qc.WITSML_OBJECTS) {
+                this.DELEGATOR.updateObject(
+                    witsmlObject,
+                    qc.USERNAME,
+                    qc.PASSWORD,
+                    this.CLIENT);
+            }
         } catch (Exception e) {
             LOG.warning("Exception in DotValve update object: " + e.getMessage());
             throw new ValveException(e.getMessage());

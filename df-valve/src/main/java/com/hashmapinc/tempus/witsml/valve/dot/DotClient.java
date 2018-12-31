@@ -139,5 +139,49 @@ public class DotClient {
         return timeUntilExpiration <= JWT_TOKEN_EXPIRY_BUFFER;
     }
 
-    public void delete(String endpoint, )
+    /**
+     * removes a user from the cache
+     *
+     * @param username - key to remove in the cache
+     */
+    private void removeFromCache(
+        String username
+    ) {
+        if (this.cache.containsKey(username))
+            this.cache.remove(username); // TODO: maybe make this thread safe?
+    }
+
+    /**
+     * executes the given unirest request with proper authorization
+     * credentials and returns the response string object.
+     *
+     * @param req - HttpRequest object to execute
+     * @param username - auth username
+     * @param password - auth password
+     */
+    public HttpResponse<String> makeRequest(
+        HttpRequest req,
+        String username,
+        String password
+    ) throws ValveException, UnirestException, ValveAuthException {
+        // get jwt
+        String tokenString = this.getJWT(username, password).getToken();
+
+        // make the DELETE call.
+        HttpResponse<String> response = req
+                .header("Authorization", "Bearer " + tokenString)
+                .asString();
+
+        // check for auth errors. Invalidate cache if any are found and throw exception
+        int status = response.getStatus();
+        if (401 == status) {
+            LOG.warning("Bad auth token.");
+            this.removeFromCache(username);
+            throw new ValveAuthException("Bad JWT");
+        } else {
+            LOG.warning("Received failure status code from DoT DELETE: " + status);
+            LOG.warning("DELETE response: " + response.getBody());
+            throw new ValveException("DELETE DoT REST call failed with status code: " + status);
+        }
+    }
 }
