@@ -77,7 +77,7 @@ public class DotDelegator {
         String uid = witsmlObj.getUid(); // get uid for delete call
         String objectType = witsmlObj.getObjectType(); // get obj type for exception handling
         String endpoint = this.getEndpoint(objectType) + uid; // add uid for delete call
-
+ 
         // create request
         HttpRequest request = Unirest.delete(endpoint);
         if ("wellbore".equals(objectType))
