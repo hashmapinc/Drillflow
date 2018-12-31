@@ -32,11 +32,9 @@ public class DotDelegator {
     private static final Logger LOG = Logger.getLogger(DotDelegator.class.getName());
 
     private final String URL;
-    private final String API_KEY;
 
     public DotDelegator(String url, String apiKey) {
         this.URL = url;
-        this.API_KEY = apiKey;
     }
 
     /**
