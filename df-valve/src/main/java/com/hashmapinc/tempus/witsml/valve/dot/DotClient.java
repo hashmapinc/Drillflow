@@ -23,9 +23,12 @@ import java.util.logging.Logger;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.hashmapinc.tempus.witsml.valve.ValveException;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
+import com.mashape.unirest.request.HttpRequest;
 
 public class DotClient {
     private static final Logger LOG = Logger.getLogger(DotClient.class.getName());
@@ -152,8 +155,7 @@ public class DotClient {
     }
 
     /**
-     * executes the given unirest request with proper authorization
-     * credentials and returns the response string object.
+     * retry wrapper for private makeRequest
      *
      * @param req - HttpRequest object to execute
      * @param username - auth username
@@ -164,24 +166,50 @@ public class DotClient {
         String username,
         String password
     ) throws ValveException, UnirestException, ValveAuthException {
+        // default numRetries
+        int numRetries = 1;
+        return this.makeRequest(req, username, password, numRetries);
+    }
+
+    /**
+     * executes the given unirest request with proper authorization
+     * credentials and returns the response string object.
+     *
+     * on bad credentials, the request is attempted numRetries times
+     *
+     * @param req - HttpRequest object to execute
+     * @param username - auth username
+     * @param password - auth password
+     * @param numRetries - number of times to retry when auth errors occur
+     */
+    private HttpResponse<String> makeRequest(
+            HttpRequest req,
+            String username,
+            String password,
+            int numRetries
+    ) throws ValveException, UnirestException, ValveAuthException {
         // get jwt
         String tokenString = this.getJWT(username, password).getToken();
 
-        // make the DELETE call.
+        // execute request.
         HttpResponse<String> response = req
-                .header("Authorization", "Bearer " + tokenString)
-                .asString();
+            .header("Authorization", "Bearer " + tokenString)
+            .asString();
 
-        // check for auth errors. Invalidate cache if any are found and throw exception
+        // check for auth errors.
         int status = response.getStatus();
         if (401 == status) {
             LOG.warning("Bad auth token.");
-            this.removeFromCache(username);
-            throw new ValveAuthException("Bad JWT");
-        } else {
-            LOG.warning("Received failure status code from DoT DELETE: " + status);
-            LOG.warning("DELETE response: " + response.getBody());
-            throw new ValveException("DELETE DoT REST call failed with status code: " + status);
+            this.removeFromCache(username); // uncache the jwt for this user
+
+            // if there are retries left, retry.
+            if (numRetries > 0) {
+                return this.makeRequest(req, username, password, numRetries-1);
+            } else {
+                throw new ValveAuthException("Bad JWT");
+            }
         }
+
+        return response;
     }
 }

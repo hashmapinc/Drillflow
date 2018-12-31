@@ -82,23 +82,17 @@ public class DotDelegator {
         String endpoint = this.getEndpoint(objectType) + uid; // add uid for delete call
  
         // create request
-        HttpRequest request = Unirest.delete(endpoint);
+        HttpRequest request = Unirest.delete(endpoint).header("Content-Type", "application/json");
         if ("wellbore".equals(objectType))
             request.queryString("uidWell", witsmlObj.getParentUid()); // TODO: ensure parent uid exists?
 
         // make the DELETE call.
-        HttpResponse<String> response = request
-            .header("Content-Type", "application/json")
-            .header("Authorization", "Bearer " + tokenString)
-            .asString();
+        HttpResponse<String> response = client.makeRequest(request, username, password);
 
         // check response status
         int status = response.getStatus();
         if (201 == status || 200 == status || 204 == status) {
             LOG.info("Received successful status code from DoT DELETE call: " + status);
-        } else if (401 == status) {
-            LOG.warning("Bad auth token.");
-            throw new ValveAuthException("Bad JWT");
         } else {
             LOG.warning("Received failure status code from DoT DELETE: " + status);
             LOG.warning("DELETE response: " + response.getBody());
@@ -124,21 +118,21 @@ public class DotDelegator {
         String objectType = witsmlObj.getObjectType(); // get obj type for exception handling
         String endpoint = this.getEndpoint(objectType) + uid; // add uid for update call
 
-        // make the UPDATE call.
+        // get witsmlObj as json string for request payload
         String payload = witsmlObj.getJSONString("1.4.1.1");
-        HttpResponse<String> response = Unirest.put(endpoint)
-            .header("Content-Type", "application/json")
-            .header("Authorization", "Bearer " + tokenString)
-            .body(payload)
-            .asString();
+
+        // build the request
+        HttpRequestWithBody request = Unirest.put(endpoint);
+        request.header("Content-Type", "application/json");
+        request.body(payload);
+
+        // make the UPDATE call.
+        HttpResponse<String> response = client.makeRequest(request, username, password);
 
         // check response status
         int status = response.getStatus();
         if (201 == status || 200 == status) {
             LOG.info("UPDATE for " + witsmlObj + " was successful with REST status code: " + status);
-        } else if (401 == status) {
-            LOG.warning("Bad auth token.");
-            throw new ValveAuthException("Bad JWT");
         } else {
             LOG.warning("Received failure status code from DoT PUT: " + status);
             LOG.warning("PUT response: " + response.getBody());
@@ -165,7 +159,10 @@ public class DotDelegator {
         String uid = witsmlObj.getUid();
         String endpoint = this.getEndpoint(objectType);
 
-        // build the create request
+        // get object as payload string
+        String payload = witsmlObj.getJSONString("1.4.1.1");
+
+        // build the request
         HttpRequestWithBody request;
         if (uid.isEmpty()){
             // create with POST and generate uid
@@ -180,22 +177,17 @@ public class DotDelegator {
         }
 
         // add the header and payload
-        request
-            .header("Content-Type", "application/json")
-            .body(payload);
+        request.header("Content-Type", "application/json");
+        request.body(payload);
 
         // get the request response.
-        String payload = witsmlObj.getJSONString("1.4.1.1");
-        HttpResponse<String> response =
+        HttpResponse<String> response = client.makeRequest(request, username, password);
 
         // check response status
         int status = response.getStatus();
         if (201 == status || 200 == status) {
             LOG.info("Received successful status code from DoT create call: " + status);
             return uid.isEmpty() ? new JsonNode(response.getBody()).getObject().getString("uid") : uid;
-        } else if (401 == status) {
-            LOG.warning("Bad auth token.");
-            throw new ValveAuthException("Bad JWT");
         } else {
             LOG.warning("Received failure status code from DoT POST: " + status);
             LOG.warning("POST response: " + response.getBody());
@@ -224,28 +216,21 @@ public class DotDelegator {
 
         // build request
         HttpRequest request = Unirest.get(endpoint);
+        request.header("accept", "application/json");
         if ("wellbore".equals(objectType))
             request.queryString("uidWell", witsmlObject.getParentUid()); // TODO: check that parent uid exists?
 
         // get response
-        HttpResponse<String> response = request
-            .header("accept", "application/json")
-            .header("Authorization", "Bearer " + tokenString)
-            .asString();
+        HttpResponse<String> response = client.makeRequest(request, username, password);
 
-        LOG.info("Response for GetObject: " + response.getBody());
-
+        // check response status
         int status = response.getStatus();
-
         if (201 == status || 200 == status) {
             LOG.info("Successfully executed GET for query object=" + witsmlObject.toString());
             // get an abstractWitsmlObject from merging the query and the result JSON objects
             JSONObject queryJSON = new JSONObject(witsmlObject.getJSONString("1.4.1.1"));
             JSONObject responseJSON = new JsonNode(response.getBody()).getObject();
             return DotTranslator.translateQueryResponse(queryJSON, responseJSON, objectType);
-        } else if (401 == status) {
-            LOG.warning("Bad auth token.");
-            throw new ValveAuthException("Bad JWT");
         } else {
             LOG.warning("Received status code from GET call to DoT: " + status);
             LOG.warning("GET response: " + response.getBody());
