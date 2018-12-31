@@ -30,6 +30,7 @@ import java.util.UUID;
 
 import javax.xml.bind.JAXBException;
 
+import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
 import org.junit.Before;
 import org.junit.Test;
 

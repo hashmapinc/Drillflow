@@ -19,7 +19,6 @@ import java.util.Map;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.QueryContext;
-import com.hashmapinc.tempus.witsml.valve.dot.ValveAuthException;
 
 public interface IValve {
     /**

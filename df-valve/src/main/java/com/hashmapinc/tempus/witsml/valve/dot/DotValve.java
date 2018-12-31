@@ -21,6 +21,7 @@ import java.util.logging.Logger;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.valve.IValve;
+import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
 
 import org.apache.commons.lang3.StringUtils;

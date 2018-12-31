@@ -18,6 +18,7 @@ package com.hashmapinc.tempus.witsml.valve.dot;
 import java.util.logging.Logger;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
