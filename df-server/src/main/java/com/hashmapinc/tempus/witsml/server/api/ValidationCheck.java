@@ -27,6 +27,7 @@ public class ValidationCheck {
     public static String uidExpression = "//*[@uid]";
     public static String uomExpression = "//*[@uom]";
     public static String WELL_XML_TAG = "well";
+    public static String LOG_XML_TAG = "logData";
     public static String uidAttribute = "uid";
     public static String uomAttribute = "uom";
 
@@ -111,7 +112,7 @@ public class ValidationCheck {
         NodeList nodeList = doc.getElementsByTagName(WELL_XML_TAG);
         if (nodeList.getLength() > 1) {
             result = true;
-        }
+            }
         return result;
     }
 
@@ -130,6 +131,27 @@ public class ValidationCheck {
         boolean result = false;
         Document doc = getXMLDocument(XMLin);
         NodeList nodeList = doc.getElementsByTagName(WELL_XML_TAG);
+        if (nodeList.getLength() < 2) {
+            result = true;
+        }
+        return result;
+    }
+    
+    /**
+     * Check well tag in XML document
+     * 
+     * @param XMLin
+     * @return true if exists else false
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     * @throws XPathExpressionException
+     */
+    public static boolean checkLogData(String XMLin)
+            throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
+        boolean result = false;
+        Document doc = getXMLDocument(XMLin);
+        NodeList nodeList = doc.getElementsByTagName(LOG_XML_TAG);
         if (nodeList.getLength() < 2) {
             result = true;
         }
@@ -159,6 +181,24 @@ public class ValidationCheck {
             Element eElement = (Element) nodeList.item(i);
             if (eElement.getAttribute(uidAttribute).equalsIgnoreCase("")
                     && eElement.getAttribute(uidAttribute).equalsIgnoreCase(null)) {
+                result = true;
+            }
+        }
+        return result;
+    }
+    
+    public static boolean checkNodeValue(String XMLin)
+            throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
+        boolean result = false;
+        Document doc = getXMLDocument(XMLin);
+        XPathFactory factory = XPathFactory.newInstance();
+
+        XPath xpath = factory.newXPath();
+        NodeList nodeList = (NodeList) xpath.evaluate("*", doc, XPathConstants.NODESET);
+
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Element eElement = (Element) nodeList.item(i);
+            if (eElement.getNodeValue().isEmpty()||eElement.getNodeValue().isBlank()) {
                 result = true;
             }
         }
@@ -256,6 +296,90 @@ public class ValidationCheck {
         }
         return result;
     }
+    
+    public static boolean checkUomNodeValue(String XMLin)
+            throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
+        boolean result = false;
+        Document doc = getXMLDocument(XMLin);
+        NodeList nodeList = getNodeListForExpression(doc, uomExpression);
+
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Element eElement = (Element) nodeList.item(i);
+            if (eElement.getNodeValue().isEmpty()||eElement.getNodeValue().isBlank()) {
+                result = true;
+                break;
+            }
+        }
+        return result;
+    }
+    
+    public static boolean checkMnemonicListNotEmpty(String XMLin)
+            throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
+        boolean result = false;
+        Document doc = getXMLDocument(XMLin);
+        NodeList nodeList = getNodeListForExpression(doc, "mnemonicList");
+
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Element eElement = (Element) nodeList.item(i);
+            if (eElement.getNodeValue().isEmpty()||eElement.getNodeValue().isBlank()) {
+                result = true;
+                break;
+            }
+        }
+        return result;
+    }
+    
+    public static boolean checkMnemonicListUnique(String XMLin)
+            throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
+        boolean result = false;
+        Document doc = getXMLDocument(XMLin);
+        NodeList nodeList = getNodeListForExpression(doc, "mnemonicList");
+
+        Set<String> mnemonic = new HashSet<String>();
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Element eElement = (Element) nodeList.item(i);
+            String mnemonicValue = eElement.getNodeValue();
+            if (mnemonic.contains(mnemonicValue)) {
+                result = true;
+                break;
+            } else {
+            	mnemonic.add(mnemonicValue);
+            }
+        }
+        return result;
+    }
+    
+    public static boolean checkUnitList(String XMLin)
+            throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
+        boolean result = false;
+        Document doc = getXMLDocument(XMLin);
+        NodeList nodeList = getNodeListForExpression(doc, "unitList");
+
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Element eElement = (Element) nodeList.item(i);
+            if (eElement.getNodeValue().isEmpty()||eElement.getNodeValue().isBlank()) {
+                result = true;
+                break;
+            }
+        }
+        return result;
+    }
+
+    public static boolean checkMnemonicForSpecialCharacters(String XMLin)
+            throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
+        boolean result = false;
+        Document doc = getXMLDocument(XMLin);
+        NodeList nodeList = getNodeListForExpression(doc, "mnemonicList");
+        String regex = "',><&//\\";
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Element eElement = (Element) nodeList.item(i);
+            if (eElement.getNodeValue().matches(regex)) {
+                result = true;
+                break;
+            }
+        }
+        return result;
+      }
 
     /**
      * Check uom attribute with witsml
