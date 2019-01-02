@@ -2,6 +2,8 @@
 Solution Architecture
 #####################
 
+.. _solution_arch:
+
 ************
 Introduction
 ************
