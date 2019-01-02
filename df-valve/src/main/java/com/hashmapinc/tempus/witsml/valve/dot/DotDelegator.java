@@ -92,12 +92,12 @@ public class DotDelegator {
         // check response status
         int status = response.getStatus();
         if (201 == status || 200 == status || 204 == status) {
-            LOG.info("Received successful status code from DoT DELETE call: " + status);
+            LOG.info("Successfully Deleted "+witsmlObj.toString() +". Status code : " + status);
         } else if (401 == status) {
             LOG.warning("Bad auth token.");
             throw new ValveAuthException("Bad JWT");
         } else {
-            LOG.warning("Received failure status code from DoT DELETE: " + status);
+            LOG.warning("Unable to delete " + witsmlObj.toString() + ". Status code : " + status);
             LOG.warning("DELETE response: " + response.getBody());
             throw new ValveException("DELETE DoT REST call failed with status code: " + status);
         }
@@ -134,7 +134,7 @@ public class DotDelegator {
             LOG.warning("Bad auth token.");
             throw new ValveAuthException("Bad JWT");
         } else {
-            LOG.warning("Received failure status code from DoT PUT: " + status);
+            LOG.warning("Received failure for " + witsmlObj+ " ,status code from DoT PUT: " + status);
             LOG.warning("PUT response: " + response.getBody());
             throw new ValveException(response.getBody());
         }
@@ -181,7 +181,7 @@ public class DotDelegator {
         // check response status
         int status = response.getStatus();
         if (201 == status || 200 == status) {
-            LOG.info("Received successful status code from DoT create call: " + status);
+            LOG.info("Object successfully created for " +uid+ " .Received successful status code from DoT create call: " + status);
             return uid.isEmpty() ? new JsonNode(response.getBody()).getObject().getString("uid") : uid;
         } else if (401 == status) {
             LOG.warning("Bad auth token.");
@@ -234,7 +234,7 @@ public class DotDelegator {
             LOG.warning("Bad auth token.");
             throw new ValveAuthException("Bad JWT");
         } else {
-            LOG.warning("Received status code from GET call to DoT: " + status);
+            LOG.warning("Unable to execute GET for " + witsmlObject.toString() + " .Received status code from GET call to DoT: " + status);
             LOG.warning("GET response: " + response.getBody());
             throw new ValveException(response.getBody());
         }
