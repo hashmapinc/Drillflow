@@ -24,9 +24,9 @@ import static org.junit.Assert.assertTrue;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
-public class DotAuthTest {
+public class DotClientTest {
 	@Autowired
-	private DotAuth dotAuth;
+	private DotClient dotClient;
 	private String username;
 	private String password;
 
@@ -37,22 +37,22 @@ public class DotAuthTest {
 		String apiKey = "test";
 		//String url = "http://localhost:8080/";
 		String url = "https://witsml.hashmapinc.com:8443/"; // TODO: MOCK THIS
-		dotAuth = new DotAuth(url, apiKey);
+		dotClient = new DotClient(url, apiKey);
 	}
 
 	@Test
 	public void authSuccessScenario() throws UnirestException, Exception {
-		DecodedJWT response = dotAuth.getJWT(username, password);
+		DecodedJWT response = dotClient.getJWT(username, password);
 		System.out.println("decoded JWT is : " + response);
 		assertNotNull(response);
 	}
 
 	@Test
 	public void authCacheSuccessScenario() throws UnirestException, Exception {
-		DecodedJWT response = dotAuth.getJWT(username, password);
+		DecodedJWT response = dotClient.getJWT(username, password);
 		assertNotNull(response);
 		// Second fetch from the cache for the same credentials.
-		DecodedJWT cacheResponse = dotAuth.getJWT(username, password);
+		DecodedJWT cacheResponse = dotClient.getJWT(username, password);
 		assertNotNull(cacheResponse);
 		assertEquals(cacheResponse.getToken(), response.getToken());
 	}
@@ -61,7 +61,7 @@ public class DotAuthTest {
 	public void authFailureScenario() throws UnirestException {
 		try {
 			String badPassword = this.password + "JUNK";
-			DecodedJWT response = dotAuth.getJWT(this.username, badPassword);
+			DecodedJWT response = dotClient.getJWT(this.username, badPassword);
 			assertTrue(null == response);
 		} catch (Exception e) {
 			assertNotNull(true);

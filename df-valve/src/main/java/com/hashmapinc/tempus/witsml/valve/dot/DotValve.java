@@ -18,18 +18,13 @@ package com.hashmapinc.tempus.witsml.valve.dot;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
-import com.auth0.jwt.interfaces.DecodedJWT;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.valve.IValve;
+import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,7 +33,7 @@ public class DotValve implements IValve {
     private static final Logger LOG = Logger.getLogger(DotValve.class.getName());
     private final String NAME = "DoT"; // DoT = Drillops Town
     private final String DESCRIPTION = "Valve for interaction with Drillops Town"; // DoT = Drillops Town
-    private final DotAuth AUTH;
+    private final DotClient CLIENT;
     private final DotDelegator DELEGATOR;
     private final String URL;
     private final String API_KEY;
@@ -46,7 +41,7 @@ public class DotValve implements IValve {
     public DotValve(Map<String, String> config) {
         this.URL = config.get("baseurl");
         this.API_KEY = config.get("apikey");
-        this.AUTH = new DotAuth(this.URL, this.API_KEY);
+        this.CLIENT = new DotClient(this.URL, this.API_KEY);
         this.DELEGATOR = new DotDelegator(this.URL, this.API_KEY);
         LOG.info("Creating valve pointing to url: " + this.URL);
     }
@@ -79,24 +74,18 @@ public class DotValve implements IValve {
     public String getObject(
         QueryContext qc
     ) throws ValveException {
-        // get auth token
-        String tokenString;
-        try {
-            tokenString = this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD).getToken();
-        } catch (Exception e) {
-            LOG.warning("Exception in getObject while authenticating: " + e.getMessage());
-            throw new ValveException(e.getMessage());
-        }
         // handle each object
         ArrayList<AbstractWitsmlObject> queryResponses = new ArrayList<AbstractWitsmlObject>();
         try {
             for (AbstractWitsmlObject witsmlObject: qc.WITSML_OBJECTS) {
-                try {
-                    queryResponses.add(this.DELEGATOR.getObject(witsmlObject, tokenString));
-                } catch (ValveAuthException vae) { // retry once with refreshed token
-                    tokenString = this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD, true).getToken(); // force refresh token
-                    queryResponses.add(this.DELEGATOR.getObject(witsmlObject, tokenString));
-                }
+                queryResponses.add(
+                    this.DELEGATOR.getObject(
+                        witsmlObject,
+                        qc.USERNAME,
+                        qc.PASSWORD,
+                        this.CLIENT
+                    )
+                );
             }
         } catch (Exception e) {
             LOG.warning("Exception in DotValve get object: " + e.getMessage());
@@ -114,27 +103,20 @@ public class DotValve implements IValve {
      */
     @Override
     public String createObject(
-            QueryContext qc
+        QueryContext qc
     ) throws ValveException {
-        // get auth token
-        String tokenString;
-        try {
-            tokenString = this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD).getToken();
-        } catch (Exception e) {
-            LOG.warning("Exception in createObject while authenticating: " + e.getMessage());
-            throw new ValveException(e.getMessage());
-        }
-
         // create each object
         ArrayList<String> uids = new ArrayList<>();
         try {
             for (AbstractWitsmlObject witsmlObject: qc.WITSML_OBJECTS) {
-                try {
-                    uids.add(this.DELEGATOR.createObject(witsmlObject, tokenString));
-                } catch (ValveAuthException vae) { // retry once with refreshed token
-                    tokenString = this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD, true).getToken(); // force refresh token
-                    uids.add(this.DELEGATOR.createObject(witsmlObject, tokenString));
-                }
+                uids.add(
+                    this.DELEGATOR.createObject(
+                        witsmlObject,
+                        qc.USERNAME,
+                        qc.PASSWORD,
+                        this.CLIENT
+                    )
+                );
             }
         } catch (Exception e) {
             LOG.warning("Exception in DotValve create object: " + e.getMessage());
@@ -149,26 +131,17 @@ public class DotValve implements IValve {
      */
     @Override
     public void deleteObject(
-            QueryContext qc
+        QueryContext qc
     ) throws ValveException {
-        // get auth token
-        String tokenString;
-        try {
-            tokenString = this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD).getToken();
-        } catch (Exception e) {
-            LOG.warning("Exception in deleteObject while authenticating: " + e.getMessage());
-            throw new ValveException(e.getMessage());
-        }
-
         // delete each object with 1 retry for bad token errors
         try {
             for (AbstractWitsmlObject witsmlObject : qc.WITSML_OBJECTS) {
-                try {
-                    this.DELEGATOR.deleteObject(witsmlObject, tokenString);
-                } catch (ValveAuthException vae) { // retry once with refreshed token
-                    tokenString = this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD, true).getToken(); // force refresh token
-                    this.DELEGATOR.deleteObject(witsmlObject, tokenString);
-                }
+                this.DELEGATOR.deleteObject(
+                    witsmlObject,
+                    qc.USERNAME,
+                    qc.PASSWORD,
+                    this.CLIENT
+                );
             }
         } catch (Exception e) {
             LOG.warning("Got exception in DotValve delete object: " + e.getMessage());
@@ -184,26 +157,14 @@ public class DotValve implements IValve {
     public void updateObject(
         QueryContext qc
     ) throws ValveException {
-        LOG.info("Updating witsml objects" + qc.WITSML_OBJECTS.toString());
-
-        // get auth token
-        String tokenString;
-        try {
-            tokenString = this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD).getToken();
-        } catch (Exception e) {
-            LOG.warning("Exception in deleteObject while authenticating: " + e.getMessage());
-            throw new ValveException(e.getMessage());
-        }
-
         // update each object with 1 retry for bad tokens
         try {
             for (AbstractWitsmlObject witsmlObject : qc.WITSML_OBJECTS) {
-                try {
-                    this.DELEGATOR.updateObject(witsmlObject, tokenString);
-                } catch (ValveAuthException vae) { // retry once with refreshed token
-                    tokenString = this.AUTH.getJWT(qc.USERNAME, qc.PASSWORD, true).getToken(); // force refresh token
-                    this.DELEGATOR.updateObject(witsmlObject, tokenString);
-                }
+                this.DELEGATOR.updateObject(
+                    witsmlObject,
+                    qc.USERNAME,
+                    qc.PASSWORD,
+                    this.CLIENT);
             }
         } catch (Exception e) {
             LOG.warning("Exception in DotValve update object: " + e.getMessage());
@@ -223,7 +184,7 @@ public class DotValve implements IValve {
         String username,
         String password
     ) throws ValveAuthException {
-        this.AUTH.getJWT(username, password);
+        this.CLIENT.getJWT(username, password);
 	}
 
     /**

@@ -17,7 +17,7 @@ package com.hashmapinc.tempus.witsml.server.api;
 
 import com.hashmapinc.tempus.witsml.valve.IValve;
 import com.hashmapinc.tempus.witsml.valve.ValveFactory;
-import com.hashmapinc.tempus.witsml.valve.dot.ValveAuthException;
+import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
