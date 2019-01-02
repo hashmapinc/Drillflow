@@ -22,7 +22,7 @@ import com.hashmapinc.tempus.witsml.server.api.QueryValidation.ERRORCODE;
 
 interface Validation extends Function<ValidateParam, ValidationResult> {
 	static Validation error401() {
-		return holds(param -> !ValidationCheck.checkWMLTypeEmpty(param.getWMLtypeIn()), ERRORCODE.ERROR_401.value());
+		return holds(param -> !ValidationCheck.checkWell(param.getXMLin()), ERRORCODE.ERROR_401.value());
 	}
 
 	static Validation error402() {
@@ -38,19 +38,19 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 
 	static Validation error405() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_405.value());
+		return holds(param -> !ValidationCheck.checkExistingUID(param.getWMLtypeIn(), param.getXMLin(), param.getOptionsIn(), param.getCapabilitiesIn()), ERRORCODE.ERROR_405.value());
 	}
 
 	static Validation error406() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_406.value());
+		return holds(param -> !ValidationCheck.checkNotNullUid(param.getXMLin()), ERRORCODE.ERROR_406.value());
 	}
 
 	static Validation error407() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_407.value());
+		return holds(param -> !ValidationCheck.checkWMLTypeEmpty(param.getWMLtypeIn()), ERRORCODE.ERROR_407.value());
 	}
 
 	static Validation error408() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_408.value());
+		return holds(param -> !ValidationCheck.checkXMLEmpty(param.getXMLin()), ERRORCODE.ERROR_408.value());
 	}
 
 	static Validation error409() {
@@ -78,19 +78,19 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 
 	static Validation error415() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_415.value());
+		return holds(param -> !ValidationCheck.checkNotNullUid(param.getXMLin()), ERRORCODE.ERROR_415.value());
 	}
 
 	static Validation error416() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_416.value());
+		return holds(param -> !ValidationCheck.checkNotNullUid(param.getXMLin()), ERRORCODE.ERROR_416.value());
 	}
 
 	static Validation error417() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_417.value());
+		return holds(param -> !ValidationCheck.checkNotNullUOM(param.getXMLin()), ERRORCODE.ERROR_417.value());
 	}
 
 	static Validation error418() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_418.value());
+		return holds(param -> !ValidationCheck.checkUniqueUid(param.getXMLin()), ERRORCODE.ERROR_418.value());
 	}
 
 	static Validation error419() {
@@ -122,7 +122,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 
 	static Validation error426() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_426.value());
+		return holds(param -> !ValidationCheck.checkNotNullUid(param.getXMLin()), ERRORCODE.ERROR_426.value());
 	}
 
 	static Validation error427() {
@@ -134,7 +134,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 
 	static Validation error429() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_429.value());
+		return holds(param -> !ValidationCheck.checkLogData(param.getXMLin()), ERRORCODE.ERROR_429.value());
 	}
 
 	static Validation error430() {
@@ -150,7 +150,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 
 	static Validation error433() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_433.value());
+		return holds(param -> !ValidationCheck.checkExistingUID(param.getWMLtypeIn(), param.getXMLin(), param.getOptionsIn(), param.getCapabilitiesIn()), ERRORCODE.ERROR_433.value());
 	}
 
 	static Validation error434() {
@@ -194,15 +194,15 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 
 	static Validation error444() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_444.value());
+		return holds(param -> !ValidationCheck.checkWellforDelete(param.getXMLin()), ERRORCODE.ERROR_444.value());
 	}
 
 	static Validation error445() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_445.value());
+		return holds(param -> !ValidationCheck.checkNodeValue(param.getXMLin()), ERRORCODE.ERROR_445.value());
 	}
 
 	static Validation error446() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_446.value());
+		return holds(param -> !ValidationCheck.checkUomNodeValue(param.getXMLin()), ERRORCODE.ERROR_446.value());
 	}
 
 	static Validation error447() {
@@ -210,19 +210,19 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 
 	static Validation error448() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_448.value());
+		return holds(param -> !ValidationCheck.checkNotNullUid(param.getXMLin()), ERRORCODE.ERROR_448.value());
 	}
 
 	static Validation error449() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_449.value());
+		return holds(param -> !ValidationCheck.checkMnemonicListNotEmpty(param.getXMLin()), ERRORCODE.ERROR_449.value());
 	}
 
 	static Validation error450() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_450.value());
+		return holds(param -> !ValidationCheck.checkMnemonicListUnique(param.getXMLin()), ERRORCODE.ERROR_450.value());
 	}
 
 	static Validation error451() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_451.value());
+		return holds(param -> !ValidationCheck.checkUnitList(param.getXMLin()), ERRORCODE.ERROR_451.value());
 	}
 
 	static Validation error452() {
@@ -230,7 +230,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 
 	static Validation error453() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_453.value());
+		return holds(param -> !ValidationCheck.checkNotNullUOM(param.getXMLin()), ERRORCODE.ERROR_453.value());
 	}
 
 	static Validation error454() {
@@ -254,7 +254,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 
 	static Validation error459() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_459.value());
+		return holds(param -> !ValidationCheck.checkMnemonicForSpecialCharacters(param.getXMLin()), ERRORCODE.ERROR_459.value());
 	}
 
 	static Validation error460() {
