@@ -21,7 +21,7 @@ import java.util.function.Predicate;
 import com.hashmapinc.tempus.witsml.server.api.QueryValidation.ERRORCODE;
 
 interface Validation extends Function<ValidateParam, ValidationResult> {
-	static Validation error401() {
+static Validation error401() {
 		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_401.value());
 	}
 
