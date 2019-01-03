@@ -114,17 +114,22 @@
 					</execution>
 				</executions>
 			</plugin>
-<!--			<plugin>
-				<groupId>org.owasp</groupId>
-				<artifactId>dependency-check-maven</artifactId>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<configuration>
+					<skipTests>${skipITs}</skipTests>
+				</configuration>
 				<executions>
 					<execution>
 						<goals>
-							<goal>check</goal>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
 						</goals>
 					</execution>
 				</executions>
-			</plugin>-->
+			</plugin>
+
 		</plugins>
 	</build>
 
