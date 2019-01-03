@@ -21,24 +21,76 @@ import org.junit.Test;
 
 import org.mockito.Mockito;
 
+import static junit.framework.TestCase.assertEquals;
+import static org.mockito.Mockito.when;
+
 public class DotValveTest {
-	private String username;
-    private String password;
+	private DotClient mockClient;
+    private DotDelegator mockDelegator;
     private DotValve valve;
 
 	@Before
 	public void doSetup() {
-		this.username = "admin";
-        this.password = "12345";
-        DotDelegator delegator = Mockito.mock(DotDelegator.class);
-        DotClient client = Mockito.mock(DotClient.class);
-		valve = new DotValve(client, delegator); // inject mocks into valve
+		this.mockClient = Mockito.mock(DotClient.class);
+		this.mockDelegator = Mockito.mock(DotDelegator.class);
+		this.valve = new DotValve(this.mockClient, this.mockDelegator); // inject mocks into valve
 	}
 
-    @Test(expected = ValveAuthException.class)
-	public void authVerifyException() throws ValveAuthException {
-		String badPassword = this.password + "JUNK";
-		valve.authenticate(username, badPassword);
+	@Test
+	public void shouldGetName() {
+		assertEquals("DoT", this.valve.getName());
+	}
+
+	@Test
+	public void shouldGetDescription() {
+		assertEquals(
+			"Valve for interaction with Drillops Town",
+			this.valve.getDescription()
+		);
+	}
+
+	@Test
+	public void shouldGetSingleObject() {
+	}
+
+	@Test
+	public void shouldGetPluralObject() {
+	}
+
+	@Test
+	public void shouldCreateSingleObject() {
+	}
+
+	@Test
+	public void shouldCreatePluralObject() {
+	}
+
+	@Test
+	public void shouldDeleteSingleObject() {
+	}
+
+	@Test
+	public void shouldDeletePluralObject() {
+	}
+
+	@Test
+	public void shouldUpdateObject() {
+	}
+
+	@Test
+	public void shouldSucceedAuthenticate() {
+	}
+
+	@Test(expected = ValveAuthException.class)
+	public void shouldFailAuthenticate() throws ValveAuthException {
+		// add mock behavior
+		when(this.mockClient.getJWT("badUsername", "badPassword"))
+			.thenThrow(new ValveAuthException(""));
+		valve.authenticate("badUsername", "badPassword");
+	}
+
+	@Test
+	public void shouldGetCap() {
 	}
 }
 
