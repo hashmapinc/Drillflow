@@ -2,12 +2,19 @@ package com.hashmapinc.tempus.witsml.server.api;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -32,7 +39,7 @@ public class ValidationCheck {
     public static String uomAttribute = "uom";
 
     /**
-     * Get XML Document
+     * This method parse the XML Document
      * 
      * @param XMLin
      * @return XML Document object
@@ -51,9 +58,31 @@ public class ValidationCheck {
         doc.getDocumentElement().normalize();
         return doc;
     }
+    
+    /**
+     * This method validates the XMLin against the schemaLocation.
+     * @param xmlFileUrl
+     * @param schemaFileUrl
+     * @return true if the XMLin is validated
+     */
+    private static boolean schemaValidate(String xmlFileUrl, String schemaFileUrl) {
+    	Objects.requireNonNull(xmlFileUrl);
+    	Objects.requireNonNull(schemaFileUrl);
+    	SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI);
+    	try {
+    	Schema schema = schemaFactory.newSchema(new URL(schemaFileUrl));
+
+    	Validator validator = schema.newValidator();
+    	validator.validate(new StreamSource(xmlFileUrl));
+    	return true;
+    	} catch (SAXException | IOException e) {
+    	e.printStackTrace();
+    	return false;
+    	}
+    	}
 
     /**
-     * Check if WML type empty
+     * This method checks for empty WMLType
      * 
      * @param WMLType
      * @return true if empty else false
@@ -67,7 +96,7 @@ public class ValidationCheck {
     }
 
     /**
-     * Check if XML empty
+     * This method checks for XML empty
      * 
      * @param XMLin
      * @return true if empty else false
@@ -81,7 +110,7 @@ public class ValidationCheck {
     }
 
     /**
-     * Check if XML Object equals WML Object
+     * This method check if XML Object equals WML Object
      * 
      * @param XMLin
      * @param WMLType
@@ -96,7 +125,7 @@ public class ValidationCheck {
     }
 
     /**
-     * Check well tag in XML document if available
+     * This method checks for well tag for deleteFromStore
      * 
      * @param XMLin
      * @return true if available else false
@@ -117,7 +146,7 @@ public class ValidationCheck {
     }
 
     /**
-     * Check well tag in XML document
+     * This method checks for multiple well tag in XMLin
      * 
      * @param XMLin
      * @return true if exists else false
@@ -137,6 +166,37 @@ public class ValidationCheck {
         return result;
     }
     
+    /**
+     * This method validates the XMlin schema
+     * @param XMLin
+     * @return true if schema doesn't match
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     * @throws XPathExpressionException
+     */
+    public static boolean validateSchemaCheck(String XMLin)
+            throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
+        boolean result = false;
+        Document doc = getXMLDocument(XMLin);
+        NodeList nodeList = doc.getElementsByTagName("wells");
+        Element eElement = (Element) nodeList;
+        String schemaLocation = eElement.getAttribute("xsi:schemaLocation");
+        if (!ValidationCheck.schemaValidate(XMLin, schemaLocation)) {
+            result = true;
+        }
+        return result;
+    }
+    
+    /**
+     * This method checks checks for the XMl version as supported by the server.
+     * @param XMLin
+     * @return true if they do not match.
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     * @throws XPathExpressionException
+     */
     public static boolean checkSchemaVersion(String XMLin)
             throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
         boolean result = false;
@@ -149,6 +209,15 @@ public class ValidationCheck {
         return result;
     }
     
+    /**
+     * This method checks NameSpace for XMLin
+     * @param XMLin
+     * @return true if check fails
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     * @throws XPathExpressionException
+     */
     public static boolean checkNameSpace(String XMLin)
             throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
         boolean result = false;
@@ -161,7 +230,7 @@ public class ValidationCheck {
         return result;
     }
     /**
-     * Check well tag in XML document
+     * This method checks for logData tag in XMLin
      * 
      * @param XMLin
      * @return true if exists else false
@@ -182,7 +251,7 @@ public class ValidationCheck {
     }
 
     /**
-     * Check if uid is null
+     * This method checks for UID to be null.
      * 
      * @param XMLin
      * @return true if uid is null else false
@@ -211,6 +280,15 @@ public class ValidationCheck {
     }
     
      
+    /**
+     * This method checks for the Node Value to be empty or blank.
+     * @param XMLin
+     * @return true is empty node value is found.
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     * @throws XPathExpressionException
+     */
     public static boolean checkNodeValue(String XMLin)
             throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
         boolean result = false;
@@ -245,7 +323,7 @@ public class ValidationCheck {
     }
 
     /**
-     * Check unique uid
+     * This method checks for unique UID in XMLin
      * 
      * @param XMLin
      * @return true if unique else false
@@ -274,7 +352,7 @@ public class ValidationCheck {
     }
 
     /**
-     * Check existing UID
+     * This method checks for existing UID's with getFromStore
      * 
      * @param WMLtypeIn
      * @param QueryIn
@@ -295,7 +373,7 @@ public class ValidationCheck {
     }
 
     /**
-     * Check if uom attribute is null
+     * This method checks for UOM attribute to be null.
      * 
      * @param XMLin
      * @return true if null else false
@@ -321,6 +399,15 @@ public class ValidationCheck {
         return result;
     }
     
+    /**
+     * This method checks for UOM node value in XMLin.
+     * @param XMLin
+     * @return true if null value exists.
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     * @throws XPathExpressionException
+     */
     public static boolean checkUomNodeValue(String XMLin)
             throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
         boolean result = false;
@@ -337,6 +424,15 @@ public class ValidationCheck {
         return result;
     }
     
+    /**
+     * This methods checks for mnemonic list for empty values.
+     * @param XMLin
+     * @return true if mnemonic list id empty.
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     * @throws XPathExpressionException
+     */
     public static boolean checkMnemonicListNotEmpty(String XMLin)
             throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
         boolean result = false;
@@ -353,6 +449,15 @@ public class ValidationCheck {
         return result;
     }
     
+    /**
+     * This method checks for mnemonic list to be unique.
+     * @param XMLin
+     * @return true if not unique.
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     * @throws XPathExpressionException
+     */
     public static boolean checkMnemonicListUnique(String XMLin)
             throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
         boolean result = false;
@@ -373,6 +478,15 @@ public class ValidationCheck {
         return result;
     }
     
+    /**
+     * This method checks for unitList to be empty
+     * @param XMLin
+     * @return true if unitList is empty.
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     * @throws XPathExpressionException
+     */
     public static boolean checkUnitList(String XMLin)
             throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
         boolean result = false;
@@ -388,7 +502,16 @@ public class ValidationCheck {
         }
         return result;
     }
-
+        
+    /**
+     * This method checks for special characters in mnemonic list
+     * @param XMLin
+     * @return true if special character is found.
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     * @throws XPathExpressionException
+     */
     public static boolean checkMnemonicForSpecialCharacters(String XMLin)
             throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
         boolean result = false;
