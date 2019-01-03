@@ -346,7 +346,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 
 	static Validation error482() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_482.value());
+		return holds(param -> !ValidationCheck.checkMnemonicListUnique(param.getXMLin()), ERRORCODE.ERROR_482.value());
 	}
 
 	static Validation error483() {
@@ -362,7 +362,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 
 	static Validation error486() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_486.value());
+		return holds(param -> !ValidationCheck.checkIfXMLEqualsWMLObj(param.getXMLin(), param.getWMLtypeIn()), ERRORCODE.ERROR_486.value());
 	}
 
 	static Validation error487() {
