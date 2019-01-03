@@ -81,7 +81,7 @@ public class ValidationCheck {
     }
 
     /**
-     * Check if XML equals WML Object
+     * Check if XML Object equals WML Object
      * 
      * @param XMLin
      * @param WMLType

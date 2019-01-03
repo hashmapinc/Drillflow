@@ -48,8 +48,7 @@ public class QueryValidation {
 		switch (witsmlVersion) {
 		case v1311:
 			LOG.info("Going to validate witsml version 1.3.1.1");
-			break;
-
+			return validateAddtoStoreVersion1311(WMLtypeIn, XMLin, OptionsIn, CapabilitiesIn);
 		case v1411:
 			LOG.info("Going to validate witsml version 1.4.1.1");
 			return validateAddtoStoreVersion1411(WMLtypeIn, XMLin, OptionsIn, CapabilitiesIn);
@@ -58,6 +57,101 @@ public class QueryValidation {
 			break;
 		}
 
+		return null;
+	}
+	
+	/**
+	 * This method validates input parameters for getFromStore in StoreImpl, if the
+	 * input is not according to the specs it will return an error code.
+	 * 
+	 * @param WMLtypeIn
+	 * @param XMLin
+	 * @param OptionsIn
+	 * @param CapabilitiesIn
+	 * @param version
+	 * @return an error code according to the specs after checking the parameters.
+	 * @throws IOException
+	 */
+	public static Short validateGetFromStore(String WMLtypeIn, String XMLin, String OptionsIn, String CapabilitiesIn,
+			String version) throws IOException {
+		LOG.info("validating input for getFromStore");
+		WITSMLVERSION witsmlVersion = WITSMLVERSION.valueOf(version);
+
+		switch (witsmlVersion) {
+		case v1311:
+			LOG.info("Going to validate witsml version 1.3.1.1");
+			return validateGetFromStoreVersion1311(WMLtypeIn, XMLin, OptionsIn, CapabilitiesIn);
+		case v1411:
+			LOG.info("Going to validate witsml version 1.4.1.1");
+			return validateGetFromStoreVersion1411(WMLtypeIn, XMLin, OptionsIn, CapabilitiesIn);
+		default:
+			LOG.info("invalid witsml version");
+			break;
+		}
+
+		return null;
+	}
+
+	/**
+	 * This method validates input parameters for updateInStore in StoreImpl, if the
+	 * input is not according to the specs it will return an error code.
+	 * 
+	 * @param WMLtypeIn
+	 * @param XMLin
+	 * @param OptionsIn
+	 * @param CapabilitiesIn
+	 * @param version
+	 * @return an error code according to the specs after checking the parameters.
+	 * @throws IOException
+	 */
+	public static Short validateUpdateInStore(String WMLtypeIn, String XMLin, String OptionsIn, String CapabilitiesIn,
+			String version) throws IOException {
+		LOG.info("validating input for updateInStore");
+		WITSMLVERSION witsmlVersion = WITSMLVERSION.valueOf(version);
+
+		switch (witsmlVersion) {
+		case v1311:
+			LOG.info("Going to validate witsml version 1.3.1.1");
+			return validateUpdateInStoreVersion1311(WMLtypeIn, XMLin, OptionsIn, CapabilitiesIn);
+		case v1411:
+			LOG.info("Going to validate witsml version 1.4.1.1");
+			return validateUpdateInStoreVersion1411(WMLtypeIn, XMLin, OptionsIn, CapabilitiesIn);
+		default:
+			LOG.info("invalid witsml version");
+			break;
+		}
+
+		return null;
+	}
+
+	/**
+	 * This method validates input parameters for deleteFromStore in StoreImpl, if
+	 * the input is not according to the specs it will return an error code.
+	 * 
+	 * @param WMLtypeIn
+	 * @param XMLin
+	 * @param OptionsIn
+	 * @param CapabilitiesIn
+	 * @param version
+	 * @return an error code according to the specs after checking the parameters.
+	 * @throws IOException
+	 */
+	public static Short validateDeleteFromStore(String WMLtypeIn, String XMLin, String OptionsIn,
+			String CapabilitiesIn, String version) throws IOException {
+		LOG.info("validating input for deleteInStore");
+		WITSMLVERSION witsmlVersion = WITSMLVERSION.valueOf(version);
+
+		switch (witsmlVersion) {
+		case v1311:
+			LOG.info("Going to validate witsml version 1.3.1.1");
+			return validateDeleteInStoreVersion1311(WMLtypeIn, XMLin, OptionsIn, CapabilitiesIn);
+		case v1411:
+			LOG.info("Going to validate witsml version 1.4.1.1");
+			return validateDeleteInStoreVersion1411(WMLtypeIn, XMLin, OptionsIn, CapabilitiesIn);
+		default:
+			LOG.info("invalid witsml version");
+			break;
+		}
 		return null;
 	}
 
@@ -77,7 +171,39 @@ public class QueryValidation {
 		return null;
 	}
 	
+	private static Short validateAddtoStoreVersion1311(String WMLtypeIn, String XMLin, String OptionsIn, String CapabilitiesIn)
+			throws IOException {
+		Optional<Short> errorCode = null;
+		// error checking for input parameters for version 1.3.1.1
+		final ValidateParam validateParam = new ValidateParam(WMLtypeIn, XMLin, OptionsIn, CapabilitiesIn);
+		Validation validation = Validation.error407().and(Validation.error408()).and(Validation.error487()).and(Validation.error409()).and(Validation.error426()).and(Validation.error401()).and(Validation.error406()).and(Validation.error464()).and(Validation.error412()).and(Validation.error479()).and(Validation.error466()).and(Validation.error413()).and(Validation.error405()).and(Validation.error481()).and(Validation.error478()).and(Validation.error453()).and(Validation.error443()).and(Validation.error456()).and(Validation.error463()).and(Validation.error999());
+		ValidationResult result = validation.apply(validateParam);
+
+		errorCode = result.getReason();
+		if (errorCode != null && errorCode.isPresent()) {
+			return errorCode.get();
+		}
+
+		return null;
+	}
+	
 	private static Short validateGetFromStoreVersion1411(String WMLtypeIn, String XMLin, String OptionsIn, String CapabilitiesIn)
+			throws IOException {
+		Optional<Short> errorCode = null;
+		// error checking for input parameters for version 1.4.1.1
+		final ValidateParam validateParam = new ValidateParam(WMLtypeIn, XMLin, OptionsIn, CapabilitiesIn);
+		Validation validation = Validation.error407().and(Validation.error408()).and(Validation.error409()).and(Validation.error410()).and(Validation.error426()).and(Validation.error425()).and(Validation.error475()).and(Validation.error476()).and(Validation.error466()).and(Validation.error402()).and(Validation.error479()).and(Validation.error427()).and(Validation.error428()).and(Validation.error477()).and(Validation.error460()).and(Validation.error461()).and(Validation.error462()).and(Validation.error429()).and(Validation.error482()).and(Validation.error999());
+		ValidationResult result = validation.apply(validateParam);
+
+		errorCode = result.getReason();
+		if (errorCode != null && errorCode.isPresent()) {
+			return errorCode.get();
+		}
+
+		return null;
+	}
+	
+	private static Short validateGetFromStoreVersion1311(String WMLtypeIn, String XMLin, String OptionsIn, String CapabilitiesIn)
 			throws IOException {
 		Optional<Short> errorCode = null;
 		// error checking for input parameters for version 1.4.1.1
@@ -109,6 +235,22 @@ public class QueryValidation {
 		return null;
 	}
 	
+	private static Short validateUpdateInStoreVersion1311(String WMLtypeIn, String XMLin, String OptionsIn, String CapabilitiesIn)
+			throws IOException {
+		Optional<Short> errorCode = null;
+		// error checking for input parameters for version 1.4.1.1
+		final ValidateParam validateParam = new ValidateParam(WMLtypeIn, XMLin, OptionsIn, CapabilitiesIn);
+		Validation validation = Validation.error407().and(Validation.error408()).and(Validation.error409()).and(Validation.error426()).and(Validation.error479()).and(Validation.error466()).and(Validation.error433()).and(Validation.error464()).and(Validation.error415()).and(Validation.error444()).and(Validation.error401()).and(Validation.error484()).and(Validation.error445()).and(Validation.error464()).and(Validation.error453()).and(Validation.error443()).and(Validation.error446()).and(Validation.error456()).and(Validation.error463()).and(Validation.error480()).and(Validation.error436()).and(Validation.error434()).and(Validation.error449()).and(Validation.error451()).and(Validation.error452()).and(Validation.error999());
+		ValidationResult result = validation.apply(validateParam);
+
+		errorCode = result.getReason();
+		if (errorCode != null && errorCode.isPresent()) {
+			return errorCode.get();
+		}
+
+		return null;
+	}
+	
 	private static Short validateDeleteInStoreVersion1411(String WMLtypeIn, String XMLin, String OptionsIn, String CapabilitiesIn)
 			throws IOException {
 		Optional<Short> errorCode = null;
@@ -124,111 +266,24 @@ public class QueryValidation {
 
 		return null;
 	}
+	
+	private static Short validateDeleteInStoreVersion1311(String WMLtypeIn, String XMLin, String OptionsIn, String CapabilitiesIn)
+			throws IOException {
+		Optional<Short> errorCode = null;
+		// error checking for input parameters for version 1.4.1.1
+		final ValidateParam validateParam = new ValidateParam(WMLtypeIn, XMLin, OptionsIn, CapabilitiesIn);
+		Validation validation = Validation.error407().and(Validation.error408()).and(Validation.error433()).and(Validation.error414()).and(Validation.error472()).and(Validation.error466()).and(Validation.error415()).and(Validation.error444()).and(Validation.error416()).and(Validation.error417()).and(Validation.error418()).and(Validation.error419()).and(Validation.error420()).and(Validation.error437()).and(Validation.error999());
+		ValidationResult result = validation.apply(validateParam);
 
-	/**
-	 * This method validates input parameters for getFromStore in StoreImpl, if the
-	 * input is not according to the specs it will return an error code.
-	 * 
-	 * @param WMLtypeIn
-	 * @param XMLin
-	 * @param OptionsIn
-	 * @param CapabilitiesIn
-	 * @param version
-	 * @return an error code according to the specs after checking the parameters.
-	 * @throws IOException
-	 */
-	public static Short validateGetFromStore(String WMLtypeIn, String XMLin, String OptionsIn, String CapabilitiesIn,
-			String version) throws IOException {
-		LOG.info("validating input for getFromStore");
-		WITSMLVERSION witsmlVersion = WITSMLVERSION.valueOf(version);
-
-		switch (witsmlVersion) {
-		case v1311:
-			LOG.info("Going to validate witsml version 1.3.1.1");
-			break;
-
-		case v1411:
-			LOG.info("Going to validate witsml version 1.4.1.1");
-			validateGetFromStoreVersion1411(WMLtypeIn, XMLin, OptionsIn, CapabilitiesIn);
-			break;
-
-		default:
-			LOG.info("invalid witsml version");
-			break;
+		errorCode = result.getReason();
+		if (errorCode != null && errorCode.isPresent()) {
+			return errorCode.get();
 		}
 
 		return null;
 	}
 
-	/**
-	 * This method validates input parameters for updateInStore in StoreImpl, if the
-	 * input is not according to the specs it will return an error code.
-	 * 
-	 * @param WMLtypeIn
-	 * @param XMLin
-	 * @param OptionsIn
-	 * @param CapabilitiesIn
-	 * @param version
-	 * @return an error code according to the specs after checking the parameters.
-	 * @throws IOException
-	 */
-	public static Short validateUpdateInStore(String WMLtypeIn, String XMLin, String OptionsIn, String CapabilitiesIn,
-			String version) throws IOException {
-		LOG.info("validating input for updateInStore");
-		WITSMLVERSION witsmlVersion = WITSMLVERSION.valueOf(version);
-
-		switch (witsmlVersion) {
-		case v1311:
-			LOG.info("Going to validate witsml version 1.3.1.1");
-			break;
-
-		case v1411:
-			LOG.info("Going to validate witsml version 1.4.1.1");
-			validateUpdateInStoreVersion1411(WMLtypeIn, XMLin, OptionsIn, CapabilitiesIn);
-			break;
-
-		default:
-			LOG.info("invalid witsml version");
-			break;
-		}
-
-		return null;
-	}
-
-	/**
-	 * This method validates input parameters for deleteFromStore in StoreImpl, if
-	 * the input is not according to the specs it will return an error code.
-	 * 
-	 * @param WMLtypeIn
-	 * @param XMLin
-	 * @param OptionsIn
-	 * @param CapabilitiesIn
-	 * @param version
-	 * @return an error code according to the specs after checking the parameters.
-	 * @throws IOException
-	 */
-	public static Short validateDeleteFromStore(String WMLtypeIn, String XMLin, String OptionsIn,
-			String CapabilitiesIn, String version) throws IOException {
-		LOG.info("validating input for deleteInStore");
-		WITSMLVERSION witsmlVersion = WITSMLVERSION.valueOf(version);
-
-		switch (witsmlVersion) {
-		case v1311:
-			LOG.info("Going to validate witsml version 1.3.1.1");
-			break;
-
-		case v1411:
-			LOG.info("Going to validate witsml version 1.4.1.1");
-			validateDeleteInStoreVersion1411(WMLtypeIn, XMLin, OptionsIn, CapabilitiesIn);
-			break;
-
-		default:
-			LOG.info("invalid witsml version");
-			break;
-		}
-		return null;
-	}
-
+	
 	/**
 	 * This method gets the errorMessage from the basemessages.properties file based
 	 * on the errorCode
