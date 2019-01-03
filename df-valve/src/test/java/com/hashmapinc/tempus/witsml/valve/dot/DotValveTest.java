@@ -16,24 +16,16 @@
 package com.hashmapinc.tempus.witsml.valve.dot;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
-import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell;
-import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore;
 import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
-import com.hashmapinc.tempus.witsml.valve.ValveException;
-import com.mashape.unirest.http.exceptions.UnirestException;
 import org.junit.Before;
 import org.junit.Test;
 
 import org.mockito.Mockito;
 
-import javax.xml.bind.JAXBException;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.mockito.Mockito.when;
@@ -97,7 +89,54 @@ public class DotValveTest {
 	}
 
 	@Test
-	public void shouldGetPluralObject() {
+	public void shouldGetPluralObject() throws Exception {
+		// build witsmlObjects list
+		ArrayList<AbstractWitsmlObject> witsmlObjects;
+		witsmlObjects = new ArrayList<>();
+
+		ObjWellbore wellboreA = new ObjWellbore();
+		wellboreA.setName("wellbore-A");
+		wellboreA.setUid("wellbore-A");
+		witsmlObjects.add(wellboreA);
+
+		ObjWellbore wellboreB = new ObjWellbore();
+		wellboreB.setName("wellbore-B");
+		wellboreB.setUid("wellbore-B");
+		witsmlObjects.add(wellboreB);
+
+
+		// build query context
+		QueryContext qc = new QueryContext(
+			"1.3.1.1",
+			"wellbore",
+			null,
+			"",
+			witsmlObjects,
+			"goodUsername",
+			"goodPassword",
+			"shouldGetPluralObject" // exchange ID
+		);
+
+
+		// mock delegator behavior
+		when(
+			this.mockDelegator.getObject(wellboreA, qc.USERNAME, qc.PASSWORD, this.mockClient)
+		).thenReturn(wellboreA);
+		when(
+			this.mockDelegator.getObject(wellboreB, qc.USERNAME, qc.PASSWORD, this.mockClient)
+		).thenReturn(wellboreB);
+
+
+		// test getObject
+		String expected = // expected = merge wellboreA and wellbore B
+			wellboreA.getXMLString("1.3.1.1").replace("</wellbores>", "") +
+			wellboreB.getXMLString("1.3.1.1").replace(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" +
+				"<wellbores version=\"1.3.1.1\" xmlns=\"http://www.witsml.org/schemas/131\">",
+				""
+			);
+		String actual = this.valve.getObject(qc);
+		assertEquals(expected, actual);
 	}
 
 	@Test
