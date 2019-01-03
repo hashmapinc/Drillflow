@@ -91,7 +91,6 @@ public class DotDelegator {
         // check response status
         int status = response.getStatus();
         if (201 == status || 200 == status || 204 == status) {
-
             LOG.info("Successfully Deleted "+witsmlObj.toString() +". Status code : " + status);
         } else if (401 == status) {
             LOG.warning("Bad auth token.");
