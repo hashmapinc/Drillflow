@@ -37,7 +37,8 @@ public class DotClientTest {
 		String apiKey = "test";
 		//String url = "http://localhost:8080/";
 		String url = "https://witsml.hashmapinc.com:8443/"; // TODO: MOCK THIS
-		dotClient = new DotClient(url, apiKey);
+		String tokenPath = "token/jwt/v1/";
+		dotClient = new DotClient(url, apiKey, tokenPath);
 	}
 
 	@Test

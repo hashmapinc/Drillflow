@@ -52,6 +52,9 @@ public class DotValveTest {
         config.put("baseurl", "https://witsml.hashmapinc.com:8443/"); // TODO: MOCK THIS
         //config.put("baseurl", "http://localhost:8080/"); // TODO: MOCK THIS
         config.put("apikey", "COOLAPIKEY");
+        config.put("well.path", "democore/well/v2/witsml/wells/");
+        config.put("token.path", "token/jwt/v1/");
+        config.put("wellbore.path", "democore/well/v2/witsml/wells/");
 		valve = new DotValve(config);
 	}
 
