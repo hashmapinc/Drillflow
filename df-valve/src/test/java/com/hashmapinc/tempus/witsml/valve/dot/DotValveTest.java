@@ -15,11 +15,25 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
+import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells;
+import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
+import com.hashmapinc.tempus.witsml.valve.ValveException;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import org.junit.Before;
 import org.junit.Test;
 
 import org.mockito.Mockito;
+
+import javax.xml.bind.JAXBException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.mockito.Mockito.when;
@@ -50,7 +64,36 @@ public class DotValveTest {
 	}
 
 	@Test
-	public void shouldGetSingleObject() {
+	public void shouldGetSingleObject() throws Exception {
+		// build well list
+		ArrayList<AbstractWitsmlObject> witsmlObjects;
+		witsmlObjects = new ArrayList<>();
+		ObjWell well = new ObjWell();
+		well.setName("well-1");
+		well.setUid("well-1");
+		witsmlObjects.add(well);
+
+		// build query context
+		QueryContext qc = new QueryContext(
+			"1.3.1.1",
+			"well",
+			null,
+			"",
+			witsmlObjects,
+			"goodUsername",
+			"goodPassword",
+			"shouldGetSingleObject" // exchange ID
+		);
+
+		// mock delegator behavior
+		when(
+			this.mockDelegator.getObject(well, qc.USERNAME, qc.PASSWORD, this.mockClient)
+		).thenReturn(well);
+
+		// test getObject
+		String expected = well.getXMLString("1.3.1.1");
+		String actual = this.valve.getObject(qc);
+		assertEquals(expected, actual);
 	}
 
 	@Test
