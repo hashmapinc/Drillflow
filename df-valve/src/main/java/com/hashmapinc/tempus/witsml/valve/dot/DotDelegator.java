@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
+import java.util.Map;
 import java.util.logging.Logger;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
@@ -32,9 +33,14 @@ public class DotDelegator {
     private static final Logger LOG = Logger.getLogger(DotDelegator.class.getName());
 
     private final String URL;
+    private final String WELL_PATH;
+    private final String WB_PATH;
 
-    public DotDelegator(String url, String apiKey) {
-        this.URL = url;
+
+    public DotDelegator(Map<String, String> config) {
+        this.URL = config.get("baseurl");
+        this.WELL_PATH = config.get("well.path");
+        this.WB_PATH = config.get("wellbore.path");
     }
 
     /**
@@ -51,10 +57,10 @@ public class DotDelegator {
         String endpoint;
         switch (objectType) { // TODO: add support for log and trajectory
             case "well":
-                endpoint = this.URL + "/democore/well/v2/witsml/wells/";
+                endpoint = this.URL + this.WELL_PATH;
                 break;
             case "wellbore":
-                endpoint = this.URL + "/democore/wellbore/v1/witsml/wellbores/";
+                endpoint = this.URL + this.WB_PATH;
                 break;
             default:
                 throw new ValveException("Unsupported object type<" + objectType + ">");

@@ -34,6 +34,7 @@ import com.mashape.unirest.request.HttpRequest;
 public class DotClient {
     private static final Logger LOG = Logger.getLogger(DotClient.class.getName());
     private final String URL;
+    private final String TOKEN_PATH;
     private final String API_KEY;
     private Map<String, DecodedJWT> cache;
 
@@ -43,9 +44,10 @@ public class DotClient {
      * @param URL
      * @param API_KEY
      */
-    public DotClient(String URL, String API_KEY) {
+    public DotClient(String URL, String API_KEY, String tokenPath) {
         this.URL = URL;
         this.API_KEY = API_KEY;
+        this.TOKEN_PATH = tokenPath;
         this.cache = new HashMap<String, DecodedJWT>();
     }
 
@@ -64,7 +66,7 @@ public class DotClient {
             String payload = "{\"account\":\"" + username + "\", \"password\":\"" + password + "\"}";
 
             // send request
-            HttpResponse<String> response = Unirest.post(URL + "token/jwt/v1/")
+            HttpResponse<String> response = Unirest.post(URL + this.TOKEN_PATH)
                     .header("accept", "application/json")
                     .header("Ocp-Apim-Subscription-Key", this.API_KEY)
                     .body(payload)

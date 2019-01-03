@@ -41,8 +41,9 @@ public class DotValve implements IValve {
     public DotValve(Map<String, String> config) {
         this.URL = config.get("baseurl");
         this.API_KEY = config.get("apikey");
-        this.CLIENT = new DotClient(this.URL, this.API_KEY);
-        this.DELEGATOR = new DotDelegator(this.URL, this.API_KEY);
+        String tokenPath = config.get("token.path");
+        this.CLIENT = new DotClient(this.URL, this.API_KEY, tokenPath);
+        this.DELEGATOR = new DotDelegator(config);
         LOG.info("Creating valve pointing to url: " + this.URL);
     }
 
