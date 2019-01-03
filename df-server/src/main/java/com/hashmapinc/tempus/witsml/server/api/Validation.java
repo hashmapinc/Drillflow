@@ -30,7 +30,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 
 	static Validation error403() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_403.value());
+		return holds(param -> !ValidationCheck.checkNameSpace(param.getXMLin()), ERRORCODE.ERROR_403.value());
 	}
 
 	static Validation error404() {
@@ -270,11 +270,11 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 
 	static Validation error463() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_463.value());
+		return holds(param -> !ValidationCheck.checkUniqueUid(param.getXMLin()), ERRORCODE.ERROR_463.value());
 	}
 
 	static Validation error464() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_464.value());
+		return holds(param -> !ValidationCheck.checkUniqueUid(param.getXMLin()), ERRORCODE.ERROR_464.value());
 	}
 
 	static Validation error465() {
@@ -290,7 +290,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 
 	static Validation error468() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_468.value());
+		return holds(param -> !ValidationCheck.checkSchemaVersion(param.getXMLin()), ERRORCODE.ERROR_468.value());
 	}
 
 	static Validation error469() {

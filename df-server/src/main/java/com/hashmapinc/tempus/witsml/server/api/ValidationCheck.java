@@ -137,6 +137,29 @@ public class ValidationCheck {
         return result;
     }
     
+    public static boolean checkSchemaVersion(String XMLin)
+            throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
+        boolean result = false;
+        Document doc = getXMLDocument(XMLin);
+        NodeList nodeList = doc.getElementsByTagName("wells");
+        Element eElement = (Element) nodeList;
+        if (eElement.getAttribute("Version")!="1.3.1.1"||eElement.getAttribute("Version")!="1.4.1.1") {
+            result = true;
+        }
+        return result;
+    }
+    
+    public static boolean checkNameSpace(String XMLin)
+            throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
+        boolean result = false;
+        Document doc = getXMLDocument(XMLin);
+        NodeList nodeList = doc.getElementsByTagName("wells");
+        Element eElement = (Element) nodeList;
+        if (eElement.getAttribute("xmlns").isBlank()||eElement.getAttribute("xmlns").isEmpty()) {
+            result = true;
+        }
+        return result;
+    }
     /**
      * Check well tag in XML document
      * 
@@ -187,6 +210,7 @@ public class ValidationCheck {
         return result;
     }
     
+     
     public static boolean checkNodeValue(String XMLin)
             throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
         boolean result = false;
