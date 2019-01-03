@@ -42,6 +42,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>11</java.version>
         <main.dir>${basedir}</main.dir>
+		<skipITs>true</skipITs>
 	</properties>
 
 	<build>
@@ -118,7 +119,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<configuration>
-					<skipTests>true</skipTests>
+					<skipTests>${skipITs}</skipTests>
 				</configuration>
 				<executions>
 					<execution>
