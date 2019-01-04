@@ -45,7 +45,6 @@ import java.util.logging.Logger;
  * @author
  *
  */
-
 public class QueryValidation {
 
     private static final Logger LOG = Logger.getLogger(QueryValidation.class.getName());
