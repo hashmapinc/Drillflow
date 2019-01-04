@@ -169,7 +169,7 @@ public class DotClient {
             String username,
             String password,
             int numRetries
-    ) throws ValveException, UnirestException, ValveAuthException {
+    ) throws UnirestException, ValveAuthException {
         // get jwt
         String tokenString = this.getJWT(username, password).getToken();
 
