@@ -28,7 +28,7 @@ import org.mockito.Mockito;
 import java.util.ArrayList;
 
 import static junit.framework.TestCase.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class DotValveTest {
 	private DotClient mockClient;
@@ -82,7 +82,7 @@ public class DotValveTest {
 			this.mockDelegator.getObject(well, qc.USERNAME, qc.PASSWORD, this.mockClient)
 		).thenReturn(well);
 
-		// test getObject
+		// test
 		String expected = well.getXMLString("1.3.1.1");
 		String actual = this.valve.getObject(qc);
 		assertEquals(expected, actual);
@@ -127,7 +127,7 @@ public class DotValveTest {
 		).thenReturn(wellboreB);
 
 
-		// test getObject
+		// test
 		String expected = // expected = merge wellboreA and wellbore B
 			wellboreA.getXMLString("1.3.1.1").replace("</wellbores>", "") +
 			wellboreB.getXMLString("1.3.1.1").replace(
@@ -170,7 +170,7 @@ public class DotValveTest {
 		).thenReturn(wellboreA.getUid());
 
 
-		// test getObject
+		// test
 		String expected = wellboreA.getUid();
 		String actual = this.valve.createObject(qc);
 		assertEquals(expected, actual);
@@ -211,22 +211,88 @@ public class DotValveTest {
 			this.mockDelegator.createObject(wellboreA, qc.USERNAME, qc.PASSWORD, this.mockClient)
 		).thenReturn(wellboreA.getUid());
 		when(
-				this.mockDelegator.createObject(wellboreB, qc.USERNAME, qc.PASSWORD, this.mockClient)
+			this.mockDelegator.createObject(wellboreB, qc.USERNAME, qc.PASSWORD, this.mockClient)
 		).thenReturn(wellboreB.getUid());
 
 
-		// test getObject
+		// test
 		String expected = wellboreA.getUid() + "," + wellboreB.getUid();
 		String actual = this.valve.createObject(qc);
 		assertEquals(expected, actual);
 	}
 
 	@Test
-	public void shouldDeleteSingleObject() {
+	public void shouldDeleteSingleObject() throws Exception {
+		// build witsmlObjects list
+		ArrayList<AbstractWitsmlObject> witsmlObjects;
+		witsmlObjects = new ArrayList<>();
+
+		ObjWellbore wellboreA = new ObjWellbore();
+		wellboreA.setName("wellbore-A");
+		wellboreA.setUid("wellbore-A");
+		witsmlObjects.add(wellboreA);
+
+
+		// build query context
+		QueryContext qc = new QueryContext(
+				"1.3.1.1",
+				"wellbore",
+				null,
+				"",
+				witsmlObjects,
+				"goodUsername",
+				"goodPassword",
+				"shouldCreatePluralObject" // exchange ID
+		);
+
+
+		// test getObject
+		this.valve.deleteObject(qc);
+
+
+		// verify
+		verify(this.mockDelegator).deleteObject(wellboreA, qc.USERNAME, qc.PASSWORD, this.mockClient);
+		verifyNoMoreInteractions(this.mockDelegator);
 	}
 
 	@Test
-	public void shouldDeletePluralObject() {
+	public void shouldDeletePluralObject() throws Exception {
+		// build witsmlObjects list
+		ArrayList<AbstractWitsmlObject> witsmlObjects;
+		witsmlObjects = new ArrayList<>();
+
+		ObjWellbore wellboreA = new ObjWellbore();
+		wellboreA.setName("wellbore-A");
+		wellboreA.setUid("wellbore-A");
+		witsmlObjects.add(wellboreA);
+
+		ObjWellbore wellboreB = new ObjWellbore();
+		wellboreB.setName("wellbore-B");
+		wellboreB.setUid("wellbore-B");
+		witsmlObjects.add(wellboreB);
+
+
+		// build query context
+		QueryContext qc = new QueryContext(
+			"1.3.1.1",
+			"wellbore",
+			null,
+			"",
+			witsmlObjects,
+			"goodUsername",
+			"goodPassword",
+			"shouldCreatePluralObject" // exchange ID
+		);
+
+
+		// test getObject
+		this.valve.deleteObject(qc);
+
+
+		// verify
+		verify(this.mockDelegator).deleteObject(wellboreA, qc.USERNAME, qc.PASSWORD, this.mockClient);
+		verify(this.mockDelegator).deleteObject(wellboreB, qc.USERNAME, qc.PASSWORD, this.mockClient);
+		verifyNoMoreInteractions(this.mockDelegator);
 	}
 
 	@Test
