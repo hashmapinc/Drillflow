@@ -15,6 +15,8 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore;
@@ -235,14 +237,14 @@ public class DotValveTest {
 
 		// build query context
 		QueryContext qc = new QueryContext(
-				"1.3.1.1",
-				"wellbore",
-				null,
-				"",
-				witsmlObjects,
-				"goodUsername",
-				"goodPassword",
-				"shouldCreatePluralObject" // exchange ID
+			"1.3.1.1",
+			"wellbore",
+			null,
+			"",
+			witsmlObjects,
+			"goodUsername",
+			"goodPassword",
+			"shouldDeleteSingleObject" // exchange ID
 		);
 
 
@@ -281,7 +283,7 @@ public class DotValveTest {
 			witsmlObjects,
 			"goodUsername",
 			"goodPassword",
-			"shouldCreatePluralObject" // exchange ID
+			"shouldDeletePluralObject" // exchange ID
 		);
 
 
@@ -296,11 +298,53 @@ public class DotValveTest {
 	}
 
 	@Test
-	public void shouldUpdateObject() {
+	public void shouldUpdateObject() throws Exception {
+		// build witsmlObjects list
+		ArrayList<AbstractWitsmlObject> witsmlObjects;
+		witsmlObjects = new ArrayList<>();
+
+		ObjWellbore wellboreA = new ObjWellbore();
+		wellboreA.setName("wellbore-A");
+		wellboreA.setUid("wellbore-A");
+		witsmlObjects.add(wellboreA);
+
+		// build query context
+		QueryContext qc = new QueryContext(
+			"1.3.1.1",
+			"wellbore",
+			null,
+			"",
+			witsmlObjects,
+			"goodUsername",
+			"goodPassword",
+			"shouldUpdateObject" // exchange ID
+		);
+
+
+		// test getObject
+		this.valve.updateObject(qc);
+
+
+		// verify
+		verify(this.mockDelegator).updateObject(wellboreA, qc.USERNAME, qc.PASSWORD, this.mockClient);
+		verifyNoMoreInteractions(this.mockDelegator);
 	}
 
 	@Test
-	public void shouldSucceedAuthenticate() {
+	public void shouldSucceedAuthenticate() throws Exception {
+		// mock behavior
+		when(this.mockClient.getJWT("goodUsername", "goodPassword"))
+			.thenReturn(JWT.decode( // using dummy token string from https://jwt.io/
+				"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiR29vZCBUb2tlbiJ9.II4bNgtahHhV4jl7dgGn8CGjVxZWwBMZht-4LXeqB_Y"
+			)
+		);
+
+		// test
+		this.valve.authenticate("goodUsername", "goodPassword");
+
+		// verify
+		verify(this.mockClient).getJWT("goodUsername", "goodPassword");
+		verifyNoMoreInteractions(this.mockClient);
 	}
 
 	@Test(expected = ValveAuthException.class)
@@ -308,7 +352,9 @@ public class DotValveTest {
 		// add mock behavior
 		when(this.mockClient.getJWT("badUsername", "badPassword"))
 			.thenThrow(new ValveAuthException(""));
-		valve.authenticate("badUsername", "badPassword");
+
+		// test
+		this.valve.authenticate("badUsername", "badPassword");
 	}
 
 	@Test
