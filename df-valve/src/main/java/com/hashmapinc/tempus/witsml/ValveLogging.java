@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.hashmapinc.tempus.witsml;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
@@ -23,8 +22,6 @@ public class ValveLogging {
 	private String message;
 	private AbstractWitsmlObject abstObject;
 
-	public ValveLogging() {}
-	
 	public ValveLogging(String id, String message, AbstractWitsmlObject abstObject) {
 		this.abstObject = abstObject;
 		this.message = message;
