@@ -140,7 +140,40 @@ public class DotValveTest {
 	}
 
 	@Test
-	public void shouldCreateSingleObject() {
+	public void shouldCreateSingleObject() throws Exception {
+		// build witsmlObjects list
+		ArrayList<AbstractWitsmlObject> witsmlObjects;
+		witsmlObjects = new ArrayList<>();
+
+		ObjWellbore wellboreA = new ObjWellbore();
+		wellboreA.setName("wellbore-A");
+		wellboreA.setUid("wellbore-A");
+		witsmlObjects.add(wellboreA);
+
+
+		// build query context
+		QueryContext qc = new QueryContext(
+				"1.3.1.1",
+				"wellbore",
+				null,
+				"",
+				witsmlObjects,
+				"goodUsername",
+				"goodPassword",
+				"shouldCreateSingleObject" // exchange ID
+		);
+
+
+		// mock delegator behavior
+		when(
+			this.mockDelegator.createObject(wellboreA, qc.USERNAME, qc.PASSWORD, this.mockClient)
+		).thenReturn(wellboreA.getUid());
+
+
+		// test getObject
+		String expected = wellboreA.getUid();
+		String actual = this.valve.createObject(qc);
+		assertEquals(expected, actual);
 	}
 
 	@Test
