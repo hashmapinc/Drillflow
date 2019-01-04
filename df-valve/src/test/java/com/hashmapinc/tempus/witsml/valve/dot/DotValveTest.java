@@ -28,8 +28,10 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Map;
 
-import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.*;
 import static org.mockito.Mockito.*;
 
 public class DotValveTest {
@@ -359,6 +361,32 @@ public class DotValveTest {
 
 	@Test
 	public void shouldGetCap() {
+		// get cap
+		Map<String, AbstractWitsmlObject[]> cap = this.valve.getCap();
+
+		// verify keys
+		assertFalse(cap.isEmpty());
+		assertTrue(cap.containsKey("WMLS_AddToStore"));
+		assertTrue(cap.containsKey("WMLS_GetFromStore"));
+		assertTrue(cap.containsKey("WMLS_DeleteFromStore"));
+		assertTrue(cap.containsKey("WMLS_UpdateInStore"));
+
+
+		// get values
+		AbstractWitsmlObject[] actualAddObjects = 	 cap.get("WMLS_AddToStore");
+		AbstractWitsmlObject[] actualGetObjects = 	 cap.get("WMLS_GetFromStore");
+		AbstractWitsmlObject[] actualDeleteObjects = cap.get("WMLS_DeleteFromStore");
+		AbstractWitsmlObject[] actualUpdateObjects = cap.get("WMLS_UpdateInStore");
+
+		// verify values
+		assertEquals("well", 	 actualAddObjects[0].getObjectType());
+		assertEquals("wellbore", actualAddObjects[1].getObjectType());
+		assertEquals("well", 	 actualGetObjects[0].getObjectType());
+		assertEquals("wellbore", actualGetObjects[1].getObjectType());
+		assertEquals("well", 	 actualDeleteObjects[0].getObjectType());
+		assertEquals("wellbore", actualDeleteObjects[1].getObjectType());
+		assertEquals("well", 	 actualUpdateObjects[0].getObjectType());
+		assertEquals("wellbore", actualUpdateObjects[1].getObjectType());
 	}
 }
 
