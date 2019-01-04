@@ -153,14 +153,14 @@ public class DotValveTest {
 
 		// build query context
 		QueryContext qc = new QueryContext(
-				"1.3.1.1",
-				"wellbore",
-				null,
-				"",
-				witsmlObjects,
-				"goodUsername",
-				"goodPassword",
-				"shouldCreateSingleObject" // exchange ID
+			"1.3.1.1",
+			"wellbore",
+			null,
+			"",
+			witsmlObjects,
+			"goodUsername",
+			"goodPassword",
+			"shouldCreateSingleObject" // exchange ID
 		);
 
 
@@ -177,7 +177,48 @@ public class DotValveTest {
 	}
 
 	@Test
-	public void shouldCreatePluralObject() {
+	public void shouldCreatePluralObject() throws Exception {
+		// build witsmlObjects list
+		ArrayList<AbstractWitsmlObject> witsmlObjects;
+		witsmlObjects = new ArrayList<>();
+
+		ObjWellbore wellboreA = new ObjWellbore();
+		wellboreA.setName("wellbore-A");
+		wellboreA.setUid("wellbore-A");
+		witsmlObjects.add(wellboreA);
+
+		ObjWellbore wellboreB = new ObjWellbore();
+		wellboreB.setName("wellbore-B");
+		wellboreB.setUid("wellbore-B");
+		witsmlObjects.add(wellboreB);
+
+
+		// build query context
+		QueryContext qc = new QueryContext(
+			"1.3.1.1",
+			"wellbore",
+			null,
+			"",
+			witsmlObjects,
+			"goodUsername",
+			"goodPassword",
+			"shouldCreatePluralObject" // exchange ID
+		);
+
+
+		// mock delegator behavior
+		when(
+			this.mockDelegator.createObject(wellboreA, qc.USERNAME, qc.PASSWORD, this.mockClient)
+		).thenReturn(wellboreA.getUid());
+		when(
+				this.mockDelegator.createObject(wellboreB, qc.USERNAME, qc.PASSWORD, this.mockClient)
+		).thenReturn(wellboreB.getUid());
+
+
+		// test getObject
+		String expected = wellboreA.getUid() + "," + wellboreB.getUid();
+		String actual = this.valve.createObject(qc);
+		assertEquals(expected, actual);
 	}
 
 	@Test
