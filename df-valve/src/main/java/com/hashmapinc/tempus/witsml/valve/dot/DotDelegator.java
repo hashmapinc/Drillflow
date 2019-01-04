@@ -75,22 +75,16 @@ public class DotDelegator {
 	public void deleteObject(AbstractWitsmlObject witsmlObj, String username, String password, DotClient client)
 			throws ValveException, UnirestException, ValveAuthException {
 		String uid = witsmlObj.getUid(); // get uid for delete call
-		String objectType = witsmlObj.getObjectType(); // get obj type for
-														// exception handling
-		String endpoint = this.getEndpoint(objectType) + uid; // add uid for
-																// delete call
-
+		String objectType = witsmlObj.getObjectType(); // get obj type for exception handling
+		String endpoint = this.getEndpoint(objectType) + uid; // add uid for delete call
+															
 		// create request
 		HttpRequest request = Unirest.delete(endpoint).header("Content-Type", "application/json");
 		ValveLogging valveLoggingRequest = new ValveLogging(witsmlObj.getUid(), logRequest(request), witsmlObj);
 		LOG.info(valveLoggingRequest.toString());
 		if ("wellbore".equals(objectType))
-			request.queryString("uidWell", witsmlObj.getParentUid()); // TODO:
-																		// ensure
-																		// parent
-																		// uid
-																		// exists?
-
+			request.queryString("uidWell", witsmlObj.getParentUid()); // TODO: ensure parent uid exists?
+																		
 		// make the DELETE call.
 		HttpResponse<String> response = client.makeRequest(request, username, password);
 		// check response status
@@ -185,11 +179,8 @@ public class DotDelegator {
 
 			// for objects that need it, provide parent uid as param
 			if ("wellbore".equals(objectType))
-				request.queryString("uidWell", witsmlObj.getParentUid()); // TODO:
-																			// error
-																			// handle
-																			// this?
-		}
+				request.queryString("uidWell", witsmlObj.getParentUid()); // TODO: error handle this?
+	     		}
 
 		// add the header and payload
 		request.header("Content-Type", "application/json");
@@ -229,20 +220,14 @@ public class DotDelegator {
 			DotClient client) throws ValveException, ValveAuthException, UnirestException {
 		String uid = witsmlObject.getUid();
 		String objectType = witsmlObject.getObjectType();
-		String endpoint = this.getEndpoint(objectType) + uid; // add uid for
-																// rest call
-
+		String endpoint = this.getEndpoint(objectType) + uid; // add uid for rest call
+																
 		// build request
 		HttpRequest request = Unirest.get(endpoint);
 		request.header("accept", "application/json");
 		if ("wellbore".equals(objectType))
-			request.queryString("uidWell", witsmlObject.getParentUid()); // TODO:
-																			// check
-																			// that
-																			// parent
-																			// uid
-																			// exists?
-
+			request.queryString("uidWell", witsmlObject.getParentUid()); // TODO: check the parent uid exists?
+																			
 		ValveLogging valveLoggingRequest = new ValveLogging(witsmlObject.getUid(), logRequest(request), witsmlObject);
 		LOG.info(valveLoggingRequest.toString());
 		// get response
