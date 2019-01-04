@@ -16,7 +16,6 @@
 package com.hashmapinc.tempus.witsml.valve.dot;
 
 import com.auth0.jwt.JWT;
-import com.auth0.jwt.interfaces.DecodedJWT;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore;
@@ -25,10 +24,7 @@ import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.mockito.Mockito;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Map;
 
 import static junit.framework.TestCase.*;
@@ -41,8 +37,8 @@ public class DotValveTest {
 
 	@Before
 	public void doSetup() {
-		this.mockClient = Mockito.mock(DotClient.class);
-		this.mockDelegator = Mockito.mock(DotDelegator.class);
+		this.mockClient = mock(DotClient.class);
+		this.mockDelegator = mock(DotDelegator.class);
 		this.valve = new DotValve(this.mockClient, this.mockDelegator); // inject mocks into valve
 	}
 

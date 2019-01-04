@@ -20,7 +20,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.mashape.unirest.http.exceptions.UnirestException;
 
 import static org.junit.Assert.*;
 
