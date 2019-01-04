@@ -91,7 +91,7 @@ public class DotDelegator {
 		int status = response.getStatus();
 		if (201 == status || 200 == status || 204 == status) {
 			ValveLogging valveLoggingResponse = new ValveLogging(witsmlObj.getUid(),
-					logResponse(response, "Successfully Deleted"), witsmlObj);
+					logResponse(response, "Successfully Deleted Object with UID :"+uid+"."), witsmlObj);
 			LOG.info(valveLoggingResponse.toString());
 		} else if (401 == status) {
 			ValveLogging valveLoggingResponse = new ValveLogging(witsmlObj.getUid(),
@@ -139,7 +139,7 @@ public class DotDelegator {
 		int status = response.getStatus();
 		if (201 == status || 200 == status) {
 			ValveLogging valveLoggingResponse = new ValveLogging(witsmlObj.getUid(),
-					logResponse(response, "UPDATE was successful"), witsmlObj);
+					logResponse(response, "UPDATE was successful with UID:" +uid+"."), witsmlObj);
 			LOG.info(valveLoggingResponse.toString());
 		} else {
 			ValveLogging valveLoggingResponse = new ValveLogging(witsmlObj.getUid(),
