@@ -15,12 +15,10 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
+import java.util.Map;
 import java.util.logging.Logger;
 
-import org.json.JSONObject;
-
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
-import com.hashmapinc.tempus.witsml.ValveLogging;
 import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
 import com.mashape.unirest.http.HttpResponse;
@@ -29,6 +27,7 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
+import org.json.JSONObject;
 
 public class DotDelegator {
 	private static final Logger LOG = Logger.getLogger(DotDelegator.class.getName());
