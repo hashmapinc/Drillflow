@@ -103,6 +103,7 @@ public class DotValve implements IValve {
                         witsmlObject,
                         qc.USERNAME,
                         qc.PASSWORD,
+                        qc.EXCHANGE_ID,
                         this.CLIENT
                     )
                 );
@@ -134,6 +135,7 @@ public class DotValve implements IValve {
                         witsmlObject,
                         qc.USERNAME,
                         qc.PASSWORD,
+                        qc.EXCHANGE_ID,
                         this.CLIENT
                     )
                 );
@@ -160,6 +162,7 @@ public class DotValve implements IValve {
                     witsmlObject,
                     qc.USERNAME,
                     qc.PASSWORD,
+                    qc.EXCHANGE_ID,
                     this.CLIENT
                 );
             }
@@ -184,6 +187,7 @@ public class DotValve implements IValve {
                     witsmlObject,
                     qc.USERNAME,
                     qc.PASSWORD,
+                    qc.EXCHANGE_ID,
                     this.CLIENT);
             }
         } catch (Exception e) {
