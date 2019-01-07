@@ -32,5 +32,4 @@ public class ValveLogging {
 	public String toString() {
 		return "Exchange Id: " + id + " Message is - " + message + " for object " + abstObject.toString();
 	}
-
 }
