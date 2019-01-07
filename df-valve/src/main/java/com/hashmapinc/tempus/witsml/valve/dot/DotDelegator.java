@@ -35,6 +35,7 @@ public class DotDelegator {
     private final String URL;
     private final String WELL_PATH;
     private final String WB_PATH;
+    private final String TRAJECTORY_PATH;
 
 
     /**
@@ -43,9 +44,10 @@ public class DotDelegator {
      * @param config - map with field values
      */
     public DotDelegator(Map<String, String> config) {
-        this.URL = config.get("baseurl");
-        this.WELL_PATH = config.get("well.path");
-        this.WB_PATH = config.get("wellbore.path");
+        this.URL =             config.get("baseurl");
+        this.WELL_PATH =       config.get("well.path");
+        this.WB_PATH =         config.get("wellbore.path");
+        this.TRAJECTORY_PATH = config.get("trajectory.path");
     }
 
     /**
@@ -66,6 +68,9 @@ public class DotDelegator {
                 break;
             case "wellbore":
                 endpoint = this.URL + this.WB_PATH;
+                break;
+            case "trajectory":
+                endpoint = this.URL + this.TRAJECTORY_PATH;
                 break;
             default:
                 throw new ValveException("Unsupported object type<" + objectType + ">");
@@ -168,6 +173,7 @@ public class DotDelegator {
         String objectType = witsmlObj.getObjectType(); // get obj type for exception handling
         String uid = witsmlObj.getUid();
         String endpoint = this.getEndpoint(objectType);
+        String version = witsmlObj.getVersion();
 
         // get object as payload string
         String payload = witsmlObj.getJSONString("1.4.1.1");
@@ -180,10 +186,20 @@ public class DotDelegator {
         } else {
             // create with PUT using existing uid
             request = Unirest.put(endpoint + uid);
+        }
 
-            // for objects that need it, provide parent uid as param
-            if ("wellbore".equals(objectType))
-                request.queryString("uidWell", witsmlObj.getParentUid()); // TODO: error handle this?
+        // add query string params
+        if ("wellbore".equals(objectType)) {
+            request.queryString("uidWell", witsmlObj.getParentUid()); // TODO: error handle this?
+        } else if ("trajectory".equals(objectType)) {
+            request.queryString("uidWellbore", witsmlObj.getParentUid());
+            String uidWell;
+            if ("1.4.1.1".equals(version)) {
+                uidWell = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory) witsmlObj).getUidWell();
+            } else {
+                uidWell = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory) witsmlObj).getUidWell();
+            }
+            request.queryString("uidWell", uidWell);
         }
 
         // add the header and payload
