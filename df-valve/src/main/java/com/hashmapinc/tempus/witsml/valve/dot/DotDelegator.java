@@ -15,7 +15,6 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
-import java.util.Map;
 import java.util.logging.Logger;
 
 import org.json.JSONObject;
