@@ -30,7 +30,7 @@ public class ValveLogging {
 
 	@Override
 	public String toString() {
-		return "id is - " + id + " Message is - " + message + " for object " + abstObject.toString();
+		return "Exchange Id: " + id + " Message is - " + message + " for object " + abstObject.toString();
 	}
 
 }
