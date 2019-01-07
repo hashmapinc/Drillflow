@@ -35,7 +35,7 @@ public class DotDelegator {
 
 	private final String URL;
 
-	public DotDelegator(String url, String apiKey) {
+	public DotDelegator(String url) {
 		this.URL = url;
 	}
 
