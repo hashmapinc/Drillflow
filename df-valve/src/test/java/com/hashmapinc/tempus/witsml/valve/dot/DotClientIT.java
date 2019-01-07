@@ -15,18 +15,17 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
+import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.mashape.unirest.http.exceptions.UnirestException;
 
-public class DotAuthTest {
+import static org.junit.Assert.*;
+
+public class DotClientIT {
 	@Autowired
-	private DotAuth dotAuth;
+	private DotClient dotClient;
 	private String username;
 	private String password;
 
@@ -35,36 +34,32 @@ public class DotAuthTest {
 		this.username = "admin";
 		this.password = "12345";
 		String apiKey = "test";
-		//String url = "http://localhost:8080/";
 		String url = "https://witsml.hashmapinc.com:8443/"; // TODO: MOCK THIS
-		dotAuth = new DotAuth(url, apiKey);
+		String tokenPath = "token/jwt/v1/";
+		dotClient = new DotClient(url, apiKey, tokenPath);
 	}
 
 	@Test
-	public void authSuccessScenario() throws UnirestException, Exception {
-		DecodedJWT response = dotAuth.getJWT(username, password);
+	public void authSuccessScenario() throws Exception {
+		DecodedJWT response = dotClient.getJWT(username, password);
 		System.out.println("decoded JWT is : " + response);
 		assertNotNull(response);
 	}
 
 	@Test
-	public void authCacheSuccessScenario() throws UnirestException, Exception {
-		DecodedJWT response = dotAuth.getJWT(username, password);
+	public void authCacheSuccessScenario() throws Exception {
+		DecodedJWT response = dotClient.getJWT(username, password);
 		assertNotNull(response);
 		// Second fetch from the cache for the same credentials.
-		DecodedJWT cacheResponse = dotAuth.getJWT(username, password);
+		DecodedJWT cacheResponse = dotClient.getJWT(username, password);
 		assertNotNull(cacheResponse);
 		assertEquals(cacheResponse.getToken(), response.getToken());
 	}
 
-	@Test
-	public void authFailureScenario() throws UnirestException {
-		try {
-			String badPassword = this.password + "JUNK";
-			DecodedJWT response = dotAuth.getJWT(this.username, badPassword);
-			assertTrue(null == response);
-		} catch (Exception e) {
-			assertNotNull(true);
-		}
+	@Test(expected = ValveAuthException.class)
+	public void authFailureScenario() throws ValveAuthException {
+		String badPassword = this.password + "JUNK";
+		DecodedJWT response = dotClient.getJWT(this.username, badPassword);
+		assertNull(response);
 	}
 }

@@ -15,378 +15,374 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
-
-import javax.xml.bind.JAXBException;
-
+import com.auth0.jwt.JWT;
+import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore;
+import com.hashmapinc.tempus.witsml.QueryContext;
+import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
-import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
-import com.hashmapinc.tempus.witsml.QueryContext;
-import com.hashmapinc.tempus.witsml.valve.ValveException;
+import java.util.ArrayList;
+import java.util.Map;
+
+import static junit.framework.TestCase.*;
+import static org.mockito.Mockito.*;
 
 public class DotValveTest {
-	private String username;
-    private String password;
+	private DotClient mockClient;
+    private DotDelegator mockDelegator;
     private DotValve valve;
 
 	@Before
 	public void doSetup() {
-		this.username = "admin";
-        this.password = "12345";
-        HashMap<String, String> config = new HashMap<>();
-        config.put("baseurl", "https://witsml.hashmapinc.com:8443/"); // TODO: MOCK THIS
-        //config.put("baseurl", "http://localhost:8080/"); // TODO: MOCK THIS
-        config.put("apikey", "COOLAPIKEY");
-		valve = new DotValve(config);
+		this.mockClient = mock(DotClient.class);
+		this.mockDelegator = mock(DotDelegator.class);
+		this.valve = new DotValve(this.mockClient, this.mockDelegator); // inject mocks into valve
 	}
 
-    //=========================================================================
-    // WELL
-    //=========================================================================
 	@Test
-	public void createObjectWell1311() throws IOException, JAXBException, ValveException {
-	    try {
-            // get query context
-            String well1311XML = new String(Files.readAllBytes(Paths.get("src/test/resources/well1311.xml")));
-            List<AbstractWitsmlObject> witsmlObjects = (List<AbstractWitsmlObject>) (List<?>) ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells) WitsmlMarshal.deserialize(well1311XML, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell.class)).getWell();
-            QueryContext qc = new QueryContext(
-                    "1.3.1.1",
-                    "well",
-                    null,
-                    well1311XML,
-                    witsmlObjects,
-                    this.username,
-                    this.password,
-                    UUID.randomUUID().toString()
-            );
-
-            // create
-            String uid = this.valve.createObject(qc);
-            assertNotNull(uid);
-            assertEquals("w-1311", uid);
-        } catch (ValveException ve) {
-            assertTrue(ve.getMessage().contains("already exists")); // accept the "already exists" response as valid behavior
-        }
+	public void shouldGetName() {
+		assertEquals("DoT", this.valve.getName());
 	}
 
-    @Test
-    public void createObjectWell1411() throws IOException, JAXBException, ValveException{
-	    try {
-            // get query context
-            String well1411XML = new String(Files.readAllBytes(Paths.get("src/test/resources/well1411.xml")));
-            List<AbstractWitsmlObject> witsmlObjects = (List<AbstractWitsmlObject>) (List<?>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWells) WitsmlMarshal.deserialize(well1411XML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell.class)).getWell();
-            QueryContext qc = new QueryContext(
-                    "1.4.1.1",
-                    "well",
-                    null,
-                    well1411XML,
-                    witsmlObjects,
-                    this.username,
-                    this.password,
-                    UUID.randomUUID().toString()
-            );
+	@Test
+	public void shouldGetDescription() {
+		assertEquals(
+			"Valve for interaction with Drillops Town",
+			this.valve.getDescription()
+		);
+	}
 
-            // create
-            String uid = this.valve.createObject(qc);
-            assertNotNull(uid);
-            assertEquals("w-1411", uid);
-        } catch (ValveException ve) {
-	        assertTrue(ve.getMessage().contains("already exists")); // accept the "already exists" response as valid behavior
-        }
-    }
+	@Test
+	public void shouldGetSingleObject() throws Exception {
+		// build well list
+		ArrayList<AbstractWitsmlObject> witsmlObjects;
+		witsmlObjects = new ArrayList<>();
+		ObjWell well = new ObjWell();
+		well.setName("well-1");
+		well.setUid("well-1");
+		witsmlObjects.add(well);
 
-    @Test
-    public void getObjectWell1311() throws IOException, JAXBException, ValveException {
-        // add the deletable object first
-        try {
-            this.createObjectWell1311();
-        } catch (Exception e) {}
+		// build query context
+		QueryContext qc = new QueryContext(
+			"1.3.1.1",
+			"well",
+			null,
+			"",
+			witsmlObjects,
+			"goodUsername",
+			"goodPassword",
+			"shouldGetSingleObject" // exchange ID
+		);
 
-        // get query context
-        String well1311XML = new String(Files.readAllBytes(Paths.get("src/test/resources/well1311query.xml")));
-        List<AbstractWitsmlObject> witsmlObjects = (List<AbstractWitsmlObject>) (List<?>) ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells) WitsmlMarshal
-                .deserialize(well1311XML, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell.class)).getWell();
-        QueryContext qc = new QueryContext("1.3.1.1", "well", null, well1311XML, witsmlObjects, this.username, this.password, UUID.randomUUID().toString());
+		// mock delegator behavior
+		when(
+			this.mockDelegator.getObject(well, qc.USERNAME, qc.PASSWORD, this.mockClient)
+		).thenReturn(well);
 
-        // get
-        String xmlOut = this.valve.getObject(qc);assertNotNull(xmlOut);
-        assertFalse(xmlOut.contains("ns0:wells"));
-    }
+		// test
+		String expected = well.getXMLString("1.3.1.1");
+		String actual = this.valve.getObject(qc);
+		assertEquals(expected, actual);
+	}
 
-    @Test
-    public void getObjectWell1411() throws IOException, JAXBException, ValveException {
-        // add the deletable object first
-        try {
-            this.createObjectWell1411();
-        } catch (Exception e) {}
+	@Test
+	public void shouldGetPluralObject() throws Exception {
+		// build witsmlObjects list
+		ArrayList<AbstractWitsmlObject> witsmlObjects;
+		witsmlObjects = new ArrayList<>();
 
-        // get query context
-        String well1411XML = new String(Files.readAllBytes(Paths.get("src/test/resources/well1411query.xml")));
-        List<AbstractWitsmlObject> witsmlObjects = (List<AbstractWitsmlObject>) (List<?>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWells) WitsmlMarshal
-                .deserialize(well1411XML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell.class)).getWell();
-        QueryContext qc = new QueryContext("1.4.1.1", "well", null, well1411XML, witsmlObjects, this.username, this.password, UUID.randomUUID().toString());
+		ObjWellbore wellboreA = new ObjWellbore();
+		wellboreA.setName("wellbore-A");
+		wellboreA.setUid("wellbore-A");
+		witsmlObjects.add(wellboreA);
 
-        // get
-        String xmlOut = this.valve.getObject(qc);
-        assertNotNull(xmlOut);
-        assertFalse(xmlOut.contains("ns0:wells"));
-    }
-
-    @Test
-    public void deleteObjectWell1311() throws IOException, JAXBException, ValveException {
-	    // add the deletable object first
-        try {
-            this.createObjectWell1311();
-        } catch (Exception e) {}
-
-        // get query context
-        String well1311XML = new String(Files.readAllBytes(Paths.get("src/test/resources/well1311.xml")));
-        List<AbstractWitsmlObject> witsmlObjects = (List<AbstractWitsmlObject>) (List<?>) ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells) WitsmlMarshal
-                .deserialize(well1311XML, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell.class)).getWell();
-        QueryContext qc = new QueryContext(
-            null,
-            "well",
-            null,
-            well1311XML,
-            witsmlObjects,
-            this.username,
-            this.password,
-            UUID.randomUUID().toString()
-        );
-
-        // delete
-        try {
-            this.valve.deleteObject(qc);
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-    }
-
-    @Test
-    public void deleteObjectWell1411() throws IOException, JAXBException, ValveException {
-        // add the deletable object first
-        try {
-            this.createObjectWell1411();
-        } catch (Exception e) {}
+		ObjWellbore wellboreB = new ObjWellbore();
+		wellboreB.setName("wellbore-B");
+		wellboreB.setUid("wellbore-B");
+		witsmlObjects.add(wellboreB);
 
 
-        // get query context
-        String well1411XML = new String(Files.readAllBytes(Paths.get("src/test/resources/well1411.xml")));
-        List<AbstractWitsmlObject> witsmlObjects = (List<AbstractWitsmlObject>) (List<?>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWells) WitsmlMarshal
-                .deserialize(well1411XML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell.class)).getWell();
-        QueryContext qc = new QueryContext(
-            "1.4.1.1",
-            "well",
-            null,
-            well1411XML,
-            witsmlObjects,
-            this.username,
-            this.password,
-            UUID.randomUUID().toString()
-        );
-
-        // delete
-        try {
-            this.valve.deleteObject(qc);
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-    }
-    //=========================================================================
-
-    //=========================================================================
-    // WELLBORE
-    //=========================================================================
-    @Test
-    public void createObjectWellbore1311() throws IOException, JAXBException, ValveException {
-	    try {
-            // get query context
-            String wellbore1311XML = new String(Files.readAllBytes(Paths.get("src/test/resources/wellbore1311.xml")));
-            List<AbstractWitsmlObject> witsmlObjects = (List<AbstractWitsmlObject>) (List<?>) ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores) WitsmlMarshal
-                    .deserialize(wellbore1311XML, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore.class)).getWellbore();
-            QueryContext qc = new QueryContext("1.3.1.1", "wellbore", null, wellbore1311XML, witsmlObjects, this.username,
-                    this.password, UUID.randomUUID().toString());
-
-            // create
-            String uid = this.valve.createObject(qc);
-            assertNotNull(uid);
-            assertEquals("b-1311-1,b-1311-2", uid);
-        } catch (ValveException ve) {
-            assertTrue(ve.getMessage().contains("already exists")); // accept the "already exists" response as valid behavior
-        }
-    }
-
-    @Test
-    public void createObjectWellbore1411() throws IOException, JAXBException, ValveException {
-	    try {
-            // get query context
-            String wellbore1411XML = new String(Files.readAllBytes(Paths.get("src/test/resources/wellbore1411.xml")));
-            List<AbstractWitsmlObject> witsmlObjects = (List<AbstractWitsmlObject>) (List<?>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbores) WitsmlMarshal
-                    .deserialize(wellbore1411XML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore.class)).getWellbore();
-            QueryContext qc = new QueryContext("1.4.1.1", "wellbore", null, wellbore1411XML, witsmlObjects, this.username,
-                    this.password, UUID.randomUUID().toString());
-
-            // create
-            String uid = this.valve.createObject(qc);
-            assertNotNull(uid);
-            assertEquals("b-1411-1,b-1411-2", uid);
-        } catch (ValveException ve) {
-            assertTrue(ve.getMessage().contains("already exists")); // accept the "already exists" response as valid behavior
-        }
-    }
-
-    @Test
-    public void getObjectWellbore1311() throws IOException, JAXBException, ValveException {
-        // add the deletable object first
-        try {
-            this.createObjectWellbore1311();
-        } catch (Exception e) {}
-
-        // get query context
-        String wellbore1311XML = new String(
-            Files.readAllBytes(Paths.get("src/test/resources/wellbore1311.xml"))
-        );
-        List<AbstractWitsmlObject> witsmlObjects = (List<AbstractWitsmlObject>) (List<?>) (
-            (com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores) WitsmlMarshal
-            .deserialize(wellbore1311XML, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore.class)
-        ).getWellbore();
-        QueryContext qc = new QueryContext(
-            "1.3.1.1",
-            "wellbore",
-            null,
-            wellbore1311XML,
-            witsmlObjects,
-            this.username,
-            this.password,
-            UUID.randomUUID().toString()
-        );
-
-        // get
-        String xmlOut = this.valve.getObject(qc);
-        assertNotNull(xmlOut);
-        assertFalse(xmlOut.contains("ns0:wells"));
-    }
-
-    @Test
-    public void getObjectWellbore1411() throws IOException, JAXBException, ValveException {
-        // add the deletable object first
-        try {
-            this.createObjectWellbore1411();
-        } catch (Exception e) {}
-
-        // get query context
-        String well1bore411XML = new String(
-            Files.readAllBytes(Paths.get("src/test/resources/wellbore1411.xml"))
-        );
-        List<AbstractWitsmlObject> witsmlObjects = (List<AbstractWitsmlObject>) (List<?>) (
-            (com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbores) WitsmlMarshal
-            .deserialize(well1bore411XML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore.class)
-        ).getWellbore();
-        QueryContext qc = new QueryContext(
-            "1.4.1.1",
-            "wellbore",
-            null,
-            well1bore411XML,
-            witsmlObjects,
-            this.username,
-            this.password,
-            UUID.randomUUID().toString()
-        );
-
-        // get
-        String xmlOut = this.valve.getObject(qc);
-        assertNotNull(xmlOut);
-        assertFalse(xmlOut.contains("ns0:wells"));
-    }
-
-    @Test
-    public void deleteObjectWellbore1311() throws IOException, JAXBException, ValveException {
-        // add the deletable object first
-        try {
-            this.createObjectWellbore1311();
-        } catch (Exception e) {}
-
-        // get query context
-        String wellbore1311XML = new String(Files.readAllBytes(Paths.get("src/test/resources/wellbore1311.xml")));
-        List<AbstractWitsmlObject> witsmlObjects = (List<AbstractWitsmlObject>) (List<?>) ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores) WitsmlMarshal
-                .deserialize(wellbore1311XML, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore.class)).getWellbore();
-        QueryContext qc = new QueryContext(
-                null,
-                "wellbore",
-                null,
-                wellbore1311XML,
-                witsmlObjects,
-                this.username,
-                this.password,
-                UUID.randomUUID().toString()
-        );
-
-        // delete
-        try {
-            this.valve.deleteObject(qc);
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-    }
-
-    @Test
-    public void deleteObjectWellbore1411() throws IOException, JAXBException, ValveException {
-        // add the deletable object first
-        try {
-            this.createObjectWellbore1411();
-        } catch (Exception e) {}
+		// build query context
+		QueryContext qc = new QueryContext(
+			"1.3.1.1",
+			"wellbore",
+			null,
+			"",
+			witsmlObjects,
+			"goodUsername",
+			"goodPassword",
+			"shouldGetPluralObject" // exchange ID
+		);
 
 
-        // get query context
-        String wellbore1411XML = new String(
-            Files.readAllBytes(
-                Paths.get("src/test/resources/wellbore1411.xml")
-            )
-        );
-        List<AbstractWitsmlObject> witsmlObjects = (List<AbstractWitsmlObject>) (List<?>) (
-            (com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbores)
-            WitsmlMarshal.deserialize(
-                wellbore1411XML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore.class
-            )
-        ).getWellbore();
-        QueryContext qc = new QueryContext(
-            "1.4.1.1",
-            "well",
-            null,
-            wellbore1411XML,
-            witsmlObjects,
-            this.username,
-            this.password,
-            UUID.randomUUID().toString()
-        );
+		// mock delegator behavior
+		when(
+			this.mockDelegator.getObject(wellboreA, qc.USERNAME, qc.PASSWORD, this.mockClient)
+		).thenReturn(wellboreA);
+		when(
+			this.mockDelegator.getObject(wellboreB, qc.USERNAME, qc.PASSWORD, this.mockClient)
+		).thenReturn(wellboreB);
 
-        // delete
-        try {
-            this.valve.deleteObject(qc);
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-    }
-    //=========================================================================
 
-    @Test(expected = ValveAuthException.class)
-	public void authVerifyException() throws ValveAuthException {
-		String badPassword = this.password + "JUNK";
-		valve.authenticate(username, badPassword);
+		// test
+		String expected = // expected = merge wellboreA and wellbore B
+			wellboreA.getXMLString("1.3.1.1").replace("</wellbores>", "") +
+			wellboreB.getXMLString("1.3.1.1").replace(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" +
+				"<wellbores version=\"1.3.1.1\" xmlns=\"http://www.witsml.org/schemas/131\">",
+				""
+			);
+		String actual = this.valve.getObject(qc);
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void shouldCreateSingleObject() throws Exception {
+		// build witsmlObjects list
+		ArrayList<AbstractWitsmlObject> witsmlObjects;
+		witsmlObjects = new ArrayList<>();
+
+		ObjWellbore wellboreA = new ObjWellbore();
+		wellboreA.setName("wellbore-A");
+		wellboreA.setUid("wellbore-A");
+		witsmlObjects.add(wellboreA);
+
+
+		// build query context
+		QueryContext qc = new QueryContext(
+			"1.3.1.1",
+			"wellbore",
+			null,
+			"",
+			witsmlObjects,
+			"goodUsername",
+			"goodPassword",
+			"shouldCreateSingleObject" // exchange ID
+		);
+
+
+		// mock delegator behavior
+		when(
+			this.mockDelegator.createObject(wellboreA, qc.USERNAME, qc.PASSWORD, this.mockClient)
+		).thenReturn(wellboreA.getUid());
+
+
+		// test
+		String expected = wellboreA.getUid();
+		String actual = this.valve.createObject(qc);
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void shouldCreatePluralObject() throws Exception {
+		// build witsmlObjects list
+		ArrayList<AbstractWitsmlObject> witsmlObjects;
+		witsmlObjects = new ArrayList<>();
+
+		ObjWellbore wellboreA = new ObjWellbore();
+		wellboreA.setName("wellbore-A");
+		wellboreA.setUid("wellbore-A");
+		witsmlObjects.add(wellboreA);
+
+		ObjWellbore wellboreB = new ObjWellbore();
+		wellboreB.setName("wellbore-B");
+		wellboreB.setUid("wellbore-B");
+		witsmlObjects.add(wellboreB);
+
+
+		// build query context
+		QueryContext qc = new QueryContext(
+			"1.3.1.1",
+			"wellbore",
+			null,
+			"",
+			witsmlObjects,
+			"goodUsername",
+			"goodPassword",
+			"shouldCreatePluralObject" // exchange ID
+		);
+
+
+		// mock delegator behavior
+		when(
+			this.mockDelegator.createObject(wellboreA, qc.USERNAME, qc.PASSWORD, this.mockClient)
+		).thenReturn(wellboreA.getUid());
+		when(
+			this.mockDelegator.createObject(wellboreB, qc.USERNAME, qc.PASSWORD, this.mockClient)
+		).thenReturn(wellboreB.getUid());
+
+
+		// test
+		String expected = wellboreA.getUid() + "," + wellboreB.getUid();
+		String actual = this.valve.createObject(qc);
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void shouldDeleteSingleObject() throws Exception {
+		// build witsmlObjects list
+		ArrayList<AbstractWitsmlObject> witsmlObjects;
+		witsmlObjects = new ArrayList<>();
+
+		ObjWellbore wellboreA = new ObjWellbore();
+		wellboreA.setName("wellbore-A");
+		wellboreA.setUid("wellbore-A");
+		witsmlObjects.add(wellboreA);
+
+
+		// build query context
+		QueryContext qc = new QueryContext(
+			"1.3.1.1",
+			"wellbore",
+			null,
+			"",
+			witsmlObjects,
+			"goodUsername",
+			"goodPassword",
+			"shouldDeleteSingleObject" // exchange ID
+		);
+
+
+		// test getObject
+		this.valve.deleteObject(qc);
+
+
+		// verify
+		verify(this.mockDelegator).deleteObject(wellboreA, qc.USERNAME, qc.PASSWORD, this.mockClient);
+		verifyNoMoreInteractions(this.mockDelegator);
+	}
+
+	@Test
+	public void shouldDeletePluralObject() throws Exception {
+		// build witsmlObjects list
+		ArrayList<AbstractWitsmlObject> witsmlObjects;
+		witsmlObjects = new ArrayList<>();
+
+		ObjWellbore wellboreA = new ObjWellbore();
+		wellboreA.setName("wellbore-A");
+		wellboreA.setUid("wellbore-A");
+		witsmlObjects.add(wellboreA);
+
+		ObjWellbore wellboreB = new ObjWellbore();
+		wellboreB.setName("wellbore-B");
+		wellboreB.setUid("wellbore-B");
+		witsmlObjects.add(wellboreB);
+
+
+		// build query context
+		QueryContext qc = new QueryContext(
+			"1.3.1.1",
+			"wellbore",
+			null,
+			"",
+			witsmlObjects,
+			"goodUsername",
+			"goodPassword",
+			"shouldDeletePluralObject" // exchange ID
+		);
+
+
+		// test getObject
+		this.valve.deleteObject(qc);
+
+
+		// verify
+		verify(this.mockDelegator).deleteObject(wellboreA, qc.USERNAME, qc.PASSWORD, this.mockClient);
+		verify(this.mockDelegator).deleteObject(wellboreB, qc.USERNAME, qc.PASSWORD, this.mockClient);
+		verifyNoMoreInteractions(this.mockDelegator);
+	}
+
+	@Test
+	public void shouldUpdateObject() throws Exception {
+		// build witsmlObjects list
+		ArrayList<AbstractWitsmlObject> witsmlObjects;
+		witsmlObjects = new ArrayList<>();
+
+		ObjWellbore wellboreA = new ObjWellbore();
+		wellboreA.setName("wellbore-A");
+		wellboreA.setUid("wellbore-A");
+		witsmlObjects.add(wellboreA);
+
+		// build query context
+		QueryContext qc = new QueryContext(
+			"1.3.1.1",
+			"wellbore",
+			null,
+			"",
+			witsmlObjects,
+			"goodUsername",
+			"goodPassword",
+			"shouldUpdateObject" // exchange ID
+		);
+
+
+		// test getObject
+		this.valve.updateObject(qc);
+
+
+		// verify
+		verify(this.mockDelegator).updateObject(wellboreA, qc.USERNAME, qc.PASSWORD, this.mockClient);
+		verifyNoMoreInteractions(this.mockDelegator);
+	}
+
+	@Test
+	public void shouldSucceedAuthenticate() throws Exception {
+		// mock behavior
+		when(this.mockClient.getJWT("goodUsername", "goodPassword"))
+			.thenReturn(JWT.decode( // using dummy token string from https://jwt.io/
+				"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiR29vZCBUb2tlbiJ9.II4bNgtahHhV4jl7dgGn8CGjVxZWwBMZht-4LXeqB_Y"
+			)
+		);
+
+		// test
+		this.valve.authenticate("goodUsername", "goodPassword");
+
+		// verify
+		verify(this.mockClient).getJWT("goodUsername", "goodPassword");
+		verifyNoMoreInteractions(this.mockClient);
+	}
+
+	@Test(expected = ValveAuthException.class)
+	public void shouldFailAuthenticate() throws ValveAuthException {
+		// add mock behavior
+		when(this.mockClient.getJWT("badUsername", "badPassword"))
+			.thenThrow(new ValveAuthException(""));
+
+		// test
+		this.valve.authenticate("badUsername", "badPassword");
+	}
+
+	@Test
+	public void shouldGetCap() {
+		// get cap
+		Map<String, AbstractWitsmlObject[]> cap = this.valve.getCap();
+
+		// verify keys
+		assertFalse(cap.isEmpty());
+		assertTrue(cap.containsKey("WMLS_AddToStore"));
+		assertTrue(cap.containsKey("WMLS_GetFromStore"));
+		assertTrue(cap.containsKey("WMLS_DeleteFromStore"));
+		assertTrue(cap.containsKey("WMLS_UpdateInStore"));
+
+
+		// get values
+		AbstractWitsmlObject[] actualAddObjects = 	 cap.get("WMLS_AddToStore");
+		AbstractWitsmlObject[] actualGetObjects = 	 cap.get("WMLS_GetFromStore");
+		AbstractWitsmlObject[] actualDeleteObjects = cap.get("WMLS_DeleteFromStore");
+		AbstractWitsmlObject[] actualUpdateObjects = cap.get("WMLS_UpdateInStore");
+
+		// verify values
+		assertEquals("well", 	 actualAddObjects[0].getObjectType());
+		assertEquals("wellbore", actualAddObjects[1].getObjectType());
+		assertEquals("well", 	 actualGetObjects[0].getObjectType());
+		assertEquals("wellbore", actualGetObjects[1].getObjectType());
+		assertEquals("well", 	 actualDeleteObjects[0].getObjectType());
+		assertEquals("wellbore", actualDeleteObjects[1].getObjectType());
+		assertEquals("well", 	 actualUpdateObjects[0].getObjectType());
+		assertEquals("wellbore", actualUpdateObjects[1].getObjectType());
 	}
 }
 
