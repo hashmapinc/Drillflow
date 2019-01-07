@@ -187,6 +187,8 @@ public class DotValveTest {
 		traj.setUid("traj-A");
 		traj.setName("traj-A");
 
+		witsmlObjects.add(traj);
+
 		// build query context
 		QueryContext qc = new QueryContext(
 			"1.3.1.1",
