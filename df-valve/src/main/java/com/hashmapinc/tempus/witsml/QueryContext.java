@@ -33,35 +33,6 @@ public class QueryContext {
     public final String USERNAME;
     public final String PASSWORD;
     public final String EXCHANGE_ID;
-    
-    /**
-     * 
-     * @param clientVersion - the WITSML version used by the client that sent the query
-     * @param objectType - the type of WITSML object being queried for
-     * @param optionsIn - MAP of options_in key/value pairs
-     * @param queryXML - String holding the raw xml query sent from the client
-     * @param username - String with the username to auth with
-     * @param password - String with password to auth with
-     */
-    public QueryContext(
-        String clientVersion,
-        String objectType,
-        Map<String, String> optionsIn, 
-        String queryXML,
-        String username,
-        String password,
-        String exchangeId
-    ) {
-        // instantiate values
-        this.CLIENT_VERSION = clientVersion;
-        this.OBJECT_TYPE = objectType;
-        this.OPTIONS_IN = optionsIn;
-        this.QUERY_XML = queryXML;
-        this.WITSML_OBJECTS = null;
-        this.PASSWORD = password;
-        this.USERNAME = username;
-        this.EXCHANGE_ID = exchangeId;
-    }
 
     /**
      * 

@@ -38,6 +38,12 @@ public class DotDelegator {
 	    private final String WELL_PATH;
 	    private final String WB_PATH;
 
+<<<<<<< HEAD
+=======
+	public DotDelegator(String url) {
+		this.URL = url;
+	}
+>>>>>>> 4b76df07c8f29c40d2110b123143109614390d7c
 
 	    public DotDelegator(Map<String, String> config) {
 	        this.URL = config.get("baseurl");
