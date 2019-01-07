@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.json.JSONObject;
@@ -33,36 +34,41 @@ import com.mashape.unirest.request.HttpRequestWithBody;
 public class DotDelegator {
 	private static final Logger LOG = Logger.getLogger(DotDelegator.class.getName());
 
-	private final String URL;
+	  private final String URL;
+	    private final String WELL_PATH;
+	    private final String WB_PATH;
 
-	public DotDelegator(String url, String apiKey) {
-		this.URL = url;
-	}
 
-	/**
-	 * returns the endpoint for each supported object type
-	 * 
-	 * @param objectType - well, wellbore, trajectory, or log
-	 * @return endpoint - String value to send requests to
-	 * @throws ValveException
-	 */
-	private String getEndpoint(String objectType) throws ValveException {
-		// TODO: these should be injected in the DotDelegator constructor and
-		// not rely on a shared this.URL
-		// get endpoint
-		String endpoint;
-		switch (objectType) { // TODO: add support for log and trajectory
-		case "well":
-			endpoint = this.URL + "/democore/well/v2/witsml/wells/";
-			break;
-		case "wellbore":
-			endpoint = this.URL + "/democore/wellbore/v1/witsml/wellbores/";
-			break;
-		default:
-			throw new ValveException("Unsupported object type<" + objectType + ">");
-		}
-		return endpoint;
-	}
+	    public DotDelegator(Map<String, String> config) {
+	        this.URL = config.get("baseurl");
+	        this.WELL_PATH = config.get("well.path");
+	        this.WB_PATH = config.get("wellbore.path");
+	    }
+
+	    /**
+	     * returns the endpoint for each supported object type
+	     * @param objectType - well, wellbore, trajectory, or log
+	     * @return endpoint - String value to send requests to
+	     * @throws ValveException
+	     */
+	    private String getEndpoint(
+	        String objectType
+	    ) throws ValveException{
+	        // TODO: these should be injected in the DotDelegator constructor and not rely on a shared this.URL
+	        // get endpoint
+	        String endpoint;
+	        switch (objectType) { // TODO: add support for log and trajectory
+	            case "well":
+	                endpoint = this.URL + this.WELL_PATH;
+	                break;
+	            case "wellbore":
+	                endpoint = this.URL + this.WB_PATH;
+	                break;
+	            default:
+	                throw new ValveException("Unsupported object type<" + objectType + ">");
+	        }
+	        return endpoint;
+	    }
 
 	/**
 	 * deletes the object from DoT
@@ -93,11 +99,6 @@ public class DotDelegator {
 			ValveLogging valveLoggingResponse = new ValveLogging(witsmlObj.getUid(),
 					logResponse(response, "Successfully Deleted Object with UID :"+uid+"."), witsmlObj);
 			LOG.info(valveLoggingResponse.toString());
-		} else if (401 == status) {
-			ValveLogging valveLoggingResponse = new ValveLogging(witsmlObj.getUid(),
-					logResponse(response, "Bad auth token."), witsmlObj);
-			LOG.warning(valveLoggingResponse.toString());
-			throw new ValveAuthException("Bad JWT");
 		} else {
 			ValveLogging valveLoggingResponse = new ValveLogging(witsmlObj.getUid(),
 					logResponse(response, "Unable to delete"), witsmlObj);
@@ -139,11 +140,11 @@ public class DotDelegator {
 		int status = response.getStatus();
 		if (201 == status || 200 == status) {
 			ValveLogging valveLoggingResponse = new ValveLogging(witsmlObj.getUid(),
-					logResponse(response, "UPDATE was successful with UID:" +uid+"."), witsmlObj);
+					logResponse(response, "UPDATE for " + witsmlObj + " was successful"), witsmlObj);
 			LOG.info(valveLoggingResponse.toString());
 		} else {
 			ValveLogging valveLoggingResponse = new ValveLogging(witsmlObj.getUid(),
-					logResponse(response, "Received failure"), witsmlObj);
+					logResponse(response, "Received failure status code from DoT PUT"), witsmlObj);
 			LOG.warning(valveLoggingResponse.toString());
 			throw new ValveException(response.getBody());
 		}
@@ -196,12 +197,12 @@ public class DotDelegator {
 		int status = response.getStatus();
 		if (201 == status || 200 == status) {
 			ValveLogging valveLoggingResponse = new ValveLogging(witsmlObj.getUid(),
-					logResponse(response, "Object successfully created"), witsmlObj);
+					logResponse(response, "Received successful status code from DoT create call"), witsmlObj);
 			LOG.info(valveLoggingResponse.toString());
 			return uid.isEmpty() ? new JsonNode(response.getBody()).getObject().getString("uid") : uid;
 		} else {
 			ValveLogging valveLoggingResponse = new ValveLogging(witsmlObj.getUid(),
-					logResponse(response, "Received failure"), witsmlObj);
+					logResponse(response, "Received failure status code from DoT POST"), witsmlObj);
 			LOG.warning(valveLoggingResponse.toString());
 			throw new ValveException(response.getBody());
 		}
@@ -237,7 +238,7 @@ public class DotDelegator {
 		int status = response.getStatus();
 		if (201 == status || 200 == status) {
 			ValveLogging valveLoggingResponse = new ValveLogging(witsmlObject.getUid(),
-					logResponse(response, "Successfully executed GET"), witsmlObject);
+					logResponse(response, "Successfully executed GET for query object=" + witsmlObject.toString()), witsmlObject);
 			LOG.info(valveLoggingResponse.toString());
 			// get an abstractWitsmlObject from merging the query and the result
 			// JSON objects
@@ -252,6 +253,11 @@ public class DotDelegator {
 		}
 	}
 
+	/**
+	 * Generates logging for Http Request
+	 * @param request
+	 * @return
+	 */
 	private String logRequest(HttpRequest request) {
 		StringBuilder requestString = new StringBuilder();
 		requestString
@@ -263,6 +269,12 @@ public class DotDelegator {
 		return String.valueOf(requestString);
 	}
 
+	/**
+	 * Generates logging for Http Response
+	 * @param response
+	 * @param customResponseMessage
+	 * @return
+	 */
 	private String logResponse(HttpResponse<String> response, String customResponseMessage) {
 		StringBuilder responseString = new StringBuilder();
 		responseString.append("============================response begin==========================================");
