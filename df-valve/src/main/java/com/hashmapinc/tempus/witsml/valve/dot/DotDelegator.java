@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.json.JSONObject;
@@ -35,7 +36,7 @@ public class DotDelegator {
 
 	private final String URL;
 
-	public DotDelegator(String url, String apiKey) {
+	public DotDelegator(String url) {
 		this.URL = url;
 	}
 

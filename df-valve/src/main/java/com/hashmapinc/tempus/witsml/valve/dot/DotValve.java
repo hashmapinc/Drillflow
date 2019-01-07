@@ -31,19 +31,38 @@ import java.util.Map;
 
 public class DotValve implements IValve {
     private static final Logger LOG = Logger.getLogger(DotValve.class.getName());
-    private final String NAME = "DoT"; // DoT = Drillops Town
-    private final String DESCRIPTION = "Valve for interaction with Drillops Town"; // DoT = Drillops Town
     private final DotClient CLIENT;
     private final DotDelegator DELEGATOR;
-    private final String URL;
-    private final String API_KEY;
 
+    /**
+     * Constructor that accepts a config map and builds
+     * the client and delegator fields
+     * @param config
+     */
     public DotValve(Map<String, String> config) {
-        this.URL = config.get("baseurl");
-        this.API_KEY = config.get("apikey");
-        this.CLIENT = new DotClient(this.URL, this.API_KEY);
-        this.DELEGATOR = new DotDelegator(this.URL, this.API_KEY);
-        LOG.info("Creating valve pointing to url: " + this.URL);
+        String url = config.get("baseurl");
+        String apikey = config.get("apikey");
+        String tokenPath = config.get("token.path");
+
+        this.CLIENT = new DotClient(url, apikey, tokenPath);
+        this.DELEGATOR = new DotDelegator(config);
+
+        LOG.info("Creating valve pointing to url: " + url);
+    }
+
+    /**
+     * Constructor for directly injecting a client
+     * and delegator
+     *
+     * @param client - dotClient for auth and request execution
+     * @pararm delegator - dotDelegator for executing valve methods
+     */
+    public DotValve(
+        DotClient client,
+        DotDelegator delegator
+    ) {
+        this.CLIENT = client;
+        this.DELEGATOR = delegator;
     }
 
     /**
@@ -52,7 +71,8 @@ public class DotValve implements IValve {
      */
     @Override
     public String getName() {
-        return this.NAME;
+        // DoT = Drillops Town
+        return "DoT";
     }
 
     /**
@@ -61,7 +81,8 @@ public class DotValve implements IValve {
      */
     @Override
     public String getDescription() {
-        return this.DESCRIPTION;
+        // DoT = Drillops Town
+        return "Valve for interaction with Drillops Town";
     }
 
     /**

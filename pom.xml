@@ -42,6 +42,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>11</java.version>
         <main.dir>${basedir}</main.dir>
+		<skipITs>true</skipITs>
 	</properties>
 
 	<build>
@@ -114,17 +115,22 @@
 					</execution>
 				</executions>
 			</plugin>
-<!--			<plugin>
-				<groupId>org.owasp</groupId>
-				<artifactId>dependency-check-maven</artifactId>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<configuration>
+					<skipTests>${skipITs}</skipTests>
+				</configuration>
 				<executions>
 					<execution>
 						<goals>
-							<goal>check</goal>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
 						</goals>
 					</execution>
 				</executions>
-			</plugin>-->
+			</plugin>
+
 		</plugins>
 	</build>
 
@@ -133,7 +139,7 @@
 		<dependency>
 			<groupId>com.hashmapinc.tempus</groupId>
 			<artifactId>WitsmlObjects</artifactId>
-			<version>1.1.5</version>
+			<version>1.1.6</version>
 		</dependency>
 	</dependencies>
 
