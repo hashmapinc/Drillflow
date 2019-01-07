@@ -31,280 +31,247 @@ import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
 
 public class DotDelegator {
-    private static final Logger LOG = Logger.getLogger(DotDelegator.class.getName());
+	private static final Logger LOG = Logger.getLogger(DotDelegator.class.getName());
 
-    private final String URL;
+	private final String URL;
 
-    public DotDelegator(String url, String apiKey) {
-        this.URL = url;
-    }
+	public DotDelegator(String url, String apiKey) {
+		this.URL = url;
+	}
 
-    /**
-     * returns the endpoint for each supported object type
-     * 
-     * @param objectType
-     *            - well, wellbore, trajectory, or log
-     * @return endpoint - String value to send requests to
-     * @throws ValveException
-     */
-    private String getEndpoint(String objectType) throws ValveException {
-        // TODO: these should be injected in the DotDelegator constructor and
-        // not rely on a shared this.URL
-        // get endpoint
-        String endpoint;
-        switch (objectType) { // TODO: add support for log and trajectory
-        case "well":
-            endpoint = this.URL + "/democore/well/v2/witsml/wells/";
-            break;
-        case "wellbore":
-            endpoint = this.URL + "/democore/wellbore/v1/witsml/wellbores/";
-            break;
-        default:
-            throw new ValveException("Unsupported object type<" + objectType + ">");
-        }
-        return endpoint;
-    }
+	/**
+	 * returns the endpoint for each supported object type
+	 * 
+	 * @param objectType - well, wellbore, trajectory, or log
+	 * @return endpoint - String value to send requests to
+	 * @throws ValveException
+	 */
+	private String getEndpoint(String objectType) throws ValveException {
+		// TODO: these should be injected in the DotDelegator constructor and
+		// not rely on a shared this.URL
+		// get endpoint
+		String endpoint;
+		switch (objectType) { // TODO: add support for log and trajectory
+		case "well":
+			endpoint = this.URL + "/democore/well/v2/witsml/wells/";
+			break;
+		case "wellbore":
+			endpoint = this.URL + "/democore/wellbore/v1/witsml/wellbores/";
+			break;
+		default:
+			throw new ValveException("Unsupported object type<" + objectType + ">");
+		}
+		return endpoint;
+	}
 
-    /**
-     * deletes the object from DoT
-     *
-     * @param witsmlObj
-     *            - object to delete
-     * @param username
-     *            - auth username
-     * @param password
-     *            - auth password
-     * @param client
-     *            - DotClient to execute requests with
-     */
-    public void deleteObject(AbstractWitsmlObject witsmlObj, String username, String password, DotClient client)
-            throws ValveException, UnirestException, ValveAuthException {
-        String uid = witsmlObj.getUid(); // get uid for delete call
-        String objectType = witsmlObj.getObjectType(); // get obj type for
-                                                       // exception handling
-        String endpoint = this.getEndpoint(objectType) + uid; // add uid for
-                                                              // delete call
+	/**
+	 * deletes the object from DoT
+	 *
+	 * @param witsmlObj - object to delete
+	 * @param username  - auth username
+	 * @param password  - auth password
+	 * @param client    - DotClient to execute requests with
+	 */
+	public void deleteObject(AbstractWitsmlObject witsmlObj, String username, String password, DotClient client)
+			throws ValveException, UnirestException, ValveAuthException {
+		String uid = witsmlObj.getUid(); // get uid for delete call
+		String objectType = witsmlObj.getObjectType(); // get obj type for exception handling
+		String endpoint = this.getEndpoint(objectType) + uid; // add uid for delete call
+															
+		// create request
+		HttpRequest request = Unirest.delete(endpoint).header("Content-Type", "application/json");
+		ValveLogging valveLoggingRequest = new ValveLogging(witsmlObj.getUid(), logRequest(request), witsmlObj);
+		LOG.info(valveLoggingRequest.toString());
+		if ("wellbore".equals(objectType))
+			request.queryString("uidWell", witsmlObj.getParentUid()); // TODO: ensure parent uid exists?
+																		
+		// make the DELETE call.
+		HttpResponse<String> response = client.makeRequest(request, username, password);
+		// check response status
+		int status = response.getStatus();
+		if (201 == status || 200 == status || 204 == status) {
+			ValveLogging valveLoggingResponse = new ValveLogging(witsmlObj.getUid(),
+					logResponse(response, "Successfully Deleted Object with UID :"+uid+"."), witsmlObj);
+			LOG.info(valveLoggingResponse.toString());
+		} else if (401 == status) {
+			ValveLogging valveLoggingResponse = new ValveLogging(witsmlObj.getUid(),
+					logResponse(response, "Bad auth token."), witsmlObj);
+			LOG.warning(valveLoggingResponse.toString());
+			throw new ValveAuthException("Bad JWT");
+		} else {
+			ValveLogging valveLoggingResponse = new ValveLogging(witsmlObj.getUid(),
+					logResponse(response, "Unable to delete"), witsmlObj);
+			LOG.warning(valveLoggingResponse.toString());
+			throw new ValveException("DELETE DoT REST call failed with status code: " + status);
+		}
+	}
 
-        // create request
-        HttpRequest request = Unirest.delete(endpoint).header("Content-Type", "application/json");
-        ValveLogging valveLoggingRequest = new ValveLogging(witsmlObj.getUid(), logRequest(request), witsmlObj);
-        LOG.info(valveLoggingRequest.toString());
-        if ("wellbore".equals(objectType))
-            request.queryString("uidWell", witsmlObj.getParentUid()); // TODO:
-                                                                      // ensure
-                                                                      // parent
-                                                                      // uid
-                                                                      // exists?
+	/**
+	 * updates the object in DoT
+	 *
+	 * @param witsmlObj - object to delete
+	 * @param username  - auth username
+	 * @param password  - auth password
+	 * @param client    - DotClient to execute requests with
+	 */
+	public void updateObject(AbstractWitsmlObject witsmlObj, String username, String password, DotClient client)
+			throws ValveException, ValveAuthException, UnirestException {
+		String uid = witsmlObj.getUid(); // get uid for delete call
+		String objectType = witsmlObj.getObjectType(); // get obj type for
+														// exception handling
+		String endpoint = this.getEndpoint(objectType) + uid; // add uid for
+																// update call
 
-        // make the DELETE call.
-        HttpResponse<String> response = client.makeRequest(request, username, password);
-        // check response status
-        int status = response.getStatus();
-        if (201 == status || 200 == status || 204 == status) {
-            ValveLogging valveLoggingResponse = new ValveLogging(witsmlObj.getUid(),
-                    logResponse(response, "Successfully Deleted"), witsmlObj);
-            LOG.info(valveLoggingResponse.toString());
-        } else if (401 == status) {
-            ValveLogging valveLoggingResponse = new ValveLogging(witsmlObj.getUid(),
-                    logResponse(response, "Bad auth token."), witsmlObj);
-            LOG.warning(valveLoggingResponse.toString());
-            throw new ValveAuthException("Bad JWT");
-        } else {
-            ValveLogging valveLoggingResponse = new ValveLogging(witsmlObj.getUid(),
-                    logResponse(response, "Unable to delete"), witsmlObj);
-            LOG.warning(valveLoggingResponse.toString());
-            throw new ValveException("DELETE DoT REST call failed with status code: " + status);
-        }
-    }
+		// get witsmlObj as json string for request payload
+		String payload = witsmlObj.getJSONString("1.4.1.1");
 
-    /**
-     * updates the object in DoT
-     *
-     * @param witsmlObj
-     *            - object to delete
-     * @param username
-     *            - auth username
-     * @param password
-     *            - auth password
-     * @param client
-     *            - DotClient to execute requests with
-     */
-    public void updateObject(AbstractWitsmlObject witsmlObj, String username, String password, DotClient client)
-            throws ValveException, ValveAuthException, UnirestException {
-        String uid = witsmlObj.getUid(); // get uid for delete call
-        String objectType = witsmlObj.getObjectType(); // get obj type for
-                                                       // exception handling
-        String endpoint = this.getEndpoint(objectType) + uid; // add uid for
-                                                              // update call
+		// build the request
+		HttpRequestWithBody request = Unirest.put(endpoint);
+		request.header("Content-Type", "application/json");
+		request.body(payload);
+		ValveLogging valveLoggingRequest = new ValveLogging(witsmlObj.getUid(), logRequest(request), witsmlObj);
+		LOG.info(valveLoggingRequest.toString());
 
-        // get witsmlObj as json string for request payload
-        String payload = witsmlObj.getJSONString("1.4.1.1");
+		// make the UPDATE call.
+		HttpResponse<String> response = client.makeRequest(request, username, password);
 
-        // build the request
-        HttpRequestWithBody request = Unirest.put(endpoint);
-        request.header("Content-Type", "application/json");
-        request.body(payload);
-        ValveLogging valveLoggingRequest = new ValveLogging(witsmlObj.getUid(), logRequest(request), witsmlObj);
-        LOG.info(valveLoggingRequest.toString());
+		// check response status
+		int status = response.getStatus();
+		if (201 == status || 200 == status) {
+			ValveLogging valveLoggingResponse = new ValveLogging(witsmlObj.getUid(),
+					logResponse(response, "UPDATE was successful with UID:" +uid+"."), witsmlObj);
+			LOG.info(valveLoggingResponse.toString());
+		} else {
+			ValveLogging valveLoggingResponse = new ValveLogging(witsmlObj.getUid(),
+					logResponse(response, "Received failure"), witsmlObj);
+			LOG.warning(valveLoggingResponse.toString());
+			throw new ValveException(response.getBody());
+		}
+	}
 
-        // make the UPDATE call.
-        HttpResponse<String> response = client.makeRequest(request, username, password);
+	/**
+	 * Submits the object to the DoT rest API for creation
+	 *
+	 * @param witsmlObj - AbstractWitsmlObject to create
+	 * @param username  - auth username
+	 * @param password  - auth password
+	 * @param client    - DotClient to execute requests with
+	 * @return
+	 */
+	public String createObject(AbstractWitsmlObject witsmlObj, String username, String password, DotClient client)
+			throws ValveException, ValveAuthException, UnirestException {
+		String objectType = witsmlObj.getObjectType(); // get obj type for
+														// exception handling
+		String uid = witsmlObj.getUid();
+		String endpoint = this.getEndpoint(objectType);
 
-        // check response status
-        int status = response.getStatus();
-        if (201 == status || 200 == status) {
-            ValveLogging valveLoggingResponse = new ValveLogging(witsmlObj.getUid(),
-                    logResponse(response, "UPDATE was successful"), witsmlObj);
-            LOG.info(valveLoggingResponse.toString());
-        } else {
-            ValveLogging valveLoggingResponse = new ValveLogging(witsmlObj.getUid(),
-                    logResponse(response, "Received failure"), witsmlObj);
-            LOG.warning(valveLoggingResponse.toString());
-            throw new ValveException(response.getBody());
-        }
-    }
+		// get object as payload string
+		String payload = witsmlObj.getJSONString("1.4.1.1");
 
-    /**
-     * Submits the object to the DoT rest API for creation
-     *
-     * @param witsmlObj
-     *            - AbstractWitsmlObject to create
-     * @param username
-     *            - auth username
-     * @param password
-     *            - auth password
-     * @param client
-     *            - DotClient to execute requests with
-     * @return
-     */
-    public String createObject(AbstractWitsmlObject witsmlObj, String username, String password, DotClient client)
-            throws ValveException, ValveAuthException, UnirestException {
-        String objectType = witsmlObj.getObjectType(); // get obj type for
-                                                       // exception handling
-        String uid = witsmlObj.getUid();
-        String endpoint = this.getEndpoint(objectType);
+		// build the request
+		HttpRequestWithBody request;
+		if (uid.isEmpty()) {
+			// create with POST and generate uid
+			request = Unirest.post(endpoint);
+		} else {
+			// create with PUT using existing uid
+			request = Unirest.put(endpoint + uid);
 
-        // get object as payload string
-        String payload = witsmlObj.getJSONString("1.4.1.1");
+			// for objects that need it, provide parent uid as param
+			if ("wellbore".equals(objectType))
+				request.queryString("uidWell", witsmlObj.getParentUid()); // TODO: error handle this?
+	     		}
 
-        // build the request
-        HttpRequestWithBody request;
-        if (uid.isEmpty()) {
-            // create with POST and generate uid
-            request = Unirest.post(endpoint);
-        } else {
-            // create with PUT using existing uid
-            request = Unirest.put(endpoint + uid);
+		// add the header and payload
+		request.header("Content-Type", "application/json");
+		request.body(payload);
 
-            // for objects that need it, provide parent uid as param
-            if ("wellbore".equals(objectType))
-                request.queryString("uidWell", witsmlObj.getParentUid()); // TODO:
-                                                                          // error
-                                                                          // handle
-                                                                          // this?
-        }
+		ValveLogging valveLoggingRequest = new ValveLogging(witsmlObj.getUid(), logRequest(request), witsmlObj);
+		LOG.info(valveLoggingRequest.toString());
 
-        // add the header and payload
-        request.header("Content-Type", "application/json");
-        request.body(payload);
+		// get the request response.
+		HttpResponse<String> response = client.makeRequest(request, username, password);
 
-        ValveLogging valveLoggingRequest = new ValveLogging(witsmlObj.getUid(), logRequest(request), witsmlObj);
-        LOG.info(valveLoggingRequest.toString());
+		// check response status
+		int status = response.getStatus();
+		if (201 == status || 200 == status) {
+			ValveLogging valveLoggingResponse = new ValveLogging(witsmlObj.getUid(),
+					logResponse(response, "Object successfully created"), witsmlObj);
+			LOG.info(valveLoggingResponse.toString());
+			return uid.isEmpty() ? new JsonNode(response.getBody()).getObject().getString("uid") : uid;
+		} else {
+			ValveLogging valveLoggingResponse = new ValveLogging(witsmlObj.getUid(),
+					logResponse(response, "Received failure"), witsmlObj);
+			LOG.warning(valveLoggingResponse.toString());
+			throw new ValveException(response.getBody());
+		}
+	}
 
-        // get the request response.
-        HttpResponse<String> response = client.makeRequest(request, username, password);
+	/**
+	 * Submits the query to the DoT rest API for object GETing
+	 *
+	 * @param witsmlObject - AbstractWitsmlObject to get
+	 * @param username     - auth username
+	 * @param password     - auth password
+	 * @param client       - DotClient to execute requests with
+	 * @return get results AbstractWitsmlObject
+	 */
+	public AbstractWitsmlObject getObject(AbstractWitsmlObject witsmlObject, String username, String password,
+			DotClient client) throws ValveException, ValveAuthException, UnirestException {
+		String uid = witsmlObject.getUid();
+		String objectType = witsmlObject.getObjectType();
+		String endpoint = this.getEndpoint(objectType) + uid; // add uid for rest call
+																
+		// build request
+		HttpRequest request = Unirest.get(endpoint);
+		request.header("accept", "application/json");
+		if ("wellbore".equals(objectType))
+			request.queryString("uidWell", witsmlObject.getParentUid()); // TODO: check the parent uid exists?
+																			
+		ValveLogging valveLoggingRequest = new ValveLogging(witsmlObject.getUid(), logRequest(request), witsmlObject);
+		LOG.info(valveLoggingRequest.toString());
+		// get response
+		HttpResponse<String> response = client.makeRequest(request, username, password);
 
-        // check response status
-        int status = response.getStatus();
-        if (201 == status || 200 == status) {
-            ValveLogging valveLoggingResponse = new ValveLogging(witsmlObj.getUid(),
-                    logResponse(response, "Object successfully created"), witsmlObj);
-            LOG.info(valveLoggingResponse.toString());
-            return uid.isEmpty() ? new JsonNode(response.getBody()).getObject().getString("uid") : uid;
-        } else {
-            ValveLogging valveLoggingResponse = new ValveLogging(witsmlObj.getUid(),
-                    logResponse(response, "Received failure"), witsmlObj);
-            LOG.warning(valveLoggingResponse.toString());
-            throw new ValveException(response.getBody());
-        }
-    }
+		// check response status
+		int status = response.getStatus();
+		if (201 == status || 200 == status) {
+			ValveLogging valveLoggingResponse = new ValveLogging(witsmlObject.getUid(),
+					logResponse(response, "Successfully executed GET"), witsmlObject);
+			LOG.info(valveLoggingResponse.toString());
+			// get an abstractWitsmlObject from merging the query and the result
+			// JSON objects
+			JSONObject queryJSON = new JSONObject(witsmlObject.getJSONString("1.4.1.1"));
+			JSONObject responseJSON = new JsonNode(response.getBody()).getObject();
+			return DotTranslator.translateQueryResponse(queryJSON, responseJSON, objectType);
+		} else {
+			ValveLogging valveLoggingResponse = new ValveLogging(witsmlObject.getUid(),
+					logResponse(response, "Unable to execute GET"), witsmlObject);
+			LOG.warning(valveLoggingResponse.toString());
+			throw new ValveException(response.getBody());
+		}
+	}
 
-    /**
-     * Submits the query to the DoT rest API for object GETing
-     *
-     * @param witsmlObject
-     *            - AbstractWitsmlObject to get
-     * @param username
-     *            - auth username
-     * @param password
-     *            - auth password
-     * @param client
-     *            - DotClient to execute requests with
-     * @return get results AbstractWitsmlObject
-     */
-    public AbstractWitsmlObject getObject(AbstractWitsmlObject witsmlObject, String username, String password,
-            DotClient client) throws ValveException, ValveAuthException, UnirestException {
-        String uid = witsmlObject.getUid();
-        String objectType = witsmlObject.getObjectType();
-        String endpoint = this.getEndpoint(objectType) + uid; // add uid for
-                                                              // rest call
+	private String logRequest(HttpRequest request) {
+		StringBuilder requestString = new StringBuilder();
+		requestString
+				.append("===========================request begin================================================");
+		requestString.append("URI         : " + request.getUrl());
+		requestString.append("Method      : " + request.getHttpMethod());
+		requestString.append("Headers     : " + request.getHeaders());
+		requestString.append("==========================request end================================================");
+		return String.valueOf(requestString);
+	}
 
-        // build request
-        HttpRequest request = Unirest.get(endpoint);
-        request.header("accept", "application/json");
-        if ("wellbore".equals(objectType))
-            request.queryString("uidWell", witsmlObject.getParentUid()); // TODO:
-                                                                         // check
-                                                                         // that
-                                                                         // parent
-                                                                         // uid
-                                                                         // exists?
-
-        ValveLogging valveLoggingRequest = new ValveLogging(witsmlObject.getUid(), logRequest(request), witsmlObject);
-        LOG.info(valveLoggingRequest.toString());
-        // get response
-        HttpResponse<String> response = client.makeRequest(request, username, password);
-
-        // check response status
-        int status = response.getStatus();
-        if (201 == status || 200 == status) {
-            ValveLogging valveLoggingResponse = new ValveLogging(witsmlObject.getUid(),
-                    logResponse(response, "Successfully executed GET"),
-                    witsmlObject);
-            LOG.info(valveLoggingResponse.toString());
-            // get an abstractWitsmlObject from merging the query and the result
-            // JSON objects
-            JSONObject queryJSON = new JSONObject(witsmlObject.getJSONString("1.4.1.1"));
-            JSONObject responseJSON = new JsonNode(response.getBody()).getObject();
-            return DotTranslator.translateQueryResponse(queryJSON, responseJSON, objectType);
-        } else {
-            ValveLogging valveLoggingResponse = new ValveLogging(witsmlObject.getUid(),
-                    logResponse(response, "Unable to execute GET"), witsmlObject);
-            LOG.warning(valveLoggingResponse.toString());
-            throw new ValveException(response.getBody());
-        }
-    }
-
-    private String logRequest(HttpRequest request) {
-        StringBuilder requestString = new StringBuilder();
-        requestString
-                .append("===========================request begin================================================");
-        requestString.append("URI         : " + request.getUrl());
-        requestString.append("Method      : " + request.getHttpMethod());
-        requestString.append("Headers     : " + request.getHeaders());
-        requestString.append("==========================request end================================================");
-        return String.valueOf(requestString);
-    }
-
-    private String logResponse(HttpResponse<String> response, String customResponseMessage) {
-    	StringBuilder responseString = new StringBuilder();
-    	responseString.append("============================response begin==========================================");
-    	responseString.append("Status code : " + response.getStatus());
-    	responseString.append("Status text : " + response.getStatusText());
-    	responseString.append("Headers : " + response.getHeaders());
-    	responseString.append("Response Message : " + customResponseMessage);
-    	responseString.append("Response body: " + response.getBody());
-    	responseString.append("============================response end==========================================");
-    	return String.valueOf(responseString);
-    	}
+	private String logResponse(HttpResponse<String> response, String customResponseMessage) {
+		StringBuilder responseString = new StringBuilder();
+		responseString.append("============================response begin==========================================");
+		responseString.append("Status code  : " + response.getStatus());
+		responseString.append("Status text  : " + response.getStatusText());
+		responseString.append("Headers      : " + response.getHeaders());
+		responseString.append("Response Message      : " + customResponseMessage);
+		responseString.append("Response body: " + response.getBody());
+		responseString.append("============================response end==========================================");
+		return String.valueOf(responseString);
+	}
 }
