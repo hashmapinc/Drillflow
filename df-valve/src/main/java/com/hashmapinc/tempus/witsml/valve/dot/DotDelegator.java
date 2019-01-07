@@ -18,8 +18,6 @@ package com.hashmapinc.tempus.witsml.valve.dot;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.management.Query;
-
 import org.json.JSONObject;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
@@ -40,8 +38,7 @@ public class DotDelegator {
 	  private final String URL;
 	    private final String WELL_PATH;
 	    private final String WB_PATH;
-	    private QueryContext qc;
-
+	    
 	    public DotDelegator(Map<String, String> config) {
 	        this.URL = config.get("baseurl");
 	        this.WELL_PATH = config.get("well.path");
