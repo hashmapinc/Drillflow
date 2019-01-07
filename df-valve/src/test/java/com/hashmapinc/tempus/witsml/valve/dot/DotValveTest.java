@@ -19,6 +19,7 @@ import com.auth0.jwt.JWT;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory;
 import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
 import org.junit.Before;
@@ -172,6 +173,41 @@ public class DotValveTest {
 
 		// test
 		String expected = wellboreA.getUid();
+		String actual = this.valve.createObject(qc);
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void shouldCreateTrajectory() throws Exception {
+		// build witsmlObjects list
+		ArrayList<AbstractWitsmlObject> witsmlObjects;
+		witsmlObjects = new ArrayList<>();
+
+		ObjTrajectory traj = new ObjTrajectory();
+		traj.setUid("traj-A");
+		traj.setName("traj-A");
+
+		// build query context
+		QueryContext qc = new QueryContext(
+			"1.3.1.1",
+			"trajectory",
+			null,
+			"",
+			witsmlObjects,
+			"goodUsername",
+			"goodPassword",
+			"shouldCreateTrajectory" // exchange ID
+		);
+
+
+		// mock delegator behavior
+		when(
+			this.mockDelegator.createObject(traj, qc.USERNAME, qc.PASSWORD, this.mockClient)
+		).thenReturn(traj.getUid());
+
+
+		// test
+		String expected = traj.getUid();
 		String actual = this.valve.createObject(qc);
 		assertEquals(expected, actual);
 	}
@@ -375,14 +411,15 @@ public class DotValveTest {
 		AbstractWitsmlObject[] actualUpdateObjects = cap.get("WMLS_UpdateInStore");
 
 		// verify values
-		assertEquals("well", 	 actualAddObjects[0].getObjectType());
-		assertEquals("wellbore", actualAddObjects[1].getObjectType());
-		assertEquals("well", 	 actualGetObjects[0].getObjectType());
-		assertEquals("wellbore", actualGetObjects[1].getObjectType());
-		assertEquals("well", 	 actualDeleteObjects[0].getObjectType());
-		assertEquals("wellbore", actualDeleteObjects[1].getObjectType());
-		assertEquals("well", 	 actualUpdateObjects[0].getObjectType());
-		assertEquals("wellbore", actualUpdateObjects[1].getObjectType());
+		assertEquals("well", 	   actualAddObjects[0].getObjectType());
+		assertEquals("wellbore",   actualAddObjects[1].getObjectType());
+		assertEquals("well", 	   actualGetObjects[0].getObjectType());
+		assertEquals("wellbore",   actualGetObjects[1].getObjectType());
+		assertEquals("trajectory", actualGetObjects[2].getObjectType());
+		assertEquals("well", 	   actualDeleteObjects[0].getObjectType());
+		assertEquals("wellbore",   actualDeleteObjects[1].getObjectType());
+		assertEquals("well", 	   actualUpdateObjects[0].getObjectType());
+		assertEquals("wellbore",   actualUpdateObjects[1].getObjectType());
 	}
 }
 
