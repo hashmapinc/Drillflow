@@ -15,17 +15,16 @@
  */
 package com.hashmapinc.tempus.witsml.server.api;
 
-import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
-import com.hashmapinc.tempus.witsml.QueryContext;
-import com.hashmapinc.tempus.witsml.WitsmlObjectParser;
-import com.hashmapinc.tempus.witsml.WitsmlUtil;
-import com.hashmapinc.tempus.witsml.server.WitsmlApiConfig;
-import com.hashmapinc.tempus.witsml.server.api.model.*;
-import com.hashmapinc.tempus.witsml.server.api.model.cap.DataObject;
-import com.hashmapinc.tempus.witsml.server.api.model.cap.ServerCap;
-import com.hashmapinc.tempus.witsml.valve.IValve;
-import com.hashmapinc.tempus.witsml.valve.ValveException;
-import com.hashmapinc.tempus.witsml.valve.ValveFactory;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
+import javax.jws.WebService;
+
 import org.apache.cxf.ext.logging.event.LogEvent;
 import org.apache.cxf.feature.Features;
 import org.apache.cxf.message.Message;
@@ -34,18 +33,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import javax.annotation.PostConstruct;
-import javax.jws.WebService;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
+
+import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.witsml.QueryContext;
+import com.hashmapinc.tempus.witsml.WitsmlObjectParser;
+import com.hashmapinc.tempus.witsml.WitsmlUtil;
+import com.hashmapinc.tempus.witsml.server.WitsmlApiConfig;
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_AddToStoreResponse;
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_DeleteFromStoreResponse;
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetBaseMsgResponse;
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse;
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetFromStoreResponse;
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetVersionResponse;
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_UpdateInStoreResponse;
+import com.hashmapinc.tempus.witsml.server.api.model.cap.DataObject;
+import com.hashmapinc.tempus.witsml.server.api.model.cap.ServerCap;
+import com.hashmapinc.tempus.witsml.valve.IValve;
+import com.hashmapinc.tempus.witsml.valve.ValveException;
+import com.hashmapinc.tempus.witsml.valve.ValveFactory;
 
 @Service
-@WebService(serviceName = "StoreSoapBinding", portName = "StoreSoapBindingSoap",
-        targetNamespace = "http://www.witsml.org/wsdl/120",
-        endpointInterface = "com.hashmapinc.tempus.witsml.server.api.IStore")
+@WebService(serviceName = "StoreSoapBinding", portName = "StoreSoapBindingSoap", targetNamespace = "http://www.witsml.org/wsdl/120", endpointInterface = "com.hashmapinc.tempus.witsml.server.api.IStore")
 @Features(features = "org.apache.cxf.ext.logging.LoggingFeature")
 public class StoreImpl implements IStore {
     private static final Logger LOG = Logger.getLogger(StoreImpl.class.getName());
@@ -429,4 +437,3 @@ public class StoreImpl implements IStore {
     }
 
 }
-
