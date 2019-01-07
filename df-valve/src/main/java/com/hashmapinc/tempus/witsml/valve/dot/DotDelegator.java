@@ -37,6 +37,11 @@ public class DotDelegator {
     private final String WB_PATH;
 
 
+    /**
+     * Map based constructor
+     *
+     * @param config - map with field values
+     */
     public DotDelegator(Map<String, String> config) {
         this.URL = config.get("baseurl");
         this.WELL_PATH = config.get("well.path");
