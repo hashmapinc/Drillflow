@@ -37,6 +37,7 @@ public class DotDelegator {
 
 	public DotDelegator(String url) {
 		this.URL = url;
+		
 	}
 
 	/**
