@@ -103,7 +103,7 @@ You can also submit issues or questions via GitHub Issues [here](https://github.
 
 ## Documentation
 
-See [The Documentation Here](https://witsml-server-api.readthedocs.io/en/latest/) for the latest updates.
+See [The Documentation Here](https://drillflow.readthedocs.io/en/latest/) for the latest updates.
 
 ## License
 
