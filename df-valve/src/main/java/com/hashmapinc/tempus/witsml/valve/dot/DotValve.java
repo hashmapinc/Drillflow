@@ -16,18 +16,17 @@
 package com.hashmapinc.tempus.witsml.valve.dot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.valve.IValve;
 import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
-
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class DotValve implements IValve {
     private static final Logger LOG = Logger.getLogger(DotValve.class.getName());
@@ -104,6 +103,7 @@ public class DotValve implements IValve {
                         witsmlObject,
                         qc.USERNAME,
                         qc.PASSWORD,
+                        qc.EXCHANGE_ID,
                         this.CLIENT
                     )
                 );
@@ -135,6 +135,7 @@ public class DotValve implements IValve {
                         witsmlObject,
                         qc.USERNAME,
                         qc.PASSWORD,
+                        qc.EXCHANGE_ID,
                         this.CLIENT
                     )
                 );
@@ -161,6 +162,7 @@ public class DotValve implements IValve {
                     witsmlObject,
                     qc.USERNAME,
                     qc.PASSWORD,
+                    qc.EXCHANGE_ID,
                     this.CLIENT
                 );
             }
@@ -185,6 +187,7 @@ public class DotValve implements IValve {
                     witsmlObject,
                     qc.USERNAME,
                     qc.PASSWORD,
+                    qc.EXCHANGE_ID,
                     this.CLIENT);
             }
         } catch (Exception e) {
