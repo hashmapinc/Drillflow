@@ -72,15 +72,9 @@ public class DotDelegatorTest {
         )), eq("goodUsername"), eq("goodPassword"))).thenReturn(resp);
 
         // test
-        String actualUid = this.delegator.createObject(traj, "goodUsername", "goodPassword", this.client);
+        String actualUid = this.delegator.createObject(traj, "goodUsername", "goodPassword", "exchangeID", this.client);
         String expectedUid = traj.getUid();
         assertEquals(expectedUid, actualUid);
-
-        // verify
-        verify(this.client).makeRequest(any(HttpRequestWithBody.class), eq("goodUsername"), eq("goodPassword"));
-        verifyNoMoreInteractions(this.client);
-        verify(resp).getStatus();
-        verifyNoMoreInteractions(resp);
     }
 
     @Test
@@ -116,15 +110,8 @@ public class DotDelegatorTest {
         )), eq("goodUsername"), eq("goodPassword"))).thenReturn(resp);
 
         // test
-        String actualUid = this.delegator.createObject(traj, "goodUsername", "goodPassword", this.client);
+        String actualUid = this.delegator.createObject(traj, "goodUsername", "goodPassword", "exchangeID", this.client);
         String expectedUid = "traj-a";
         assertEquals(expectedUid, actualUid);
-
-        // verify
-        verify(this.client).makeRequest(any(HttpRequestWithBody.class), eq("goodUsername"), eq("goodPassword"));
-        verifyNoMoreInteractions(this.client);
-        verify(resp).getStatus();
-        verify(resp).getBody();
-        verifyNoMoreInteractions(resp);
     }
 }

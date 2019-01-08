@@ -39,7 +39,6 @@ public class DotDelegator {
     private final String WB_PATH;
     private final String TRAJECTORY_PATH;
 
-
     /**
      * Map based constructor
      *

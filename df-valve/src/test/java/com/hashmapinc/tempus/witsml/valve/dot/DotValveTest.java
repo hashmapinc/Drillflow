@@ -204,7 +204,7 @@ public class DotValveTest {
 
 		// mock delegator behavior
 		when(
-			this.mockDelegator.createObject(traj, qc.USERNAME, qc.PASSWORD, this.mockClient)
+			this.mockDelegator.createObject(traj, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.mockClient)
 		).thenReturn(traj.getUid());
 
 
