@@ -173,6 +173,7 @@ public class DotClient {
         // get jwt
         String tokenString = this.getJWT(username, password).getToken();
 
+        LOG.info("Making request to " + req.getUrl());
         // execute request.
         HttpResponse<String> response = req
             .header("Authorization", "Bearer " + tokenString)
