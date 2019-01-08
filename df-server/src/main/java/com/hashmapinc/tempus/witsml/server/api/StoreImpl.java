@@ -54,6 +54,11 @@ public class StoreImpl implements IStore {
     private WitsmlApiConfig witsmlApiConfigUtil;
     private IValve valve;
     private ValveConfig config;
+    @Value("${wmls.version}")
+    private String version;
+
+    @Value("${valve.name}")
+    private String valveName;
 
     @Autowired
     private void setServerCap(ServerCap cap){
@@ -69,12 +74,6 @@ public class StoreImpl implements IStore {
     private void setValveConfig(ValveConfig config){
         this.config = config;
     }
-
-    @Value("${wmls.version}")
-    private String version;
-
-    @Value("${valve.name}")
-    private String valveName;
 
     @PostConstruct
     private void setValve(){

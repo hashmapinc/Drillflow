@@ -15,9 +15,9 @@
  */
 package com.hashmapinc.tempus.witsml.server.api;
 
-import com.hashmapinc.tempus.witsml.valve.IValve;
-import com.hashmapinc.tempus.witsml.valve.ValveFactory;
-import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
+import java.util.ArrayList;
+
+import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,9 +29,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.Map;
+import com.hashmapinc.tempus.witsml.valve.IValve;
+import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
+import com.hashmapinc.tempus.witsml.valve.ValveFactory;
 
 @Component
 @ComponentScan(basePackages = "com.hashmapinc.tempus.witsml.valve")

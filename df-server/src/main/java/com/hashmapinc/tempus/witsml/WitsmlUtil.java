@@ -15,8 +15,8 @@
  */
 package com.hashmapinc.tempus.witsml;
 
-import java.util.HashMap;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.logging.Logger;
 
 
@@ -53,9 +53,9 @@ public class WitsmlUtil {
         } else if (!is1311candidate && is1411candidate) {
             version = "1.4.1.1";
         } else if (!is1311candidate && !is1411candidate) {
-            throw new Exception("could not find a valid version in raw xml");
+            throw new IllegalArgumentException("could not find a valid version in raw xml");
         } else {
-            throw new Exception("found both witsml version 1.3.1.1 and 1.4.1.1 in raw xml");
+            throw new IllegalArgumentException("found both witsml version 1.3.1.1 and 1.4.1.1 in raw xml");
         }
         
         // successfully parsed version. Return here
