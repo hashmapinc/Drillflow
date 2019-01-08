@@ -79,7 +79,7 @@ public class DotValveTest {
 
 		// mock delegator behavior
 		when(
-			this.mockDelegator.getObject(well, qc.USERNAME, qc.PASSWORD, this.mockClient)
+			this.mockDelegator.getObject(well, qc.USERNAME, qc.PASSWORD,qc.EXCHANGE_ID, this.mockClient)
 		).thenReturn(well);
 
 		// test
@@ -120,10 +120,10 @@ public class DotValveTest {
 
 		// mock delegator behavior
 		when(
-			this.mockDelegator.getObject(wellboreA, qc.USERNAME, qc.PASSWORD, this.mockClient)
+			this.mockDelegator.getObject(wellboreA, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.mockClient)
 		).thenReturn(wellboreA);
 		when(
-			this.mockDelegator.getObject(wellboreB, qc.USERNAME, qc.PASSWORD, this.mockClient)
+			this.mockDelegator.getObject(wellboreB, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.mockClient)
 		).thenReturn(wellboreB);
 
 
@@ -166,7 +166,7 @@ public class DotValveTest {
 
 		// mock delegator behavior
 		when(
-			this.mockDelegator.createObject(wellboreA, qc.USERNAME, qc.PASSWORD, this.mockClient)
+			this.mockDelegator.createObject(wellboreA, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.mockClient)
 		).thenReturn(wellboreA.getUid());
 
 
@@ -208,10 +208,10 @@ public class DotValveTest {
 
 		// mock delegator behavior
 		when(
-			this.mockDelegator.createObject(wellboreA, qc.USERNAME, qc.PASSWORD, this.mockClient)
+			this.mockDelegator.createObject(wellboreA, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.mockClient)
 		).thenReturn(wellboreA.getUid());
 		when(
-			this.mockDelegator.createObject(wellboreB, qc.USERNAME, qc.PASSWORD, this.mockClient)
+			this.mockDelegator.createObject(wellboreB, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.mockClient)
 		).thenReturn(wellboreB.getUid());
 
 
@@ -251,7 +251,7 @@ public class DotValveTest {
 
 
 		// verify
-		verify(this.mockDelegator).deleteObject(wellboreA, qc.USERNAME, qc.PASSWORD, this.mockClient);
+		verify(this.mockDelegator).deleteObject(wellboreA, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.mockClient);
 		verifyNoMoreInteractions(this.mockDelegator);
 	}
 
@@ -290,8 +290,8 @@ public class DotValveTest {
 
 
 		// verify
-		verify(this.mockDelegator).deleteObject(wellboreA, qc.USERNAME, qc.PASSWORD, this.mockClient);
-		verify(this.mockDelegator).deleteObject(wellboreB, qc.USERNAME, qc.PASSWORD, this.mockClient);
+		verify(this.mockDelegator).deleteObject(wellboreA, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.mockClient);
+		verify(this.mockDelegator).deleteObject(wellboreB, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.mockClient);
 		verifyNoMoreInteractions(this.mockDelegator);
 	}
 
@@ -324,7 +324,7 @@ public class DotValveTest {
 
 
 		// verify
-		verify(this.mockDelegator).updateObject(wellboreA, qc.USERNAME, qc.PASSWORD, this.mockClient);
+		verify(this.mockDelegator).updateObject(wellboreA, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.mockClient);
 		verifyNoMoreInteractions(this.mockDelegator);
 	}
 
