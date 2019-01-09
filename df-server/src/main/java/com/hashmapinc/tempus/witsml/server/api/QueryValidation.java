@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.tempus.witsml.server.api;
 
+<<<<<<< HEAD
 /**
 * Copyright © 2018-2018 Hashmap, Inc
 *
@@ -31,6 +32,8 @@ package com.hashmapinc.tempus.witsml.server.api;
 * limitations under the License.
 */
 
+=======
+>>>>>>> bcb4429891033225cc302cd9351327740cd4bed1
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
