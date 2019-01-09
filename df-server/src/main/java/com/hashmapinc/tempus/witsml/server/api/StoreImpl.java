@@ -159,7 +159,7 @@ public class StoreImpl implements IStore {
             //TODO: handle exception
             LOG.warning("ValveException in addToStore: " + ve.getMessage());
             response.setSuppMsgOut(ve.getMessage());
-            response.setResult((short)-1);
+            response.setResult((short)-425);
             return response;
         } catch (Exception e) {
             //TODO: handle exception
@@ -167,16 +167,30 @@ public class StoreImpl implements IStore {
                 "could not add witsml object to store: \n" +
                 "Error: " + e
             );
+           
+			try {
+				String version = WitsmlUtil.getVersionFromXML(XMLin);
+				Short errorCode = QueryValidation.validateAddToStore(
+		         		   WMLtypeIn, 
+		         		   XMLin, 
+		         		   OptionsIn, 
+		         		   CapabilitiesIn, 
+		         		   version);
+		            response.setSuppMsgOut("Error adding to store: " + QueryValidation.getErrorMessage(errorCode));
+		            response.setResult((short)errorCode);
+		            return response;
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+				response.setSuppMsgOut("error validating documents");
+				response.setResult((short)-999);
+				return response;
+			}
             //checking the input parameters for errorCode if not return 1 for success.
-            Short errorCode = QueryValidation.validateAddToStore(
-         		   WMLtypeIn, 
-         		   XMLin, 
-         		   OptionsIn, 
-         		   CapabilitiesIn, 
-         		   version);
-            response.setSuppMsgOut("Error adding to store: " + QueryValidation.getErrorMessage(errorCode));
-            response.setResult((short)errorCode);
-            return response;
+            
+            /*response.setSuppMsgOut("Error");
+            response.setResult((short)-1);
+            return response;*/
         }
 
         LOG.info("Successfully added object: " + witsmlObjects.get(0).toString());
@@ -221,7 +235,7 @@ public class StoreImpl implements IStore {
             //TODO: handle exception
             LOG.warning("ValveException in updateInStore: " + ve.getMessage());
             response.setSuppMsgOut(ve.getMessage());
-            response.setResult((short)-1);
+            response.setResult((short)-425);
             return response;
         } catch (Exception e) {
             //TODO: handle exception
@@ -273,15 +287,7 @@ public class StoreImpl implements IStore {
                     "OptionsIn: " + OptionsIn + " \n" +
                     "CapabilitiesIn: " + CapabilitiesIn
             );
-          //checking the input parameters for errorCode, if not return 1 for success.
-            String clientVersion = WitsmlUtil.getVersionFromXML(QueryIn);
-            Short errorCode = QueryValidation.validateDeleteFromStore(
-            		WMLtypeIn, 
-            		QueryIn, 
-            		OptionsIn, 
-            		CapabilitiesIn, 
-            		clientVersion);
-            resp.setSuppMsgOut("Bad QueryIn. Got error message: " + QueryValidation.getErrorMessage(errorCode));
+            resp.setSuppMsgOut("Bad QueryIn. Got error message: " + e.getMessage());
             return resp;
         }
 
@@ -304,7 +310,15 @@ public class StoreImpl implements IStore {
             this.valve.deleteObject(qc);
             resp.setResult((short) 1);
         } catch (Exception e) {
-            resp.setSuppMsgOut(e.getMessage());
+        	 String clientVersion = WitsmlUtil.getVersionFromXML(QueryIn);
+             Short errorCode = QueryValidation.validateDeleteFromStore(
+             		WMLtypeIn, 
+             		QueryIn, 
+             		OptionsIn, 
+             		CapabilitiesIn, 
+             		clientVersion);
+             resp.setSuppMsgOut("Bad QueryIn. Got error message: " + QueryValidation.getErrorMessage(errorCode));
+             return resp;
         }
 
         // return response
@@ -380,16 +394,8 @@ public class StoreImpl implements IStore {
                         "OptionsIn: " + OptionsIn + " \n" + 
                         "CapabilitiesIn: " + CapabilitiesIn
             );
-          //checking the input parameters for errorCode, if not return 1 for success.
-            clientVersion = WitsmlUtil.getVersionFromXML(QueryIn);
-            Short errorCode = QueryValidation.validateGetFromStore(
-            		WMLtypeIn, 
-            		QueryIn, 
-            		OptionsIn, 
-            		CapabilitiesIn, 
-            		clientVersion);
-            resp.setSuppMsgOut("Error parsing input: " + QueryValidation.getErrorMessage(errorCode));
-            resp.setResult((short) errorCode);
+            resp.setSuppMsgOut("Error parsing input: " + e.getMessage());
+            resp.setResult((short) -1);
             return resp;
         }
 
@@ -418,8 +424,17 @@ public class StoreImpl implements IStore {
                 resp.setResult((short) 1);
                 resp.setXMLout(xmlOut);
             } else {
-                resp.setSuppMsgOut("Unhandled error from REST backend.");
-                resp.setResult((short) -1);
+            	//checking the input parameters for errorCode, if not return 1 for success.
+                clientVersion = WitsmlUtil.getVersionFromXML(QueryIn);
+                Short errorCode = QueryValidation.validateGetFromStore(
+                		WMLtypeIn, 
+                		QueryIn, 
+                		OptionsIn, 
+                		CapabilitiesIn, 
+                		clientVersion);
+                resp.setSuppMsgOut("Error parsing input: " + QueryValidation.getErrorMessage(errorCode));
+                resp.setResult((short) errorCode);
+                return resp;
             }
         } catch (ValveException ve) {
             resp.setResult((short)-425);
