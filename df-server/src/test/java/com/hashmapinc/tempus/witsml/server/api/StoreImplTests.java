@@ -49,7 +49,7 @@ public class StoreImplTests {
 					"OptionsIn",
 					"CapabilitiesIn"
 				).getResult()
-			).isEqualTo((short)-999);
+			).isEqualTo((short)-1);
 		} catch (IOException e) {
 			fail("Add to store failed...");
 		}

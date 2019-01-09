@@ -183,15 +183,10 @@ public class StoreImpl implements IStore {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 				response.setSuppMsgOut("error validating documents");
-				response.setResult((short)-999);
+				response.setResult((short)-1);
 				return response;
 			}
-            //checking the input parameters for errorCode if not return 1 for success.
-            
-            /*response.setSuppMsgOut("Error");
-            response.setResult((short)-1);
-            return response;*/
-        }
+         }
 
         LOG.info("Successfully added object: " + witsmlObjects.get(0).toString());
         response.setSuppMsgOut(uid);
