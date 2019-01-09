@@ -161,35 +161,15 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 
 	static Validation error425() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_425.value());
-	}
-
-	static Validation error426() {
-		return holds(param -> !checkNotNullUid(param.getXMLin()), ERRORCODE.ERROR_426.value());
-	}
-
-	static Validation error427() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_427.value());
-	}
-
-	static Validation error428() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_428.value());
+		return holds(param -> !checkOptionsInHeader(param.getOptionsIn()), ERRORCODE.ERROR_425.value());
 	}
 
 	static Validation error429() {
 		return holds(param -> !checkLogData(param.getXMLin()), ERRORCODE.ERROR_429.value());
 	}
 
-	static Validation error430() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_430.value());
-	}
-
-	static Validation error431() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_431.value());
-	}
-
 	static Validation error432() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_432.value());
+		return holds(param -> !checkNotNullUid(param.getXMLin()), ERRORCODE.ERROR_432.value());
 	}
 
 	static Validation error433() {
@@ -198,43 +178,19 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 
 	static Validation error434() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_434.value());
-	}
-
-	static Validation error435() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_435.value());
-	}
-
-	static Validation error436() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_436.value());
+		return holds(param -> !checkNotNullUid(param.getXMLin()), ERRORCODE.ERROR_434.value());
 	}
 
 	static Validation error437() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_437.value());
+		return holds(param -> !checkMnemonicListUnique(param.getXMLin()), ERRORCODE.ERROR_437.value());
 	}
 
 	static Validation error438() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_438.value());
+		return holds(param -> checkMnemonicListUnique(param.getXMLin()), ERRORCODE.ERROR_438.value());
 	}
 
 	static Validation error439() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_439.value());
-	}
-
-	static Validation error440() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_440.value());
-	}
-
-	static Validation error441() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_441.value());
-	}
-
-	static Validation error442() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_442.value());
-	}
-
-	static Validation error443() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_443.value());
+		return holds(param -> !checkMnemonicListNotEmpty(param.getXMLin()), ERRORCODE.ERROR_439.value());
 	}
 
 	static Validation error444() {
@@ -250,7 +206,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 
 	static Validation error447() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_447.value());
+		return holds(param -> !checkUniqueUid(param.getXMLin()), ERRORCODE.ERROR_447.value());
 	}
 
 	static Validation error448() {
@@ -269,48 +225,20 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 		return holds(param -> !checkUnitList(param.getXMLin()), ERRORCODE.ERROR_451.value());
 	}
 
-	static Validation error452() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_452.value());
-	}
-
 	static Validation error453() {
 		return holds(param -> !checkNotNullUOM(param.getXMLin()), ERRORCODE.ERROR_453.value());
-	}
-
-	static Validation error454() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_454.value());
-	}
-
-	static Validation error455() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_455.value());
-	}
-
-	static Validation error456() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_456.value());
-	}
-
-	static Validation error457() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_457.value());
-	}
-
-	static Validation error458() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_458.value());
 	}
 
 	static Validation error459() {
 		return holds(param -> !checkMnemonicForSpecialCharacters(param.getXMLin()), ERRORCODE.ERROR_459.value());
 	}
 
-	static Validation error460() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_460.value());
-	}
-
 	static Validation error461() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_461.value());
+		return holds(param -> !checkMnemonicListNotEmpty(param.getXMLin()), ERRORCODE.ERROR_461.value());
 	}
 
 	static Validation error462() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_462.value());
+		return holds(param -> !checkMnemonicListNotEmpty(param.getXMLin()), ERRORCODE.ERROR_462.value());
 	}
 
 	static Validation error463() {
@@ -321,72 +249,20 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 		return holds(param -> !checkUniqueUid(param.getXMLin()), ERRORCODE.ERROR_464.value());
 	}
 
-	static Validation error465() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_465.value());
-	}
-
-	static Validation error466() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_466.value());
-	}
-
-	static Validation error467() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_467.value());
-	}
-
 	static Validation error468() {
 		return holds(param -> !checkSchemaVersion(param.getXMLin()), ERRORCODE.ERROR_468.value());
 	}
 
 	static Validation error469() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_469.value());
-	}
-
-	static Validation error470() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_470.value());
-	}
-
-	static Validation error471() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_471.value());
-	}
-
-	static Validation error472() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_472.value());
-	}
-
-	static Validation error473() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_473.value());
-	}
-
-	static Validation error474() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_474.value());
+		return holds(param -> !validateSchemaCheck(param.getXMLin()), ERRORCODE.ERROR_469.value());
 	}
 
 	static Validation error475() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_475.value());
-	}
-
-	static Validation error476() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_476.value());
-	}
-
-	static Validation error477() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_477.value());
-	}
-
-	static Validation error478() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_478.value());
-	}
-
-	static Validation error479() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_479.value());
-	}
-
-	static Validation error480() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_480.value());
+		return holds(param -> !checkWell(param.getXMLin()), ERRORCODE.ERROR_475.value());
 	}
 
 	static Validation error481() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_481.value());
+		return holds(param -> !checkExistingUID(param.getWMLtypeIn(), param.getXMLin(), param.getOptionsIn(), param.getCapabilitiesIn()), ERRORCODE.ERROR_481.value());
 	}
 
 	static Validation error482() {
@@ -394,24 +270,12 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 
 	static Validation error483() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_483.value());
-	}
-
-	static Validation error484() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_484.value());
-	}
-
-	static Validation error485() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_485.value());
+		return holds(param -> !validateSchemaCheck(param.getXMLin()), ERRORCODE.ERROR_483.value());
 	}
 
 	static Validation error486() {
 		return holds(param -> !checkIfXMLEqualsWMLObj(param.getXMLin(), param.getWMLtypeIn()),
 				ERRORCODE.ERROR_486.value());
-	}
-
-	static Validation error487() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_487.value());
 	}
 
 	static Validation error999() {
@@ -425,8 +289,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
     }
 
     static ValidationResult invalid(String message) {
-        //return new Invalid(message);
-    	return null;
+    	return new Invalid(Short.valueOf(message));
         
     }
 
@@ -1037,34 +900,22 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
     }
 
     /**
-     * Check uom attribute with witsml
+     * This method checks for header in OptionsIn
      * 
-     * @param XMLin
-     * @return
-     * @throws ParserConfigurationException
-     * @throws SAXException
-     * @throws IOException
-     * @throws XPathExpressionException
+     * @param OptionsIn
+     * @return true if nested objects are not found
+     * 
      */
-    static boolean checkUOMWithWitsml(String XMLin) {
+    static boolean checkOptionsInHeader(String OptionsIn) {
         boolean result = false;
-        Document doc;
-        try {
-            doc = getXMLDocument(XMLin);
-            NodeList nodeList = getNodeListForExpression(doc, uomExpression);
-
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                Element eElement = (Element) nodeList.item(i);
-                String uom = eElement.getAttribute(uomAttribute);
-                // check uom with witsml unit
-            }
-        } catch (SAXException | IOException | ParserConfigurationException | XPathExpressionException e) {
-            LOG.warning(e.getMessage());
-        }
-
+        String regex = ";";
+		if (!OptionsIn.matches(regex)) {
+		    result = true;
+         }
         return result;
     }
-    
+  
+   
     /**
      * Check uom attribute with witsml
      * 
@@ -1096,57 +947,57 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
     }
 
     static Validation checkErrorForAddtoStoreVersion1411() {
-        return error407().and(error408()).and(error487()).and(error409()).and(error426()).and(error401())
-                .and(error406()).and(error464()).and(error412()).and(error479()).and(error466()).and(error413())
-                .and(error405()).and(error481()).and(error478()).and(error453()).and(error443()).and(error456())
+        return error407().and(error408()).and(error409()).and(error401())
+                .and(error406()).and(error464()).and(error412()).and(error413())
+                .and(error405()).and(error481()).and(error453())
                 .and(error463()).and(error999());
     }
 
     static Validation checkErrorForAddtoStoreVersion1311() {
-        return error407().and(error408()).and(error487()).and(error409()).and(error426()).and(error401())
-                .and(error406()).and(error464()).and(error412()).and(error479()).and(error466()).and(error413())
-                .and(error405()).and(error481()).and(error478()).and(error453()).and(error443()).and(error456())
+        return error407().and(error408()).and(error409()).and(error401())
+                .and(error406()).and(error464()).and(error412()).and(error413())
+                .and(error405()).and(error481()).and(error453())
                 .and(error463()).and(error999());
     }
 
     static Validation checkErrorForGetFromStoreVersion1411() {
-        return error407().and(error408()).and(error409()).and(error410()).and(error426()).and(error425())
-                .and(error475()).and(error476()).and(error466()).and(error402()).and(error479()).and(error427())
-                .and(error428()).and(error477()).and(error460()).and(error461()).and(error462()).and(error429())
+        return error407().and(error408()).and(error409()).and(error410()).and(error425())
+                .and(error475()).and(error402())
+               .and(error461()).and(error462()).and(error429())
                 .and(error482()).and(error999());
     }
 
     static Validation checkErrorForGetFromStoreVersion1311() {
-        return error407().and(error408()).and(error409()).and(error410()).and(error426()).and(error425())
-                .and(error475()).and(error476()).and(error466()).and(error402()).and(error479()).and(error427())
-                .and(error428()).and(error477()).and(error460()).and(error461()).and(error462()).and(error429())
-                .and(error482()).and(error999());
+    	 return error407().and(error408()).and(error409()).and(error410()).and(error425())
+                 .and(error475()).and(error402())
+                .and(error461()).and(error462()).and(error429())
+                 .and(error482()).and(error999());
     }
 
     static Validation checkErrorForUpdateInStoreVersion1411() {
-        return error407().and(error408()).and(error409()).and(error426()).and(error479()).and(error466())
-                .and(error433()).and(error464()).and(error415()).and(error444()).and(error401()).and(error484())
-                .and(error445()).and(error464()).and(error453()).and(error443()).and(error446()).and(error456())
-                .and(error463()).and(error480()).and(error436()).and(error434()).and(error449()).and(error451())
-                .and(error452()).and(error999());
+        return error407().and(error408()).and(error409())
+                .and(error433()).and(error464()).and(error415()).and(error444()).and(error401())
+                .and(error445()).and(error464()).and(error453()).and(error446())
+                .and(error463()).and(error434()).and(error449()).and(error451())
+                .and(error999());
     }
 
     static Validation checkErrorForUpdateInStoreVersion1311() {
-        return error407().and(error408()).and(error409()).and(error426()).and(error479()).and(error466())
-                .and(error433()).and(error464()).and(error415()).and(error444()).and(error401()).and(error484())
-                .and(error445()).and(error464()).and(error453()).and(error443()).and(error446()).and(error456())
-                .and(error463()).and(error480()).and(error436()).and(error434()).and(error449()).and(error451())
-                .and(error452()).and(error999());
+    	 return error407().and(error408()).and(error409())
+                 .and(error433()).and(error464()).and(error415()).and(error444()).and(error401())
+                 .and(error445()).and(error464()).and(error453()).and(error446())
+                 .and(error463()).and(error434()).and(error449()).and(error451())
+                 .and(error999());
     }
 
     static Validation checkErrorForDeleteInStoreVersion1411() {
-        return error407().and(error408()).and(error433()).and(error414()).and(error472()).and(error466())
+        return error407().and(error408()).and(error433()).and(error414())
                 .and(error415()).and(error444()).and(error416()).and(error417()).and(error418()).and(error419())
                 .and(error420()).and(error437()).and(error999());
     }
 
     static Validation checkErrorForDeleteInStoreVersion1311() {
-        return error407().and(error408()).and(error433()).and(error414()).and(error472()).and(error466())
+        return error407().and(error408()).and(error433()).and(error414())
                 .and(error415()).and(error444()).and(error416()).and(error417()).and(error418()).and(error419())
                 .and(error420()).and(error437()).and(error999());
     }
