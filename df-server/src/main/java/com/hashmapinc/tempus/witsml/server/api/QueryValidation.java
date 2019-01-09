@@ -414,7 +414,7 @@ public class QueryValidation {
 
         public static WITSMLVERSION getType(String typeName) {
             if (typeMapping.get(typeName) == null) {
-                throw new RuntimeException(String.format("There is no Type mapping with name (%s)"));
+                throw new IllegalArgumentException(String.format("There is no Type mapping with name (%s)"));
             }
             return typeMapping.get(typeName);
         }

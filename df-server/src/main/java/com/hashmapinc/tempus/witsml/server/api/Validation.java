@@ -497,7 +497,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
             doc = getXMLDocument(XMLin);
             NodeList nodeList = doc.getElementsByTagName("wells");
             Element eElement = (Element) nodeList;
-            if (eElement.getAttribute("Version") != "1.3.1.1" || eElement.getAttribute("Version") != "1.4.1.1") {
+            if (!eElement.getAttribute("Version").equals("1.3.1.1")|| !eElement.getAttribute("Version").equals("1.4.1.1")) {
                 result = true;
             }
         } catch (SAXException | IOException | ParserConfigurationException e) {

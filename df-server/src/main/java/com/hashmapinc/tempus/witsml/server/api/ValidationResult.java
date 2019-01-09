@@ -60,7 +60,7 @@ final class ValidationSupport {
 		}
 	};
 
-	static ValidationResult valid() {
+	public static ValidationResult valid() {
 		return valid;
 	}
 }
