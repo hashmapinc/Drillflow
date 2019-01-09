@@ -49,6 +49,14 @@ import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetFromStoreResponse;
 interface Validation extends Function<ValidateParam, ValidationResult> {
 
 	static final Logger LOG = Logger.getLogger(Validation.class.getName());
+	 public static StoreImpl store = new StoreImpl();
+
+	    public static String uidExpression = "//*[@uid]";
+	    public static String uomExpression = "//*[@uom]";
+	    public static String WELL_XML_TAG = "well";
+	    public static String LOG_XML_TAG = "logData";
+	    public static String uidAttribute = "uid";
+	    public static String uomAttribute = "uom";
 
 	static Validation error401() {
 		return holds(param -> !checkWell(param.getXMLin()), ERRORCODE.ERROR_401.value());
@@ -92,7 +100,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 
 	static Validation error411() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_411.value());
+		return holds(param -> !checkOptionsForEncoding(param.getOptionsIn()), ERRORCODE.ERROR_411.value());
 	}
 
 	static Validation error412() {
@@ -102,9 +110,10 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	static Validation error413() {
 		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_413.value());
 	}
-
+	
+	//checks if the user have the delete rights
 	static Validation error414() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_414.value());
+		return holds(param -> false, ERRORCODE.ERROR_414.value());
 	}
 
 	static Validation error415() {
@@ -124,27 +133,31 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 
 	static Validation error419() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_419.value());
+		return holds(param -> !checkNodeValue(param.getXMLin()), ERRORCODE.ERROR_419.value());
 	}
 
 	static Validation error420() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_420.value());
+		return holds(param -> !checkNodeValue(param.getXMLin()), ERRORCODE.ERROR_420.value());
 	}
-
+	
+	//checks for return after delete call
 	static Validation error421() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_421.value());
+		return holds(param -> true, ERRORCODE.ERROR_421.value());
 	}
-
+	
+	//checks for GetBaseMessage input
 	static Validation error422() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_422.value());
+		return holds(param -> true, ERRORCODE.ERROR_422.value());
 	}
-
+	
+	//checks for GetCap 
 	static Validation error423() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_423.value());
+		return holds(param -> true, ERRORCODE.ERROR_423.value());
 	}
-
+	
+	//checks for data version of OptionsIn for GetCap
 	static Validation error424() {
-		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_424.value());
+		return holds(param -> !checkDataVerison(param.getCapabilitiesIn()), ERRORCODE.ERROR_424.value());
 	}
 
 	static Validation error425() {
@@ -412,8 +425,9 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
     }
 
     static ValidationResult invalid(String message) {
-        // return new Invalid(message);
-        return null;
+        //return new Invalid(message);
+    	retrun null;
+        
     }
 
     static ValidationResult valid() {
@@ -427,16 +441,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
         };
     }
 
-    public static StoreImpl store = new StoreImpl();
-
-    public static String uidExpression = "//*[@uid]";
-    public static String uomExpression = "//*[@uom]";
-    public static String WELL_XML_TAG = "well";
-    public static String LOG_XML_TAG = "logData";
-    public static String uidAttribute = "uid";
-    public static String uomAttribute = "uom";
-
-    /**
+     /**
      * This method parse the XML Document
      * 
      * @param XMLin
@@ -455,8 +460,8 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
         doc.getDocumentElement().normalize();
         return doc;
     }
-
-    /**
+    
+     /**
      * This method validates the XMLin against the schemaLocation.
      * 
      * @param xmlFileUrl
@@ -492,7 +497,20 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
         }
         return result;
     }
-
+    
+    /**
+     * This method checks for empty WMLType
+     * 
+     * @param WMLType
+     * @return true if empty else false
+     */
+    static boolean checkDataVerison(String OptionsIn) {
+        boolean result = false;
+        if (OptionsIn.trim().isEmpty()) {
+            result = true;
+        }
+        return result;
+    }    
     /**
      * This method checks for XML empty
      * 
@@ -1001,6 +1019,22 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
         }
         return result;
     }
+    
+    /**
+     * This method checks for Encoding in OptionsIn
+     * 
+     * @param OptionsIn
+     * @return true if special character is found.
+     * 
+     */
+    static boolean checkOptionsForEncoding(String OptionsIn) {
+        boolean result = false;
+        String regex = ";";
+		if (!OptionsIn.matches(regex)) {
+		    result = true;
+         }
+        return result;
+    }
 
     /**
      * Check uom attribute with witsml
@@ -1024,6 +1058,36 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
                 String uom = eElement.getAttribute(uomAttribute);
                 // check uom with witsml unit
             }
+        } catch (SAXException | IOException | ParserConfigurationException | XPathExpressionException e) {
+            LOG.warning(e.getMessage());
+        }
+
+        return result;
+    }
+    
+    /**
+     * Check uom attribute with witsml
+     * 
+     * @param XMLin
+     * @return
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     * @throws XPathExpressionException
+     */
+    static boolean checkErrorCode(String XMLin) {
+        boolean result = false;
+        try {
+                Document  doc = getXMLDocument(XMLin);
+                NodeList nodeList = getNodeListForExpression(doc, "mnemonicList");
+                String regex = "',><&//\\";
+                for (int i = 0; i < nodeList.getLength(); i++) {
+                    Element eElement = (Element) nodeList.item(i);
+                    if (eElement.getNodeValue().matches(regex)) {
+                        result = true;
+                        break;
+                    }
+                }
         } catch (SAXException | IOException | ParserConfigurationException | XPathExpressionException e) {
             LOG.warning(e.getMessage());
         }
