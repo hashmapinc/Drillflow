@@ -39,52 +39,54 @@ public class StoreImplTests {
 
 	@Test
 	public void addToStoreShouldHandleBadInput() {
-			assertThat(
-				this.witsmlServer.addToStore(
-					"WMLtypeIn",
-					"XMLin",
-					"OptionsIn",
-					"CapabilitiesIn"
-				).getResult()
-			).isEqualTo((short)-999);
-			}
+		assertThat(
+				this.witsmlServer.addToStore("WMLtypeIn", "XMLin", "OptionsIn=available", "CapabilitiesIn").getResult())
+						.isEqualTo((short) -1);
+	}
 
 	@Test
-	public void getVersionShouldReturnDefaultVersion(){
+	public void addToStoreShouldHandleBadInputAndReturn999() {
+		assertThat(this.witsmlServer
+				.addToStore("WMLtypeIn", "version=\"1.3.1.1\"", "OptionsIn=available", "CapabilitiesIn").getResult())
+						.isEqualTo((short) -999);
+	}
+
+	@Test
+	public void getVersionShouldReturnDefaultVersion() {
 		assertThat(this.witsmlServer.getVersion().getResult()).contains("1.3.1.1,1.4.1.1");
 	}
 
 	@Test
-	public void getBaseMsgShouldReturnATextualDescription(){
-		assertThat(this.witsmlServer.getBaseMsg((short)412).getResult()).contains("add");
+	public void getBaseMsgShouldReturnATextualDescription() {
+		assertThat(this.witsmlServer.getBaseMsg((short) 412).getResult()).contains("add");
 	}
 
 	@Test
-	public void getBaseMsgShouldReturnATextualDescriptionForANegativeNumber(){
-		assertThat(this.witsmlServer.getBaseMsg((short)-412).getResult()).contains("add");
+	public void getBaseMsgShouldReturnATextualDescriptionForANegativeNumber() {
+		assertThat(this.witsmlServer.getBaseMsg((short) -412).getResult()).contains("add");
 	}
 
 	@Test
-	public void getCapShouldReturnAnXMLForACorrectVersion(){
+	public void getCapShouldReturnAnXMLForACorrectVersion() {
 		WMLS_GetCapResponse resp = this.witsmlServer.getCap("dataValue=1.3.1.1");
 		assertThat(resp).isNotNull();
 		assertThat(resp.getCapabilitiesOut()).contains("<name>");
-		assertThat(resp.getResult()).isEqualTo((short)1);
+		assertThat(resp.getResult()).isEqualTo((short) 1);
 	}
 
 	@Test
-	public void getCapShouldReturn424ForAnIncorrectVersion(){
+	public void getCapShouldReturn424ForAnIncorrectVersion() {
 		WMLS_GetCapResponse resp = this.witsmlServer.getCap("dataValue=7");
 		assertThat(resp).isNotNull();
-		assertThat(resp.getResult()).isEqualTo((short)-424);
+		assertThat(resp.getResult()).isEqualTo((short) -424);
 		assertThat(resp.getCapabilitiesOut()).isNull();
 	}
 
 	@Test
-	public void getCapShouldReturnTheCorrectErrorForAnEmptyValue(){
+	public void getCapShouldReturnTheCorrectErrorForAnEmptyValue() {
 		WMLS_GetCapResponse resp = this.witsmlServer.getCap("");
 		assertThat(resp).isNotNull();
-		assertThat(resp.getResult()).isEqualTo((short)-424);
+		assertThat(resp.getResult()).isEqualTo((short) -424);
 		assertThat(resp.getCapabilitiesOut()).isNull();
 	}
 }

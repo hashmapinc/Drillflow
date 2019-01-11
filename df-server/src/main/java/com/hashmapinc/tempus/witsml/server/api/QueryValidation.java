@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.tempus.witsml.server.api;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -127,6 +128,9 @@ public class QueryValidation {
             String version, STOREFUNCTION storeFunction) throws IOException {
         short result = -1;
         WITSMLVERSION witsmlVersion = WITSMLVERSION.getType(version);
+        if (witsmlVersion == null) {
+        	return result;
+        }
 
         switch (witsmlVersion) {
         case v1311:
@@ -384,16 +388,25 @@ public class QueryValidation {
      */
     public static String getErrorMessage(Short errorCode) throws IOException {
         LOG.info("Checking the basemessage.properties file for errorMessages");
+        if (errorCode == -1) {
+        	return "Failed Response";
+        }
+        String result = null;
         Properties prop = new Properties();
         InputStream input = null;
-        String basemessages = "resources/basemessages.properties";
-        input = QueryValidation.class.getResourceAsStream(basemessages);
+        String basemessages = "basemessages.properties";
+        input = QueryValidation.class.getClassLoader().getResourceAsStream(basemessages);
         if (input == null) {
             LOG.info("Error loading the basemessages.properties file");
+            throw new FileNotFoundException("Error loading the basemessages.properties file");
         }
         prop.load(input);
         String errorM = "basemessages." + errorCode;
         LOG.info("The error Code is :" + errorM);
+        result = prop.getProperty(errorM);
+        if (result == null) {
+        	return "-999";
+        }
         return prop.getProperty(errorM);
     }
 
@@ -408,13 +421,13 @@ public class QueryValidation {
 
         public static Map<String, WITSMLVERSION> typeMapping = new HashMap<String, QueryValidation.WITSMLVERSION>();
         static {
-            typeMapping.put(v1311.name(), v1311);
-            typeMapping.put(v1411.name(), v1411);
+            typeMapping.put(v1311.value(), v1311);
+            typeMapping.put(v1411.value(), v1411);
         }
 
         public static WITSMLVERSION getType(String typeName) {
             if (typeMapping.get(typeName) == null) {
-                throw new IllegalArgumentException(String.format("There is no Type mapping with name (%s)"));
+                return null;
             }
             return typeMapping.get(typeName);
         }
