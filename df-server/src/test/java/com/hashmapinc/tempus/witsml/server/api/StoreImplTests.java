@@ -15,17 +15,15 @@
  */
 package com.hashmapinc.tempus.witsml.server.api;
 
-import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
-
-import java.io.IOException;
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -41,7 +39,6 @@ public class StoreImplTests {
 
 	@Test
 	public void addToStoreShouldHandleBadInput() {
-		try {
 			assertThat(
 				this.witsmlServer.addToStore(
 					"WMLtypeIn",
@@ -49,11 +46,8 @@ public class StoreImplTests {
 					"OptionsIn",
 					"CapabilitiesIn"
 				).getResult()
-			).isEqualTo((short)-1);
-		} catch (IOException e) {
-			fail("Add to store failed...");
-		}
-	}
+			).isEqualTo((short)-999);
+			}
 
 	@Test
 	public void getVersionShouldReturnDefaultVersion(){
