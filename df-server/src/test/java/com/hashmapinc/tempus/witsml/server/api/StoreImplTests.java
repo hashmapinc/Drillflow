@@ -45,28 +45,48 @@ public class StoreImplTests {
 
 	@Test
 	public void addToStoreShouldHandleBadInput() throws InterruptedException, ExecutionException {
+<<<<<<< HEAD
 		assertThat(this.storeImpl.addToStore("WMLtypeIn", "XMLin", "OptionsIn", "CapabilitiesIn").get().getResult())
+=======
+		assertThat(this.witsmlServer.addToStore("WMLtypeIn", "XMLin", "OptionsIn", "CapabilitiesIn").get().getResult())
+>>>>>>> Spring Async using futures implentation
 				.isEqualTo((short) -1);
 	}
 
 	@Test
 	public void getVersionShouldReturnDefaultVersion() {
+<<<<<<< HEAD
 		assertThat(this.storeImpl.getVersion().getResult()).contains("1.3.1.1,1.4.1.1");
+=======
+		assertThat(this.witsmlServer.getVersion().getResult()).contains("1.3.1.1,1.4.1.1");
+>>>>>>> Spring Async using futures implentation
 	}
 
 	@Test
 	public void getBaseMsgShouldReturnATextualDescription() {
+<<<<<<< HEAD
 		assertThat(this.storeImpl.getBaseMsg((short) 412).getResult()).contains("add");
+=======
+		assertThat(this.witsmlServer.getBaseMsg((short) 412).getResult()).contains("add");
+>>>>>>> Spring Async using futures implentation
 	}
 
 	@Test
 	public void getBaseMsgShouldReturnATextualDescriptionForANegativeNumber() {
+<<<<<<< HEAD
 		assertThat(this.storeImpl.getBaseMsg((short) -412).getResult()).contains("add");
+=======
+		assertThat(this.witsmlServer.getBaseMsg((short) -412).getResult()).contains("add");
+>>>>>>> Spring Async using futures implentation
 	}
 
 	@Test
 	public void getCapShouldReturnAnXMLForACorrectVersion() {
+<<<<<<< HEAD
 		WMLS_GetCapResponse resp = this.storeImpl.getCap("dataValue=1.3.1.1");
+=======
+		WMLS_GetCapResponse resp = this.witsmlServer.getCap("dataValue=1.3.1.1");
+>>>>>>> Spring Async using futures implentation
 		assertThat(resp).isNotNull();
 		assertThat(resp.getCapabilitiesOut()).contains("<name>");
 		assertThat(resp.getResult()).isEqualTo((short) 1);
@@ -74,7 +94,11 @@ public class StoreImplTests {
 
 	@Test
 	public void getCapShouldReturn424ForAnIncorrectVersion() {
+<<<<<<< HEAD
 		WMLS_GetCapResponse resp = this.storeImpl.getCap("dataValue=7");
+=======
+		WMLS_GetCapResponse resp = this.witsmlServer.getCap("dataValue=7");
+>>>>>>> Spring Async using futures implentation
 		assertThat(resp).isNotNull();
 		assertThat(resp.getResult()).isEqualTo((short) -424);
 		assertThat(resp.getCapabilitiesOut()).isNull();
@@ -82,7 +106,11 @@ public class StoreImplTests {
 
 	@Test
 	public void getCapShouldReturnTheCorrectErrorForAnEmptyValue() {
+<<<<<<< HEAD
 		WMLS_GetCapResponse resp = this.storeImpl.getCap("");
+=======
+		WMLS_GetCapResponse resp = this.witsmlServer.getCap("");
+>>>>>>> Spring Async using futures implentation
 		assertThat(resp).isNotNull();
 		assertThat(resp.getResult()).isEqualTo((short) -424);
 		assertThat(resp.getCapabilitiesOut()).isNull();
@@ -90,9 +118,26 @@ public class StoreImplTests {
 
 	@Test
 	public void testAsyncAnnotationForAddMethod() throws InterruptedException, ExecutionException {
+<<<<<<< HEAD
 		CompletableFuture<WMLS_AddToStoreResponse> future = this.storeImpl.addToStore("WMLtypeIn", "XMLin",
 				"OptionsIn", "CapabilitiesIn");
 		assertNotNull(future);
 		assertEquals(-1, future.get().getResult());
+=======
+		CompletableFuture<WMLS_AddToStoreResponse> future = this.witsmlServer.addToStore("WMLtypeIn", "XMLin",
+				"OptionsIn", "CapabilitiesIn");
+		while (true) {
+			System.out.println("Waiting for response from addToStore()...");
+			if (future.isDone()) {
+				System.out.println("Result from Async addToStore() -> " + future.get().getResult());
+				break;
+			}
+			System.out.println("Continue execution...");
+			Thread.sleep(1000);
+		}
+
+		System.out.println("Exit test case...");
+
+>>>>>>> Spring Async using futures implentation
 	}
 }
