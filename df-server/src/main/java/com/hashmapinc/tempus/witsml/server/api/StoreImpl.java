@@ -365,7 +365,6 @@ public class StoreImpl implements IStore {
                 getExchangeId()
             );
 
-            // get query XML
             String xmlOut = this.valve.getObject(qc);
 
             // populate response

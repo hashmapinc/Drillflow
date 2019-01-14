@@ -15,11 +15,6 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
-import java.util.Map;
-import java.util.logging.Logger;
-
-import org.json.JSONObject;
-
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.ValveLogging;
 import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
@@ -30,6 +25,12 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.logging.Logger;
 
 public class DotDelegator {
     private static final Logger LOG = Logger.getLogger(DotDelegator.class.getName());
@@ -38,6 +39,7 @@ public class DotDelegator {
     private final String WELL_PATH;
     private final String WB_PATH;
     private final String TRAJECTORY_PATH;
+    private final String WELL_GQL_PATH;
 
     /**
      * Map based constructor
@@ -49,6 +51,7 @@ public class DotDelegator {
         this.WELL_PATH =       config.get("well.path");
         this.WB_PATH =         config.get("wellbore.path");
         this.TRAJECTORY_PATH = config.get("trajectory.path");
+        this.WELL_GQL_PATH =   config.get("well.gql.path");
     }
 
     /**
@@ -65,8 +68,11 @@ public class DotDelegator {
         String endpoint;
         switch (objectType) { // TODO: add support for log and trajectory
             case "well":
-                endpoint = this.URL + this.WELL_PATH;
+            	endpoint = this.URL + this.WELL_PATH;
                 break;
+			case "wellsearch":
+				endpoint = this.URL + this.WELL_GQL_PATH;
+				break;
             case "wellbore":
                 endpoint = this.URL + this.WB_PATH;
                 break;
@@ -308,6 +314,55 @@ public class DotDelegator {
 	}
 
 	/**
+	 * Submits a search query to the DoT rest API for object GETing
+	 *
+	 * @param witsmlObject - AbstractWitsmlObject to get
+	 * @param username - auth username
+	 * @param password - auth password
+	 * @param exchangeID - unique string for tracking which exchange called this method
+	 * @param client - DotClient to execute requests with
+	 * @return get results AbstractWitsmlObject
+	 */
+	public ArrayList<AbstractWitsmlObject> executeGraphQL(
+			AbstractWitsmlObject witsmlObject,
+			String query,
+			String username,
+			String password,
+			String exchangeID,
+			DotClient client
+	) throws ValveException, ValveAuthException, UnirestException, IOException {
+		String objectType = witsmlObject.getObjectType();
+		String endpoint = this.getEndpoint(objectType + "search");
+
+		// build request
+		HttpRequestWithBody request = Unirest.post(endpoint);
+		request.header("Content-Type", "application/json");
+		request.body(query);
+		ValveLogging valveLoggingRequest = new ValveLogging(exchangeID, logRequest(request), witsmlObject);
+		LOG.info(valveLoggingRequest.toString());
+		// get response
+		HttpResponse<String> response = client.makeRequest(request, username, password);
+
+		// check response status
+		int status = response.getStatus();
+		if (201 == status || 200 == status || 400 == status) {
+			ValveLogging valveLoggingResponse = new ValveLogging(exchangeID,
+					logResponse(response, "Successfully executed POST for query object=" + witsmlObject.toString()),
+					witsmlObject);
+			LOG.info(valveLoggingResponse.toString());
+			// get an abstractWitsmlObject from merging the query and the result
+			// JSON objects
+			GraphQLRespConverter converter = new GraphQLRespConverter();
+			return converter.convert(response.getBody(), objectType);
+		} else {
+			ValveLogging valveLoggingResponse = new ValveLogging(witsmlObject.getUid(),
+					logResponse(response, "Unable to execute POST"), witsmlObject);
+			LOG.warning(valveLoggingResponse.toString());
+			throw new ValveException(response.getBody());
+		}
+	}
+
+	/**
 	 * Generates logging for Http Request
 	 * @param request
 	 * @return
@@ -315,11 +370,11 @@ public class DotDelegator {
 	private String logRequest(HttpRequest request) {
 		StringBuilder requestString = new StringBuilder();
 		requestString
-				.append("===========================request begin================================================");
-		requestString.append("URI         : " + request.getUrl());
-		requestString.append("Method      : " + request.getHttpMethod());
-		requestString.append("Headers     : " + request.getHeaders());
-		requestString.append("==========================request end================================================");
+				.append("===========================request begin================================================" + System.lineSeparator());
+		requestString.append("URI         : " + request.getUrl() + System.lineSeparator());
+		requestString.append("Method      : " + request.getHttpMethod() + System.lineSeparator());
+		requestString.append("Headers     : " + request.getHeaders() + System.lineSeparator());
+		requestString.append("==========================request end================================================" + System.lineSeparator());
 		return String.valueOf(requestString);
 	}
 
@@ -331,13 +386,13 @@ public class DotDelegator {
 	 */
 	private String logResponse(HttpResponse<String> response, String customResponseMessage) {
 		StringBuilder responseString = new StringBuilder();
-		responseString.append("============================response begin==========================================");
-		responseString.append("Status code  : " + response.getStatus());
-		responseString.append("Status text  : " + response.getStatusText());
-		responseString.append("Headers      : " + response.getHeaders());
-		responseString.append("Response Message      : " + customResponseMessage);
-		responseString.append("Response body: " + response.getBody());
-		responseString.append("============================response end==========================================");
+		responseString.append("============================response begin==========================================" + System.lineSeparator());
+		responseString.append("Status code  : " + response.getStatus() + System.lineSeparator());
+		responseString.append("Status text  : " + response.getStatusText() + System.lineSeparator());
+		responseString.append("Headers      : " + response.getHeaders() + System.lineSeparator());
+		responseString.append("Response Message      : " + customResponseMessage + System.lineSeparator());
+		responseString.append("Response body: " + response.getBody() + System.lineSeparator());
+		responseString.append("============================response end==========================================" + System.lineSeparator());
 		return String.valueOf(responseString);
 	}
 }
