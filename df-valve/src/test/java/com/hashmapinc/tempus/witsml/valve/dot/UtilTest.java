@@ -25,5 +25,22 @@ public class UtilTest {
 
         assertEquals(expected, actual);
     }
+
+
+    @Test
+    public void shouldReturnEmptyMergeObject() throws Exception {
+        String destString = "{\"fakeField\": null}";
+        String srcString = new String(Files.readAllBytes(Paths.get("src/test/resources/utilTest/well1311src.json")));
+
+        JSONObject dest = new JSONObject(destString);
+        JSONObject src = new JSONObject(srcString);
+
+        JSONObject merged = Util.merge(dest, src);
+
+        String actual = merged.toString(2);
+        String expected = "{}";
+
+        assertEquals(expected, actual);
+    }
 }
 
