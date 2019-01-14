@@ -17,8 +17,10 @@ package com.hashmapinc.tempus.witsml.valve.dot;
 
 import com.auth0.jwt.JWT;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory;
 import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
@@ -85,6 +87,39 @@ public class DotValveTest {
 
 		// test
 		String expected = well.getXMLString("1.3.1.1");
+		String actual = this.valve.getObject(qc);
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void shouldGetEmptyObject() throws Exception {
+		// build well list
+		ArrayList<AbstractWitsmlObject> witsmlObjects;
+		witsmlObjects = new ArrayList<>();
+		ObjWell well = new ObjWell();
+		well.setName("well-1");
+		well.setUid("well-1");
+		witsmlObjects.add(well);
+
+		// build query context
+		QueryContext qc = new QueryContext(
+			"1.3.1.1",
+			"well",
+			null,
+			"",
+			witsmlObjects,
+			"goodUsername",
+			"goodPassword",
+			"shouldGetEmptyObject" // exchange ID
+		);
+
+		// mock delegator behavior
+		when(
+			this.mockDelegator.getObject(well, qc.USERNAME, qc.PASSWORD,qc.EXCHANGE_ID, this.mockClient)
+		).thenReturn(null);
+
+		// test
+		String expected = WitsmlMarshal.serialize(new ObjWells());
 		String actual = this.valve.getObject(qc);
 		assertEquals(expected, actual);
 	}

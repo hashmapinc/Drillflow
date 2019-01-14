@@ -91,7 +91,18 @@ public class Util {
         if (obj instanceof String) return ((String) obj).isEmpty();
 
         // handle json array
-        if (obj instanceof JSONArray) return ((JSONArray) obj).length() == 0;
+        if (obj instanceof JSONArray) {
+            JSONArray objArray = (JSONArray) obj;
+            if (objArray.length() == 0)
+                return true;
+
+            // check if elements are empty too
+            boolean elementsAreEmpty = true;
+            for (int i = 0; i < objArray.length(); i++ )
+                elementsAreEmpty &= isEmpty(objArray.get(i));
+
+            return elementsAreEmpty;
+        }
 
         // handle json objects
         if (obj instanceof JSONObject) {

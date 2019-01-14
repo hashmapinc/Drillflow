@@ -296,6 +296,9 @@ public class DotDelegator {
 			JSONObject queryJSON = new JSONObject(witsmlObject.getJSONString("1.4.1.1"));
 			JSONObject responseJSON = new JsonNode(response.getBody()).getObject();
 			return DotTranslator.translateQueryResponse(queryJSON, responseJSON, objectType);
+		} else if (404 == status) {
+			// handle not found. This is a valid response
+			return null;
 		} else {
 			ValveLogging valveLoggingResponse = new ValveLogging(witsmlObject.getUid(),
 					logResponse(response, "Unable to execute GET"), witsmlObject);
