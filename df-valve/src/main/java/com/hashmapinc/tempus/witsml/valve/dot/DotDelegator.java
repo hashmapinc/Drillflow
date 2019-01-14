@@ -15,17 +15,6 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
-
-import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
-import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.ValveLogging;
 import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
@@ -36,6 +25,12 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.logging.Logger;
 
 public class DotDelegator {
     private static final Logger LOG = Logger.getLogger(DotDelegator.class.getName());
@@ -325,7 +320,7 @@ public class DotDelegator {
 	 * @param client - DotClient to execute requests with
 	 * @return get results AbstractWitsmlObject
 	 */
-	public ArrayList<AbstractWitsmlObject> getObjects(
+	public ArrayList<AbstractWitsmlObject> executeGraphQL(
 			AbstractWitsmlObject witsmlObject,
 			String query,
 			String username,

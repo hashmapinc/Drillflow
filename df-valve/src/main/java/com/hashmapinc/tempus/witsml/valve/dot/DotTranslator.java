@@ -15,16 +15,14 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Logger;
-
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
-
 import com.hashmapinc.tempus.witsml.valve.ValveException;
 import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.logging.Logger;
 
 /**
  * ABANDON ALL HOPE, YE WHO ENTER HERE

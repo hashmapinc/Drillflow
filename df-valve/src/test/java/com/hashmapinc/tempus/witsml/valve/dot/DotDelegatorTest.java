@@ -18,7 +18,6 @@ package com.hashmapinc.tempus.witsml.valve.dot;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory;
-import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
@@ -161,7 +160,7 @@ public class DotDelegatorTest {
                         someReq.getHeaders().containsKey("Content-Type")
         )), eq("goodUsername"), eq("goodPassword"))).thenReturn(resp);
 
-        ArrayList<AbstractWitsmlObject> foundObjects = this.delegator.getObjects(singleWell, jsonQuery, "goodUsername", "goodPassword", "exchangeID", this.client);
+        ArrayList<AbstractWitsmlObject> foundObjects = this.delegator.executeGraphQL(singleWell, jsonQuery, "goodUsername", "goodPassword", "exchangeID", this.client);
         assertEquals(3, foundObjects.size());
     }
 }

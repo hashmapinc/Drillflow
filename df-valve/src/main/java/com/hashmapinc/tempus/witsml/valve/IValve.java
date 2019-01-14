@@ -42,10 +42,10 @@ public interface IValve {
 
     /**
      * Gets a collection of objects based on the WITSML Query
-     * @param qc - QueryContext needed to execute the getObjects query
+     * @param qc - QueryContext needed to execute the executeGraphQL query
      * @return The resultant object from the query in XML string format
      */
-    public String getObjects(QueryContext qc) throws ValveException;
+    //public String getObjects(QueryContext qc) throws ValveException;
 
     /**
      * Creates an object

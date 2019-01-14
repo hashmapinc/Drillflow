@@ -20,13 +20,14 @@ import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import javax.json.JsonArray;
-import java.io.IOException;;
+import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+;
 
 //This class takes a WITSML Query search and converts it to a GraphQL search
 class GraphQLQueryConverter {
@@ -41,7 +42,7 @@ class GraphQLQueryConverter {
      * @return the object
      * @throws IOException Thrown if there is an error in creation of the query
      */
-    String convertQuery(AbstractWitsmlObject wmlObject) throws IOException {
+    public String convertQuery(AbstractWitsmlObject wmlObject) throws IOException {
         switch (wmlObject.getObjectType()){
             case "well":
                 return convertWell(wmlObject);
@@ -105,7 +106,7 @@ class GraphQLQueryConverter {
                 continue;
             }
             String value = jsonWitsml.get(key).toString();
-            if (!value.equals("") && !value.equals("null")) {
+            if (!"".equals(value) && !"null".equals(value)) {
                 this.builder.addVariable("wellArgument", key, value);
             }
             queryKeys.add(indent + key);
@@ -118,8 +119,6 @@ class GraphQLQueryConverter {
     {
         private String query;
         private Map<String, Map<String, String>> variables = new HashMap();
-
-        public QueryBuilder() {}
 
         public String getQuery() { return query; }
 

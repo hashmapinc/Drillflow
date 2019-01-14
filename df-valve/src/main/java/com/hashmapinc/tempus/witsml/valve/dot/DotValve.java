@@ -95,18 +95,30 @@ public class DotValve implements IValve {
     public String getObject(
         QueryContext qc
     ) throws ValveException {
+
+        if (qc.WITSML_OBJECTS.size() == 1 && "".equals(qc.WITSML_OBJECTS.get(0).getUid())){
+            // its a search
+            return doSearch(qc);
+        } else {
+            // its a get
+            return getSingularObject(qc);
+        }
+    }
+
+    private String getSingularObject(QueryContext qc) throws ValveException{
+
         // handle each object
         ArrayList<AbstractWitsmlObject> queryResponses = new ArrayList<AbstractWitsmlObject>();
         try {
             for (AbstractWitsmlObject witsmlObject: qc.WITSML_OBJECTS) {
                 queryResponses.add(
-                    this.DELEGATOR.getObject(
-                        witsmlObject,
-                        qc.USERNAME,
-                        qc.PASSWORD,
-                        qc.EXCHANGE_ID,
-                        this.CLIENT
-                    )
+                        this.DELEGATOR.getObject(
+                                witsmlObject,
+                                qc.USERNAME,
+                                qc.PASSWORD,
+                                qc.EXCHANGE_ID,
+                                this.CLIENT
+                        )
                 );
             }
         } catch (Exception e) {
@@ -117,8 +129,7 @@ public class DotValve implements IValve {
         return DotTranslator.consolidateObjectsToXML(queryResponses, qc.CLIENT_VERSION);
     }
 
-    @Override
-    public String getObjects(QueryContext qc) throws ValveException {
+    private String doSearch(QueryContext qc) throws ValveException {
         // handle each object
         ArrayList<AbstractWitsmlObject> queryResponses = new ArrayList<AbstractWitsmlObject>();
         if (qc.WITSML_OBJECTS.size() > 1) {
@@ -133,7 +144,7 @@ public class DotValve implements IValve {
             throw new ValveException(ex.getMessage());
         }
         try {
-            queryResponses = this.DELEGATOR.getObjects(qc.WITSML_OBJECTS.get(0), query, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.CLIENT);
+            queryResponses = this.DELEGATOR.executeGraphQL(qc.WITSML_OBJECTS.get(0), query, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.CLIENT);
         } catch (Exception e) {
             LOG.warning("Exception in DotValve get object: " + e.getMessage());
             throw new ValveException(e.getMessage());

@@ -365,15 +365,7 @@ public class StoreImpl implements IStore {
                 getExchangeId()
             );
 
-            String xmlOut;
-            // Test for search
-            if (qc.WITSML_OBJECTS.size() == 1 && "".equals(qc.WITSML_OBJECTS.get(0).getUid())){
-                // its a search
-                xmlOut = this.valve.getObjects(qc);
-            } else {
-                // its a get
-                xmlOut = this.valve.getObject(qc);
-            }
+            String xmlOut = this.valve.getObject(qc);
 
             // populate response
             if (null != xmlOut) {
