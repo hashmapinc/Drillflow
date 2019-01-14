@@ -163,6 +163,12 @@ public class DotDelegator {
 		HttpRequestWithBody request = Unirest.put(endpoint);
 		request.header("Content-Type", "application/json");
 		request.body(payload);
+
+		// add query string params
+		if ("wellbore".equals(objectType)) {
+			request.queryString("uidWell", witsmlObj.getParentUid()); // TODO: error handle this?
+		}
+
 		ValveLogging valveLoggingRequest = new ValveLogging(exchangeID, logRequest(request), witsmlObj);
 		LOG.info(valveLoggingRequest.toString());
 
