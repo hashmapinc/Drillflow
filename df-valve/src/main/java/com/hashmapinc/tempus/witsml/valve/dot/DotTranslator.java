@@ -23,6 +23,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Logger;
+import javax.xml.bind.JAXBException;
 
 /**
  * ABANDON ALL HOPE, YE WHO ENTER HERE
@@ -108,39 +109,108 @@ public class DotTranslator {
     }
 
     /**
+     * converts witsmlObjects list of wells to valid
+     * witsml XML string based on version and whether
+     * the list is empty or not
+     * @param witsmlObjects - list of wells to serialize. Should be 1 or 0 wells
+     * @param version - witsml version to serialize to
+     * @return STRING xml serialization result
+     * @throws ValveException
+     */
+    private static String consolidateWellsToXML(
+        ArrayList<AbstractWitsmlObject> witsmlObjects,
+        String version
+    ) throws ValveException {
+        String xml;
+        boolean is1411 = "1.4.1.1".equals(version);
+
+        // handle empty well list
+        if (0 == witsmlObjects.size()) {
+            try {
+                xml = is1411 ?
+                    WitsmlMarshal.serialize(new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWells()) :
+                    WitsmlMarshal.serialize(new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells());
+            } catch (JAXBException jxbe) {
+                throw new ValveException("Could not serialize empty wells object");
+            }
+
+
+        } else {
+            // handle non empty well list
+            xml = is1411 ? 
+                consolidate1411WellsToXML(witsmlObjects) : 
+                consolidate1311WellsToXML(witsmlObjects);
+        }
+
+        return xml;
+    }
+
+    /**
+     * converts witsmlObjects list of wellbores to valid
+     * witsml XML string based on version and whether
+     * the list is empty or not
+     * @param witsmlObjects - list of objects to serialize
+     * @param version - witsml version to serialize to
+     * @return STRING xml serialization result
+     * @throws ValveException
+     */
+    private static String consolidateWellboresToXML(
+        ArrayList<AbstractWitsmlObject> witsmlObjects,
+        String version
+    ) throws ValveException {
+        String xml;
+        boolean is1411 = "1.4.1.1".equals(version);
+
+        // handle empty list
+        if (0 == witsmlObjects.size()) {
+            try {
+                xml = is1411 ?
+                    WitsmlMarshal.serialize(new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores()) :
+                    WitsmlMarshal.serialize(new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbores());
+            } catch (JAXBException jxbe) {
+                throw new ValveException("Could not serialize empty wellbores object");
+            }
+
+
+        } else {
+            // handle non empty list
+            xml = is1411 ?
+                consolidate1411WellboresToXML(witsmlObjects) :
+                consolidate1311WellboresToXML(witsmlObjects);
+        }
+
+        return xml;
+    }
+
+    /**
      * Consolidates each object under 1 parent and serializes
      * the consolidated object into an XML string in the proper
      * WITSML version format
      *
      * @param witsmlObjects - list of objects to consolidate
      * @param version - witsml version to serialize to
+     * @param objectType - type of objects being consolidated (well, wellbore, trajectory, or log)
      * @return = serialized parent object in requested WITSML version format
      * @throws ValveException
      */
     public static String consolidateObjectsToXML(
         ArrayList<AbstractWitsmlObject> witsmlObjects,
-        String version
+        String version,
+        String objectType
     ) throws ValveException {
         // validate version
         if(!"1.3.1.1".equals(version) && !"1.4.1.1".equals(version)) {
             throw new ValveException("Unsupported client version <" + version + "> in DoT GET");
         }
 
-        // makes if statements more legible
-        boolean is1411 = "1.4.1.1".equals(version);
-
         // get xmlString
         String xmlString;
-        switch (witsmlObjects.get(0).getObjectType()) {
+        switch (objectType) {
             case "well": // no consolidation needed for wells
-                xmlString = is1411 ?
-                    consolidate1411WellsToXML(witsmlObjects) :
-                    consolidate1311WellsToXML(witsmlObjects);
+                xmlString = consolidateWellsToXML(witsmlObjects, version);
                 break;
             case "wellbore": // no consolidation needed for wells
-                xmlString = is1411 ?
-                    consolidate1411WellboresToXML(witsmlObjects) :
-                    consolidate1311WellboresToXML(witsmlObjects);
+                xmlString = consolidateWellboresToXML(witsmlObjects, version);
                 break;
             default:
                 throw new ValveException("Unsupported object type: " + witsmlObjects.get(0).getObjectType());

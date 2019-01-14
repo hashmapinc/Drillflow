@@ -1,0 +1,370 @@
+{
+  "country": "",
+  "numLicense": "",
+  "county": "",
+  "waterDepth": {
+    "uom": null,
+    "value": null
+  },
+  "operator": "",
+  "pcInterest": {
+    "uom": "",
+    "value": null
+  },
+  "objectType": "well",
+  "uid": "uid12333",
+  "nameLegal": "",
+  "block": "",
+  "state": "",
+  "operatorDiv": "",
+  "groundElevation": {
+    "datum": "",
+    "uom": null,
+    "value": null
+  },
+  "commonData": {
+    "comments": "",
+    "acquisitionTimeZone": [],
+    "extensionNameValue": []
+  },
+  "timeZone": "",
+  "numAPI": "",
+  "version": "1.4.1.1",
+  "referencePoint": [
+    {
+      "elevation": {
+        "datum": "",
+        "uom": null,
+        "value": null
+      },
+      "uid": "",
+      "measuredDepth": {
+        "datum": "",
+        "uom": null,
+        "value": null
+      },
+      "name": "",
+      "description": "",
+      "location": [
+        {
+          "southing": {
+            "uom": "",
+            "value": null
+          },
+          "easting": {
+            "uom": "",
+            "value": null
+          },
+          "latitude": {
+            "uom": "",
+            "value": null
+          },
+          "description": "",
+          "extensionNameValue": [],
+          "northing": {
+            "uom": "",
+            "value": null
+          },
+          "uid": null,
+          "projectedX": {
+            "uom": "",
+            "value": null
+          },
+          "wellCRS": {
+            "value": "",
+            "uidRef": ""
+          },
+          "projectedY": {
+            "uom": "",
+            "value": null
+          },
+          "localY": {
+            "uom": "",
+            "value": null
+          },
+          "westing": {
+            "uom": "",
+            "value": null
+          },
+          "localX": {
+            "uom": "",
+            "value": null
+          },
+          "longitude": {
+            "uom": "",
+            "value": null
+          }
+        }
+      ],
+      "type": "",
+      "extensionNameValue": []
+    }
+  ],
+  "wellLocation": [
+    {
+      "southing": {
+        "uom": "",
+        "value": null
+      },
+      "easting": {
+        "uom": "",
+        "value": null
+      },
+      "latitude": {
+        "uom": "",
+        "value": null
+      },
+      "description": "",
+      "extensionNameValue": [],
+      "northing": {
+        "uom": "",
+        "value": null
+      },
+      "uid": null,
+      "projectedX": {
+        "uom": "",
+        "value": null
+      },
+      "wellCRS": {
+        "value": "",
+        "uidRef": ""
+      },
+      "projectedY": {
+        "uom": "",
+        "value": null
+      },
+      "localY": {
+        "uom": "",
+        "value": null
+      },
+      "westing": {
+        "uom": "",
+        "value": null
+      },
+      "localX": {
+        "uom": "",
+        "value": null
+      },
+      "longitude": {
+        "uom": "",
+        "value": null
+      }
+    }
+  ],
+  "wellheadElevation": {
+    "datum": null,
+    "uom": null,
+    "value": null
+  },
+  "field": "",
+  "wellCRS": [
+    {
+      "uid": "",
+      "localCRS": {
+        "yaxisAzimuth": {
+          "uom": "",
+          "northDirection": null,
+          "value": null
+        },
+        "origin": {
+          "value": "",
+          "uidRef": null
+        },
+        "yaxisDescription": "",
+        "originDescription": ""
+      },
+      "geographic": {
+        "ztranslation": {
+          "uom": "",
+          "value": null
+        },
+        "xtranslation": {
+          "uom": "",
+          "value": null
+        },
+        "yrotation": {
+          "uom": "",
+          "value": null
+        },
+        "scaleFactor": null,
+        "ellipsoidCode": null,
+        "geodeticDatumCode": null,
+        "ellipsoidSemiMajorAxis": {
+          "uom": "",
+          "value": null
+        },
+        "ytranslation": {
+          "uom": "",
+          "value": null
+        },
+        "nameCRS": {
+          "namingSystem": "",
+          "code": "",
+          "value": ""
+        },
+        "ellipsoidInverseFlattening": null,
+        "xrotation": {
+          "uom": "",
+          "value": null
+        },
+        "zrotation": {
+          "uom": "",
+          "value": null
+        }
+      },
+      "mapProjection": {
+        "latitudeForScale": {
+          "uom": "",
+          "value": null
+        },
+        "originLatitude": {
+          "uom": "",
+          "value": null
+        },
+        "projectionCode": null,
+        "falseNorthing": {
+          "uom": "",
+          "value": null
+        },
+        "description": "",
+        "latitude1": {
+          "uom": "",
+          "value": null
+        },
+        "latitude2": {
+          "uom": "",
+          "value": null
+        },
+        "zone": "",
+        "parameter": [
+          {
+            "uid": null,
+            "uom": "",
+            "name": "",
+            "index": null,
+            "description": "",
+            "value": ""
+          }
+        ],
+        "hemisphere": null,
+        "spheroidRadius": {
+          "uom": "",
+          "value": null
+        },
+        "longitudeForScale": {
+          "uom": "",
+          "value": null
+        },
+        "nadtype": null,
+        "stdParallel1": {
+          "uom": "",
+          "value": null
+        },
+        "trueScaleLatitude": {
+          "uom": "",
+          "value": null
+        },
+        "projectedFrom": {
+          "value": "",
+          "uidRef": ""
+        },
+        "perspectiveHeight": {
+          "uom": "",
+          "value": null
+        },
+        "bearing": {
+          "uom": "",
+          "value": null
+        },
+        "scaleFactor": null,
+        "centralMeridian": {
+          "uom": "",
+          "value": null
+        },
+        "methodVariant": null,
+        "stdParallel2": {
+          "uom": "",
+          "value": null
+        },
+        "longitude2": {
+          "uom": "",
+          "value": null
+        },
+        "longitude1": {
+          "uom": "",
+          "value": null
+        },
+        "originLongitude": {
+          "uom": "",
+          "value": null
+        },
+        "nameCRS": {
+          "namingSystem": "",
+          "code": "",
+          "value": ""
+        },
+        "falseEasting": {
+          "uom": "",
+          "value": null
+        }
+      },
+      "name": "",
+      "description": "",
+      "extensionNameValue": []
+    }
+  ],
+  "district": "",
+  "name": "",
+  "numGovt": "",
+  "region": "",
+  "wellDatum": [
+    {
+      "elevation": {
+        "datum": "",
+        "uom": null,
+        "value": null
+      },
+      "rig": {
+        "wellboreParent": {
+          "value": "",
+          "uidRef": null
+        },
+        "rigReference": {
+          "value": "",
+          "uidRef": null
+        },
+        "wellParent": {
+          "value": "",
+          "uidRef": null
+        }
+      },
+      "uid": "",
+      "wellbore": {
+        "wellParent": {
+          "value": "",
+          "uidRef": null
+        },
+        "wellboreReference": {
+          "value": "",
+          "uidRef": null
+        }
+      },
+      "datumName": {
+        "namingSystem": null,
+        "code": null,
+        "value": ""
+      },
+      "kind": [
+        ""
+      ],
+      "measuredDepth": {
+        "datum": "",
+        "uom": null,
+        "value": null
+      },
+      "name": "",
+      "comment": "",
+      "extensionNameValue": []
+    }
+  ]
+}

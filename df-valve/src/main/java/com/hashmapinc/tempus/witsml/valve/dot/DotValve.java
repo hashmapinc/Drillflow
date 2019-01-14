@@ -111,22 +111,21 @@ public class DotValve implements IValve {
         ArrayList<AbstractWitsmlObject> queryResponses = new ArrayList<AbstractWitsmlObject>();
         try {
             for (AbstractWitsmlObject witsmlObject: qc.WITSML_OBJECTS) {
-                queryResponses.add(
-                        this.DELEGATOR.getObject(
-                                witsmlObject,
-                                qc.USERNAME,
-                                qc.PASSWORD,
-                                qc.EXCHANGE_ID,
-                                this.CLIENT
-                        )
+                AbstractWitsmlObject response = this.DELEGATOR.getObject(
+                    witsmlObject,
+                    qc.USERNAME,
+                    qc.PASSWORD,
+                    qc.EXCHANGE_ID,
+                    this.CLIENT
                 );
+                if (null != response) queryResponses.add(response);
             }
         } catch (Exception e) {
             LOG.warning("Exception in DotValve get object: " + e.getMessage());
             throw new ValveException(e.getMessage());
         }
         // return consolidated XML response in proper version
-        return DotTranslator.consolidateObjectsToXML(queryResponses, qc.CLIENT_VERSION);
+        return DotTranslator.consolidateObjectsToXML(queryResponses, qc.CLIENT_VERSION, qc.OBJECT_TYPE);
     }
 
     private String doSearch(QueryContext qc) throws ValveException {
