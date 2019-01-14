@@ -15,7 +15,7 @@
  */
 package com.hashmapinc.tempus.witsml.server.api;
 
-import com.hashmapinc.tempus.witsml.server.api.model.*;
+import java.util.concurrent.CompletableFuture;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -24,13 +24,21 @@ import javax.jws.soap.SOAPBinding;
 import javax.xml.ws.RequestWrapper;
 import javax.xml.ws.ResponseWrapper;
 
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_AddToStoreResponse;
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_DeleteFromStoreResponse;
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetBaseMsgResponse;
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse;
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetFromStoreResponse;
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetVersionResponse;
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_UpdateInStoreResponse;
+
 @WebService(targetNamespace = "http://www.witsml.org/wsdl/120", name = "StoreSoapBinding")
 public interface IStore {
 
     @WebMethod(action = "http://www.witsml.org/action/120/Store.WMLS_AddToStore", operationName = "WMLS_AddToStore")
     @RequestWrapper(targetNamespace = "http://www.witsml.org/message/120")
     @SOAPBinding(style = SOAPBinding.Style.RPC, parameterStyle= SOAPBinding.ParameterStyle.BARE, use = SOAPBinding.Use.ENCODED)
-    WMLS_AddToStoreResponse addToStore(
+    CompletableFuture<WMLS_AddToStoreResponse> addToStore(
         @WebParam(partName = "WMLtypeIn") String WMLtypeIn,
         @WebParam(partName = "XMLin") String XMLin,
         @WebParam(partName = "OptionsIn") String OptionsIn,
@@ -40,7 +48,7 @@ public interface IStore {
     @WebMethod(action = "http://www.witsml.org/action/120/Store.WMLS_UpdateInStore", operationName = "WMLS_UpdateInStore")
     @RequestWrapper(targetNamespace = "http://www.witsml.org/message/120")
     @SOAPBinding(style = SOAPBinding.Style.RPC, parameterStyle= SOAPBinding.ParameterStyle.BARE, use = SOAPBinding.Use.ENCODED)
-    WMLS_UpdateInStoreResponse updateInStore(
+    CompletableFuture<WMLS_UpdateInStoreResponse> updateInStore(
         @WebParam(partName = "WMLtypeIn") String WMLtypeIn,
         @WebParam(partName = "XMLin") String XMLin,
         @WebParam(partName = "OptionsIn") String OptionsIn,
@@ -50,7 +58,7 @@ public interface IStore {
     @WebMethod(action = "http://www.witsml.org/action/120/Store.WMLS_DeleteFromStore", operationName = "WMLS_DeleteFromStore")
     @RequestWrapper(targetNamespace = "http://www.witsml.org/message/120")
     @SOAPBinding(style=SOAPBinding.Style.RPC, parameterStyle=SOAPBinding.ParameterStyle.BARE, use=SOAPBinding.Use.ENCODED)
-    WMLS_DeleteFromStoreResponse deleteFromStore(
+    CompletableFuture<WMLS_DeleteFromStoreResponse> deleteFromStore(
             @WebParam(partName = "WMLtypeIn") String WMLtypeIn,
             @WebParam(partName = "QueryIn") String QueryIn,
             @WebParam(partName = "OptionsIn") String OptionsIn,
@@ -80,6 +88,8 @@ public interface IStore {
     @ResponseWrapper(targetNamespace = "http://www.witsml.org/message/120",
             className = "com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetFromStoreResponse")
     @SOAPBinding(style = SOAPBinding.Style.RPC, parameterStyle= SOAPBinding.ParameterStyle.BARE, use = SOAPBinding.Use.ENCODED)
-    WMLS_GetFromStoreResponse getFromStore(@WebParam(partName = "WMLtypeIn") String WMLtypeIn, @WebParam(partName = "QueryIn") String QueryIn, @WebParam(partName = "OptionsIn") String OptionsIn, @WebParam(partName = "CapabilitiesIn") String CapabilitiesIn);
+    CompletableFuture<WMLS_GetFromStoreResponse> getFromStore(@WebParam(partName = "WMLtypeIn") String WMLtypeIn,
+            @WebParam(partName = "QueryIn") String QueryIn, @WebParam(partName = "OptionsIn") String OptionsIn,
+            @WebParam(partName = "CapabilitiesIn") String CapabilitiesIn);
 
 }

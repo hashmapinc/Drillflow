@@ -15,14 +15,17 @@
  */
 package com.hashmapinc.tempus.witsml.server.api;
 
-import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse;
+import static org.assertj.core.api.Assertions.assertThat;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_AddToStoreResponse;
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -37,53 +40,65 @@ public class StoreImplTests {
 	}
 
 	@Test
-	public void addToStoreShouldHandleBadInput() {
-		assertThat(
-			this.witsmlServer.addToStore(
-				"WMLtypeIn",
-				"XMLin",
-				"OptionsIn",
-				"CapabilitiesIn"
-			).getResult()
-		).isEqualTo((short)-1);
+	public void addToStoreShouldHandleBadInput() throws InterruptedException, ExecutionException {
+		assertThat(this.witsmlServer.addToStore("WMLtypeIn", "XMLin", "OptionsIn", "CapabilitiesIn").get().getResult())
+				.isEqualTo((short) -1);
 	}
 
 	@Test
-	public void getVersionShouldReturnDefaultVersion(){
+	public void getVersionShouldReturnDefaultVersion() {
 		assertThat(this.witsmlServer.getVersion().getResult()).contains("1.3.1.1,1.4.1.1");
 	}
 
 	@Test
-	public void getBaseMsgShouldReturnATextualDescription(){
-		assertThat(this.witsmlServer.getBaseMsg((short)412).getResult()).contains("add");
+	public void getBaseMsgShouldReturnATextualDescription() {
+		assertThat(this.witsmlServer.getBaseMsg((short) 412).getResult()).contains("add");
 	}
 
 	@Test
-	public void getBaseMsgShouldReturnATextualDescriptionForANegativeNumber(){
-		assertThat(this.witsmlServer.getBaseMsg((short)-412).getResult()).contains("add");
+	public void getBaseMsgShouldReturnATextualDescriptionForANegativeNumber() {
+		assertThat(this.witsmlServer.getBaseMsg((short) -412).getResult()).contains("add");
 	}
 
 	@Test
-	public void getCapShouldReturnAnXMLForACorrectVersion(){
+	public void getCapShouldReturnAnXMLForACorrectVersion() {
 		WMLS_GetCapResponse resp = this.witsmlServer.getCap("dataValue=1.3.1.1");
 		assertThat(resp).isNotNull();
 		assertThat(resp.getCapabilitiesOut()).contains("<name>");
-		assertThat(resp.getResult()).isEqualTo((short)1);
+		assertThat(resp.getResult()).isEqualTo((short) 1);
 	}
 
 	@Test
-	public void getCapShouldReturn424ForAnIncorrectVersion(){
+	public void getCapShouldReturn424ForAnIncorrectVersion() {
 		WMLS_GetCapResponse resp = this.witsmlServer.getCap("dataValue=7");
 		assertThat(resp).isNotNull();
-		assertThat(resp.getResult()).isEqualTo((short)-424);
+		assertThat(resp.getResult()).isEqualTo((short) -424);
 		assertThat(resp.getCapabilitiesOut()).isNull();
 	}
 
 	@Test
-	public void getCapShouldReturnTheCorrectErrorForAnEmptyValue(){
+	public void getCapShouldReturnTheCorrectErrorForAnEmptyValue() {
 		WMLS_GetCapResponse resp = this.witsmlServer.getCap("");
 		assertThat(resp).isNotNull();
-		assertThat(resp.getResult()).isEqualTo((short)-424);
+		assertThat(resp.getResult()).isEqualTo((short) -424);
 		assertThat(resp.getCapabilitiesOut()).isNull();
+	}
+
+	@Test
+	public void testAsyncAnnotationForAddMethod() throws InterruptedException, ExecutionException {
+		CompletableFuture<WMLS_AddToStoreResponse> future = this.witsmlServer.addToStore("WMLtypeIn", "XMLin",
+				"OptionsIn", "CapabilitiesIn");
+		while (true) {
+			System.out.println("Waiting for response from addToStore()...");
+			if (future.isDone()) {
+				System.out.println("Result from Async addToStore() -> " + future.get().getResult());
+				break;
+			}
+			System.out.println("Continue execution...");
+			Thread.sleep(1000);
+		}
+
+		System.out.println("Exit test case...");
+
 	}
 }
