@@ -149,7 +149,7 @@ public class DotValve implements IValve {
             throw new ValveException(e.getMessage());
         }
         // return consolidated XML response in proper version
-        return DotTranslator.consolidateObjectsToXML(queryResponses, qc.CLIENT_VERSION);
+        return DotTranslator.consolidateObjectsToXML(queryResponses, qc.CLIENT_VERSION, qc.OBJECT_TYPE);
     }
 
     /**
