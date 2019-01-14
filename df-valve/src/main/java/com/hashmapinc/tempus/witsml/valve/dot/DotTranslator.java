@@ -17,6 +17,7 @@ package com.hashmapinc.tempus.witsml.valve.dot;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
@@ -135,8 +136,8 @@ public class DotTranslator {
         switch (witsmlObjects.get(0).getObjectType()) {
             case "well": // no consolidation needed for wells
                 xmlString = is1411 ?
-                    witsmlObjects.get(0).getXMLString("1.4.1.1") :
-                    get1311WitsmlObject(witsmlObjects.get(0)).getXMLString("1.3.1.1");
+                    consolidate1411WellsToXML(witsmlObjects) :
+                    consolidate1311WellsToXML(witsmlObjects);
                 break;
             case "wellbore": // no consolidation needed for wells
                 xmlString = is1411 ?
@@ -148,6 +149,50 @@ public class DotTranslator {
         }
 
         return xmlString;
+    }
+
+    private static String consolidate1311WellsToXML(
+            ArrayList<AbstractWitsmlObject> witsmlObjects
+    ) throws ValveException {
+        try {
+            // get parent object from first child
+            com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells parent =
+                    new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells();
+
+            // consolidate children
+            for (AbstractWitsmlObject child : witsmlObjects) {
+                parent.addWell(
+                        (com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell) get1311WitsmlObject(child)
+                );
+            }
+
+            // return xml
+            return WitsmlMarshal.serialize(parent);
+        } catch (Exception e ) {
+            throw new ValveException(e.getMessage());
+        }
+    }
+
+    private static String consolidate1411WellsToXML(
+            ArrayList<AbstractWitsmlObject> witsmlObjects
+    ) throws ValveException {
+        try {
+            // get parent object from first child
+            com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWells parent =
+                    new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWells();
+
+            // consolidate children
+            for (AbstractWitsmlObject child : witsmlObjects) {
+                parent.addWell(
+                        (com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) child
+                );
+            }
+
+            // return xml
+            return WitsmlMarshal.serialize(parent);
+        } catch (Exception e ) {
+            throw new ValveException(e.getMessage());
+        }
     }
 
     private static String consolidate1311WellboresToXML(

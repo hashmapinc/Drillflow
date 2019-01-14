@@ -25,6 +25,7 @@ valve :
         apikey: ${VALVE_API_KEY}
         token.path: token/jwt/v1/
         well.path: democore/well/v2/witsml/wells/
+        well.gql.path: democore/well/v2/graphql/
         wellbore.path: democore/wellbore/v1/witsml/wellbores/
 wmls:
     version: 1.3.1.1,1.4.1.1

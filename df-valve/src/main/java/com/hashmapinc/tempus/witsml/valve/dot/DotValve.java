@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -108,6 +109,31 @@ public class DotValve implements IValve {
                     )
                 );
             }
+        } catch (Exception e) {
+            LOG.warning("Exception in DotValve get object: " + e.getMessage());
+            throw new ValveException(e.getMessage());
+        }
+        // return consolidated XML response in proper version
+        return DotTranslator.consolidateObjectsToXML(queryResponses, qc.CLIENT_VERSION);
+    }
+
+    @Override
+    public String getObjects(QueryContext qc) throws ValveException {
+        // handle each object
+        ArrayList<AbstractWitsmlObject> queryResponses = new ArrayList<AbstractWitsmlObject>();
+        if (qc.WITSML_OBJECTS.size() > 1) {
+            LOG.info("Query received with more than one singular object, not supported");
+            return "";
+        }
+        GraphQLQueryConverter converter = new GraphQLQueryConverter();
+        String query;
+        try {
+            query = converter.convertQuery(qc.WITSML_OBJECTS.get(0));
+        } catch (IOException ex){
+            throw new ValveException(ex.getMessage());
+        }
+        try {
+            queryResponses = this.DELEGATOR.getObjects(qc.WITSML_OBJECTS.get(0), query, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.CLIENT);
         } catch (Exception e) {
             LOG.warning("Exception in DotValve get object: " + e.getMessage());
             throw new ValveException(e.getMessage());
