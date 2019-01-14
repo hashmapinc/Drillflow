@@ -23,7 +23,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @SpringBootApplication()
-@EnableAsync
+@EnableAsync(proxyTargetClass=true)
 public class WitsmlServerApplication {
 
     public static void main(String[] args) {
