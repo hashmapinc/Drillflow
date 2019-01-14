@@ -241,7 +241,7 @@
             "uid": null,
             "uom": "",
             "name": "",
-            "index": 0,
+            "index": null,
             "description": "",
             "value": ""
           }
