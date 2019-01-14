@@ -1,0 +1,24 @@
+{
+  "country": "US",
+  "numLicense": "Company License Number",
+  "commonData": {
+    "dTimLastChange": "2019-01-07T14:53:50.3274906+00:00",
+    "dTimCreation": "2019-01-03T16:34:23.924594+00:00"
+  },
+  "county": "Montgomery",
+  "timeZone": "-06:00",
+  "operator": "Operating Company",
+  "referencePoint": [],
+  "uid": "uid12333",
+  "wellLocation": [],
+  "field": "FunctionalTest",
+  "wellCRS": [],
+  "nameLegal": "Company Legal Name",
+  "district": "District Name",
+  "name": "Well hm1223",
+  "numGovt": "Govt-Number",
+  "block": "Block Name",
+  "state": "TX",
+  "region": "Region Name",
+  "wellDatum": []
+}

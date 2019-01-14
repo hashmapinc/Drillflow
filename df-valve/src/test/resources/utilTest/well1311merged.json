@@ -1,0 +1,18 @@
+{
+  "country": "US",
+  "numLicense": "Company License Number",
+  "county": "Montgomery",
+  "operator": "Operating Company",
+  "objectType": "well",
+  "uid": "uid12333",
+  "nameLegal": "Company Legal Name",
+  "block": "Block Name",
+  "state": "TX",
+  "timeZone": "-06:00",
+  "version": "1.4.1.1",
+  "field": "FunctionalTest",
+  "district": "District Name",
+  "name": "Well hm1223",
+  "numGovt": "Govt-Number",
+  "region": "Region Name"
+}
