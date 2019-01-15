@@ -131,7 +131,6 @@ public class StoreImpl implements IStore {
         String OptionsIn,
         String CapabilitiesIn
     ) {
-    	LOG.info("Thread name -> " + Thread.currentThread().getName());
         LOG.info("Executing addToStore for query <" + getExchangeId() + ">");
         // try to add to store
         List<AbstractWitsmlObject> witsmlObjects = null;
