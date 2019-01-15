@@ -454,6 +454,56 @@ public class DotValveTest {
 	}
 
 	@Test
+	public void shouldUpdateTrajectory() throws Exception {
+		// build witsmlObjects lists
+		ArrayList<AbstractWitsmlObject> trajs1311 = new ArrayList<>();
+		ArrayList<AbstractWitsmlObject> trajs1411 = new ArrayList<>();
+
+		// get traj 1311
+		ObjTrajectory traj1311 = new ObjTrajectory();
+		traj1311.setName("traj-1311");
+		traj1311.setUid("traj-1311");
+		trajs1311.add(traj1311);
+
+		// get traj 1411
+		com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory traj1411 = new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory();
+		traj1411.setName("traj-1411");
+		traj1411.setUid("traj-1411");
+		trajs1411.add(traj1411);
+
+		// build query contexts
+		QueryContext qc1311 = new QueryContext(
+			"1.3.1.1",
+			"trajectory",
+			null,
+			"",
+			trajs1311,
+			"goodUsername",
+			"goodPassword",
+			"shouldUpdateTrajectory-1311" // exchange ID
+		);
+		QueryContext qc1411 = new QueryContext(
+			"1.4.1.1",
+			"trajectory",
+			null,
+			"",
+			trajs1411,
+			"goodUsername",
+			"goodPassword",
+			"shouldUpdateTrajectory-1411" // exchange ID
+		);
+
+		// test update
+		this.valve.updateObject(qc1311);
+		this.valve.updateObject(qc1411);
+
+		// verify
+		verify(this.mockDelegator).updateObject(traj1311, qc1311.USERNAME, qc1311.PASSWORD, qc1311.EXCHANGE_ID, this.mockClient);
+		verify(this.mockDelegator).updateObject(traj1411, qc1411.USERNAME, qc1411.PASSWORD, qc1411.EXCHANGE_ID, this.mockClient);
+		verifyNoMoreInteractions(this.mockDelegator);
+	}
+
+	@Test
 	public void shouldSucceedAuthenticate() throws Exception {
 		// mock behavior
 		when(this.mockClient.getJWT("goodUsername", "goodPassword"))
@@ -510,6 +560,7 @@ public class DotValveTest {
 		assertEquals("trajectory",   actualDeleteObjects[2].getObjectType());
 		assertEquals("well", 	   actualUpdateObjects[0].getObjectType());
 		assertEquals("wellbore",   actualUpdateObjects[1].getObjectType());
+		assertEquals("trajectory",   actualUpdateObjects[2].getObjectType());
 	}
 }
 
