@@ -202,4 +202,85 @@ public class DotDelegatorTest {
                 someReq.getHeaders().containsKey("Content-Type")
         )), eq("goodUsername"), eq("goodPassword"));
     }
+
+    @Test
+    public void shouldUpdateTrajectory() throws Exception {
+        //=====================================================================
+        // 1.3.1.1
+        //=====================================================================
+        // build object
+        ObjTrajectory traj1311 = new ObjTrajectory();
+        traj1311.setUid("traj1311");
+        traj1311.setName("traj1311");
+        traj1311.setUidWellbore("wellbore1311");
+        traj1311.setUidWell("well1311");
+
+        // build http request
+        String endpoint = this.url + this.trajectoryPath + traj1311.getUid();
+        HttpRequest req1311 = Unirest.put(endpoint);
+        req1311.header("Content-Type", "application/json");
+        req1311.queryString("uidWellbore", traj1311.getUidWellbore());
+        req1311.queryString("uidWell", traj1311.getUidWell());
+
+        // build http response mock
+        HttpResponse<String> resp = mock(HttpResponse.class);
+        when(resp.getStatus()).thenReturn(200);
+
+        // mock client behavior
+        when(this.client.makeRequest(argThat(someReq -> (
+            someReq.getHttpMethod().name().equals(req1311.getHttpMethod().name()) &&
+                someReq.getUrl().equals(req1311.getUrl()) &&
+                someReq.getHeaders().containsKey("Content-Type")
+        )), eq("goodUsername"), eq("goodPassword"))).thenReturn(resp);
+
+        // test
+        this.delegator.updateObject(traj1311, "goodUsername", "goodPassword", "exchangeID", this.client);
+
+        // verify
+        verify(this.client).makeRequest(argThat(someReq -> (
+            someReq.getHttpMethod().name().equals(req1311.getHttpMethod().name()) &&
+                someReq.getUrl().equals(req1311.getUrl()) &&
+                someReq.getHeaders().containsKey("Content-Type")
+        )), eq("goodUsername"), eq("goodPassword"));
+        //=====================================================================
+
+        //=====================================================================
+        // 1.4.1.1
+        //=====================================================================
+        // build object
+        com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory traj1411 = new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory();
+        traj1411.setUid("traj1411");
+        traj1411.setName("traj1411");
+        traj1411.setUidWellbore("wellbore1411");
+        traj1411.setUidWell("well1411");
+
+        // build http request
+        endpoint = this.url + this.trajectoryPath + traj1411.getUid();
+        HttpRequest req1411 = Unirest.put(endpoint);
+        req1411.header("Content-Type", "application/json");
+        req1411.queryString("uidWellbore", traj1411.getUidWellbore());
+        req1411.queryString("uidWell", traj1411.getUidWell());
+
+        // build http response mock
+        resp = mock(HttpResponse.class);
+        when(resp.getStatus()).thenReturn(200);
+
+        // mock client behavior
+        when(this.client.makeRequest(argThat(someReq -> (
+            someReq.getHttpMethod().name().equals(req1411.getHttpMethod().name()) &&
+                someReq.getUrl().equals(req1411.getUrl()) &&
+                someReq.getHeaders().containsKey("Content-Type")
+        )), eq("goodUsername"), eq("goodPassword"))).thenReturn(resp);
+
+        // test
+        this.delegator.updateObject(traj1411, "goodUsername", "goodPassword", "exchangeID", this.client);
+
+        // verify
+        verify(this.client).makeRequest(argThat(someReq -> (
+            someReq.getHttpMethod().name().equals(req1411.getHttpMethod().name()) &&
+                someReq.getUrl().equals(req1411.getUrl()) &&
+                someReq.getHeaders().containsKey("Content-Type")
+        )), eq("goodUsername"), eq("goodPassword"));
+        //=====================================================================
+    }
 }
