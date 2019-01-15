@@ -31,6 +31,7 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequest;
+import com.mashape.unirest.request.HttpRequestWithBody;
 
 public class DotClient {
     private static final Logger LOG = Logger.getLogger(DotClient.class.getName());
@@ -66,12 +67,14 @@ public class DotClient {
             // build payload for authentication
             String payload = "{\"account\":\"" + username + "\", \"password\":\"" + password + "\"}";
 
+            // build request
+            HttpRequestWithBody req = Unirest.post(URL + this.TOKEN_PATH);
+            req.header("accept", "application/json")
+                .header("Ocp-Apim-Subscription-Key", this.API_KEY)
+                .body(payload);
+
             // send request
-            HttpResponse<String> response = Unirest.post(URL + this.TOKEN_PATH)
-                    .header("accept", "application/json")
-                    .header("Ocp-Apim-Subscription-Key", this.API_KEY)
-                    .body(payload)
-                    .asString();
+            HttpResponse<String> response = new DotRestCommand(req).run();
 
             // validate response
             int status = response.getStatus();
@@ -98,8 +101,8 @@ public class DotClient {
      * @throws ValveAuthException
      */
     public DecodedJWT getJWT(
-            String username,
-            String password
+        String username,
+        String password
     ) throws ValveAuthException {
         // refresh token if necessary
         if (!cache.containsKey(username) || isTokenExpired(username))
@@ -166,19 +169,21 @@ public class DotClient {
      * @param numRetries - number of times to retry when auth errors occur
      */
     private HttpResponse<String> makeRequest(
-            HttpRequest req,
-            String username,
-            String password,
-            int numRetries
-    ) throws UnirestException, ValveAuthException {
+        HttpRequest req,
+        String username,
+        String password,
+        int numRetries
+    ) throws UnirestException, ValveAuthException, ValveException {
         // get jwt
         String tokenString = this.getJWT(username, password).getToken();
 
-        LOG.info("Making request to " + req.getUrl() + System.lineSeparator() + "Body Time!:" + System.lineSeparator() + req.getBody());
         // execute request.
-        HttpResponse<String> response = req
-            .header("Authorization", "Bearer " + tokenString)
-            .asString();
+        req.header("Authorization", "Bearer " + tokenString); // add auth header
+        HttpResponse<String> response = new DotRestCommand(req).run();
+
+        // ensure response is not null
+        if (null == response)
+            throw new ValveException("Circuit broken for DoT REST requests");
 
         // check for auth errors.
         int status = response.getStatus();
