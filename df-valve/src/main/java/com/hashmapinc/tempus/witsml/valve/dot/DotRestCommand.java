@@ -21,7 +21,6 @@ import com.netflix.hystrix.HystrixCommandGroupKey;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.request.HttpRequest;
-import com.netflix.hystrix.exception.HystrixBadRequestException;
 
 public class DotRestCommand extends HystrixCommand<HttpResponse<String>> {
     private HttpRequest request;
