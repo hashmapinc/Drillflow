@@ -277,7 +277,7 @@ public class DotValve implements IValve {
             {well, wellbore, trajectory}, // ADD TO STORE OBJECTS
             {well, wellbore}, // GET FROM STORE OBJECTS
             {well, wellbore, trajectory}, // DELETE FROM STORE OBJECTS
-            {well, wellbore}, // UPDATE IN STORE OBJECTS
+            {well, wellbore, trajectory}, // UPDATE IN STORE OBJECTS
         };
 
         // populate cap
