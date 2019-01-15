@@ -165,8 +165,6 @@ public class DotDelegatorTest {
         assertEquals(3, foundObjects.size());
     }
 
-
-
     @Test
     public void shouldDeleteTrajectory() throws Exception {
         // build object
@@ -175,9 +173,6 @@ public class DotDelegatorTest {
         traj.setName("traj-a");
         traj.setUidWellbore("wellbore-a");
         traj.setUidWell("well-a");
-
-        // get payload
-        String payload = ((AbstractWitsmlObject) traj).getJSONString("1.4.1.1");
 
         // build http request
         String endpoint = this.url + this.trajectoryPath + traj.getUid();
