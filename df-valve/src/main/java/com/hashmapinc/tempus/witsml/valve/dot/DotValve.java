@@ -276,7 +276,7 @@ public class DotValve implements IValve {
         AbstractWitsmlObject[][] supportedObjects = {
             {well, wellbore, trajectory}, // ADD TO STORE OBJECTS
             {well, wellbore}, // GET FROM STORE OBJECTS
-            {well, wellbore}, // DELETE FROM STORE OBJECTS
+            {well, wellbore, trajectory}, // DELETE FROM STORE OBJECTS
             {well, wellbore}, // UPDATE IN STORE OBJECTS
         };
 
