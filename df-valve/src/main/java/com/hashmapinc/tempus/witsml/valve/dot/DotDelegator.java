@@ -40,6 +40,7 @@ public class DotDelegator {
     private final String WB_PATH;
     private final String TRAJECTORY_PATH;
     private final String WELL_GQL_PATH;
+    private final String WELLBORE_GQL_PATH;
 
     /**
      * Map based constructor
@@ -47,11 +48,12 @@ public class DotDelegator {
      * @param config - map with field values
      */
     public DotDelegator(Map<String, String> config) {
-        this.URL =             config.get("baseurl");
-        this.WELL_PATH =       config.get("well.path");
-        this.WB_PATH =         config.get("wellbore.path");
-        this.TRAJECTORY_PATH = config.get("trajectory.path");
-        this.WELL_GQL_PATH =   config.get("well.gql.path");
+        this.URL =             	config.get("baseurl");
+        this.WELL_PATH =       	config.get("well.path");
+        this.WB_PATH =         	config.get("wellbore.path");
+        this.TRAJECTORY_PATH = 	config.get("trajectory.path");
+        this.WELL_GQL_PATH =   	config.get("well.gql.path");
+        this.WELLBORE_GQL_PATH =config.get("wellbore.gql.path") 	;
     }
 
     /**
@@ -76,6 +78,9 @@ public class DotDelegator {
             case "wellbore":
                 endpoint = this.URL + this.WB_PATH;
                 break;
+			case "wellboresearch":
+				endpoint = this.URL + this.WELLBORE_GQL_PATH;
+				break;
             case "trajectory":
                 endpoint = this.URL + this.TRAJECTORY_PATH;
                 break;

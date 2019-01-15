@@ -22,10 +22,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 ;
 
@@ -43,22 +40,25 @@ class GraphQLQueryConverter {
      * @throws IOException Thrown if there is an error in creation of the query
      */
     public String convertQuery(AbstractWitsmlObject wmlObject) throws IOException {
+        String objJson = wmlObject.getJSONString("1.4.1.1");
         switch (wmlObject.getObjectType()){
             case "well":
-                return convertWell(wmlObject);
+                this.createWellQuery(objJson);
+                break;
+            case "wellbore":
+                this.createWellboreQuery(objJson);
+                break;
             default:
                 return null;
         }
-    }
-
-    private String convertWell (AbstractWitsmlObject well) throws IOException {
-        String objJson = well.getJSONString("1.4.1.1");
-        this.createWellQuery(objJson);
         return this.builder.GetGraphQLQuery();
     }
 
     private void createWellQuery(String jsonObj) throws IOException{
         JSONObject obj = new JSONObject(jsonObj);
+        List<String> keysToOmit = new ArrayList<>();
+        keysToOmit.add("customData");
+        keysToOmit.add("commonData");
         StringBuilder querybuilder = new StringBuilder();
         querybuilder.append("query WellQuery($wellArgument: WellArgument) ");
         this.builder.addVariableGroup("wellArgument");
@@ -69,7 +69,7 @@ class GraphQLQueryConverter {
         querybuilder.append("{");
         querybuilder.append(delimeter);
         String indentStr = "";
-        querybuilder.append(this.getQuery(obj, indentStr));
+        querybuilder.append(this.getQuery(obj, indentStr, "well", keysToOmit));
         querybuilder.append(delimeter);
         querybuilder.append("}");
         querybuilder.append(delimeter);
@@ -77,17 +77,44 @@ class GraphQLQueryConverter {
         this.builder.setQuery(querybuilder.toString());
     }
 
-    private String getQuery(JSONObject jsonWitsml, String indent) {
+    private void createWellboreQuery(String jsonObj) throws IOException{
+        JSONObject obj = new JSONObject(jsonObj);
+        List<String> keysToOmit = new ArrayList<>();
+        keysToOmit.add("parentUid");
+        keysToOmit.add("customData");
+        keysToOmit.add("commonData");
+        StringBuilder querybuilder = new StringBuilder();
+        querybuilder.append("query WellboreQuery($wellboreArgument: WellboreArgument) ");
+        this.builder.addVariableGroup("wellboreArgument");
+        querybuilder.append(delimeter);
+        querybuilder.append("{");
+        querybuilder.append(delimeter);
+        querybuilder.append("wellbores(wellboreArgument: $wellboreArgument)");
+        querybuilder.append("{");
+        querybuilder.append(delimeter);
+        String indentStr = "";
+        querybuilder.append(this.getQuery(obj, indentStr, "wellbore", keysToOmit));
+        querybuilder.append(delimeter);
+        querybuilder.append("}");
+        querybuilder.append(delimeter);
+        querybuilder.append("}");
+        this.builder.setQuery(querybuilder.toString());
+    }
+
+    private String getQuery(JSONObject jsonWitsml, String indent, String wmlObjType, List<String> keysToOmit) {
         Set<String> keyset = jsonWitsml.keySet();
         ArrayList<String> queryKeys = new ArrayList<>();
         HashMap variables = new HashMap();
         for (String key : keyset) {
+            if (keysToOmit.contains(key)){
+                continue;
+            }
             Object queryObj = jsonWitsml.get(key);
             if (queryObj instanceof JSONObject) {
                 JSONObject subObj = (JSONObject)queryObj;
                 queryKeys.add(indent + key);
                 queryKeys.add(indent + "{");
-                queryKeys.add(this.getQuery(subObj, indent));
+                queryKeys.add(this.getQuery(subObj, indent, wmlObjType, keysToOmit));
                 queryKeys.add(indent + "}");
                 continue;
             }
@@ -99,17 +126,20 @@ class GraphQLQueryConverter {
                         queryKeys.add(indent + key);
                         JSONObject subObj = (JSONObject) arrObj;
                         queryKeys.add(indent + "{");
-                        queryKeys.add(this.getQuery(subObj, indent));
+                        queryKeys.add(this.getQuery(subObj, indent, wmlObjType, keysToOmit));
                         queryKeys.add(indent + "}");
                     }
                 }
                 continue;
             }
             String value = jsonWitsml.get(key).toString();
-            if (!"".equals(value) && !"null".equals(value)) {
-                this.builder.addVariable("wellArgument", key, value);
+            if (!"".equals(value) && !"null".equals(value) && !keysToOmit.contains(key)) {
+                this.builder.addVariable(wmlObjType + "Argument", key, value);
             }
             queryKeys.add(indent + key);
+        }
+        for (String key : keysToOmit){
+            queryKeys.remove(key);
         }
         return String.join(this.delimeter, queryKeys);
     }
