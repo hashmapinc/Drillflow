@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import com.hashmapinc.tempus.witsml.ValveLogging;
 import org.apache.commons.lang3.StringUtils;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
@@ -139,6 +140,10 @@ public class DotValve implements IValve {
         String query;
         try {
             query = converter.convertQuery(qc.WITSML_OBJECTS.get(0));
+            ValveLogging log = new ValveLogging(qc.EXCHANGE_ID, System.lineSeparator() +
+                    "Graph QL Query: " + query,
+                    qc.WITSML_OBJECTS.get(0));
+            LOG.fine(log.toString());
         } catch (IOException ex){
             throw new ValveException(ex.getMessage());
         }
