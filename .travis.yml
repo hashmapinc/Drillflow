@@ -32,3 +32,6 @@ deploy:
   acl: public_read
   on:
     repo: hashmapinc/Drillflow
+after_deploy:
+  - curl -H "Content-Type: application/json" --data '{"docker_tag": "master"}' -X POST https://registry.hub.docker.com/u/hashmapinc/drillflow/trigger/e7994f9c-af82-4576-96d4-26ebe5a5a64e/
+
