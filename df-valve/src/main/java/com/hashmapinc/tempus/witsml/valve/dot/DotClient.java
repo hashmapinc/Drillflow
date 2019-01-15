@@ -30,6 +30,7 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequest;
+import com.mashape.unirest.request.HttpRequestWithBody;
 
 public class DotClient {
     private static final Logger LOG = Logger.getLogger(DotClient.class.getName());
@@ -65,12 +66,14 @@ public class DotClient {
             // build payload for authentication
             String payload = "{\"account\":\"" + username + "\", \"password\":\"" + password + "\"}";
 
+            // build request
+            HttpRequestWithBody req = Unirest.post(URL + this.TOKEN_PATH);
+            req.header("accept", "application/json")
+                .header("Ocp-Apim-Subscription-Key", this.API_KEY)
+                .body(payload);
+
             // send request
-            HttpResponse<String> response = Unirest.post(URL + this.TOKEN_PATH)
-                    .header("accept", "application/json")
-                    .header("Ocp-Apim-Subscription-Key", this.API_KEY)
-                    .body(payload)
-                    .asString();
+            HttpResponse<String> response = new DotRestCommand(req).run();
 
             // validate response
             int status = response.getStatus();
@@ -97,8 +100,8 @@ public class DotClient {
      * @throws ValveAuthException
      */
     public DecodedJWT getJWT(
-            String username,
-            String password
+        String username,
+        String password
     ) throws ValveAuthException {
         // refresh token if necessary
         if (!cache.containsKey(username) || isTokenExpired(username))
