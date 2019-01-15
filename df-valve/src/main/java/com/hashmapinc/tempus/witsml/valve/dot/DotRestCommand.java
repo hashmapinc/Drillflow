@@ -22,7 +22,10 @@ import com.netflix.hystrix.HystrixCommandGroupKey;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.request.HttpRequest;
 
+import java.util.logging.Logger;
+
 public class DotRestCommand extends HystrixCommand<HttpResponse<String>> {
+    private static final Logger LOG = Logger.getLogger(DotRestCommand.class.getName());
     private HttpRequest request;
 
     /**
@@ -53,6 +56,7 @@ public class DotRestCommand extends HystrixCommand<HttpResponse<String>> {
      */
     @Override
     protected HttpResponse<String> getFallback() {
+        LOG.warning("DotRestCommand encountered broken circuit. Getting Fallback now...");
         return null; // fail silently
     }
 }
