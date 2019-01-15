@@ -168,19 +168,21 @@ public class DotClient {
      * @param numRetries - number of times to retry when auth errors occur
      */
     private HttpResponse<String> makeRequest(
-            HttpRequest req,
-            String username,
-            String password,
-            int numRetries
-    ) throws UnirestException, ValveAuthException {
+        HttpRequest req,
+        String username,
+        String password,
+        int numRetries
+    ) throws UnirestException, ValveAuthException, ValveException {
         // get jwt
         String tokenString = this.getJWT(username, password).getToken();
 
-        LOG.info("Making request to " + req.getUrl());
         // execute request.
-        HttpResponse<String> response = req
-            .header("Authorization", "Bearer " + tokenString)
-            .asString();
+        req.header("Authorization", "Bearer " + tokenString); // add auth header
+        HttpResponse<String> response = new DotRestCommand(req).run();
+
+        // ensure response is not null
+        if (null == response)
+            throw new ValveException("Circuit broken for DoT REST requests");
 
         // check for auth errors.
         int status = response.getStatus();
