@@ -109,8 +109,20 @@ public class DotDelegator {
 		HttpRequest request = Unirest.delete(endpoint).header("Content-Type", "application/json");
 		ValveLogging valveLoggingRequest = new ValveLogging(exchangeID, logRequest(request), witsmlObj);
 		LOG.info(valveLoggingRequest.toString());
-        if ("wellbore".equals(objectType))
-            request.queryString("uidWell", witsmlObj.getParentUid()); // TODO: ensure parent uid exists?
+
+		// add query string params
+        if ("wellbore".equals(objectType)) {
+			request.queryString("uidWell", witsmlObj.getParentUid()); // TODO: ensure parent uid exists?
+		} else if ("trajectory".equals(objectType)){
+			request.queryString("uidWellbore", witsmlObj.getParentUid());
+			String uidWell;
+			if ("1.4.1.1".equals(witsmlObj.getVersion())) {
+				uidWell = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory) witsmlObj).getUidWell();
+			} else {
+				uidWell = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory) witsmlObj).getUidWell();
+			}
+			request.queryString("uidWell", uidWell);
+		}
 
         // make the DELETE call.
         HttpResponse<String> response = client.makeRequest(request, username, password);
