@@ -33,4 +33,8 @@ deploy:
   on:
     repo: hashmapinc/Drillflow
 after_deploy:
-  - "curl -H 'Content-Type: application/json' --data '{\"docker_tag\": \"master\"}' -X POST https://registry.hub.docker.com/u/hashmapinc/drillflow/trigger/e7994f9c-af82-4576-96d4-26ebe5a5a64e/"
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - export REPO=hashmapinc/drillflow
+  - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo "$TRAVIS_BRANCH" ; fi`
+  - docker build $TRAVIS_BUILD_DIR/docker/ -t $REPO:$TAG
+  - docker push $REPO:$TAG
