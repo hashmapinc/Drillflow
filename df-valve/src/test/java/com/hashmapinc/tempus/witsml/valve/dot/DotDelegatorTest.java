@@ -21,6 +21,7 @@ import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
 import org.junit.Before;
 import org.junit.Test;
@@ -162,5 +163,48 @@ public class DotDelegatorTest {
 
         ArrayList<AbstractWitsmlObject> foundObjects = this.delegator.executeGraphQL(singleWell, jsonQuery, "goodUsername", "goodPassword", "exchangeID", this.client);
         assertEquals(3, foundObjects.size());
+    }
+
+
+
+    @Test
+    public void shouldDeleteTrajectory() throws Exception {
+        // build object
+        ObjTrajectory traj = new ObjTrajectory();
+        traj.setUid("traj-a");
+        traj.setName("traj-a");
+        traj.setUidWellbore("wellbore-a");
+        traj.setUidWell("well-a");
+
+        // get payload
+        String payload = ((AbstractWitsmlObject) traj).getJSONString("1.4.1.1");
+
+        // build http request
+        String endpoint = this.url + this.trajectoryPath + traj.getUid();
+        HttpRequest req = Unirest.delete(endpoint);
+        req.header("Content-Type", "application/json");
+        req.queryString("uidWellbore", traj.getUidWellbore());
+        req.queryString("uidWell", traj.getUidWell());
+
+        // build http response mock
+        HttpResponse<String> resp = mock(HttpResponse.class);
+        when(resp.getStatus()).thenReturn(204);
+
+        // mock client behavior
+        when(this.client.makeRequest(argThat(someReq -> (
+            someReq.getHttpMethod().name().equals(req.getHttpMethod().name()) &&
+                someReq.getUrl().equals(req.getUrl()) &&
+                someReq.getHeaders().containsKey("Content-Type")
+        )), eq("goodUsername"), eq("goodPassword"))).thenReturn(resp);
+
+        // test
+        this.delegator.deleteObject(traj, "goodUsername", "goodPassword", "exchangeID", this.client);
+
+        // verify
+        verify(this.client).makeRequest(argThat(someReq -> (
+            someReq.getHttpMethod().name().equals(req.getHttpMethod().name()) &&
+                someReq.getUrl().equals(req.getUrl()) &&
+                someReq.getHeaders().containsKey("Content-Type")
+        )), eq("goodUsername"), eq("goodPassword"));
     }
 }
