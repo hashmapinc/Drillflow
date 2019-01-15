@@ -204,7 +204,7 @@ public class DotDelegatorTest {
     }
 
     @Test
-    public void shouldUpdateTrajectory() throws Exception {
+    public void shouldUpdateTrajectory1311() throws Exception {
         //=====================================================================
         // 1.3.1.1
         //=====================================================================
@@ -229,8 +229,8 @@ public class DotDelegatorTest {
         // mock client behavior
         when(this.client.makeRequest(argThat(someReq -> (
             someReq.getHttpMethod().name().equals(req1311.getHttpMethod().name()) &&
-                someReq.getUrl().equals(req1311.getUrl()) &&
-                someReq.getHeaders().containsKey("Content-Type")
+            someReq.getUrl().equals(req1311.getUrl()) &&
+            someReq.getHeaders().containsKey("Content-Type")
         )), eq("goodUsername"), eq("goodPassword"))).thenReturn(resp);
 
         // test
@@ -239,11 +239,14 @@ public class DotDelegatorTest {
         // verify
         verify(this.client).makeRequest(argThat(someReq -> (
             someReq.getHttpMethod().name().equals(req1311.getHttpMethod().name()) &&
-                someReq.getUrl().equals(req1311.getUrl()) &&
-                someReq.getHeaders().containsKey("Content-Type")
+            someReq.getUrl().equals(req1311.getUrl()) &&
+            someReq.getHeaders().containsKey("Content-Type")
         )), eq("goodUsername"), eq("goodPassword"));
         //=====================================================================
+    }
 
+    @Test
+    public void shouldUpdateTrajectory1411() throws Exception {
         //=====================================================================
         // 1.4.1.1
         //=====================================================================
@@ -255,21 +258,21 @@ public class DotDelegatorTest {
         traj1411.setUidWell("well1411");
 
         // build http request
-        endpoint = this.url + this.trajectoryPath + traj1411.getUid();
+        String endpoint = this.url + this.trajectoryPath + traj1411.getUid();
         HttpRequest req1411 = Unirest.put(endpoint);
         req1411.header("Content-Type", "application/json");
         req1411.queryString("uidWellbore", traj1411.getUidWellbore());
         req1411.queryString("uidWell", traj1411.getUidWell());
 
         // build http response mock
-        resp = mock(HttpResponse.class);
+        HttpResponse<String> resp = mock(HttpResponse.class);
         when(resp.getStatus()).thenReturn(200);
 
         // mock client behavior
         when(this.client.makeRequest(argThat(someReq -> (
             someReq.getHttpMethod().name().equals(req1411.getHttpMethod().name()) &&
-                someReq.getUrl().equals(req1411.getUrl()) &&
-                someReq.getHeaders().containsKey("Content-Type")
+            someReq.getUrl().equals(req1411.getUrl()) &&
+            someReq.getHeaders().containsKey("Content-Type")
         )), eq("goodUsername"), eq("goodPassword"))).thenReturn(resp);
 
         // test
@@ -278,8 +281,8 @@ public class DotDelegatorTest {
         // verify
         verify(this.client).makeRequest(argThat(someReq -> (
             someReq.getHttpMethod().name().equals(req1411.getHttpMethod().name()) &&
-                someReq.getUrl().equals(req1411.getUrl()) &&
-                someReq.getHeaders().containsKey("Content-Type")
+            someReq.getUrl().equals(req1411.getUrl()) &&
+            someReq.getHeaders().containsKey("Content-Type")
         )), eq("goodUsername"), eq("goodPassword"));
         //=====================================================================
     }
