@@ -34,7 +34,7 @@ public class DotClientIT {
 		this.username = "admin";
 		this.password = "12345";
 		String apiKey = "test";
-		String url = "https://witsml.hashmapinc.com:8443/"; // TODO: MOCK THIS
+		String url = "https://witsml.hashmapinc.com:8443/";
 		String tokenPath = "token/jwt/v1/";
 		dotClient = new DotClient(url, apiKey, tokenPath);
 	}
