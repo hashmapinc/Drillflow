@@ -16,6 +16,8 @@
 package com.hashmapinc.tempus.witsml.server.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -90,17 +92,7 @@ public class StoreImplTests {
 	public void testAsyncAnnotationForAddMethod() throws InterruptedException, ExecutionException {
 		CompletableFuture<WMLS_AddToStoreResponse> future = this.storeImpl.addToStore("WMLtypeIn", "XMLin",
 				"OptionsIn", "CapabilitiesIn");
-		while (true) {
-			System.out.println("Waiting for response from addToStore()...");
-			if (future.isDone()) {
-				System.out.println("Result from Async addToStore() -> " + future.get().getResult());
-				break;
-			}
-			System.out.println("Continue execution...");
-			Thread.sleep(1000);
-		}
-
-		System.out.println("Exit test case...");
-
+		assertNotNull(future);
+		assertEquals(-1, future.get().getResult());
 	}
 }
