@@ -507,6 +507,7 @@ public class DotValveTest {
 		assertEquals("wellbore",   actualGetObjects[1].getObjectType());
 		assertEquals("well", 	   actualDeleteObjects[0].getObjectType());
 		assertEquals("wellbore",   actualDeleteObjects[1].getObjectType());
+		assertEquals("trajectory",   actualDeleteObjects[2].getObjectType());
 		assertEquals("well", 	   actualUpdateObjects[0].getObjectType());
 		assertEquals("wellbore",   actualUpdateObjects[1].getObjectType());
 	}
