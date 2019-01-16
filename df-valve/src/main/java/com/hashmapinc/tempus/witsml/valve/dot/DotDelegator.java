@@ -235,7 +235,7 @@ public class DotDelegator {
 
         // build the request
         HttpRequestWithBody request;
-        if (uid.isEmpty()){
+        if (null == uid || uid.isEmpty()){
             // create with POST and generate uid
             request = Unirest.post(endpoint);
         } else {
@@ -273,10 +273,10 @@ public class DotDelegator {
 			ValveLogging valveLoggingResponse = new ValveLogging(exchangeID,
 					logResponse(response, "Received successful status code from DoT create call"), witsmlObj);
 			LOG.info(valveLoggingResponse.toString());
-            return uid.isEmpty() ? new JsonNode(response.getBody()).getObject().getString("uid") : uid;
+            return (null == uid || uid.isEmpty()) ? new JsonNode(response.getBody()).getObject().getString("uid") : uid;
         } else {
 			ValveLogging valveLoggingResponse = new ValveLogging(exchangeID,
-					logResponse(response, "Received failure status code from DoT POST"), witsmlObj);
+					logResponse(response, "Received " + status + " from DoT POST" + response.getBody()), witsmlObj);
 			LOG.warning(valveLoggingResponse.toString());
             throw new ValveException(response.getBody());
         }
