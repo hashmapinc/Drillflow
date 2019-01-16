@@ -19,7 +19,7 @@ package com.hashmapinc.tempus.witsml.server;
  * App Constants
  *
  */
-public class AppConstants {
+public class AsyncAppConstants {
 
     /**
      * CorePoolSize is the initial number of threads that will be running tasks

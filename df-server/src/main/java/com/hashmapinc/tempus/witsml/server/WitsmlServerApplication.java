@@ -39,12 +39,12 @@ public class WitsmlServerApplication {
     @Bean("asyncCustomTaskExecutor")
     public TaskExecutor getAsyncExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(AppConstants.CORE_POOL_SIZE);
-        executor.setMaxPoolSize(AppConstants.MAX_POOL_SIZE);
-        executor.setQueueCapacity(AppConstants.QUEUE_CAPACITY);
-        executor.setKeepAliveSeconds(AppConstants.KEEP_ALIVE_TIME_IN_SEC);
+        executor.setCorePoolSize(AsyncAppConstants.CORE_POOL_SIZE);
+        executor.setMaxPoolSize(AsyncAppConstants.MAX_POOL_SIZE);
+        executor.setQueueCapacity(AsyncAppConstants.QUEUE_CAPACITY);
+        executor.setKeepAliveSeconds(AsyncAppConstants.KEEP_ALIVE_TIME_IN_SEC);
         executor.setWaitForTasksToCompleteOnShutdown(true);
-        executor.setThreadNamePrefix(AppConstants.ASYNC_THREAD_NAME);
+        executor.setThreadNamePrefix(AsyncAppConstants.ASYNC_THREAD_NAME);
         executor.initialize();
         return executor;
     }
