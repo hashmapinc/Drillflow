@@ -15,11 +15,13 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import com.hashmapinc.tempus.witsml.ValveLogging;
 import org.apache.commons.lang3.StringUtils;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
@@ -94,26 +96,65 @@ public class DotValve implements IValve {
     public String getObject(
         QueryContext qc
     ) throws ValveException {
+
+        if (qc.WITSML_OBJECTS.size() == 1 && "".equals(qc.WITSML_OBJECTS.get(0).getUid())){
+            // its a search
+            return doSearch(qc);
+        } else {
+            // its a get
+            return getSingularObject(qc);
+        }
+    }
+
+    private String getSingularObject(QueryContext qc) throws ValveException{
+
         // handle each object
         ArrayList<AbstractWitsmlObject> queryResponses = new ArrayList<AbstractWitsmlObject>();
         try {
             for (AbstractWitsmlObject witsmlObject: qc.WITSML_OBJECTS) {
-                queryResponses.add(
-                    this.DELEGATOR.getObject(
-                        witsmlObject,
-                        qc.USERNAME,
-                        qc.PASSWORD,
-                        qc.EXCHANGE_ID,
-                        this.CLIENT
-                    )
+                AbstractWitsmlObject response = this.DELEGATOR.getObject(
+                    witsmlObject,
+                    qc.USERNAME,
+                    qc.PASSWORD,
+                    qc.EXCHANGE_ID,
+                    this.CLIENT
                 );
+                if (null != response) queryResponses.add(response);
             }
         } catch (Exception e) {
             LOG.warning("Exception in DotValve get object: " + e.getMessage());
             throw new ValveException(e.getMessage());
         }
         // return consolidated XML response in proper version
-        return DotTranslator.consolidateObjectsToXML(queryResponses, qc.CLIENT_VERSION);
+        return DotTranslator.consolidateObjectsToXML(queryResponses, qc.CLIENT_VERSION, qc.OBJECT_TYPE);
+    }
+
+    private String doSearch(QueryContext qc) throws ValveException {
+        // handle each object
+        ArrayList<AbstractWitsmlObject> queryResponses = new ArrayList<AbstractWitsmlObject>();
+        if (qc.WITSML_OBJECTS.size() > 1) {
+            LOG.info("Query received with more than one singular object, not supported");
+            return "";
+        }
+        GraphQLQueryConverter converter = new GraphQLQueryConverter();
+        String query;
+        try {
+            query = converter.convertQuery(qc.WITSML_OBJECTS.get(0));
+            ValveLogging log = new ValveLogging(qc.EXCHANGE_ID, System.lineSeparator() +
+                    "Graph QL Query: " + query,
+                    qc.WITSML_OBJECTS.get(0));
+            LOG.fine(log.toString());
+        } catch (IOException ex){
+            throw new ValveException(ex.getMessage());
+        }
+        try {
+            queryResponses = this.DELEGATOR.executeGraphQL(qc.WITSML_OBJECTS.get(0), query, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.CLIENT);
+        } catch (Exception e) {
+            LOG.warning("Exception in DotValve get object: " + e.getMessage());
+            throw new ValveException(e.getMessage());
+        }
+        // return consolidated XML response in proper version
+        return DotTranslator.consolidateObjectsToXML(queryResponses, qc.CLIENT_VERSION, qc.OBJECT_TYPE);
     }
 
     /**

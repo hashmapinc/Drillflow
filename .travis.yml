@@ -32,3 +32,9 @@ deploy:
   acl: public_read
   on:
     repo: hashmapinc/Drillflow
+after_deploy:
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - export REPO=hashmapinc/drillflow
+  - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo "$TRAVIS_BRANCH" ; fi`
+  - docker build $TRAVIS_BUILD_DIR/docker/ -t $REPO:$TAG
+  - docker push $REPO:$TAG

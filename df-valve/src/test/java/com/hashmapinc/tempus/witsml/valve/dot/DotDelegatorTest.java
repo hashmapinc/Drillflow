@@ -16,13 +16,16 @@
 package com.hashmapinc.tempus.witsml.valve.dot;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.request.HttpRequestWithBody;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import static junit.framework.TestCase.assertEquals;
@@ -33,12 +36,14 @@ public class DotDelegatorTest {
     private DotClient client;
     private String url;
     private String trajectoryPath;
+    private String graphQlWellPath;
 
     @Before
     public void init() {
         // instantiate strings
         this.url = "test.com";
         this.trajectoryPath = "/trajectory/";
+        this.graphQlWellPath = "/well/graphql/";
 
         // build config
         HashMap<String, String> config = new HashMap<>();
@@ -46,6 +51,7 @@ public class DotDelegatorTest {
         config.put("well.path", "/well/");
         config.put("wellbore.path", "/wellbore/");
         config.put("trajectory.path", this.trajectoryPath);
+        config.put("well.gql.path", "/well/graphql/");
 
         // instantiate delegator
         this.delegator = new DotDelegator(config);
@@ -128,5 +134,33 @@ public class DotDelegatorTest {
         String actualUid = this.delegator.createObject(traj, "goodUsername", "goodPassword", "exchangeID", this.client);
         String expectedUid = "traj-a";
         assertEquals(expectedUid, actualUid);
+    }
+
+    @Test
+    public void shouldFindWellsWithEmptyGraphQLQuery() throws Exception {
+        String query = TestUtilities.getResourceAsString("well1311FullEmptyQuery.xml");
+        String response = TestUtilities.getResourceAsString("WellGraphQLResponseFull.json");
+
+        ObjWells queryObject = WitsmlMarshal.deserialize(query, ObjWells.class);
+        AbstractWitsmlObject singleWell = queryObject.getWell().get(0);
+        GraphQLQueryConverter converter = new GraphQLQueryConverter();
+        String jsonQuery = converter.convertQuery(singleWell);
+        String endpoint = this.url + this.graphQlWellPath;
+        HttpRequestWithBody req = Unirest.post(endpoint);
+        req.header("Content-Type", "application/json");
+        req.body(jsonQuery);
+
+        HttpResponse<String> resp = mock(HttpResponse.class);
+        when(resp.getBody()).thenReturn(response);
+        when(resp.getStatus()).thenReturn(200);
+
+        when(this.client.makeRequest(argThat(someReq -> (
+                someReq.getHttpMethod().name().equals(req.getHttpMethod().name()) &&
+                        someReq.getUrl().equals(req.getUrl()) &&
+                        someReq.getHeaders().containsKey("Content-Type")
+        )), eq("goodUsername"), eq("goodPassword"))).thenReturn(resp);
+
+        ArrayList<AbstractWitsmlObject> foundObjects = this.delegator.executeGraphQL(singleWell, jsonQuery, "goodUsername", "goodPassword", "exchangeID", this.client);
+        assertEquals(3, foundObjects.size());
     }
 }
