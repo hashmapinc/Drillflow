@@ -165,8 +165,8 @@ public class DotTranslator {
         if (0 == witsmlObjects.size()) {
             try {
                 xml = is1411 ?
-                    WitsmlMarshal.serialize(new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores()) :
-                    WitsmlMarshal.serialize(new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbores());
+                    WitsmlMarshal.serialize(new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbores()):
+                    WitsmlMarshal.serialize(new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores());
             } catch (JAXBException jxbe) {
                 throw new ValveException("Could not serialize empty wellbores object");
             }
