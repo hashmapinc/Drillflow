@@ -15,32 +15,43 @@
  */
 package com.hashmapinc.tempus.witsml.server.api;
 
-import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
-import com.hashmapinc.tempus.witsml.QueryContext;
-import com.hashmapinc.tempus.witsml.WitsmlObjectParser;
-import com.hashmapinc.tempus.witsml.WitsmlUtil;
-import com.hashmapinc.tempus.witsml.server.WitsmlApiConfig;
-import com.hashmapinc.tempus.witsml.server.api.model.*;
-import com.hashmapinc.tempus.witsml.server.api.model.cap.DataObject;
-import com.hashmapinc.tempus.witsml.server.api.model.cap.ServerCap;
-import com.hashmapinc.tempus.witsml.valve.IValve;
-import com.hashmapinc.tempus.witsml.valve.ValveException;
-import com.hashmapinc.tempus.witsml.valve.ValveFactory;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
+import javax.jws.WebService;
+
 import org.apache.cxf.ext.logging.event.LogEvent;
 import org.apache.cxf.feature.Features;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import javax.annotation.PostConstruct;
-import javax.jws.WebService;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
+
+import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.witsml.QueryContext;
+import com.hashmapinc.tempus.witsml.WitsmlObjectParser;
+import com.hashmapinc.tempus.witsml.WitsmlUtil;
+import com.hashmapinc.tempus.witsml.server.WitsmlApiConfig;
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_AddToStoreResponse;
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_DeleteFromStoreResponse;
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetBaseMsgResponse;
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse;
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetFromStoreResponse;
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetVersionResponse;
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_UpdateInStoreResponse;
+import com.hashmapinc.tempus.witsml.server.api.model.cap.DataObject;
+import com.hashmapinc.tempus.witsml.server.api.model.cap.ServerCap;
+import com.hashmapinc.tempus.witsml.valve.IValve;
+import com.hashmapinc.tempus.witsml.valve.ValveException;
+import com.hashmapinc.tempus.witsml.valve.ValveFactory;
 
 @Service
 @WebService(serviceName = "StoreSoapBinding", portName = "StoreSoapBindingSoap",
@@ -111,17 +122,19 @@ public class StoreImpl implements IStore {
         return message.getExchange().get(LogEvent.KEY_EXCHANGE_ID).toString();
     }
 
+    @Async("asyncCustomTaskExecutor")
     @Override
-    public WMLS_AddToStoreResponse addToStore(
+    public CompletableFuture<WMLS_AddToStoreResponse> addToStore(
         String WMLtypeIn,
         String XMLin,
         String OptionsIn,
         String CapabilitiesIn
     ) {
+    	LOG.info("Thread name -> " + Thread.currentThread().getName());
         LOG.info("Executing addToStore for query <" + getExchangeId() + ">");
         // try to add to store
-        List<AbstractWitsmlObject> witsmlObjects;
-        String uid;
+        List<AbstractWitsmlObject> witsmlObjects = null;
+        String uid = null;
         WMLS_AddToStoreResponse response = new WMLS_AddToStoreResponse();
         try {
             // build the query context
@@ -142,15 +155,14 @@ public class StoreImpl implements IStore {
 
             // handle each object
             uid = valve.createObject(qc);
-            LOG.info(
-                "Successfully added object: " + witsmlObjects.toString()
-            );
+            LOG.info("Successfully added object: " + witsmlObjects.get(0).toString());
+            response.setSuppMsgOut(uid);
+            response.setResult((short) 1);
         } catch (ValveException ve) {
             //TODO: handle exception
             LOG.warning("ValveException in addToStore: " + ve.getMessage());
             response.setSuppMsgOut(ve.getMessage());
             response.setResult((short)-1);
-            return response;
         } catch (Exception e) {
             //TODO: handle exception
             LOG.warning(
@@ -159,17 +171,13 @@ public class StoreImpl implements IStore {
             );
             response.setSuppMsgOut("Error adding to store: " + e.getMessage());
             response.setResult((short)-1);
-            return response;
         }
-
-        LOG.info("Successfully added object: " + witsmlObjects.get(0).toString());
-        response.setSuppMsgOut(uid);
-        response.setResult((short)1);
-        return response;
+        return CompletableFuture.completedFuture(response);
     }
 
+    @Async("asyncCustomTaskExecutor")
     @Override
-    public WMLS_UpdateInStoreResponse updateInStore(
+    public CompletableFuture<WMLS_UpdateInStoreResponse> updateInStore(
         String WMLtypeIn,
         String XMLin,
         String OptionsIn,
@@ -177,7 +185,7 @@ public class StoreImpl implements IStore {
     ) {
         LOG.info("Executing updateInStore");
         // try to update in store
-        List<AbstractWitsmlObject> witsmlObjects;
+        List<AbstractWitsmlObject> witsmlObjects = null;
         WMLS_UpdateInStoreResponse response = new WMLS_UpdateInStoreResponse();
         try {
             // build the query context
@@ -198,12 +206,13 @@ public class StoreImpl implements IStore {
 
             // perform update
             valve.updateObject(qc);
+            LOG.info("Successfully updated object: " + witsmlObjects.toString());
+            response.setResult((short) 1);
         } catch (ValveException ve) {
             //TODO: handle exception
             LOG.warning("ValveException in updateInStore: " + ve.getMessage());
             response.setSuppMsgOut(ve.getMessage());
             response.setResult((short)-1);
-            return response;
         } catch (Exception e) {
             //TODO: handle exception
             LOG.warning(
@@ -212,16 +221,14 @@ public class StoreImpl implements IStore {
             );
             response.setSuppMsgOut("Error updating in store: " + e.getMessage());
             response.setResult((short)-1);
-            return response;
         }
 
-        LOG.info("Successfully updated object: " + witsmlObjects.toString());
-        response.setResult((short)1);
-        return response;
+        return CompletableFuture.completedFuture(response);
     }
 
+    @Async("asyncCustomTaskExecutor")
     @Override
-    public WMLS_DeleteFromStoreResponse deleteFromStore(
+    public CompletableFuture<WMLS_DeleteFromStoreResponse> deleteFromStore(
         String WMLtypeIn,
         String QueryIn,
         String OptionsIn,
@@ -246,7 +253,7 @@ public class StoreImpl implements IStore {
                     "CapabilitiesIn: " + CapabilitiesIn
             );
             resp.setSuppMsgOut("Bad QueryIn. Got error message: " + e.getMessage());
-            return resp;
+            return CompletableFuture.completedFuture(resp);
         }
 
         // try to delete
@@ -271,7 +278,7 @@ public class StoreImpl implements IStore {
         }
 
         // return response
-        return resp;
+        return CompletableFuture.completedFuture(resp);
     }
 
     @Override
@@ -320,8 +327,9 @@ public class StoreImpl implements IStore {
         return response;
     }
 
+    @Async("asyncCustomTaskExecutor")
     @Override
-    public WMLS_GetFromStoreResponse getFromStore(
+    public CompletableFuture<WMLS_GetFromStoreResponse> getFromStore(
         String WMLtypeIn, 
         String QueryIn, 
         String OptionsIn, 
@@ -346,7 +354,7 @@ public class StoreImpl implements IStore {
 
             resp.setSuppMsgOut("Error parsing input: " + e.getMessage());
             resp.setResult((short) -1);
-            return resp;
+            return CompletableFuture.completedFuture(resp);
         }
 
         // try to query
@@ -388,7 +396,7 @@ public class StoreImpl implements IStore {
         }
 
         // return response
-        return resp;
+        return CompletableFuture.completedFuture(resp);
     }
 
 }
