@@ -100,7 +100,7 @@ public class DotTranslator {
         try {
             switch (objectType) { // TODO: support log and trajectory
                 case "well":
-                    ObjWell well =  WitsmlMarshal.deserializeFromJSON(result.toString(), com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell.class);
+                    ObjWell well =  WitsmlMarshal.deserializeFromJSON(result.toString(), ObjWell.class);
                     return well;
                 case "wellbore":
                     return WitsmlMarshal.deserializeFromJSON(
