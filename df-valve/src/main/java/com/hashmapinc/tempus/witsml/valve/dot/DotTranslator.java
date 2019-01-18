@@ -17,6 +17,7 @@ package com.hashmapinc.tempus.witsml.valve.dot;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
 import org.json.JSONObject;
 
@@ -86,6 +87,12 @@ public class DotTranslator {
         String objectType
     ) throws ValveException {
         // Merge the 2 objects
+        if (!query.has("commonData")){
+            query.append("commonData", new JSONObject());
+        }
+        JSONObject commonData = (JSONObject)query.get("commonData");
+        commonData.append("dTimLastChange", null);
+        commonData.append("dTimCreation", null);
         JSONObject result = Util.merge(query,response); // WARNING: this method modifies query internally
 
         // convert the queryJSON back to valid xml
@@ -93,9 +100,8 @@ public class DotTranslator {
         try {
             switch (objectType) { // TODO: support log and trajectory
                 case "well":
-                    return WitsmlMarshal.deserializeFromJSON(
-                        result.toString(), com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell.class
-                    );
+                    ObjWell well =  WitsmlMarshal.deserializeFromJSON(result.toString(), com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell.class);
+                    return well;
                 case "wellbore":
                     return WitsmlMarshal.deserializeFromJSON(
                         result.toString(), com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore.class
