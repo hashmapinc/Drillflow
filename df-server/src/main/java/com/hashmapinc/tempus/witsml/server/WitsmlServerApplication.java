@@ -17,35 +17,11 @@ package com.hashmapinc.tempus.witsml.server;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.core.task.TaskExecutor;
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @SpringBootApplication()
-@EnableAsync(proxyTargetClass=true)
 public class WitsmlServerApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(WitsmlServerApplication.class, args);
-    }
-
-    /**
-     * Configure custom Async task executor to provide async functionality for
-     * this application
-     *
-     * @return custom task executor async in nature
-     */
-    @Bean("asyncCustomTaskExecutor")
-    public TaskExecutor getAsyncExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(AsyncAppConstants.CORE_POOL_SIZE);
-        executor.setMaxPoolSize(AsyncAppConstants.MAX_POOL_SIZE);
-        executor.setQueueCapacity(AsyncAppConstants.QUEUE_CAPACITY);
-        executor.setKeepAliveSeconds(AsyncAppConstants.KEEP_ALIVE_TIME_IN_SEC);
-        executor.setWaitForTasksToCompleteOnShutdown(true);
-        executor.setThreadNamePrefix(AsyncAppConstants.ASYNC_THREAD_NAME);
-        executor.initialize();
-        return executor;
-    }
+	public static void main(String[] args) {
+		SpringApplication.run(WitsmlServerApplication.class, args);
+	}
 }
