@@ -21,11 +21,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import com.hashmapinc.tempus.witsml.ValveLogging;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.scheduling.annotation.Async;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.QueryContext;
+import com.hashmapinc.tempus.witsml.ValveLogging;
 import com.hashmapinc.tempus.witsml.valve.IValve;
 import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
@@ -93,6 +94,7 @@ public class DotValve implements IValve {
      * @return The resultant object from the query in xml string format
      */
     @Override
+    @Async("asyncCustomTaskExecutor")
     public String getObject(
         QueryContext qc
     ) throws ValveException {
@@ -164,12 +166,16 @@ public class DotValve implements IValve {
      * @return the UID of the newly created object
      */
     @Override
+    @Async("asyncCustomTaskExecutor")
     public String createObject(
         QueryContext qc
     ) throws ValveException {
         // create each object
         ArrayList<String> uids = new ArrayList<>();
+        LOG.info("Async create object");
+
         try {
+            Thread.sleep(8000);
             for (AbstractWitsmlObject witsmlObject: qc.WITSML_OBJECTS) {
                 uids.add(
                     this.DELEGATOR.createObject(
@@ -181,6 +187,7 @@ public class DotValve implements IValve {
                     )
                 );
             }
+            
         } catch (Exception e) {
             LOG.warning("Exception in DotValve create object: " + e.getMessage());
             throw new ValveException(e.getMessage());
@@ -193,6 +200,7 @@ public class DotValve implements IValve {
      * @param qc - QueryContext with information needed to delete object
      */
     @Override
+    @Async("asyncCustomTaskExecutor")
     public void deleteObject(
         QueryContext qc
     ) throws ValveException {
@@ -218,6 +226,7 @@ public class DotValve implements IValve {
      * @param qc - QueryContext needed to execute the deleteObject querying
      */
     @Override
+    @Async("asyncCustomTaskExecutor")
     public void updateObject(
         QueryContext qc
     ) throws ValveException {

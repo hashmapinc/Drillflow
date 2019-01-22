@@ -37,15 +37,9 @@ public class StoreImplTests {
 	}
 
 	@Test
-	public void addToStoreShouldHandleBadInput() {
-		assertThat(
-			this.witsmlServer.addToStore(
-				"WMLtypeIn",
-				"XMLin",
-				"OptionsIn",
-				"CapabilitiesIn"
-			).getResult()
-		).isEqualTo((short)-1);
+	public void addToStoreShouldHandleBadInput() throws InterruptedException, ExecutionException {
+		assertThat(this.storeImpl.addToStore("WMLtypeIn", "XMLin", "OptionsIn", "CapabilitiesIn").getResult())
+				.isEqualTo((short) -1);
 	}
 
 	@Test
