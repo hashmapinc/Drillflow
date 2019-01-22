@@ -15,13 +15,15 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
-import org.json.JSONObject;
-import org.junit.Test;
+import static junit.framework.TestCase.assertEquals;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import static junit.framework.TestCase.assertEquals;
+import org.json.JSONObject;
+import org.junit.Test;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.reflect.Whitebox;
 
 public class UtilTest {
 
@@ -57,5 +59,21 @@ public class UtilTest {
 
         assertEquals(expected, actual);
     }
+    
+	@Test
+	public void checkIsEmpty() throws Exception {
+		Util spy = PowerMockito.spy(new Util());
+		String methodToTest = "isEmpty";
+
+		String srcString = new String(Files.readAllBytes(Paths.get("src/test/resources/utilTest/well1311src.json")));
+		JSONObject src = new JSONObject(srcString);
+		boolean result = Whitebox.invokeMethod(spy, methodToTest, src);
+		assertEquals(false, result);
+
+		String destString = "{\"fakeField\": null}";
+		JSONObject dest = new JSONObject(destString);
+		result = Whitebox.invokeMethod(spy, methodToTest, dest);
+		assertEquals(true, result);
+	}
 }
 
