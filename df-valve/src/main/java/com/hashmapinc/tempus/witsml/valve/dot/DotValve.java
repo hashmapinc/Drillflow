@@ -168,7 +168,6 @@ public class DotValve implements IValve {
 		LOG.info("Async create object");
 
 		try {
-			Thread.sleep(4000);
 			for (AbstractWitsmlObject witsmlObject : qc.WITSML_OBJECTS) {
 				uids.add(this.DELEGATOR.createObject(witsmlObject, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID,
 						this.CLIENT));
