@@ -130,12 +130,12 @@ public class DotValveTest {
 		ArrayList<AbstractWitsmlObject> witsmlObjects;
 		witsmlObjects = new ArrayList<>();
 
-		ObjWellbore wellboreA = new ObjWellbore();
+		com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore wellboreA = new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore();
 		wellboreA.setName("wellbore-A");
 		wellboreA.setUid("wellbore-A");
 		witsmlObjects.add(wellboreA);
 
-		ObjWellbore wellboreB = new ObjWellbore();
+		com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore wellboreB = new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore();
 		wellboreB.setName("wellbore-B");
 		wellboreB.setUid("wellbore-B");
 		witsmlObjects.add(wellboreB);
@@ -155,13 +155,8 @@ public class DotValveTest {
 
 
 		// mock delegator behavior
-		when(
-			this.mockDelegator.getObject(wellboreA, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.mockClient)
-		).thenReturn(wellboreA);
-		when(
-			this.mockDelegator.getObject(wellboreB, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.mockClient)
-		).thenReturn(wellboreB);
-
+		doReturn(wellboreA).when(this.mockDelegator).getObject(wellboreA, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.mockClient);
+		doReturn(wellboreB).when(this.mockDelegator).getObject(wellboreB, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.mockClient);
 
 		// test
 		String expected = // expected = merge wellboreA and wellbore B
