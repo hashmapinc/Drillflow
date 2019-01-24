@@ -17,8 +17,6 @@ package com.hashmapinc.tempus.witsml.server.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.concurrent.ExecutionException;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

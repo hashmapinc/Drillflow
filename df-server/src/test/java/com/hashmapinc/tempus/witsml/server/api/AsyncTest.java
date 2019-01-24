@@ -24,14 +24,11 @@ import java.util.concurrent.CompletableFuture;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore;
