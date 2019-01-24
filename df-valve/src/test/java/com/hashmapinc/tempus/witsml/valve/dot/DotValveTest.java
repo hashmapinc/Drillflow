@@ -87,7 +87,7 @@ public class DotValveTest {
 
 		// test
 		String expected = well.getXMLString("1.3.1.1");
-		String actual = this.valve.getObject(qc);
+		String actual = this.valve.getObject(qc).get();
 		assertEquals(expected, actual);
 	}
 
@@ -120,7 +120,7 @@ public class DotValveTest {
 
 		// test
 		String expected = WitsmlMarshal.serialize(new ObjWells());
-		String actual = this.valve.getObject(qc);
+		String actual = this.valve.getObject(qc).get();
 		assertEquals(expected, actual);
 	}
 
@@ -171,7 +171,7 @@ public class DotValveTest {
 				"<wellbores version=\"1.3.1.1\" xmlns=\"http://www.witsml.org/schemas/131\">",
 				""
 			);
-		String actual = this.valve.getObject(qc);
+		String actual = this.valve.getObject(qc).get();
 		assertEquals(expected, actual);
 	}
 
@@ -208,7 +208,7 @@ public class DotValveTest {
 
 		// test
 		String expected = wellboreA.getUid();
-		String actual = this.valve.createObject(qc);
+		String actual = this.valve.createObject(qc).get();
 		assertEquals(expected, actual);
 	}
 
@@ -245,7 +245,7 @@ public class DotValveTest {
 
 		// test
 		String expected = traj.getUid();
-		String actual = this.valve.createObject(qc);
+		String actual = this.valve.createObject(qc).get();
 		assertEquals(expected, actual);
 	}
 
@@ -290,7 +290,7 @@ public class DotValveTest {
 
 		// test
 		String expected = wellboreA.getUid() + "," + wellboreB.getUid();
-		String actual = this.valve.createObject(qc);
+		String actual = this.valve.createObject(qc).get();
 		assertEquals(expected, actual);
 	}
 
@@ -563,11 +563,3 @@ public class DotValveTest {
 		assertEquals("trajectory",   actualUpdateObjects[2].getObjectType());
 	}
 }
-
-
-
-
-
-
-
-

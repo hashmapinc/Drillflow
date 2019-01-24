@@ -141,7 +141,7 @@ public class StoreImpl implements IStore {
             );
 
             // handle each object
-            uid = valve.createObject(qc);
+            uid = valve.createObject(qc).get();
             LOG.info(
                 "Successfully added object: " + witsmlObjects.toString()
             );
@@ -197,7 +197,7 @@ public class StoreImpl implements IStore {
             );
 
             // perform update
-            valve.updateObject(qc);
+            valve.updateObject(qc).get();
         } catch (ValveException ve) {
             //TODO: handle exception
             LOG.warning("ValveException in updateInStore: " + ve.getMessage());
@@ -264,7 +264,7 @@ public class StoreImpl implements IStore {
                     user.getPassword(),
                     getExchangeId()
             );
-            this.valve.deleteObject(qc);
+            this.valve.deleteObject(qc).get();
             resp.setResult((short) 1);
         } catch (Exception e) {
             resp.setSuppMsgOut(e.getMessage());
@@ -365,7 +365,7 @@ public class StoreImpl implements IStore {
                 getExchangeId()
             );
 
-            String xmlOut = this.valve.getObject(qc);
+            String xmlOut = this.valve.getObject(qc).get();
 
             // populate response
             if (null != xmlOut) {

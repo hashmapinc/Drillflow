@@ -16,6 +16,7 @@
 package com.hashmapinc.tempus.witsml.valve;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.QueryContext;
@@ -38,7 +39,7 @@ public interface IValve {
      * @param qc - QueryContext needed to execute the getObject querying
      * @return The resultant object from the query in XML string format
      */
-    public String getObject(QueryContext qc) throws ValveException;
+    public CompletableFuture<String> getObject(QueryContext qc) throws ValveException;
 
     /**
      * Gets a collection of objects based on the WITSML Query
@@ -53,19 +54,20 @@ public interface IValve {
      * @param qc - QueryContext needed to execute the createObject querying
      * @return the UID of the newly created object
      */
-    public String createObject(QueryContext qc) throws ValveException;
+    public CompletableFuture<String> createObject(QueryContext qc) throws ValveException;
 
     /**
      * Deletes an object
      * @param qc - QueryContext needed to execute the deleteObject querying
      */
-    public void deleteObject(QueryContext qc) throws ValveException;
+    public CompletableFuture<Boolean> deleteObject(QueryContext qc) throws ValveException;
 
     /**
      * Updates an already existing object
      * @param qc - QueryContext needed to execute the updateObject querying
+     * @return 
      */
-    public void updateObject(QueryContext qc) throws ValveException;
+    public CompletableFuture<Boolean> updateObject(QueryContext qc) throws ValveException;
 
     /**
      * Performs authentication
