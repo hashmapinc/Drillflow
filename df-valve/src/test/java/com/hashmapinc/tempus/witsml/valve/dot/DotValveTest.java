@@ -87,7 +87,7 @@ public class DotValveTest {
 
 		// test
 		String expected = well.getXMLString("1.3.1.1");
-		String actual = this.valve.getObject(qc);
+		String actual = this.valve.getObject(qc).get();
 		assertEquals(expected, actual);
 	}
 
@@ -120,7 +120,7 @@ public class DotValveTest {
 
 		// test
 		String expected = WitsmlMarshal.serialize(new ObjWells());
-		String actual = this.valve.getObject(qc);
+		String actual = this.valve.getObject(qc).get();
 		assertEquals(expected, actual);
 	}
 
@@ -130,12 +130,12 @@ public class DotValveTest {
 		ArrayList<AbstractWitsmlObject> witsmlObjects;
 		witsmlObjects = new ArrayList<>();
 
-		ObjWellbore wellboreA = new ObjWellbore();
+		com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore wellboreA = new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore();
 		wellboreA.setName("wellbore-A");
 		wellboreA.setUid("wellbore-A");
 		witsmlObjects.add(wellboreA);
 
-		ObjWellbore wellboreB = new ObjWellbore();
+		com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore wellboreB = new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore();
 		wellboreB.setName("wellbore-B");
 		wellboreB.setUid("wellbore-B");
 		witsmlObjects.add(wellboreB);
@@ -155,13 +155,8 @@ public class DotValveTest {
 
 
 		// mock delegator behavior
-		when(
-			this.mockDelegator.getObject(wellboreA, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.mockClient)
-		).thenReturn(wellboreA);
-		when(
-			this.mockDelegator.getObject(wellboreB, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.mockClient)
-		).thenReturn(wellboreB);
-
+		doReturn(wellboreA).when(this.mockDelegator).getObject(wellboreA, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.mockClient);
+		doReturn(wellboreB).when(this.mockDelegator).getObject(wellboreB, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.mockClient);
 
 		// test
 		String expected = // expected = merge wellboreA and wellbore B
@@ -171,7 +166,7 @@ public class DotValveTest {
 				"<wellbores version=\"1.3.1.1\" xmlns=\"http://www.witsml.org/schemas/131\">",
 				""
 			);
-		String actual = this.valve.getObject(qc);
+		String actual = this.valve.getObject(qc).get();
 		assertEquals(expected, actual);
 	}
 
@@ -208,7 +203,7 @@ public class DotValveTest {
 
 		// test
 		String expected = wellboreA.getUid();
-		String actual = this.valve.createObject(qc);
+		String actual = this.valve.createObject(qc).get();
 		assertEquals(expected, actual);
 	}
 
@@ -245,7 +240,7 @@ public class DotValveTest {
 
 		// test
 		String expected = traj.getUid();
-		String actual = this.valve.createObject(qc);
+		String actual = this.valve.createObject(qc).get();
 		assertEquals(expected, actual);
 	}
 
@@ -290,7 +285,7 @@ public class DotValveTest {
 
 		// test
 		String expected = wellboreA.getUid() + "," + wellboreB.getUid();
-		String actual = this.valve.createObject(qc);
+		String actual = this.valve.createObject(qc).get();
 		assertEquals(expected, actual);
 	}
 
@@ -563,11 +558,3 @@ public class DotValveTest {
 		assertEquals("trajectory",   actualUpdateObjects[2].getObjectType());
 	}
 }
-
-
-
-
-
-
-
-

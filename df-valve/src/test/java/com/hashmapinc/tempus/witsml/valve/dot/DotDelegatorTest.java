@@ -36,6 +36,15 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNotNull;
+import static org.mockito.Mockito.*;
 
 public class DotDelegatorTest {
     private DotDelegator delegator;
@@ -151,6 +160,7 @@ public class DotDelegatorTest {
         AbstractWitsmlObject singleWell = queryObject.getWell().get(0);
         GraphQLQueryConverter converter = new GraphQLQueryConverter();
         String jsonQuery = converter.convertQuery(singleWell);
+        assertNotNull(jsonQuery);
         String endpoint = this.url + this.graphQlWellPath;
         HttpRequestWithBody req = Unirest.post(endpoint);
         req.header("Content-Type", "application/json");

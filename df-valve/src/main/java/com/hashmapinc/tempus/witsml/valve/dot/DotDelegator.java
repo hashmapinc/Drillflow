@@ -323,7 +323,8 @@ public class DotDelegator {
 			LOG.info(valveLoggingResponse.toString());
 			// get an abstractWitsmlObject from merging the query and the result
 			// JSON objects
-			JSONObject queryJSON = new JSONObject(witsmlObject.getJSONString("1.4.1.1"));
+			String jsonObj = witsmlObject.getJSONString("1.4.1.1");
+			JSONObject queryJSON = new JSONObject(jsonObj);
 			JSONObject responseJSON = new JsonNode(response.getBody()).getObject();
 			return DotTranslator.translateQueryResponse(queryJSON, responseJSON, objectType);
 		} else if (404 == status) {

@@ -41,6 +41,9 @@ class GraphQLQueryConverter {
      */
     public String convertQuery(AbstractWitsmlObject wmlObject) throws IOException {
         String objJson = wmlObject.getJSONString("1.4.1.1");
+        if (objJson == null) {
+            return null;
+        }
         switch (wmlObject.getObjectType()){
             case "well":
                 this.createWellQuery(objJson);
@@ -59,6 +62,9 @@ class GraphQLQueryConverter {
         List<String> keysToOmit = new ArrayList<>();
         keysToOmit.add("customData");
         keysToOmit.add("commonData");
+        keysToOmit.add("dTimLastChange");
+        keysToOmit.add("dTimCreation");
+        keysToOmit.add("defaultDatum");
         StringBuilder querybuilder = new StringBuilder();
         querybuilder.append("query WellQuery($wellArgument: WellArgument) ");
         this.builder.addVariableGroup("wellArgument");
@@ -82,7 +88,9 @@ class GraphQLQueryConverter {
         List<String> keysToOmit = new ArrayList<>();
         keysToOmit.add("parentUid");
         keysToOmit.add("customData");
-        keysToOmit.add("commonData");
+        keysToOmit.add("dTimLastChange");
+        keysToOmit.add("dTimCreation");
+        keysToOmit.add("defaultDatum");
         StringBuilder querybuilder = new StringBuilder();
         querybuilder.append("query WellboreQuery($wellboreArgument: WellboreArgument) ");
         this.builder.addVariableGroup("wellboreArgument");
