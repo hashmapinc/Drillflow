@@ -15,6 +15,19 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
+import static junit.framework.TestCase.assertEquals;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory;
@@ -23,14 +36,6 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import static junit.framework.TestCase.assertEquals;
-import static org.mockito.Mockito.*;
 
 public class DotDelegatorTest {
     private DotDelegator delegator;

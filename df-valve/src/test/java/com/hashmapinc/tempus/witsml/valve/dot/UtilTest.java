@@ -51,7 +51,6 @@ public class UtilTest {
 
         JSONObject dest = new JSONObject(destString);
         JSONObject src = new JSONObject(srcString);
-
         JSONObject merged = Util.merge(dest, src);
 
         String actual = merged.toString(2);
