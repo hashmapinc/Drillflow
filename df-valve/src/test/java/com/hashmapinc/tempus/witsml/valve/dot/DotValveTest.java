@@ -21,7 +21,7 @@ import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells;
-import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory;
 import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
 import org.junit.Before;
@@ -87,7 +87,7 @@ public class DotValveTest {
 
 		// test
 		String expected = well.getXMLString("1.3.1.1");
-		String actual = this.valve.getObject(qc);
+		String actual = this.valve.getObject(qc).get();
 		assertEquals(expected, actual);
 	}
 
@@ -120,7 +120,7 @@ public class DotValveTest {
 
 		// test
 		String expected = WitsmlMarshal.serialize(new ObjWells());
-		String actual = this.valve.getObject(qc);
+		String actual = this.valve.getObject(qc).get();
 		assertEquals(expected, actual);
 	}
 
@@ -130,12 +130,12 @@ public class DotValveTest {
 		ArrayList<AbstractWitsmlObject> witsmlObjects;
 		witsmlObjects = new ArrayList<>();
 
-		ObjWellbore wellboreA = new ObjWellbore();
+		com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore wellboreA = new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore();
 		wellboreA.setName("wellbore-A");
 		wellboreA.setUid("wellbore-A");
 		witsmlObjects.add(wellboreA);
 
-		ObjWellbore wellboreB = new ObjWellbore();
+		com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore wellboreB = new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore();
 		wellboreB.setName("wellbore-B");
 		wellboreB.setUid("wellbore-B");
 		witsmlObjects.add(wellboreB);
@@ -155,13 +155,8 @@ public class DotValveTest {
 
 
 		// mock delegator behavior
-		when(
-			this.mockDelegator.getObject(wellboreA, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.mockClient)
-		).thenReturn(wellboreA);
-		when(
-			this.mockDelegator.getObject(wellboreB, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.mockClient)
-		).thenReturn(wellboreB);
-
+		doReturn(wellboreA).when(this.mockDelegator).getObject(wellboreA, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.mockClient);
+		doReturn(wellboreB).when(this.mockDelegator).getObject(wellboreB, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.mockClient);
 
 		// test
 		String expected = // expected = merge wellboreA and wellbore B
@@ -171,7 +166,7 @@ public class DotValveTest {
 				"<wellbores version=\"1.3.1.1\" xmlns=\"http://www.witsml.org/schemas/131\">",
 				""
 			);
-		String actual = this.valve.getObject(qc);
+		String actual = this.valve.getObject(qc).get();
 		assertEquals(expected, actual);
 	}
 
@@ -208,7 +203,7 @@ public class DotValveTest {
 
 		// test
 		String expected = wellboreA.getUid();
-		String actual = this.valve.createObject(qc);
+		String actual = this.valve.createObject(qc).get();
 		assertEquals(expected, actual);
 	}
 
@@ -245,7 +240,7 @@ public class DotValveTest {
 
 		// test
 		String expected = traj.getUid();
-		String actual = this.valve.createObject(qc);
+		String actual = this.valve.createObject(qc).get();
 		assertEquals(expected, actual);
 	}
 
@@ -290,7 +285,7 @@ public class DotValveTest {
 
 		// test
 		String expected = wellboreA.getUid() + "," + wellboreB.getUid();
-		String actual = this.valve.createObject(qc);
+		String actual = this.valve.createObject(qc).get();
 		assertEquals(expected, actual);
 	}
 
@@ -325,6 +320,58 @@ public class DotValveTest {
 
 		// verify
 		verify(this.mockDelegator).deleteObject(wellboreA, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.mockClient);
+		verifyNoMoreInteractions(this.mockDelegator);
+	}
+
+	@Test
+	public void shouldDeleteTrajectory() throws Exception {
+		// build witsmlObjects lists
+		ArrayList<AbstractWitsmlObject> trajs1311 = new ArrayList<>();
+		ArrayList<AbstractWitsmlObject> trajs1411 = new ArrayList<>();
+
+		// get traj 1311
+		ObjTrajectory traj1311 = new ObjTrajectory();
+		traj1311.setName("traj-1311");
+		traj1311.setUid("traj-1311");
+		trajs1311.add(traj1311);
+
+		// get traj 1411
+		com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory traj1411 = new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory();
+		traj1411.setName("traj-1411");
+		traj1411.setUid("traj-1411");
+		trajs1411.add(traj1411);
+
+		// build query contexts
+		QueryContext qc1311 = new QueryContext(
+			"1.3.1.1",
+			"trajectory",
+			null,
+			"",
+			trajs1311,
+			"goodUsername",
+			"goodPassword",
+			"shouldDeleteTrajectory-1311" // exchange ID
+		);
+		QueryContext qc1411 = new QueryContext(
+			"1.4.1.1",
+			"trajectory",
+			null,
+			"",
+			trajs1411,
+			"goodUsername",
+			"goodPassword",
+			"shouldDeleteTrajectory-1411" // exchange ID
+		);
+
+
+		// test deletes
+		this.valve.deleteObject(qc1311);
+		this.valve.deleteObject(qc1411);
+
+
+		// verify
+		verify(this.mockDelegator).deleteObject(traj1311, qc1311.USERNAME, qc1311.PASSWORD, qc1311.EXCHANGE_ID, this.mockClient);
+		verify(this.mockDelegator).deleteObject(traj1411, qc1411.USERNAME, qc1411.PASSWORD, qc1411.EXCHANGE_ID, this.mockClient);
 		verifyNoMoreInteractions(this.mockDelegator);
 	}
 
@@ -402,6 +449,56 @@ public class DotValveTest {
 	}
 
 	@Test
+	public void shouldUpdateTrajectory() throws Exception {
+		// build witsmlObjects lists
+		ArrayList<AbstractWitsmlObject> trajs1311 = new ArrayList<>();
+		ArrayList<AbstractWitsmlObject> trajs1411 = new ArrayList<>();
+
+		// get traj 1311
+		ObjTrajectory traj1311 = new ObjTrajectory();
+		traj1311.setName("traj-1311");
+		traj1311.setUid("traj-1311");
+		trajs1311.add(traj1311);
+
+		// get traj 1411
+		com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory traj1411 = new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory();
+		traj1411.setName("traj-1411");
+		traj1411.setUid("traj-1411");
+		trajs1411.add(traj1411);
+
+		// build query contexts
+		QueryContext qc1311 = new QueryContext(
+			"1.3.1.1",
+			"trajectory",
+			null,
+			"",
+			trajs1311,
+			"goodUsername",
+			"goodPassword",
+			"shouldUpdateTrajectory-1311" // exchange ID
+		);
+		QueryContext qc1411 = new QueryContext(
+			"1.4.1.1",
+			"trajectory",
+			null,
+			"",
+			trajs1411,
+			"goodUsername",
+			"goodPassword",
+			"shouldUpdateTrajectory-1411" // exchange ID
+		);
+
+		// test update
+		this.valve.updateObject(qc1311);
+		this.valve.updateObject(qc1411);
+
+		// verify
+		verify(this.mockDelegator).updateObject(traj1311, qc1311.USERNAME, qc1311.PASSWORD, qc1311.EXCHANGE_ID, this.mockClient);
+		verify(this.mockDelegator).updateObject(traj1411, qc1411.USERNAME, qc1411.PASSWORD, qc1411.EXCHANGE_ID, this.mockClient);
+		verifyNoMoreInteractions(this.mockDelegator);
+	}
+
+	@Test
 	public void shouldSucceedAuthenticate() throws Exception {
 		// mock behavior
 		when(this.mockClient.getJWT("goodUsername", "goodPassword"))
@@ -455,15 +552,9 @@ public class DotValveTest {
 		assertEquals("wellbore",   actualGetObjects[1].getObjectType());
 		assertEquals("well", 	   actualDeleteObjects[0].getObjectType());
 		assertEquals("wellbore",   actualDeleteObjects[1].getObjectType());
+		assertEquals("trajectory",   actualDeleteObjects[2].getObjectType());
 		assertEquals("well", 	   actualUpdateObjects[0].getObjectType());
 		assertEquals("wellbore",   actualUpdateObjects[1].getObjectType());
+		assertEquals("trajectory",   actualUpdateObjects[2].getObjectType());
 	}
 }
-
-
-
-
-
-
-
-

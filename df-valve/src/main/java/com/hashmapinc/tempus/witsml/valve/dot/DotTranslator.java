@@ -16,7 +16,12 @@
 package com.hashmapinc.tempus.witsml.valve.dot;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.WitsmlObjects.Util.WellConverter;
+import com.hashmapinc.tempus.WitsmlObjects.Util.WellboreConverter;
 import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbores;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
 import org.json.JSONObject;
 
@@ -51,20 +56,15 @@ public class DotTranslator {
     ) throws ValveException {
         LOG.info("converting to 1311 from 1411 object" + obj1411.toString());
 
-        // get 1311 string
-        String xml1311 = obj1411.getXMLString("1.3.1.1");
-
         // convert to 1311 object
         try {
             switch (obj1411.getObjectType()) { //TODO: support log and trajectory
                 case "well":
-                    return ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells) WitsmlMarshal.deserialize(
-                        xml1311, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells.class)
-                    ).getWell().get(0);
+                    if (obj1411 instanceof com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell) return obj1411;
+                    return WellConverter.convertTo1311((ObjWell)obj1411);
                 case "wellbore":
-                    return ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores) WitsmlMarshal.deserialize(
-                        xml1311, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores.class)
-                    ).getWellbore().get(0);
+                    if (obj1411 instanceof com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore) return obj1411;
+                    return WellboreConverter.convertTo1311((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) obj1411);
                 default:
                     throw new ValveException("unsupported object type: " + obj1411.getObjectType());
             }
@@ -93,9 +93,8 @@ public class DotTranslator {
         try {
             switch (objectType) { // TODO: support log and trajectory
                 case "well":
-                    return WitsmlMarshal.deserializeFromJSON(
-                        result.toString(), com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell.class
-                    );
+                    ObjWell well =  WitsmlMarshal.deserializeFromJSON(result.toString(), ObjWell.class);
+                    return well;
                 case "wellbore":
                     return WitsmlMarshal.deserializeFromJSON(
                         result.toString(), com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore.class
@@ -165,8 +164,8 @@ public class DotTranslator {
         if (0 == witsmlObjects.size()) {
             try {
                 xml = is1411 ?
-                    WitsmlMarshal.serialize(new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores()) :
-                    WitsmlMarshal.serialize(new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbores());
+                    WitsmlMarshal.serialize(new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbores()):
+                    WitsmlMarshal.serialize(new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores());
             } catch (JAXBException jxbe) {
                 throw new ValveException("Could not serialize empty wellbores object");
             }

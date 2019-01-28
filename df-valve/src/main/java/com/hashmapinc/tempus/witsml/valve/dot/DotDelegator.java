@@ -114,8 +114,20 @@ public class DotDelegator {
 		HttpRequest request = Unirest.delete(endpoint).header("Content-Type", "application/json");
 		ValveLogging valveLoggingRequest = new ValveLogging(exchangeID, logRequest(request), witsmlObj);
 		LOG.info(valveLoggingRequest.toString());
-        if ("wellbore".equals(objectType))
-            request.queryString("uidWell", witsmlObj.getParentUid()); // TODO: ensure parent uid exists?
+
+		// add query string params
+        if ("wellbore".equals(objectType)) {
+			request.queryString("uidWell", witsmlObj.getParentUid()); // TODO: ensure parent uid exists?
+		} else if ("trajectory".equals(objectType)){
+			request.queryString("uidWellbore", witsmlObj.getParentUid());
+			String uidWell;
+			if ("1.4.1.1".equals(witsmlObj.getVersion())) {
+				uidWell = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory) witsmlObj).getUidWell();
+			} else {
+				uidWell = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory) witsmlObj).getUidWell();
+			}
+			request.queryString("uidWell", uidWell);
+		}
 
         // make the DELETE call.
         HttpResponse<String> response = client.makeRequest(request, username, password);
@@ -150,11 +162,9 @@ public class DotDelegator {
 		String exchangeID, 
 		DotClient client
 	) throws ValveException, ValveAuthException, UnirestException {
-		String uid = witsmlObj.getUid(); // get uid for delete call
-		String objectType = witsmlObj.getObjectType(); // get obj type for
-														// exception handling
-		String endpoint = this.getEndpoint(objectType) + uid; // add uid for
-																// update call
+		String uid = witsmlObj.getUid();
+		String objectType = witsmlObj.getObjectType();
+		String endpoint = this.getEndpoint(objectType) + uid;
 
 		// get witsmlObj as json string for request payload
 		String payload = witsmlObj.getJSONString("1.4.1.1");
@@ -166,7 +176,16 @@ public class DotDelegator {
 
 		// add query string params
 		if ("wellbore".equals(objectType)) {
-			request.queryString("uidWell", witsmlObj.getParentUid()); // TODO: error handle this?
+			request.queryString("uidWell", witsmlObj.getParentUid());
+		} else if ("trajectory".equals(objectType)) {
+			request.queryString("uidWellbore", witsmlObj.getParentUid());
+			String uidWell;
+			if ("1.4.1.1".equals(witsmlObj.getVersion())) {
+				uidWell = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory) witsmlObj).getUidWell();
+			} else {
+				uidWell = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory) witsmlObj).getUidWell();
+			}
+			request.queryString("uidWell", uidWell);
 		}
 
 		ValveLogging valveLoggingRequest = new ValveLogging(exchangeID, logRequest(request), witsmlObj);
@@ -179,11 +198,11 @@ public class DotDelegator {
 		int status = response.getStatus();
 		if (201 == status || 200 == status) {
 			ValveLogging valveLoggingResponse = new ValveLogging(exchangeID,
-					logResponse(response, "UPDATE for " + witsmlObj + " was successful"), witsmlObj);
+				logResponse(response, "UPDATE for " + witsmlObj + " was successful"), witsmlObj);
 			LOG.info(valveLoggingResponse.toString());
 		} else {
 			ValveLogging valveLoggingResponse = new ValveLogging(exchangeID,
-					logResponse(response, "Received failure status code from DoT PUT"), witsmlObj);
+				logResponse(response, "Received failure status code from DoT PUT"), witsmlObj);
 			LOG.warning(valveLoggingResponse.toString());
 			throw new ValveException(response.getBody());
 		}
@@ -216,7 +235,7 @@ public class DotDelegator {
 
         // build the request
         HttpRequestWithBody request;
-        if (uid.isEmpty()){
+        if (null == uid || uid.isEmpty()){
             // create with POST and generate uid
             request = Unirest.post(endpoint);
         } else {
@@ -254,10 +273,10 @@ public class DotDelegator {
 			ValveLogging valveLoggingResponse = new ValveLogging(exchangeID,
 					logResponse(response, "Received successful status code from DoT create call"), witsmlObj);
 			LOG.info(valveLoggingResponse.toString());
-            return uid.isEmpty() ? new JsonNode(response.getBody()).getObject().getString("uid") : uid;
+            return (null == uid || uid.isEmpty()) ? new JsonNode(response.getBody()).getObject().getString("uid") : uid;
         } else {
 			ValveLogging valveLoggingResponse = new ValveLogging(exchangeID,
-					logResponse(response, "Received failure status code from DoT POST"), witsmlObj);
+					logResponse(response, "Received " + status + " from DoT POST" + response.getBody()), witsmlObj);
 			LOG.warning(valveLoggingResponse.toString());
             throw new ValveException(response.getBody());
         }
@@ -304,7 +323,8 @@ public class DotDelegator {
 			LOG.info(valveLoggingResponse.toString());
 			// get an abstractWitsmlObject from merging the query and the result
 			// JSON objects
-			JSONObject queryJSON = new JSONObject(witsmlObject.getJSONString("1.4.1.1"));
+			String jsonObj = witsmlObject.getJSONString("1.4.1.1");
+			JSONObject queryJSON = new JSONObject(jsonObj);
 			JSONObject responseJSON = new JsonNode(response.getBody()).getObject();
 			return DotTranslator.translateQueryResponse(queryJSON, responseJSON, objectType);
 		} else if (404 == status) {
