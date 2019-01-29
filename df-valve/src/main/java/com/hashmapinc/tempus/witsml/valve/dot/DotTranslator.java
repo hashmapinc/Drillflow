@@ -19,16 +19,14 @@ import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.WitsmlObjects.Util.WellConverter;
 import com.hashmapinc.tempus.WitsmlObjects.Util.WellboreConverter;
 import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
-import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell;
-import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbores;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
 import org.json.JSONObject;
 
+import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Logger;
-import javax.xml.bind.JAXBException;
 
 /**
  * ABANDON ALL HOPE, YE WHO ENTER HERE
@@ -65,6 +63,12 @@ public class DotTranslator {
                 case "wellbore":
                     if (obj1411 instanceof com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore) return obj1411;
                     return WellboreConverter.convertTo1311((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) obj1411);
+                case "trajectory":
+                    if (obj1411 instanceof com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory) return obj1411;
+                    String xml1311 = obj1411.getXMLString("1.3.1.1");
+                    return ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectorys) WitsmlMarshal.deserialize(
+                            xml1311, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectorys.class)
+                    ).getTrajectory().get(0);
                 default:
                     throw new ValveException("unsupported object type: " + obj1411.getObjectType());
             }
@@ -97,8 +101,10 @@ public class DotTranslator {
                     return well;
                 case "wellbore":
                     return WitsmlMarshal.deserializeFromJSON(
-                        result.toString(), com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore.class
-                    );
+                        result.toString(), com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore.class);
+                case "trajectory":
+                    return WitsmlMarshal.deserializeFromJSON(
+                        result.toString(), com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory.class);
                 default:
                     throw new ValveException("unsupported object type");
             }
@@ -182,6 +188,43 @@ public class DotTranslator {
     }
 
     /**
+     * converts witsmlObjects list of wellbores to valid
+     * witsml XML string based on version and whether
+     * the list is empty or not
+     * @param witsmlObjects - list of objects to serialize
+     * @param version - witsml version to serialize to
+     * @return STRING xml serialization result
+     * @throws ValveException
+     */
+    private static String consolidateTrajectoriesToXML(
+            ArrayList<AbstractWitsmlObject> witsmlObjects,
+            String version
+    ) throws ValveException {
+        String xml;
+        boolean is1411 = "1.4.1.1".equals(version);
+
+        // handle empty list
+        if (0 == witsmlObjects.size()) {
+            try {
+                xml = is1411 ?
+                        WitsmlMarshal.serialize(new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys()):
+                        WitsmlMarshal.serialize(new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectorys());
+            } catch (JAXBException jxbe) {
+                throw new ValveException("Could not serialize empty trajectories object");
+            }
+
+
+        } else {
+            // handle non empty list
+            xml = is1411 ?
+                    consolidate1411TrajectoriesToXML(witsmlObjects) :
+                    consolidate1311TrajectoriesToXML(witsmlObjects);
+        }
+
+        return xml;
+    }
+
+    /**
      * Consolidates each object under 1 parent and serializes
      * the consolidated object into an XML string in the proper
      * WITSML version format
@@ -211,12 +254,58 @@ public class DotTranslator {
             case "wellbore": // no consolidation needed for wells
                 xmlString = consolidateWellboresToXML(witsmlObjects, version);
                 break;
+            case "trajectory":
+                xmlString = consolidateTrajectoriesToXML(witsmlObjects, version);
+                break;
             default:
                 throw new ValveException("Unsupported object type: " + witsmlObjects.get(0).getObjectType());
         }
 
         return xmlString;
     }
+
+    private static String consolidate1311TrajectoriesToXML(ArrayList<AbstractWitsmlObject> witsmlObjects)
+            throws ValveException {
+        try {
+            // get parent object from first child
+            com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectorys parent =
+                    new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectorys();
+
+            // consolidate children
+            for (AbstractWitsmlObject child : witsmlObjects) {
+                parent.addTrajectory(
+                        (com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory) get1311WitsmlObject(child)
+                );
+            }
+
+            // return xml
+            return WitsmlMarshal.serialize(parent);
+        } catch (Exception e ) {
+            throw new ValveException(e.getMessage());
+        }
+    }
+
+    private static String consolidate1411TrajectoriesToXML(ArrayList<AbstractWitsmlObject> witsmlObjects)
+            throws ValveException {
+        try {
+            // get parent object from first child
+            com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys parent =
+                    new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys();
+
+            // consolidate children
+            for (AbstractWitsmlObject child : witsmlObjects) {
+                parent.addTrajectory(
+                        (com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory) child
+                );
+            }
+
+            // return xml
+            return WitsmlMarshal.serialize(parent);
+        } catch (Exception e ) {
+            throw new ValveException(e.getMessage());
+        }
+    }
+
 
     private static String consolidate1311WellsToXML(
             ArrayList<AbstractWitsmlObject> witsmlObjects

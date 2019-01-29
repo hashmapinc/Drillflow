@@ -302,13 +302,23 @@ public class DotDelegator {
 		String uid = witsmlObject.getUid();
 		String objectType = witsmlObject.getObjectType();
 		String endpoint = this.getEndpoint(objectType) + uid; // add uid for rest call
+		String version = witsmlObject.getVersion();
 
 		// build request
 		HttpRequest request = Unirest.get(endpoint);
 		request.header("accept", "application/json");
-		if ("wellbore".equals(objectType))
+		if ("wellbore".equals(objectType)) {
 			request.queryString("uidWell", witsmlObject.getParentUid()); // TODO: check the parent uid exists?
-
+		} else if ("trajectory".equals(objectType)) {
+			request.queryString("uidWellbore", witsmlObject.getParentUid());
+			String uidWell;
+			if ("1.4.1.1".equals(version)) {
+				uidWell = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory) witsmlObject).getUidWell();
+			} else {
+				uidWell = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory) witsmlObject).getUidWell();
+			}
+			request.queryString("uidWell", uidWell);
+		}
 		ValveLogging valveLoggingRequest = new ValveLogging(exchangeID, logRequest(request), witsmlObject);
 		LOG.info(valveLoggingRequest.toString());
 		// get response
@@ -394,8 +404,7 @@ public class DotDelegator {
 	 */
 	private String logRequest(HttpRequest request) {
 		StringBuilder requestString = new StringBuilder();
-		requestString
-				.append("===========================request begin================================================" + System.lineSeparator());
+		requestString.append("===========================request begin================================================" + System.lineSeparator());
 		requestString.append("URI         : " + request.getUrl() + System.lineSeparator());
 		requestString.append("Method      : " + request.getHttpMethod() + System.lineSeparator());
 		requestString.append("Headers     : " + request.getHeaders() + System.lineSeparator());
