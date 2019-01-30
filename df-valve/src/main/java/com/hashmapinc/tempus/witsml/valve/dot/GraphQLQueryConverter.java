@@ -60,6 +60,7 @@ class GraphQLQueryConverter {
     private void createWellQuery(String jsonObj) throws IOException{
         JSONObject obj = new JSONObject(jsonObj);
         List<String> keysToOmit = new ArrayList<>();
+        Map<String, String> keysToRename = new HashMap<>();
         keysToOmit.add("customData");
         keysToOmit.add("commonData");
         keysToOmit.add("dTimLastChange");
@@ -75,7 +76,7 @@ class GraphQLQueryConverter {
         querybuilder.append("{");
         querybuilder.append(delimeter);
         String indentStr = "";
-        querybuilder.append(this.getQuery(obj, indentStr, "well", keysToOmit));
+        querybuilder.append(this.getQuery(obj, indentStr, "well", keysToOmit, "",keysToRename));
         querybuilder.append(delimeter);
         querybuilder.append("}");
         querybuilder.append(delimeter);
@@ -86,11 +87,14 @@ class GraphQLQueryConverter {
     private void createWellboreQuery(String jsonObj) throws IOException{
         JSONObject obj = new JSONObject(jsonObj);
         List<String> keysToOmit = new ArrayList<>();
+        Map<String, String> keysToRename = new HashMap<>();
         keysToOmit.add("parentUid");
         keysToOmit.add("customData");
         keysToOmit.add("dTimLastChange");
         keysToOmit.add("dTimCreation");
         keysToOmit.add("defaultDatum");
+        keysToRename.put("/parentWellbore/value", "title");
+        keysToOmit.add("extensionAny");
         StringBuilder querybuilder = new StringBuilder();
         querybuilder.append("query WellboreQuery($wellboreArgument: WellboreArgument) ");
         this.builder.addVariableGroup("wellboreArgument");
@@ -101,7 +105,7 @@ class GraphQLQueryConverter {
         querybuilder.append("{");
         querybuilder.append(delimeter);
         String indentStr = "";
-        querybuilder.append(this.getQuery(obj, indentStr, "wellbore", keysToOmit));
+        querybuilder.append(this.getQuery(obj, indentStr, "wellbore", keysToOmit, "", keysToRename));
         querybuilder.append(delimeter);
         querybuilder.append("}");
         querybuilder.append(delimeter);
@@ -109,11 +113,12 @@ class GraphQLQueryConverter {
         this.builder.setQuery(querybuilder.toString());
     }
 
-    private String getQuery(JSONObject jsonWitsml, String indent, String wmlObjType, List<String> keysToOmit) {
+    private String getQuery(JSONObject jsonWitsml, String indent, String wmlObjType, List<String> keysToOmit, String currentPath, Map<String, String> keysToRename) {
         Set<String> keyset = jsonWitsml.keySet();
         ArrayList<String> queryKeys = new ArrayList<>();
         HashMap variables = new HashMap();
         for (String key : keyset) {
+            currentPath = currentPath + "/" + key;
             if (keysToOmit.contains(key)){
                 continue;
             }
@@ -122,7 +127,7 @@ class GraphQLQueryConverter {
                 JSONObject subObj = (JSONObject)queryObj;
                 queryKeys.add(indent + key);
                 queryKeys.add(indent + "{");
-                queryKeys.add(this.getQuery(subObj, indent, wmlObjType, keysToOmit));
+                queryKeys.add(this.getQuery(subObj, indent, wmlObjType, keysToOmit, currentPath, keysToRename));
                 queryKeys.add(indent + "}");
                 continue;
             }
@@ -134,7 +139,7 @@ class GraphQLQueryConverter {
                         queryKeys.add(indent + key);
                         JSONObject subObj = (JSONObject) arrObj;
                         queryKeys.add(indent + "{");
-                        queryKeys.add(this.getQuery(subObj, indent, wmlObjType, keysToOmit));
+                        queryKeys.add(this.getQuery(subObj, indent, wmlObjType, keysToOmit, currentPath, keysToRename));
                         queryKeys.add(indent + "}");
                     }
                 }
@@ -143,6 +148,9 @@ class GraphQLQueryConverter {
             String value = jsonWitsml.get(key).toString();
             if (!"".equals(value) && !"null".equals(value) && !keysToOmit.contains(key)) {
                 this.builder.addVariable(wmlObjType + "Argument", key, value);
+            }
+            if (keysToRename.containsKey(currentPath)){
+                key = keysToRename.get(currentPath);
             }
             queryKeys.add(indent + key);
         }
