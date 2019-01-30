@@ -24,12 +24,10 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.*;
 
-;
-
 //This class takes a WITSML Query search and converts it to a GraphQL search
 class GraphQLQueryConverter {
 
-    private final String delimeter = " ";
+    private final String delimiter = " ";
     private final QueryBuilder builder = new QueryBuilder();
 
     /**
@@ -69,17 +67,17 @@ class GraphQLQueryConverter {
         StringBuilder querybuilder = new StringBuilder();
         querybuilder.append("query WellQuery($wellArgument: WellArgument) ");
         this.builder.addVariableGroup("wellArgument");
-        querybuilder.append(delimeter);
+        querybuilder.append(delimiter);
         querybuilder.append("{");
-        querybuilder.append(delimeter);
+        querybuilder.append(delimiter);
         querybuilder.append("wells(wellArgument: $wellArgument)");
         querybuilder.append("{");
-        querybuilder.append(delimeter);
+        querybuilder.append(delimiter);
         String indentStr = "";
         querybuilder.append(this.getQuery(obj, indentStr, "well", keysToOmit, "",keysToRename));
-        querybuilder.append(delimeter);
+        querybuilder.append(delimiter);
         querybuilder.append("}");
-        querybuilder.append(delimeter);
+        querybuilder.append(delimiter);
         querybuilder.append("}");
         this.builder.setQuery(querybuilder.toString());
     }
@@ -98,17 +96,17 @@ class GraphQLQueryConverter {
         StringBuilder querybuilder = new StringBuilder();
         querybuilder.append("query WellboreQuery($wellboreArgument: WellboreArgument) ");
         this.builder.addVariableGroup("wellboreArgument");
-        querybuilder.append(delimeter);
+        querybuilder.append(delimiter);
         querybuilder.append("{");
-        querybuilder.append(delimeter);
+        querybuilder.append(delimiter);
         querybuilder.append("wellbores(wellboreArgument: $wellboreArgument)");
         querybuilder.append("{");
-        querybuilder.append(delimeter);
+        querybuilder.append(delimiter);
         String indentStr = "";
         querybuilder.append(this.getQuery(obj, indentStr, "wellbore", keysToOmit, "", keysToRename));
-        querybuilder.append(delimeter);
+        querybuilder.append(delimiter);
         querybuilder.append("}");
-        querybuilder.append(delimeter);
+        querybuilder.append(delimiter);
         querybuilder.append("}");
         this.builder.setQuery(querybuilder.toString());
     }
@@ -157,7 +155,7 @@ class GraphQLQueryConverter {
         for (String key : keysToOmit){
             queryKeys.remove(key);
         }
-        return String.join(this.delimeter, queryKeys);
+        return String.join(this.delimiter, queryKeys);
     }
 
     // Internal class that handles the structuring and serialization of the GraphQL query
