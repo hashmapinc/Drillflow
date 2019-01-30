@@ -16,6 +16,7 @@
 package com.hashmapinc.tempus.witsml.valve.dot;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.WitsmlObjects.Util.TrajectoryConverter;
 import com.hashmapinc.tempus.WitsmlObjects.Util.WellConverter;
 import com.hashmapinc.tempus.WitsmlObjects.Util.WellboreConverter;
 import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
@@ -65,10 +66,7 @@ public class DotTranslator {
                     return WellboreConverter.convertTo1311((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) obj1411);
                 case "trajectory":
                     if (obj1411 instanceof com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory) return obj1411;
-                    String xml1311 = obj1411.getXMLString("1.3.1.1");
-                    return ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectorys) WitsmlMarshal.deserialize(
-                            xml1311, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectorys.class)
-                    ).getTrajectory().get(0);
+                    return TrajectoryConverter.convertTo1311((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory) obj1411);
                 default:
                     throw new ValveException("unsupported object type: " + obj1411.getObjectType());
             }
