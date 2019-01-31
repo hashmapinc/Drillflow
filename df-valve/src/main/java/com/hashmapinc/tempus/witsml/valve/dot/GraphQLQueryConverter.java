@@ -116,7 +116,7 @@ class GraphQLQueryConverter {
         ArrayList<String> queryKeys = new ArrayList<>();
         HashMap variables = new HashMap();
         for (String key : keyset) {
-            currentPath = currentPath + "/" + key;
+            String localPath = currentPath + "/" + key;
             if (keysToOmit.contains(key)){
                 continue;
             }
@@ -125,7 +125,7 @@ class GraphQLQueryConverter {
                 JSONObject subObj = (JSONObject)queryObj;
                 queryKeys.add(indent + key);
                 queryKeys.add(indent + "{");
-                queryKeys.add(this.getQuery(subObj, indent, wmlObjType, keysToOmit, currentPath, keysToRename));
+                queryKeys.add(this.getQuery(subObj, indent, wmlObjType, keysToOmit, localPath, keysToRename));
                 queryKeys.add(indent + "}");
                 continue;
             }
@@ -137,7 +137,7 @@ class GraphQLQueryConverter {
                         queryKeys.add(indent + key);
                         JSONObject subObj = (JSONObject) arrObj;
                         queryKeys.add(indent + "{");
-                        queryKeys.add(this.getQuery(subObj, indent, wmlObjType, keysToOmit, currentPath, keysToRename));
+                        queryKeys.add(this.getQuery(subObj, indent, wmlObjType, keysToOmit, localPath, keysToRename));
                         queryKeys.add(indent + "}");
                     }
                 }

@@ -42,7 +42,6 @@ public class GraphQLQueryConverterTest {
         String queryResp = TestUtilities.getResourceAsString("GraphQLResponse.json");
         GraphQLRespConverter converter = new GraphQLRespConverter();
         List<AbstractWitsmlObject> objs =  converter.convert(queryResp, "wellbore");
-        ObjWellbores respObject = WitsmlMarshal.deserializeFromJSON(queryResp, ObjWellbores.class);
-        assertNotNull(respObject);
+        assertNotNull(objs);
     }
 }
