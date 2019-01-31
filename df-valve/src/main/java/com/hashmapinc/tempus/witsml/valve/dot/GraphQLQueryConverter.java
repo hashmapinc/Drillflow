@@ -147,8 +147,8 @@ class GraphQLQueryConverter {
             if (!"".equals(value) && !"null".equals(value) && !keysToOmit.contains(key)) {
                 this.builder.addVariable(wmlObjType + "Argument", key, value);
             }
-            if (keysToRename.containsKey(currentPath)){
-                key = keysToRename.get(currentPath);
+            if (keysToRename.containsKey(localPath)){
+                key = keysToRename.get(localPath);
             }
             queryKeys.add(indent + key);
         }

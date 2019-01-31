@@ -24,6 +24,7 @@ import org.junit.Test;
 import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class GraphQLQueryConverterTest {
 
@@ -35,6 +36,7 @@ public class GraphQLQueryConverterTest {
         GraphQLQueryConverter converter = new GraphQLQueryConverter();
         String graphQLQuery = converter.convertQuery(singularObject);
         assertNotNull(graphQLQuery);
+        assertTrue(graphQLQuery.contains("title"));
     }
 
     @Test
