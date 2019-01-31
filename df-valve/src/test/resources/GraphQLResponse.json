@@ -1,0 +1,71 @@
+{
+  "data": {
+    "wellbores": [
+      {
+        "parentWellbore": {
+          "title": null,
+          "uidRef": null
+        },
+        "mdKickoff": {
+          "datum": null,
+          "uom": "FT",
+          "value": 0.0
+        },
+        "mdPlanned": {
+          "datum": null,
+          "uom": "FT",
+          "value": 15800.0
+        },
+        "nameWell": null,
+        "mdSubSeaPlanned": {
+          "datum": null,
+          "uom": "FT",
+          "value": 12800.0
+        },
+        "dayTarget": {
+          "uom": "d",
+          "value": 128.0
+        },
+        "number": "019",
+        "uid": "HMWBA098",
+        "tvdPlanned": {
+          "datum": null,
+          "uom": "FT",
+          "value": 12567.0
+        },
+        "tvdSubSeaPlanned": {
+          "datum": null,
+          "uom": "FT",
+          "value": 9567.0
+        },
+        "dTimKickoff": "2001-03-15T13:20:00+00:00",
+        "tvdBit": null,
+        "purposeWellbore": "exploration",
+        "typeWellbore": "initial",
+        "md": {
+          "datum": null,
+          "uom": "FT",
+          "value": 0.0
+        },
+        "mdBit": null,
+        "tvd": {
+          "datum": null,
+          "uom": "FT",
+          "value": 0.0
+        },
+        "shape": "horizontal",
+        "statusWellbore": "active",
+        "commonData": null,
+        "tvdKickoff": {
+          "datum": null,
+          "uom": "FT",
+          "value": 0.0
+        },
+        "uidWell": "HM_Youngblood",
+        "name": "WellboreBayside",
+        "suffixAPI": "02",
+        "numGovt": "Govt098"
+      }
+    ]
+  }
+}
