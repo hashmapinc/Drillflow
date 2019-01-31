@@ -24,6 +24,7 @@ import org.json.JSONObject;
 import org.junit.Test;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.CsCommonData;
@@ -112,6 +113,43 @@ public class DotTranslatorTest {
         objectType = "wellbore";
 
         expected = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><wellbores version=\"1.4.1.1\" xmlns=\"http://www.witsml.org/schemas/1series\" xmlns:ns2=\"http://www.energistics.org/schemas/abstract\"><wellbore uid=\"well-1\"><name>well-1</name></wellbore></wellbores>";
+
+        actual = DotTranslator.consolidateObjectsToXML(witsmlObjects, clientVersion, objectType);
+
+        System.out.println(actual);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void consolidateObjectsToXMLTrajectoryTest() throws ValveException {
+
+        // build well list
+        ArrayList<AbstractWitsmlObject> witsmlObjects = new ArrayList<>();
+        ObjTrajectory trajectory = new ObjTrajectory();
+        trajectory.setName("trajectory-1");
+        trajectory.setUid("trajectory-1");
+        witsmlObjects.add(trajectory);
+
+        String clientVersion = "1.3.1.1";
+        String objectType = "trajectory";
+
+        String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><trajectorys version=\"1.3.1.1\" xmlns=\"http://www.witsml.org/schemas/131\"><trajectory uid=\"trajectory-1\"><name>trajectory-1</name></trajectory></trajectorys>";
+
+        String actual = DotTranslator.consolidateObjectsToXML(witsmlObjects, clientVersion, objectType);
+
+        assertEquals(expected, actual);
+
+        witsmlObjects = new ArrayList<>();
+        com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory well1411 = new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory();
+        well1411.setName("trajectory-1");
+        well1411.setUid("trajectory-1");
+        witsmlObjects.add(well1411);
+
+        clientVersion = "1.4.1.1";
+        objectType = "trajectory";
+
+        expected = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><trajectorys version=\"1.4.1.1\" xmlns=\"http://www.witsml.org/schemas/1series\" xmlns:ns2=\"http://www.energistics.org/schemas/abstract\"><trajectory uid=\"trajectory-1\"><name>trajectory-1</name></trajectory></trajectorys>";
 
         actual = DotTranslator.consolidateObjectsToXML(witsmlObjects, clientVersion, objectType);
 
