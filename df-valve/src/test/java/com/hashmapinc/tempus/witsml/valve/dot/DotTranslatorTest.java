@@ -141,10 +141,10 @@ public class DotTranslatorTest {
         assertEquals(expected, actual);
 
         witsmlObjects = new ArrayList<>();
-        com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory well1411 = new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory();
-        well1411.setName("trajectory-1");
-        well1411.setUid("trajectory-1");
-        witsmlObjects.add(well1411);
+        com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory traj1411 = new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory();
+        traj1411.setName("trajectory-1");
+        traj1411.setUid("trajectory-1");
+        witsmlObjects.add(traj1411);
 
         clientVersion = "1.4.1.1";
         objectType = "trajectory";
