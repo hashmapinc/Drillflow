@@ -59,7 +59,7 @@ public class Util {
                 dest.put(key, destObj); // update dest with the updated value for this key
 
             } else if (destObj instanceof JSONArray && srcObj instanceof JSONArray ) {
-                if (!isEmpty(destObj) && !isEmpty(srcObj)) {
+                if (isEmpty(destObj) && !isEmpty(srcObj)) {
                     dest.put(key, srcObj); // TODO: deep merging on sub objects
                 }
             } else { // handle all basic values (non array, non nested objects)
