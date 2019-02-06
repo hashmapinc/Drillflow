@@ -35,6 +35,8 @@ public class WitsmlApiConfig {
     private Bus bus;
     private Environment env;
     private StoreImpl storeImpl;
+    @Value("${wmls.compression}")
+    private boolean compression;
 
     @Autowired
     private void setEnv(Environment env){
@@ -50,9 +52,6 @@ public class WitsmlApiConfig {
     private void setStoreImpl(StoreImpl storeImpl){
         this.storeImpl = storeImpl;
     }
-
-    @Value("${wmls.compression}")
-    private boolean compression;
 
     @Bean
     public Endpoint endpoint() {
