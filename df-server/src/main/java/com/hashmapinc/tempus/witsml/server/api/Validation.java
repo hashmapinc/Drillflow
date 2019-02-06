@@ -16,8 +16,8 @@
 package com.hashmapinc.tempus.witsml.server.api;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -41,6 +41,7 @@ import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.hashmapinc.tempus.witsml.server.api.QueryValidation.ERRORCODE;
@@ -313,13 +314,23 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
      * @throws IOException
      * @throws ParserConfigurationException
      */
-    static Document getXMLDocument(String XMLin) throws SAXException, IOException, ParserConfigurationException {
-
-    	URL url = new URL(XMLin);
-        URLConnection urlConnection = url.openConnection();
-        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-        Document doc = dBuilder.parse(urlConnection.getInputStream());
+//    static Document getXMLDocument(String XMLin) throws SAXException, IOException, ParserConfigurationException {
+//
+//    	URL url = new URL(XMLin);
+//        URLConnection urlConnection = url.openConnection();
+//        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+//        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+//        Document doc = dBuilder.parse(urlConnection.getInputStream());
+//        doc.getDocumentElement().normalize();
+//        return doc;
+//    }
+    
+    public static Document getXMLDocument(String XMLin) throws Exception
+    {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        InputSource is = new InputSource(new StringReader(XMLin));
+        Document doc = builder.parse(is);
         doc.getDocumentElement().normalize();
         return doc;
     }
@@ -435,7 +446,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
             if (nodeList.getLength() > 1) {
                 result = true;
             }
-        } catch (SAXException | IOException | ParserConfigurationException e) {
+        } catch (Exception e) {
             LOG.warning(e.getMessage());
         }
         return result;
@@ -460,7 +471,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
             if (nodeList.getLength() < 2) {
                 result = true;
             }
-        } catch (SAXException | IOException | ParserConfigurationException e) {
+        } catch (Exception e) {
             LOG.warning(e.getMessage());
         }
         return result;
@@ -487,7 +498,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
             if (!schemaValidate(XMLin, schemaLocation)) {
                 result = true;
             }
-        } catch (SAXException | IOException | ParserConfigurationException e) {
+        } catch (Exception e) {
             LOG.warning(e.getMessage());
         }
         return result;
@@ -513,7 +524,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
             if (!eElement.getAttribute("Version").equals("1.3.1.1")|| !eElement.getAttribute("Version").equals("1.4.1.1")) {
                 result = true;
             }
-        } catch (SAXException | IOException | ParserConfigurationException e) {
+        } catch (Exception e) {
             LOG.warning(e.getMessage());
         }
 
@@ -540,7 +551,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
             if (eElement.getAttribute("xmlns").isEmpty()) {
                 result = true;
             }
-        } catch (SAXException | IOException | ParserConfigurationException e) {
+        } catch (Exception e) {
             LOG.warning(e.getMessage());
         }
         return result;
@@ -565,7 +576,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
             if (nodeList.getLength() < 2) {
                 result = true;
             }
-        } catch (SAXException | IOException | ParserConfigurationException e) {
+        } catch (Exception e) {
             LOG.warning(e.getMessage());
         }
         return result;
@@ -590,15 +601,15 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 
             XPath xpath = factory.newXPath();
             NodeList nodeList = (NodeList) xpath.evaluate(uidExpression, doc, XPathConstants.NODESET);
-
+            LOG.info("the uid expression is :" +uidExpression);
             for (int i = 0; i < nodeList.getLength(); i++) {
                 Element eElement = (Element) nodeList.item(i);
                 if (eElement.getAttribute(uidAttribute).equalsIgnoreCase("")
-                        && eElement.getAttribute(uidAttribute).equalsIgnoreCase(null)) {
+                        || eElement.getAttribute(uidAttribute).equalsIgnoreCase(null)) {
                     result = true;
                 }
             }
-        } catch (SAXException | IOException | ParserConfigurationException | XPathExpressionException e) {
+        } catch (Exception e) {
             LOG.warning(e.getMessage());
         }
         return result;
@@ -630,7 +641,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
                     result = true;
                 }
             }
-        } catch (SAXException | IOException | ParserConfigurationException | XPathExpressionException e) {
+        } catch (Exception e) {
             LOG.warning(e.getMessage());
         }
         return result;
@@ -678,7 +689,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
                     uids.add(uid);
                 }
             }
-        } catch (SAXException | IOException | ParserConfigurationException | XPathExpressionException e) {
+        } catch (Exception e) {
             LOG.warning(e.getMessage());
         }
 
@@ -734,7 +745,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
                     break;
                 }
             }
-        } catch (SAXException | IOException | ParserConfigurationException | XPathExpressionException e) {
+        } catch (Exception e) {
             LOG.warning(e.getMessage());
         }
         return result;
@@ -764,7 +775,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
                     break;
                 }
             }
-        } catch (SAXException | IOException | ParserConfigurationException | XPathExpressionException e) {
+        } catch (Exception e) {
             LOG.warning(e.getMessage());
         }
         return result;
@@ -794,7 +805,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
                     break;
                 }
             }
-        } catch (SAXException | IOException | ParserConfigurationException | XPathExpressionException e) {
+        } catch (Exception e) {
             LOG.warning(e.getMessage());
         }
         return result;
@@ -828,7 +839,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
                     mnemonic.add(mnemonicValue);
                 }
             }
-        } catch (SAXException | IOException | ParserConfigurationException | XPathExpressionException e) {
+        } catch (Exception e) {
             LOG.warning(e.getMessage());
         }
 
@@ -859,7 +870,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
                     break;
                 }
             }
-        } catch (SAXException | IOException | ParserConfigurationException | XPathExpressionException e) {
+        } catch (Exception e) {
             LOG.warning(e.getMessage());
         }
 
@@ -890,7 +901,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
                     break;
                 }
             }
-        } catch (SAXException | IOException | ParserConfigurationException | XPathExpressionException e) {
+        } catch (Exception e) {
             LOG.warning(e.getMessage());
         }
         return result;
@@ -952,7 +963,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
                         break;
                     }
                 }
-        } catch (SAXException | IOException | ParserConfigurationException | XPathExpressionException e) {
+        } catch (Exception e) {
             LOG.warning(e.getMessage());
         }
 

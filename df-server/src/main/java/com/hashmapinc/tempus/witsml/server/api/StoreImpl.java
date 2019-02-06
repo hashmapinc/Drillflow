@@ -140,30 +140,28 @@ public class StoreImpl implements IStore {
 			QueryContext qc = new QueryContext(version, WMLtypeIn, optionsMap, XMLin, witsmlObjects, user.getUserName(),
 					user.getPassword(), getExchangeId());
 
-			// handle each object
-			uid = valve.createObject(qc).get();
-			LOG.info("Successfully added object: " + witsmlObjects.toString());
-			response.setSuppMsgOut(uid);
-			response.setResult((short) 1);
+			Short errorCode = QueryValidation.validateAddToStore(WMLtypeIn, XMLin, OptionsIn, CapabilitiesIn, version);
+			response.setSuppMsgOut("Error adding to store: " + QueryValidation.getErrorMessage(errorCode));
+			response.setResult((short) errorCode);
+			if (errorCode == 1) {
+				// handle each object
+				uid = valve.createObject(qc).get();
+				LOG.info("Successfully added object: " + witsmlObjects.toString());
+				response.setSuppMsgOut(uid);
+				response.setResult((short) 1);
+			}
 		} catch (ValveException ve) {
 			// TODO: handle exception
 			LOG.warning("ValveException in addToStore: " + ve.getMessage());
 			response.setSuppMsgOut(ve.getMessage());
 			response.setResult((short) -425);
+		} catch (IOException e1) {
+			LOG.warning("Could not set errorCode for addToStore()..." + e1.getMessage());
+			response.setSuppMsgOut("Could not set errorCode for addToStore()...");
+			response.setResult((short) -1);
 		} catch (Exception e) {
 			// TODO: handle exception
 			LOG.warning("could not add witsml object to store: \n" + "Error: " + e);
-
-			try {
-				Short errorCode = QueryValidation.validateAddToStore(WMLtypeIn, XMLin, OptionsIn, CapabilitiesIn,
-						version);
-				response.setSuppMsgOut("Error adding to store: " + QueryValidation.getErrorMessage(errorCode));
-				response.setResult((short) errorCode);
-			} catch (IOException e1) {
-				LOG.warning("Could not set errorCode for addToStore()..." + e1.getMessage());
-				response.setSuppMsgOut("Could not set errorCode for addToStore()...");
-				response.setResult((short) -1);
-			}
 		}
 		return response;
 	}
@@ -186,32 +184,31 @@ public class StoreImpl implements IStore {
 			ValveUser user = (ValveUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			QueryContext qc = new QueryContext(version, WMLtypeIn, optionsMap, XMLin, witsmlObjects, user.getUserName(),
 					user.getPassword(), getExchangeId());
+			short errorCode = QueryValidation.validateUpdateInStore(WMLtypeIn, XMLin, OptionsIn, CapabilitiesIn,
+					version);
+			response.setSuppMsgOut("Error updating in store: " + QueryValidation.getErrorMessage(errorCode));
+			response.setResult((short) errorCode);
 
-			// perform update
-			valve.updateObject(qc).get();
-			LOG.info("Successfully updated object: " + witsmlObjects.toString());
-			response.setResult((short) 1);
+			if (errorCode == 1) {
+				// perform update
+				valve.updateObject(qc).get();
+				LOG.info("Successfully updated object: " + witsmlObjects.toString());
+				response.setResult((short) 1);
+			}
 		} catch (ValveException ve) {
 			// TODO: handle exception
 			LOG.warning("ValveException in updateInStore: " + ve.getMessage());
 			response.setSuppMsgOut(ve.getMessage());
 			response.setResult((short) -425);
+		} catch (IOException e1) {
+			LOG.warning("Could not set errorCode for updateInStore()..." + e1.getMessage());
+			response.setSuppMsgOut("Could not set errorCode for updateInStore()...");
+			response.setResult((short) -1);
 		} catch (Exception e) {
 			// TODO: handle exception
 			LOG.warning("could not add witsml object to store: \n" + "Error: " + e);
 			// checking the input parameters for errorCode if not return 1 for success.
-			try {
-				short errorCode = QueryValidation.validateUpdateInStore(WMLtypeIn, XMLin, OptionsIn, CapabilitiesIn,
-						version);
-				response.setSuppMsgOut("Error updating in store: " + QueryValidation.getErrorMessage(errorCode));
-				response.setResult((short) errorCode);
-			} catch (IOException e1) {
-				LOG.warning("Could not set errorCode for updateInStore()..." + e1.getMessage());
-				response.setSuppMsgOut("Could not set errorCode for updateInStore()...");
-				response.setResult((short) -1);
-			}
 		}
-
 		return response;
 	}
 
@@ -248,19 +245,20 @@ public class StoreImpl implements IStore {
 			QueryContext qc = new QueryContext(null, // client version not needed
 					WMLtypeIn, optionsMap, QueryIn, witsmlObjects, user.getUserName(), user.getPassword(),
 					getExchangeId());
-			this.valve.deleteObject(qc).get();
-			resp.setResult((short) 1);
-		} catch (Exception e) {
-			try {
-				short errorCode = QueryValidation.validateDeleteFromStore(WMLtypeIn, QueryIn, OptionsIn, CapabilitiesIn,
-						clientVersion);
-				resp.setSuppMsgOut("Bad QueryIn. Got error message: " + QueryValidation.getErrorMessage(errorCode));
-				resp.setResult((short) errorCode);
-			} catch (IOException e1) {
-				LOG.warning("Could not set errorCode for deleteFromStore()..." + e1.getMessage());
-				resp.setSuppMsgOut("Could not set errorCode for deleteFromStore()...");
-				resp.setResult((short) -1);
+			short errorCode = QueryValidation.validateDeleteFromStore(WMLtypeIn, QueryIn, OptionsIn, CapabilitiesIn,
+					clientVersion);
+			resp.setSuppMsgOut("Bad QueryIn. Got error message: " + QueryValidation.getErrorMessage(errorCode));
+			resp.setResult((short) errorCode);
+			if (errorCode == 1) {
+				this.valve.deleteObject(qc).get();
+				resp.setResult((short) 1);
 			}
+		} catch (IOException e1) {
+			LOG.warning("Could not set errorCode for deleteFromStore()..." + e1.getMessage());
+			resp.setSuppMsgOut("Could not set errorCode for deleteFromStore()...");
+			resp.setResult((short) -1);
+		} catch (Exception e) {
+			LOG.warning("could not delete witsml object from store: \n" + "Error: " + e);
 		}
 
 		// return response
@@ -341,21 +339,20 @@ public class StoreImpl implements IStore {
 			QueryContext qc = new QueryContext(clientVersion, WMLtypeIn, optionsMap, QueryIn, witsmlObjects,
 					user.getUserName(), user.getPassword(), getExchangeId());
 
+			Short errorCode = QueryValidation.validateGetFromStore(WMLtypeIn, QueryIn, OptionsIn, CapabilitiesIn,
+					clientVersion);
+			resp.setSuppMsgOut("Error parsing input: " + QueryValidation.getErrorMessage(errorCode));
+			resp.setResult((short) errorCode);
 			// get query XML
-			String xmlOut = this.valve.getObject(qc).get();
+			if (errorCode == 1) {
+				String xmlOut = this.valve.getObject(qc).get();
 
-			// populate response
-			if (null != xmlOut) {
-				resp.setSuppMsgOut("");
-				resp.setResult((short) 1);
-				resp.setXMLout(xmlOut);
-			} else {
-				// checking the input parameters for errorCode, if not return 1 for success.
-				clientVersion = WitsmlUtil.getVersionFromXML(QueryIn);
-				Short errorCode = QueryValidation.validateGetFromStore(WMLtypeIn, QueryIn, OptionsIn, CapabilitiesIn,
-						clientVersion);
-				resp.setSuppMsgOut("Error parsing input: " + QueryValidation.getErrorMessage(errorCode));
-				resp.setResult((short) errorCode);
+				// populate response
+				if (null != xmlOut) {
+					resp.setSuppMsgOut("");
+					resp.setResult((short) 1);
+					resp.setXMLout(xmlOut);
+				}
 			}
 		} catch (ValveException ve) {
 			resp.setResult((short) -425);
@@ -375,6 +372,5 @@ public class StoreImpl implements IStore {
 		// return response
 		return resp;
 	}
-
 
 }
