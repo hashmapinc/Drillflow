@@ -122,9 +122,10 @@ public class QueryValidation {
 	private static short validateStoreFunction(String WMLtypeIn, String XMLin, String OptionsIn, String CapabilitiesIn,
 			String version, STOREFUNCTION storeFunction) throws IOException {
 		short result = -1;
+
 		WITSMLVERSION witsmlVersion = WITSMLVERSION.getType(version);
 		if (witsmlVersion == null) {
-			return result;
+			return -468;
 		}
 
 		switch (witsmlVersion) {

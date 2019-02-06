@@ -467,7 +467,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
         Document doc;
         try {
             doc = getXMLDocument(XMLin);
-            NodeList nodeList = doc.getElementsByTagName(WELL_XML_TAG);
+            NodeList nodeList = doc.getElementsByTagNameNS("*", WELL_XML_TAG);
             if (nodeList.getLength() < 2) {
                 result = true;
             }

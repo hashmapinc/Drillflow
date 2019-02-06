@@ -52,10 +52,8 @@ public class WitsmlUtil {
             version = "1.3.1.1";
         } else if (!is1311candidate && is1411candidate) {
             version = "1.4.1.1";
-        } else if (!is1311candidate && !is1411candidate) {
-            throw new IllegalArgumentException("could not find a valid version in raw xml");
         } else {
-            throw new IllegalArgumentException("found both witsml version 1.3.1.1 and 1.4.1.1 in raw xml");
+            return null;
         }
         
         // successfully parsed version. Return here
