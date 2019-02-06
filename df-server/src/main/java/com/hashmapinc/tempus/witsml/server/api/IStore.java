@@ -16,6 +16,7 @@
 package com.hashmapinc.tempus.witsml.server.api;
 
 import com.hashmapinc.tempus.witsml.server.api.model.*;
+import org.apache.cxf.annotations.GZIP;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -25,6 +26,7 @@ import javax.xml.ws.RequestWrapper;
 import javax.xml.ws.ResponseWrapper;
 
 @WebService(targetNamespace = "http://www.witsml.org/wsdl/120", name = "StoreSoapBinding")
+@GZIP
 public interface IStore {
 
     @WebMethod(action = "http://www.witsml.org/action/120/Store.WMLS_AddToStore", operationName = "WMLS_AddToStore")

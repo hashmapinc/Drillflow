@@ -20,7 +20,9 @@ import javax.xml.ws.Endpoint;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBus;
 import org.apache.cxf.jaxws.EndpointImpl;
+import org.apache.cxf.transport.common.gzip.GZIPOutInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -49,9 +51,14 @@ public class WitsmlApiConfig {
         this.storeImpl = storeImpl;
     }
 
+    @Value("${wmls.compression}")
+    private boolean compression;
+
     @Bean
     public Endpoint endpoint() {
         EndpointImpl endpoint = new EndpointImpl(bus, storeImpl);
+        if (compression)
+            endpoint.getOutInterceptors().add(new GZIPOutInterceptor());
         endpoint.publish("/WMLS");
         return endpoint;
     }
