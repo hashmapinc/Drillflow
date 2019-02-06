@@ -387,6 +387,19 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
         }
         return result;
     }
+    /**
+     * This method checks for XML empty
+     * 
+     * @param XMLin
+     * @return true if empty else false
+     */
+    static boolean checkCapabilitiesEmpty(String Capabilities) {
+        boolean result = false;
+        if (Capabilities.trim().isEmpty()) {
+            result = true;
+        }
+        return result;
+    }
 
     /**
      * This method check if XML Object equals WML Object
