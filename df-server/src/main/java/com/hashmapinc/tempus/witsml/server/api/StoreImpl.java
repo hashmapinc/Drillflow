@@ -162,6 +162,8 @@ public class StoreImpl implements IStore {
 		} catch (Exception e) {
 			// TODO: handle exception
 			LOG.warning("could not add witsml object to store: \n" + "Error: " + e);
+			response.setSuppMsgOut("Could not set errorCode for addToStore()...");
+			response.setResult((short) -1);
 		}
 		return response;
 	}
