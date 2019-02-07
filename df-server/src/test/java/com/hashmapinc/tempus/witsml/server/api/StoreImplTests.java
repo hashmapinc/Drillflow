@@ -16,6 +16,12 @@
 package com.hashmapinc.tempus.witsml.server.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_AddToStoreResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse;
 
 @RunWith(SpringRunner.class)
@@ -80,5 +87,14 @@ public class StoreImplTests {
 		assertThat(resp).isNotNull();
 		assertThat(resp.getResult()).isEqualTo((short)-424);
 		assertThat(resp.getCapabilitiesOut()).isNull();
+	}
+	
+	@Test
+    public void validate1311wellTest() throws IOException {
+        String xmlString = new String(Files.readAllBytes(Paths.get("src/test/resources/well1311Test.xml")));
+        WMLS_AddToStoreResponse response = this.witsmlServer.addToStore("well", xmlString, "", "");
+        System.out.println(response.getResult());
+        assertNotNull(response);
+        assertEquals(response.getResult(), -464);
 	}
 }
