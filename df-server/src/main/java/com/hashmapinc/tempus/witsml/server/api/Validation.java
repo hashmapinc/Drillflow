@@ -50,9 +50,6 @@ import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetFromStoreResponse;
 interface Validation extends Function<ValidateParam, ValidationResult> {
 
 	static final Logger LOG = Logger.getLogger(Validation.class.getName());
-	static HashMapWithExpiry<String, Document> hashMapWithExpiry = new HashMapWithExpiry<>();
-	// 5 minutes
-	static int timeToLiveInMap = 3 * 1000;
 	public static StoreImpl store = new StoreImpl();
 
 	public static String uidExpression = "//*[@uid]";
@@ -319,20 +316,25 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	 * @throws IOException
 	 * @throws ParserConfigurationException
 	 */
-
+	public static void WmlType(String WMLTypein)
+	{
+		String type = WMLTypein.toString();
+		System.out.println("The type is :"+type);
+	}
+	
+	
 	public static Document getXMLDocument(String XMLin) throws Exception {
-		if (!hashMapWithExpiry.containsKey(XMLin)) {
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = factory.newDocumentBuilder();
 			InputSource is = new InputSource(new StringReader(XMLin));
 			Document doc = builder.parse(is);
 			doc.getDocumentElement().normalize();
-			hashMapWithExpiry.put(XMLin, doc, timeToLiveInMap);
-		}
-
-		return hashMapWithExpiry.get(XMLin);
+			
+		return doc;
 	}
-
+	
+	public 
+	
 	/**
 	 * This method validates the XMLin against the schemaLocation.
 	 * 
@@ -364,6 +366,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	 */
 	static boolean checkWMLTypeEmpty(String WMLType) {
 		boolean result = false;
+		LOG.info("The WMLType in is : "+WMLType);
 		if (WMLType.trim().isEmpty()) {
 			result = true;
 		}

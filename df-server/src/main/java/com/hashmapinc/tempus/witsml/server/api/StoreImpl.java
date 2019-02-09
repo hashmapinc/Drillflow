@@ -133,7 +133,7 @@ public class StoreImpl implements IStore {
 			// build the query context
 			Map<String, String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
 			version = WitsmlUtil.getVersionFromXML(XMLin);
-
+					
 			Short errorCode = QueryValidation.validateAddToStore(WMLtypeIn, XMLin, OptionsIn, CapabilitiesIn, version);
 			response.setSuppMsgOut("Error adding to store: " + QueryValidation.getErrorMessage(errorCode));
 			response.setResult((short) errorCode);
@@ -141,7 +141,7 @@ public class StoreImpl implements IStore {
 				return response;
 			}
 			witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, XMLin, version);
-
+			
 			ValveUser user = (ValveUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 			QueryContext qc = new QueryContext(version, WMLtypeIn, optionsMap, XMLin, witsmlObjects, user.getUserName(),
 					user.getPassword(), getExchangeId());
