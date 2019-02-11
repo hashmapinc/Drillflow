@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
@@ -44,6 +45,9 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.witsml.WitsmlObjectParser;
+import com.hashmapinc.tempus.witsml.WitsmlUtil;
 import com.hashmapinc.tempus.witsml.server.api.QueryValidation.ERRORCODE;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetFromStoreResponse;
 
@@ -59,7 +63,8 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	public static String LOG_XML_TAG = "logData";
 	public static String uidAttribute = "uid";
 	public static String uomAttribute = "uom";
-
+	public static List<AbstractWitsmlObject> witsmlObjects=null;
+	public static String version =null;
 	static Validation error401() {
 		return holds(param -> !checkWell(param.getXMLin()), ERRORCODE.ERROR_401.value());
 	}
@@ -82,7 +87,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 
 	static Validation error406() {
-		return holds(param -> !checkNotNullUid(param.getXMLin()), ERRORCODE.ERROR_406.value());
+		return holds(param -> !checkNotNullUid(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_406.value());
 	}
 
 	static Validation error407() {
@@ -119,27 +124,27 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 
 	static Validation error415() {
-		return holds(param -> !checkNotNullUid(param.getXMLin()), ERRORCODE.ERROR_415.value());
+		return holds(param -> !checkNotNullUid(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_415.value());
 	}
 
 	static Validation error416() {
-		return holds(param -> !checkNotNullUid(param.getXMLin()), ERRORCODE.ERROR_416.value());
+		return holds(param -> !checkNotNullUid(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_416.value());
 	}
 
 	static Validation error417() {
-		return holds(param -> !checkNotNullUOM(param.getXMLin()), ERRORCODE.ERROR_417.value());
+		return holds(param -> !checkNotNullUOM(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_417.value());
 	}
 
 	static Validation error418() {
-		return holds(param -> !checkUniqueUid(param.getXMLin()), ERRORCODE.ERROR_418.value());
+		return holds(param -> !checkUniqueUid(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_418.value());
 	}
 
 	static Validation error419() {
-		return holds(param -> !checkNodeValue(param.getXMLin()), ERRORCODE.ERROR_419.value());
+		return holds(param -> !checkNodeValue(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_419.value());
 	}
 
 	static Validation error420() {
-		return holds(param -> !checkNodeValue(param.getXMLin()), ERRORCODE.ERROR_420.value());
+		return holds(param -> !checkNodeValue(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_420.value());
 	}
 
 	// checks for return after delete call
@@ -171,7 +176,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 
 	static Validation error432() {
-		return holds(param -> !checkNotNullUid(param.getXMLin()), ERRORCODE.ERROR_432.value());
+		return holds(param -> !checkNotNullUid(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_432.value());
 	}
 
 	static Validation error433() {
@@ -180,55 +185,53 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 
 	static Validation error434() {
-		return holds(param -> !checkNotNullUid(param.getXMLin()), ERRORCODE.ERROR_434.value());
+		return holds(param -> !checkNotNullUid(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_434.value());
 	}
 
 	static Validation error437() {
-		return holds(param -> !checkMnemonicListUnique(param.getXMLin()), ERRORCODE.ERROR_437.value());
+		return holds(param -> !checkMnemonicListUnique(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_437.value());
 	}
 
 	static Validation error438() {
-		return holds(param -> checkMnemonicListUnique(param.getXMLin()), ERRORCODE.ERROR_438.value());
+		return holds(param -> checkMnemonicListUnique(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_438.value());
 	}
 
 	static Validation error439() {
-		return holds(param -> !checkMnemonicListNotEmpty(param.getXMLin()), ERRORCODE.ERROR_439.value());
+		return holds(param -> !checkMnemonicListNotEmpty(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_439.value());
 	}
 
 	static Validation error444() {
-		return holds(param -> !checkWellforDelete(param.getXMLin()), ERRORCODE.ERROR_444.value());
+		return holds(param -> !checkWellforDelete(param.getWMLtypeIn(), param.getXMLin(), param.getOptionsIn(),
+				param.getCapabilitiesIn()), ERRORCODE.ERROR_444.value());
 	}
 
 	static Validation error445() {
-		return holds(param -> !checkNodeValue(param.getXMLin()), ERRORCODE.ERROR_445.value());
+		return holds(param -> !checkNodeValue(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_445.value());
 	}
 
 	static Validation error446() {
-		return holds(param -> !checkUomNodeValue(param.getXMLin()), ERRORCODE.ERROR_446.value());
+		return holds(param -> !checkUomNodeValue(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_446.value());
 	}
 
 	static Validation error447() {
-		return holds(param -> !checkUniqueUid(param.getXMLin()), ERRORCODE.ERROR_447.value());
+		return holds(param -> !checkUniqueUid(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_447.value());
 	}
 
 	static Validation error448() {
-		return holds(param -> !checkNotNullUid(param.getXMLin()), ERRORCODE.ERROR_448.value());
+		return holds(param -> !checkNotNullUid(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_448.value());
 	}
 
 	static Validation error449() {
-		return holds(param -> !checkMnemonicListNotEmpty(param.getXMLin()), ERRORCODE.ERROR_449.value());
+		return holds(param -> !checkMnemonicListNotEmpty(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_449.value());
 	}
 
 	static Validation error450() {
-		return holds(param -> !checkMnemonicListUnique(param.getXMLin()), ERRORCODE.ERROR_450.value());
+		return holds(param -> !checkMnemonicListUnique(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_450.value());
 	}
 
-	static Validation error451() {
-		return holds(param -> !checkUnitList(param.getXMLin()), ERRORCODE.ERROR_451.value());
-	}
-
+	
 	static Validation error453() {
-		return holds(param -> !checkNotNullUOM(param.getXMLin()), ERRORCODE.ERROR_453.value());
+		return holds(param -> !checkNotNullUOM(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_453.value());
 	}
 
 	static Validation error459() {
@@ -236,19 +239,19 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 
 	static Validation error461() {
-		return holds(param -> !checkMnemonicListNotEmpty(param.getXMLin()), ERRORCODE.ERROR_461.value());
+		return holds(param -> !checkMnemonicListNotEmpty(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_461.value());
 	}
 
 	static Validation error462() {
-		return holds(param -> !checkMnemonicListNotEmpty(param.getXMLin()), ERRORCODE.ERROR_462.value());
+		return holds(param -> !checkMnemonicListNotEmpty(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_462.value());
 	}
 
 	static Validation error463() {
-		return holds(param -> !checkUniqueUid(param.getXMLin()), ERRORCODE.ERROR_463.value());
+		return holds(param -> !checkUniqueUid(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_463.value());
 	}
 
 	static Validation error464() {
-		return holds(param -> !checkUniqueUid(param.getXMLin()), ERRORCODE.ERROR_464.value());
+		return holds(param -> !checkUniqueUid(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_464.value());
 	}
 
 	static Validation error468() {
@@ -269,7 +272,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 
 	static Validation error482() {
-		return holds(param -> !checkMnemonicListUnique(param.getXMLin()), ERRORCODE.ERROR_482.value());
+		return holds(param -> !checkMnemonicListUnique(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_482.value());
 	}
 
 	static Validation error483() {
@@ -333,7 +336,6 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 		return doc;
 	}
 	
-	public 
 	
 	/**
 	 * This method validates the XMLin against the schemaLocation.
@@ -440,13 +442,13 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	 * @throws IOException
 	 * @throws XPathExpressionException
 	 */
-	static boolean checkWellforDelete(String XMLin) {
+	
+	static boolean checkWellforDelete(String WMLtypeIn, String QueryIn, String OptionsIn, String CapabilitiesIn) {
 		boolean result = false;
-		Document doc;
+		WMLS_GetFromStoreResponse resp = new WMLS_GetFromStoreResponse();
 		try {
-			doc = getXMLDocument(XMLin);
-			NodeList nodeList = doc.getElementsByTagName(WELL_XML_TAG);
-			if (nodeList.getLength() > 1) {
+			resp = store.getFromStore(WMLtypeIn, QueryIn, OptionsIn, CapabilitiesIn);
+			if (resp.getResult() == 1) {
 				result = true;
 			}
 		} catch (Exception e) {
@@ -467,13 +469,14 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	 */
 	static boolean checkWell(String XMLin) {
 		boolean result = false;
-		Document doc;
+	
 		try {
-			doc = getXMLDocument(XMLin);
-			NodeList nodeList = doc.getElementsByTagName(WELLS_XML_TAG);
-			if (nodeList.getLength() != 1) {
+			if(!XMLin.contains("wells"))
+			{
 				result = true;
 			}
+			
+
 		} catch (Exception e) {
 			LOG.warning(e.getMessage());
 		}
@@ -519,13 +522,9 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	 */
 	static boolean checkSchemaVersion(String XMLin) {
 		boolean result = false;
-		Document doc;
 		try {
-			doc = getXMLDocument(XMLin);
-			NodeList nodeList = doc.getElementsByTagName("wells");
-			Element eElement = (Element) nodeList;
-			if (!eElement.getAttribute("version").equals("1.3.1.1")
-					|| !eElement.getAttribute("version").equals("1.4.1.1")) {
+			String version = WitsmlUtil.getVersionFromXML(XMLin);
+			if (version!="1.3.1.1"||version!="1.4.1.1") {
 				result = true;
 			}
 		} catch (Exception e) {
@@ -547,12 +546,8 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	 */
 	static boolean checkNameSpace(String XMLin) {
 		boolean result = false;
-		Document doc;
 		try {
-			doc = getXMLDocument(XMLin);
-			NodeList nodeList = doc.getElementsByTagName("wells");
-			Element eElement = (Element) nodeList;
-			if (eElement.getAttribute("xmlns").isEmpty()) {
+			if (!XMLin.contains("xmlns")) {
 				result = true;
 			}
 		} catch (Exception e) {
@@ -573,11 +568,9 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	 */
 	static boolean checkLogData(String XMLin) {
 		boolean result = false;
-		Document doc;
 		try {
-			doc = getXMLDocument(XMLin);
-			NodeList nodeList = doc.getElementsByTagName(LOG_XML_TAG);
-			if (nodeList.getLength() < 2) {
+			
+			if (!XMLin.contains(LOG_XML_TAG)) {
 				result = true;
 			}
 		} catch (Exception e) {
@@ -596,10 +589,17 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	 * @throws IOException
 	 * @throws XPathExpressionException
 	 */
-	static boolean checkNotNullUid(String XMLin) {
+	static boolean checkNotNullUid(String XMLin, String WMLTypein) {
 		boolean result = false;
 		Document doc;
+		List<AbstractWitsmlObject> witsmlObjects;
+		String version;
 		try {
+			version = WitsmlUtil.getVersionFromXML(XMLin);
+			witsmlObjects = WitsmlObjectParser.parse(WMLTypein, XMLin, version);
+				
+			//String uid = obj.getUid();
+			//witsmlObjects.
 			doc = getXMLDocument(XMLin);
 			XPathFactory factory = XPathFactory.newInstance();
 
@@ -629,7 +629,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	 * @throws IOException
 	 * @throws XPathExpressionException
 	 */
-	static boolean checkNodeValue(String XMLin) {
+	static boolean checkNodeValue(String XMLin, String WMLTypein) {
 		boolean result = false;
 		Document doc;
 		try {
@@ -676,7 +676,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	 * @throws IOException
 	 * @throws XPathExpressionException
 	 */
-	static boolean checkUniqueUid(String XMLin) {
+	static boolean checkUniqueUid(String XMLin, String WMLTypein) {
 		boolean result = false;
 		Document doc;
 		try {
@@ -735,7 +735,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	 * @throws IOException
 	 * @throws XPathExpressionException
 	 */
-	static boolean checkNotNullUOM(String XMLin) {
+	static boolean checkNotNullUOM(String XMLin, String WMLTypein) {
 		boolean result = false;
 		Document doc;
 		try {
@@ -766,7 +766,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	 * @throws IOException
 	 * @throws XPathExpressionException
 	 */
-	static boolean checkUomNodeValue(String XMLin) {
+	static boolean checkUomNodeValue(String XMLin, String WMLTypein) {
 		boolean result = false;
 		Document doc;
 		try {
@@ -796,7 +796,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	 * @throws IOException
 	 * @throws XPathExpressionException
 	 */
-	static boolean checkMnemonicListNotEmpty(String XMLin) {
+	static boolean checkMnemonicListNotEmpty(String XMLin, String WMLTypein) {
 		boolean result = false;
 		Document doc;
 		try {
@@ -826,7 +826,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	 * @throws IOException
 	 * @throws XPathExpressionException
 	 */
-	static boolean checkMnemonicListUnique(String XMLin) {
+	static boolean checkMnemonicListUnique(String XMLin, String WMLTypin) {
 		boolean result = false;
 		Document doc;
 		try {
@@ -851,37 +851,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 		return result;
 	}
 
-	/**
-	 * This method checks for unitList to be empty
-	 * 
-	 * @param XMLin
-	 * @return true if unitList is empty.
-	 * @throws ParserConfigurationException
-	 * @throws SAXException
-	 * @throws IOException
-	 * @throws XPathExpressionException
-	 */
-	static boolean checkUnitList(String XMLin) {
-		boolean result = false;
-		Document doc;
-		try {
-			doc = getXMLDocument(XMLin);
-			NodeList nodeList = getNodeListForExpression(doc, "unitList");
-
-			for (int i = 0; i < nodeList.getLength(); i++) {
-				Element eElement = (Element) nodeList.item(i);
-				if (eElement.getNodeValue().isEmpty()) {
-					result = true;
-					break;
-				}
-			}
-		} catch (Exception e) {
-			LOG.warning(e.getMessage());
-		}
-
-		return result;
-	}
-
+	
 	/**
 	 * This method checks for special characters in mnemonic list
 	 * 
@@ -894,17 +864,15 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	 */
 	static boolean checkMnemonicForSpecialCharacters(String XMLin) {
 		boolean result = false;
-		Document doc;
+		
 		try {
-			doc = getXMLDocument(XMLin);
-			NodeList nodeList = getNodeListForExpression(doc, "mnemonicList");
+		
+				
 			String regex = "',><&//\\";
-			for (int i = 0; i < nodeList.getLength(); i++) {
-				Element eElement = (Element) nodeList.item(i);
-				if (eElement.getNodeValue().matches(regex)) {
-					result = true;
-					break;
-				}
+			
+			if(!XMLin.matches(regex))
+			{
+				result=true;
 			}
 		} catch (Exception e) {
 			LOG.warning(e.getMessage());
@@ -944,36 +912,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 		return result;
 	}
 
-	/**
-	 * Check uom attribute with witsml
-	 * 
-	 * @param XMLin
-	 * @return
-	 * @throws ParserConfigurationException
-	 * @throws SAXException
-	 * @throws IOException
-	 * @throws XPathExpressionException
-	 */
-	static boolean checkErrorCode(String XMLin) {
-		boolean result = false;
-		try {
-			Document doc = getXMLDocument(XMLin);
-			NodeList nodeList = getNodeListForExpression(doc, "mnemonicList");
-			String regex = "',><&//\\";
-			for (int i = 0; i < nodeList.getLength(); i++) {
-				Element eElement = (Element) nodeList.item(i);
-				if (eElement.getNodeValue().matches(regex)) {
-					result = true;
-					break;
-				}
-			}
-		} catch (Exception e) {
-			LOG.warning(e.getMessage());
-		}
-
-		return result;
-	}
-
+	
 	static Validation checkErrorForAddtoStoreVersion1411() {
 		return error407().and(error408()).and(error409()).and(error401()).and(error406()).and(error464())
 				.and(error412()).and(error413()).and(error405()).and(error481()).and(error453()).and(error463())
@@ -999,13 +938,13 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	static Validation checkErrorForUpdateInStoreVersion1411() {
 		return error407().and(error408()).and(error409()).and(error433()).and(error464()).and(error415())
 				.and(error444()).and(error401()).and(error445()).and(error464()).and(error453()).and(error446())
-				.and(error463()).and(error434()).and(error449()).and(error451()).and(error999());
+				.and(error463()).and(error434()).and(error449()).and(error999());
 	}
 
 	static Validation checkErrorForUpdateInStoreVersion1311() {
 		return error407().and(error408()).and(error409()).and(error433()).and(error464()).and(error415())
 				.and(error444()).and(error401()).and(error445()).and(error464()).and(error453()).and(error446())
-				.and(error463()).and(error434()).and(error449()).and(error451()).and(error999());
+				.and(error463()).and(error434()).and(error449()).and(error999());
 	}
 
 	static Validation checkErrorForDeleteInStoreVersion1411() {

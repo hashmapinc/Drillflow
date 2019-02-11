@@ -1,3 +1,10 @@
+import java.util.HashSet;
+import java.util.Set;
+
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
+
 /**
  * Copyright © 2018-2018 Hashmap, Inc
  *
@@ -13,26 +20,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.tempus.witsml.server.api;
-
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
-
 public class TrajectoryHandler extends DefaultHandler {
-	
-	@Override
+
+    private UIDValidator uidValidator;
+
+    boolean isTrajectoryUIDPresent = false;
+    boolean isTrajectoryStationUIDPresent = false;
+
+    Set<String> uidSet = new HashSet<String>();
+
+    public TrajectoryHandler(UIDValidator uidValidator) {
+        this.uidValidator = uidValidator;
+    }
+
+    @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 
         if (qName.equalsIgnoreCase("trajectory")) {
             String uid = attributes.getValue("uid");
+            isTrajectoryUIDPresent = true;
             System.out.println("Trajectory UID : " + uid);
         } else if (qName.equalsIgnoreCase("trajectoryStation")) {
             String uid = attributes.getValue("uid");
+            isTrajectoryStationUIDPresent = true;
             System.out.println("TrajectoryStation UID : " + uid);
         } else if (qName.equalsIgnoreCase("location")) {
-            String uid = attributes.getValue("uid");
-            System.out.println("TrajectoryLocation UID : " + uid);
+            if (!uidValidator.isError464()) {
+                String uid = attributes.getValue("uid");
+                if (uidSet.add(uid) == false) {
+                    uidValidator.setError464(true);
+                    System.out.println("Duplicate uid found");
+                }
+                System.out.println("TrajectoryLocation UID : " + uid);
+            }
+        }
+
+        if (isTrajectoryUIDPresent && isTrajectoryStationUIDPresent) {
+            uidValidator.setError401(false);
         }
     }
 }

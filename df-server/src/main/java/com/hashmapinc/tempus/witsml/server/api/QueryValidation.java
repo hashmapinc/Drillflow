@@ -207,6 +207,7 @@ public class QueryValidation {
 		Optional<Short> errorCode = null;
 		// error checking for input parameters for version 1.3.1.1
 		final ValidateParam validateParam = new ValidateParam(WMLtypeIn, XMLin, OptionsIn, CapabilitiesIn);
+		
 		Validation validation = Validation.checkErrorForAddtoStoreVersion1311();
 		ValidationResult result = validation.apply(validateParam);
 
