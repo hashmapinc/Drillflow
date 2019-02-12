@@ -37,22 +37,152 @@ class GraphQLQueryConverter {
      * @return the object
      * @throws IOException Thrown if there is an error in creation of the query
      */
-    public String convertQuery(AbstractWitsmlObject wmlObject) throws IOException {
-        String objJson = wmlObject.getJSONString("1.4.1.1");
-        if (objJson == null) {
-            return null;
-        }
+    public static String convertQuery(AbstractWitsmlObject wmlObject) throws IOException {
         switch (wmlObject.getObjectType()){
             case "well":
-                this.createWellQuery(objJson);
+                this.createWellQuery(wmlObject.getJSONString("1.4.1.1"));
                 break;
             case "wellbore":
-                this.createWellboreQuery(objJson);
+                this.createWellboreQuery(wmlObject.getJSONString("1.4.1.1"));
                 break;
+            case "trajectory":
+                String json = wmlObject.getJSONString("2.0");
+                return this.getTrajectoryQuery(json);
             default:
                 return null;
         }
         return this.builder.GetGraphQLQuery();
+    }
+
+    /**
+     * this function converts 2.0 trajectory json
+     * into a graphql query
+     *
+     * @param jsonString - json string version of the query to execute
+     * @return graphql query string
+     */
+    private static String getTrajectoryQuery(String jsonString) {
+        // payload json object for building full query
+        JSONObject payload = new JSONObject();
+
+        // fields to return
+        ArrayList<String> trajFields = new ArrayList<>();
+        ArrayList<String> stationFields = new ArrayList<>();
+
+        // parse json string
+        JSONObject trajectoryJson = new JSONObject(jsonString);
+
+        // ====================================================================
+        // get trajectory query fields
+        // ====================================================================
+        JSONObject trajQueryFields = new JSONObject();
+        // uuid
+        if (trajectoryJson.has("uuid") && !Util.isEmpty(trajectoryJson.get("uuid")))
+            trajQueryFields.put("uuid", trajectoryJson.get("uuid"));
+
+        // uuidWell
+        if (trajectoryJson.has("uuidWell") && !Util.isEmpty(trajectoryJson.get("uuidWell")))
+            trajQueryFields.put("uuidWell", trajectoryJson.get("uuidWell"));
+
+        // uuidWellbore
+        if (trajectoryJson.has("uuidWellbore") && !Util.isEmpty(trajectoryJson.get("uuidWellbore")))
+            trajQueryFields.put("uuidWellbore", trajectoryJson.get("uuidWellbore"));
+
+        // name
+        if (trajectoryJson.has("name") && !Util.isEmpty(trajectoryJson.get("name")))
+            trajQueryFields.put("name", trajectoryJson.get("name"));
+
+        // nameWell
+        if (trajectoryJson.has("nameWell") && !Util.isEmpty(trajectoryJson.get("nameWell")))
+            trajQueryFields.put("nameWell", trajectoryJson.get("nameWell"));
+
+        // nameWellbore
+        if (trajectoryJson.has("nameWellbore") && !Util.isEmpty(trajectoryJson.get("nameWellbore")))
+            trajQueryFields.put("nameWellbore", trajectoryJson.get("nameWellbore"));
+
+        // growingStatus
+        if (trajectoryJson.has("growingStatus") && !Util.isEmpty(trajectoryJson.get("growingStatus")))
+            trajQueryFields.put("growingStatus", trajectoryJson.get("growingStatus"));
+
+        // lastUpdateTimeUtc
+        if (trajectoryJson.has("lastUpdateTimeUtc") && !Util.isEmpty(trajectoryJson.get("lastUpdateTimeUtc")))
+            trajQueryFields.put("lastUpdateTimeUtc", trajectoryJson.get("lastUpdateTimeUtc"));
+        // ====================================================================
+
+
+        // ====================================================================
+        // get trajectory station query fields
+        // ====================================================================
+        JSONObject stationQueryFields = new JSONObject();
+        JSONArray stationsJson = (
+            trajectoryJson.has("trajectoryStation")
+            ? trajectoryJson.getJSONArray("trajectoryStation")
+            : new JSONArray()
+        );
+
+        // support query by uid OR query by filters, not both
+        // uid-based station query
+        if (!Util.isEmpty(stationsJson) && stationsJson.getJSONObject(0).get("uid") != null) {
+            // get list of UIDs
+            ArrayList<String> stationUids = new ArrayList<>();
+            for (int i = 0; i < stationsJson.length(); i++) {
+                stationUids.add(stationsJson.getJSONObject(i).get("uid"));
+            }
+
+        // non uid-based station query
+        } else {
+
+        }
+
+        // lastUpdateTimeUtc
+        if (trajectoryJson.has("uuid") && !Util.isEmpty(trajectoryJson.get("uuid")))
+            trajQueryFields.put("uuid", trajectoryJson.get("uuid"));
+
+        // mdMn
+        if (trajectoryJson.has("uuid") && !Util.isEmpty(trajectoryJson.get("uuid")))
+            trajQueryFields.put("uuid", trajectoryJson.get("uuid"));
+
+        // mdMx
+        if (trajectoryJson.has("uuid") && !Util.isEmpty(trajectoryJson.get("uuid")))
+            trajQueryFields.put("uuid", trajectoryJson.get("uuid"));
+
+        // ====================================================================
+
+
+        // get trajectory response fields
+
+
+        // get station response fields
+
+
+        // build variables section
+        payload.put("variables", variables);
+
+        // build query section of payload
+        String queryString = String.join("\n",
+                "query TrajectoryQuery($trajArg: TrajectoryArgument, $trajStationArg: TrajectoryStationArgument) {",
+                "	trajectories(trajectoryArgument: $trajArg) {",
+                "		...trajFields",
+                "	}",
+                "}",
+                "",
+                "fragment trajFields on TrajectoryType {",
+                String.join("\n    ", trajFields),
+                "    trajectoryStation(trajectoryStationArgument: $trajStationArg) {",
+                "        ...stationFields",
+                "    }",
+                "}",
+                "",
+                "fragment stationFields on TrajectoryStation {",
+                String.join("\n    ", stationFields),
+                "}"
+        );
+
+        payload.put("query", queryString);
+
+
+        // return payload
+        return payload.toString(2);
     }
 
     private void createWellQuery(String jsonObj) throws IOException{

@@ -107,6 +107,15 @@ public class DotValve implements IValve {
 		return CompletableFuture.completedFuture(result);
 	}
 
+	/**
+	 * This method gets a singular object by ID and returns
+	 * the xml string of that object in the proper client version
+	 * format from qc.CLIENT_VERSION
+	 *
+	 * @param qc - query context for getting singular object
+	 * @return - xml string response
+	 * @throws ValveException
+	 */
 	private String getSingularObject(QueryContext qc) throws ValveException {
 
 		// handle each object
@@ -126,13 +135,19 @@ public class DotValve implements IValve {
 		return DotTranslator.consolidateObjectsToXML(queryResponses, qc.CLIENT_VERSION, qc.OBJECT_TYPE);
 	}
 
+	/**
+	 * This function queries for objects by non-uid fields.
+	 *
+	 * @param qc - query context to use for searching
+	 * @return xml string of results in qc.CLIENT_VERSION format
+	 * @throws ValveException
+	 */
 	private String doSearch(QueryContext qc) throws ValveException {
 		// handle each object
 		ArrayList<AbstractWitsmlObject> queryResponses = new ArrayList<AbstractWitsmlObject>();
-		if (qc.WITSML_OBJECTS.size() > 1) {
+		if (qc.WITSML_OBJECTS.size() > 1)
 			LOG.info("Query received with more than one singular object, not supported");
-			// return "";
-		}
+
 		GraphQLQueryConverter converter = new GraphQLQueryConverter();
 		String query;
 		try {
