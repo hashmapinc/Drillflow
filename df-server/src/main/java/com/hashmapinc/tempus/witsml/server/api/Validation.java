@@ -30,6 +30,7 @@ import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
@@ -46,8 +47,12 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.CsCommonData;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.CsGeodeticModel;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.CsLocalCRS;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.CsLocation;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogCurveInfo;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.CsProjectionx;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.CsReferencePoint;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.CsWellCRS;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.CsWellDatum;
@@ -64,6 +69,8 @@ import com.hashmapinc.tempus.witsml.WitsmlObjectParser;
 import com.hashmapinc.tempus.witsml.WitsmlUtil;
 import com.hashmapinc.tempus.witsml.server.api.QueryValidation.ERRORCODE;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetFromStoreResponse;
+import com.hashmapinc.tempus.witsml.server.api.pojo.Location;
+import com.hashmapinc.tempus.witsml.server.api.pojo.WellLocation;
 
 interface Validation extends Function<ValidateParam, ValidationResult> {
 
@@ -225,10 +232,6 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 
 	static Validation error445() {
 		return holds(param -> !checkNodeValue(param.getXMLin(), param.getWMLtypeIn()), ERRORCODE.ERROR_445.value());
-	}
-
-	static Validation error446() {
-		return holds(param -> !checkUomNodeValue(param.getXMLin(), param.getWMLtypeIn()), ERRORCODE.ERROR_446.value());
 	}
 
 	static Validation error447() {
@@ -775,40 +778,534 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	 */
 	static boolean checkNodeValue(String XMLin, String WMLTypein) {
 		boolean result = false;
-		Document doc;
+		List<AbstractWitsmlObject> witsmlObjects;
+		String version;
 		try {
-			doc = getXMLDocument(XMLin);
-			XPathFactory factory = XPathFactory.newInstance();
-
-			XPath xpath = factory.newXPath();
-			NodeList nodeList = (NodeList) xpath.evaluate("*", doc, XPathConstants.NODESET);
-
-			for (int i = 0; i < nodeList.getLength(); i++) {
-				Element eElement = (Element) nodeList.item(i);
-				if (eElement.getNodeValue().isEmpty()) {
-					result = true;
-				}
+			version = WitsmlUtil.getVersionFromXML(XMLin);
+			LOG.info("the version is: " + version);
+			witsmlObjects = WitsmlObjectParser.parse(WMLTypein, XMLin, version);
+			switch (WMLTypein) {
+			case "log":
+				//result = checkNotNullUidForDiffVersionLog(witsmlObjects);
+			case "trajectory":
+				//result = checkNotNullUidForDiffVersionTraj(witsmlObjects);
+			case "well":
+				result = checkNotNullNodeForDiffVersionWell(witsmlObjects);
+			case "wellbore":
+				result = checkNotNullNodeForDiffVersionWellbore(witsmlObjects);
+			default:
+				throw new WitsmlException("unsupported witsml object type: " + WMLTypein);
 			}
 		} catch (Exception e) {
-			LOG.warning(e.getMessage());
+			LOG.warning("the error is the " + e.getMessage());
 		}
 		return result;
 	}
+	
 
-	/**
-	 * Get node list for given document and expression
-	 * 
-	 * @param doc
-	 * @param expression
-	 * @return nodelist
-	 * @throws XPathExpressionException
-	 */
-	static NodeList getNodeListForExpression(Document doc, String expression) throws XPathExpressionException {
-		XPathFactory factory = XPathFactory.newInstance();
-		XPath xpath = factory.newXPath();
-		NodeList nodeList = (NodeList) xpath.evaluate(expression, doc, XPathConstants.NODESET);
-		return nodeList;
+	static boolean checkNotNullNodeForDiffVersionWell(List<AbstractWitsmlObject> witsmlObjects) {
+
+		boolean result = false;
+
+		for (AbstractWitsmlObject abstractWitsmlObject : witsmlObjects) {
+			if (abstractWitsmlObject instanceof ObjWell) {
+				LOG.info("checking well object ");
+				ObjWell objWell1311 = (ObjWell) abstractWitsmlObject;
+				if (objWell1311.getUid() == null
+						|| (objWell1311.getUid() != null && objWell1311.getUid().isEmpty())) {
+					result=true;
+					break;
+				}
+				else if(objWell1311.getName()==null||(objWell1311.getName() != null && objWell1311.getName().isEmpty())) {
+					result=true;
+					break;
+				}
+				else if(objWell1311.getNameLegal()==null||(objWell1311.getNameLegal() != null && objWell1311.getNameLegal().isEmpty())) {
+					result=true;
+					break;
+				}
+				else if(objWell1311.getNumLicense()==null||(objWell1311.getNumLicense() != null && objWell1311.getNumLicense().isEmpty())) {
+					result=true;
+					break;
+				}
+				else if(objWell1311.getNumGovt()==null||(objWell1311.getNumGovt() != null && objWell1311.getNumGovt().isEmpty())) {
+					result=true;
+					break;
+				}
+				else if(objWell1311.getField()==null||(objWell1311.getField() != null && objWell1311.getField().isEmpty())) {
+					result=true;
+					break;
+				}
+				else if(objWell1311.getCountry()==null||(objWell1311.getCountry() != null && objWell1311.getCountry().isEmpty())) {
+					result=true;
+					break;
+				}
+				else if(objWell1311.getRegion()==null||(objWell1311.getRegion() != null && objWell1311.getRegion().isEmpty())) {
+					result=true;
+					break;
+				}
+				else if(objWell1311.getDistrict()==null||(objWell1311.getDistrict() != null && objWell1311.getDistrict().isEmpty())) {
+					result=true;
+					break;
+				}
+				else if(objWell1311.getBlock()==null||(objWell1311.getBlock() != null && objWell1311.getBlock().isEmpty())) {
+					result=true;
+					break;
+				}
+				else if(objWell1311.getTimeZone()==null||(objWell1311.getTimeZone() != null && objWell1311.getTimeZone().isEmpty())) {
+					result=true;
+					break;
+				}
+				else if(objWell1311.getOperator()==null||(objWell1311.getOperator() != null && objWell1311.getOperator().isEmpty())) {
+					result=true;
+					break;
+				}
+				else if(objWell1311.getOperatorDiv()==null||(objWell1311.getOperatorDiv() != null && objWell1311.getOperatorDiv().isEmpty())) {
+					result=true;
+					break;
+				}
+				else if(objWell1311.getPcInterest()==null||(objWell1311.getPcInterest() != null && objWell1311.getPcInterest().toString().isEmpty())) {
+					result=true;
+					break;
+				}
+				else if(objWell1311.getNumAPI()==null||(objWell1311.getNumAPI() != null && objWell1311.getNumAPI().isEmpty())) {
+					result=true;
+					break;
+				}
+				else if(objWell1311.getStatusWell()==null||(objWell1311.getStatusWell() != null && objWell1311.getStatusWell().isEmpty())) {
+					result=true;
+					break;
+				}
+				else if(objWell1311.getPurposeWell()==null||(objWell1311.getPurposeWell() != null && objWell1311.getPurposeWell().isEmpty())) {					
+						result=true;
+					break;
+				}
+				else if(objWell1311.getDTimSpud()==null||(objWell1311.getDTimSpud() != null && objWell1311.getDTimSpud().isEmpty())) {
+					result=true;
+					break;
+				}
+				else if(objWell1311.getDTimPa()==null||(objWell1311.getDTimPa() != null && objWell1311.getDTimPa().isEmpty())) {					
+						result=true;
+					break;
+				}
+				else if(objWell1311.getWellheadElevation()==null||(objWell1311.getWellheadElevation() != null && objWell1311.getWellheadElevation().toString().isEmpty())) {					
+					result=true;
+				break;
+				}
+				else if(objWell1311.getGroundElevation()==null||(objWell1311.getGroundElevation() != null && objWell1311.getGroundElevation().toString().isEmpty())) {					
+					result=true;
+				break;
+				}
+				else if(objWell1311.getWaterDepth()==null||(objWell1311.getWaterDepth() != null && objWell1311.getWaterDepth().toString().isEmpty())) {					
+					result=true;
+				break;
+				}
+				List<CsWellDatum> wellDatum = objWell1311.getWellDatum();
+				for(CsWellDatum datum : wellDatum) {
+					if(datum.getName()==null||(datum.getName()!=null&&datum.getName().isEmpty())) {
+						result=true;
+						break;
+					}
+					if(datum.getCode()==null||(datum.getCode()!=null&&datum.getCode().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+					if(datum.getElevation()==null||(datum.getElevation()!=null&&datum.getElevation().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<CsLocation> wellLocation = objWell1311.getWellLocation();
+				for(CsLocation location : wellLocation) {
+					if(location.getWellCRS()==null||(location.getWellCRS()!=null&&location.getWellCRS().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+					if(location.getEasting()==null||(location.getEasting()!=null&&location.getEasting().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+					if(location.getNorthing()==null||(location.getNorthing()!=null&&location.getNorthing().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+					if(location.getDescription()==null||(location.getDescription()!=null&&location.getDescription().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<CsReferencePoint> referencePoint = objWell1311.getReferencePoint();
+				for(CsReferencePoint reference : referencePoint) {
+					if(reference.getName()==null||(reference.getName()!=null&&reference.getName().isEmpty())) {
+						result=true;
+						break;
+					}
+					if(reference.getType()==null||(reference.getType()!=null&&reference.getType().isEmpty())) {
+						result=true;
+						break;
+					}
+					if(reference.getElevation()==null||(reference.getElevation()!=null&&reference.getElevation().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+					if(reference.getMeasuredDepth()==null||(reference.getMeasuredDepth()!=null&&reference.getMeasuredDepth().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+					List<CsLocation> location = objWell1311.getWellLocation();
+					for(CsLocation loc : location) {
+						if(loc.getWellCRS()==null||(loc.getWellCRS()!=null&&loc.getWellCRS().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+						if(loc.getEasting()==null||(loc.getEasting()!=null&&loc.getEasting().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+						if(loc.getNorthing()==null||(loc.getNorthing()!=null&&loc.getNorthing().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+						if(loc.getLocalX()==null||(loc.getLocalX()!=null&&loc.getLocalX().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+						if(loc.getLocalY()==null||(loc.getLocalY()!=null&&loc.getLocalY().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+						if(loc.getDescription()==null||(loc.getDescription()!=null&&loc.getDescription().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+						if(loc.getLongitude()==null||(loc.getLongitude()!=null&&loc.getLongitude().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+						if(loc.getLatitude()==null||(loc.getLatitude()!=null&&loc.getLatitude().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+					}
+					
+				}
+				List<CsWellCRS> wellCRS = objWell1311.getWellCRS();
+				for(CsWellCRS crs : wellCRS) {
+					if(crs.getName()==null||(crs.getName()!=null&&crs.getName().isEmpty())) {
+						result=true;
+						break;
+					}
+					List<CsGeodeticModel> geographic = (List<CsGeodeticModel>) crs.getGeographic();
+					for(CsGeodeticModel geo : geographic) {
+						if(geo.getNameCRS()==null||(geo.getNameCRS()!=null&&geo.getNameCRS().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+						if(geo.getGeodeticDatumCode()==null||(geo.getGeodeticDatumCode()!=null&&geo.getGeodeticDatumCode().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+						if(geo.getXTranslation()==null||(geo.getXTranslation()!=null&&geo.getXTranslation().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+						if(geo.getYTranslation()==null||(geo.getYTranslation()!=null&&geo.getYTranslation().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+						if(geo.getZTranslation()==null||(geo.getZTranslation()!=null&&geo.getZTranslation().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+						if(geo.getXRotation()==null||(geo.getXRotation()!=null&&geo.getXRotation().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+						if(geo.getYRotation()==null||(geo.getYRotation()!=null&&geo.getYRotation().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+						if(geo.getZRotation()==null||(geo.getZRotation()!=null&&geo.getZRotation().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+						if(geo.getScaleFactor()==null||(geo.getScaleFactor()!=null&&geo.getScaleFactor().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+						if(geo.getEllipsoidCode()==null||(geo.getEllipsoidCode()!=null&&geo.getEllipsoidCode().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+						if(geo.getEllipsoidSemiMajorAxis()==null||(geo.getEllipsoidSemiMajorAxis()!=null&&geo.getEllipsoidSemiMajorAxis().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+						if(geo.getEllipsoidInverseFlattening()==null||(geo.getEllipsoidInverseFlattening()!=null&&geo.getEllipsoidInverseFlattening().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+					}
+					List<CsProjectionx> mapProjection = (List<CsProjectionx>) crs.getMapProjection();
+					for(CsProjectionx projection : mapProjection) {
+						if(projection.getNameCRS()==null||projection.getNameCRS()!=null&&projection.getNameCRS().toString().isEmpty()) {
+							result=true;
+							break;
+						}
+						if(projection.getProjectionCode()==null||projection.getProjectionCode()!=null&&projection.getProjectionCode().toString().isEmpty()) {
+							result=true;
+							break;
+						}
+						if(projection.getProjectedFrom()==null||projection.getProjectedFrom()!=null&&projection.getProjectedFrom().toString().isEmpty()) {
+							result=true;
+							break;
+						}
+						if(projection.getZone()==null||projection.getZone()!=null&&projection.getZone().toString().isEmpty()) {
+							result=true;
+							break;
+						}
+					}
+					
+					List<CsLocalCRS> localCRS = (List<CsLocalCRS>) crs.getLocalCRS();
+					for(CsLocalCRS local : localCRS) {
+						if(local.getYAxisAzimuth()==null||local.getYAxisAzimuth()!=null&&local.getYAxisAzimuth().toString().isEmpty()) {
+							result=true;
+							break;
+						}
+						if(local.getYAxisDescription()==null||local.getYAxisDescription()!=null&&local.getYAxisDescription().toString().isEmpty()) {
+							result=true;
+							break;
+						}
+						if(local.isUsesWellAsOrigin()==null||local.isUsesWellAsOrigin()!=null&&local.isUsesWellAsOrigin().toString().isEmpty()) {
+							result=true;
+							break;
+						}
+						if(local.isXRotationCounterClockwise()==null||local.isXRotationCounterClockwise()!=null&&local.isXRotationCounterClockwise().toString().isEmpty()) {
+							result=true;
+							break;
+						}
+					}
+				}
+				List<CsCommonData> commonData = (List<CsCommonData>) objWell1311.getCommonData();
+				for(CsCommonData data : commonData) {
+					if(data.getDTimCreation()==null||data.getDTimCreation()!=null&&data.getDTimCreation().toString().isEmpty()) {
+						result=true;
+						break;
+					}
+					if(data.getDTimLastChange()==null||data.getDTimLastChange()!=null&&data.getDTimLastChange().toString().isEmpty()) {
+						result=true;
+						break;
+					}
+					if(data.getItemState()==null||data.getItemState()!=null&&data.getItemState().toString().isEmpty()) {
+						result=true;
+						break;
+					}
+					if(data.getComments()==null||data.getComments()!=null&&data.getComments().isEmpty()) {
+						result=true;
+						break;
+					}
+				}
+							
+
+			} else if (abstractWitsmlObject instanceof com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) {
+				if (abstractWitsmlObject.getUid() == null
+						|| (abstractWitsmlObject.getUid() != null && abstractWitsmlObject.getUid().isEmpty())) {
+					result = true;
+					break;
+				}
+				List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsReferencePoint> wellRefrenceinfo = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject)
+						.getReferencePoint();
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsReferencePoint refrencePoint : wellRefrenceinfo) {
+					if (refrencePoint.getUid() == null
+							|| (refrencePoint.getUid() != null && refrencePoint.getUid().isEmpty())) {
+						result = true;
+						break;
+					}
+				}
+				List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsWellDatum> wellDatum = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getWellDatum();
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsWellDatum datum : wellDatum) {
+					if(datum.getUid()==null||(datum.getUid()!=null && datum.getUid().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLocation> wellLocation = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject)
+						.getWellLocation();
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsLocation location : wellLocation) {
+					if(location.getUid()==null||(location.getUid()!=null && location.getUid().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsWellCRS> wellCRS = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject)
+						.getWellCRS();
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsWellCRS crs : wellCRS) {
+					if(crs.getUid()==null||(crs.getUid()!=null && crs.getUid().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+			}
+		}
+
+		return result;
 	}
+	
+	static boolean checkNotNullNodeForDiffVersionWellbore(List<AbstractWitsmlObject> witsmlObjects) {
+
+		boolean result = false;
+
+		for (AbstractWitsmlObject abstractWitsmlObject : witsmlObjects) {
+			if (abstractWitsmlObject instanceof ObjWellbore) {
+				LOG.info("checking wellBore object ");
+				ObjWellbore objWellbore1311 = (ObjWellbore) abstractWitsmlObject;
+				
+				List<MeasuredDepthCoord> mdCurrent = (List<MeasuredDepthCoord>) objWellbore1311.getMdCurrent();
+				for (MeasuredDepthCoord current : mdCurrent) {
+					if (current.getUom() == null
+							|| (current.getUom() != null && current.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<WellVerticalDepthCoord> tvdCurrent = (List<WellVerticalDepthCoord>) objWellbore1311.getTvdCurrent();
+				for (WellVerticalDepthCoord vdCurrent : tvdCurrent) {
+					if(vdCurrent.getUom()==null||(vdCurrent.getUom()!=null && vdCurrent.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<MeasuredDepthCoord> mdKickoff = (List<MeasuredDepthCoord>) objWellbore1311.getMdKickoff();
+				for (MeasuredDepthCoord kickOff : mdKickoff) {
+					if (kickOff.getUom() == null
+							|| (kickOff.getUom() != null && kickOff.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<WellVerticalDepthCoord> tvdKickoff = (List<WellVerticalDepthCoord>) objWellbore1311.getTvdKickoff();
+				for (WellVerticalDepthCoord vdKickOff : tvdKickoff) {
+					if(vdKickOff.getUom()==null||(vdKickOff.getUom()!=null && vdKickOff.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<MeasuredDepthCoord> mdPlanned = (List<MeasuredDepthCoord>) objWellbore1311.getMdPlanned();
+				for (MeasuredDepthCoord planned : mdPlanned) {
+					if (planned.getUom() == null
+							|| (planned.getUom() != null && planned.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<WellVerticalDepthCoord> tvdPlanned = (List<WellVerticalDepthCoord>) objWellbore1311.getTvdPlanned();
+				for (WellVerticalDepthCoord vdPlanned : tvdPlanned) {
+					if(vdPlanned.getUom()==null||(vdPlanned.getUom()!=null && vdPlanned.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<MeasuredDepthCoord> mdSubSeaPlanned = (List<MeasuredDepthCoord>) objWellbore1311.getMdSubSeaPlanned();
+				for (MeasuredDepthCoord seaPlanned : mdSubSeaPlanned) {
+					if (seaPlanned.getUom() == null
+							|| (seaPlanned.getUom() != null && seaPlanned.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<WellVerticalDepthCoord> tvdSubSeaPlanned = (List<WellVerticalDepthCoord>) objWellbore1311.getTvdSubSeaPlanned();
+				for (WellVerticalDepthCoord tvSeaPlanned : tvdSubSeaPlanned) {
+					if(tvSeaPlanned.getUom()==null||(tvSeaPlanned.getUom()!=null && tvSeaPlanned.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<TimeMeasure> dayTarget = (List<TimeMeasure>) objWellbore1311.getDayTarget();
+				for (TimeMeasure target : dayTarget) {
+					if(target.getUom()==null||(target.getUom()!=null && target.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				
+
+			} else if (abstractWitsmlObject instanceof com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) {
+				
+				List<com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord> mdCurrent = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord>) ((ObjWellbore) abstractWitsmlObject).getMdCurrent();
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord current : mdCurrent) {
+					if (current.getUom() == null
+							|| (current.getUom() != null && current.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord> tvdCurrent = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord>) ((ObjWellbore) abstractWitsmlObject).getTvdCurrent();
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord vdCurrent : tvdCurrent) {
+					if(vdCurrent.getUom()==null||(vdCurrent.getUom()!=null && vdCurrent.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord> mdKickoff = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject).getMdKickoff();
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord kickOff : mdKickoff) {
+					if (kickOff.getUom() == null
+							|| (kickOff.getUom() != null && kickOff.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord> tvdKickoff = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject).getTvdKickoff();
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord vdKickOff : tvdKickoff) {
+					if(vdKickOff.getUom()==null||(vdKickOff.getUom()!=null && vdKickOff.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord> mdPlanned = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject).getMdPlanned();
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord planned : mdPlanned) {
+					if (planned.getUom() == null
+							|| (planned.getUom() != null && planned.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord> tvdPlanned = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject).getTvdPlanned();
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord vdPlanned : tvdPlanned) {
+					if(vdPlanned.getUom()==null||(vdPlanned.getUom()!=null && vdPlanned.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord> mdSubSeaPlanned = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject).getMdSubSeaPlanned();
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord seaPlanned : mdSubSeaPlanned) {
+					if (seaPlanned.getUom() == null
+							|| (seaPlanned.getUom() != null && seaPlanned.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord> tvdSubSeaPlanned = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject).getTvdSubSeaPlanned();
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord tvSeaPlanned : tvdSubSeaPlanned) {
+					if(tvSeaPlanned.getUom()==null||(tvSeaPlanned.getUom()!=null && tvSeaPlanned.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<com.hashmapinc.tempus.WitsmlObjects.v1411.TimeMeasure> dayTarget = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.TimeMeasure>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject).getDayTarget();
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.TimeMeasure target : dayTarget) {
+					if(target.getUom()==null||(target.getUom()!=null && target.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				
+			}
+		}
+
+		return result;
+	}
+	
+
 
 	/**
 	 * This method checks for unique UID in XMLin
@@ -1128,35 +1625,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 
 		return result;
 	}
-	/**
-	 * This method checks for UOM node value in XMLin.
-	 * 
-	 * @param XMLin
-	 * @return true if null value exists.
-	 * @throws ParserConfigurationException
-	 * @throws SAXException
-	 * @throws IOException
-	 * @throws XPathExpressionException
-	 */
-	static boolean checkUomNodeValue(String XMLin, String WMLTypein) {
-		boolean result = false;
-		Document doc;
-		try {
-			doc = getXMLDocument(XMLin);
-			NodeList nodeList = getNodeListForExpression(doc, uomExpression);
-
-			for (int i = 0; i < nodeList.getLength(); i++) {
-				Element eElement = (Element) nodeList.item(i);
-				if (eElement.getNodeValue().isEmpty()) {
-					result = true;
-					break;
-				}
-			}
-		} catch (Exception e) {
-			LOG.warning(e.getMessage());
-		}
-		return result;
-	}
+	
 
 	/**
 	 * This methods checks for mnemonic list for empty values.
@@ -1305,13 +1774,13 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 
 	static Validation checkErrorForUpdateInStoreVersion1411() {
 		return error407().and(error408()).and(error409()).and(error433()).and(error464()).and(error415())
-				.and(error444()).and(error401()).and(error445()).and(error464()).and(error453()).and(error446())
+				.and(error444()).and(error401()).and(error445()).and(error464()).and(error453())
 				.and(error463()).and(error434()).and(error449()).and(error999());
 	}
 
 	static Validation checkErrorForUpdateInStoreVersion1311() {
 		return error407().and(error408()).and(error409()).and(error433()).and(error464()).and(error415())
-				.and(error444()).and(error401()).and(error445()).and(error464()).and(error453()).and(error446())
+				.and(error444()).and(error401()).and(error445()).and(error464()).and(error453())
 				.and(error463()).and(error434()).and(error449()).and(error999());
 	}
 
