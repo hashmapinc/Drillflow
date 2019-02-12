@@ -46,12 +46,19 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.CsLocation;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogCurveInfo;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.CsReferencePoint;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.CsWellCRS;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.CsWellDatum;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.LengthMeasure;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.MeasuredDepthCoord;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog;
-import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.TimeMeasure;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.WellElevationCoord;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.WellVerticalDepthCoord;
 import com.hashmapinc.tempus.witsml.WitsmlException;
 import com.hashmapinc.tempus.witsml.WitsmlObjectParser;
 import com.hashmapinc.tempus.witsml.WitsmlUtil;
@@ -644,6 +651,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 						break;
 					}
 				}
+				
 
 			} else if (abstractWitsmlObject instanceof com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) {
 				if (abstractWitsmlObject.getUid() == null
@@ -672,7 +680,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 
 		for (AbstractWitsmlObject abstractWitsmlObject : witsmlObjects) {
 			if (abstractWitsmlObject instanceof ObjWell) {
-				LOG.info("checking well onject ");
+				LOG.info("checking well object ");
 				ObjWell objWell1311 = (ObjWell) abstractWitsmlObject;
 				if (objWell1311.getUid() == null
 						|| (objWell1311.getUid() != null && objWell1311.getUid().isEmpty())) {
@@ -687,6 +695,28 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 						break;
 					}
 				}
+				List<CsWellDatum> wellDatum = objWell1311.getWellDatum();
+				for (CsWellDatum datum : wellDatum) {
+					if(datum.getUid()==null||(datum.getUid()!=null && datum.getUid().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<CsLocation> wellLocation = objWell1311.getWellLocation();
+				for (CsLocation location : wellLocation) {
+					if(location.getUid()==null||(location.getUid()!=null && location.getUid().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<CsWellCRS> wellCRS = objWell1311.getWellCRS();
+				for (CsWellCRS crs : wellCRS) {
+					if(crs.getUid()==null||(crs.getUid()!=null && crs.getUid().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				
 
 			} else if (abstractWitsmlObject instanceof com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) {
 				if (abstractWitsmlObject.getUid() == null
@@ -703,65 +733,36 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 						break;
 					}
 				}
+				List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsWellDatum> wellDatum = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getWellDatum();
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsWellDatum datum : wellDatum) {
+					if(datum.getUid()==null||(datum.getUid()!=null && datum.getUid().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLocation> wellLocation = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject)
+						.getWellLocation();
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsLocation location : wellLocation) {
+					if(location.getUid()==null||(location.getUid()!=null && location.getUid().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsWellCRS> wellCRS = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject)
+						.getWellCRS();
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsWellCRS crs : wellCRS) {
+					if(crs.getUid()==null||(crs.getUid()!=null && crs.getUid().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
 			}
 		}
 
 		return result;
 	}
 
-	/**
-	 * @param witsmlObjects
-	 * @param version
-	 * @return true if the UID is null or empty
-	 * @throws WitsmlException
-	 */
-	static boolean checkNotNullUidForDiffVersion(List<AbstractWitsmlObject> witsmlObjects, String version)
-			throws WitsmlException {
-		boolean result = true;
-		LOG.info("we are here");
-		switch (version) {
-		case "1.3.1.1":
-			for (AbstractWitsmlObject abstractWitsmlObject : witsmlObjects) {
-				if (abstractWitsmlObject instanceof ObjLog) {
-					ObjLog objLog1311 = (ObjLog) abstractWitsmlObject;
-					if (objLog1311.getUid() == null || (objLog1311.getUid() != null && objLog1311.getUid().isEmpty())) {
-						return result;
-					}
-					List<CsLogCurveInfo> logCurveInfos = objLog1311.getLogCurveInfo();
-					for (CsLogCurveInfo csLogCurveInfo : logCurveInfos) {
-						if (csLogCurveInfo.getUid() == null
-								|| (csLogCurveInfo.getUid() != null && csLogCurveInfo.getUid().isEmpty())) {
-							return result;
-						}
-					}
-				} else if (abstractWitsmlObject instanceof ObjTrajectory) {
-
-				} else if (abstractWitsmlObject instanceof ObjWell) {
-					LOG.info("checking well onject ");
-					ObjWell objWell1311 = (ObjWell) abstractWitsmlObject;
-					if (objWell1311.getUid() == null
-							|| (objWell1311.getUid() != null && objWell1311.getUid().isEmpty())) {
-						return result;
-					}
-					List<CsReferencePoint> wellRefrenceinfo = objWell1311.getReferencePoint();
-					for (CsReferencePoint refrencePoint : wellRefrenceinfo) {
-						if (refrencePoint.getUid() == null
-								|| (refrencePoint.getUid() != null && refrencePoint.getUid().isEmpty())) {
-							return result;
-						}
-					}
-
-				} else if (abstractWitsmlObject instanceof ObjWellbore) {
-
-				}
-			}
-		case "1.4.1.1":
-
-		default:
-			throw new WitsmlException("unsupported witsml version...");
-		}
-	}
-
+	
 	/**
 	 * This method checks for the Node Value to be empty or blank.
 	 * 
@@ -880,25 +881,253 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	 */
 	static boolean checkNotNullUOM(String XMLin, String WMLTypein) {
 		boolean result = false;
-		Document doc;
+		List<AbstractWitsmlObject> witsmlObjects;
+		String version;
 		try {
-			doc = getXMLDocument(XMLin);
-			NodeList nodeList = getNodeListForExpression(doc, uomExpression);
-
-			for (int i = 0; i < nodeList.getLength(); i++) {
-				Element eElement = (Element) nodeList.item(i);
-				if (eElement.getAttribute(uomAttribute).equalsIgnoreCase("")
-						&& eElement.getAttribute(uomAttribute).equalsIgnoreCase(null)) {
-					result = true;
-					break;
-				}
+			version = WitsmlUtil.getVersionFromXML(XMLin);
+			LOG.info("the version is: " + version);
+			witsmlObjects = WitsmlObjectParser.parse(WMLTypein, XMLin, version);
+			switch (WMLTypein) {
+			case "log":
+				//result = checkNotNullUidForDiffVersionLog(witsmlObjects);
+			case "trajectory":
+				//result = checkNotNullUidForDiffVersionTraj(witsmlObjects);
+			case "well":
+				result = checkNotNullUOMForDiffVersionWell(witsmlObjects);
+			case "wellbore":
+				result = checkNotNullUOMForDiffVersionWellBore(witsmlObjects);
+			default:
+				throw new WitsmlException("unsupported witsml object type: " + WMLTypein);
 			}
 		} catch (Exception e) {
-			LOG.warning(e.getMessage());
+			LOG.warning("the error is the " + e.getMessage());
 		}
 		return result;
 	}
+	
+	static boolean checkNotNullUOMForDiffVersionWell(List<AbstractWitsmlObject> witsmlObjects) {
 
+		boolean result = false;
+
+		for (AbstractWitsmlObject abstractWitsmlObject : witsmlObjects) {
+			if (abstractWitsmlObject instanceof ObjWell) {
+				LOG.info("checking well object ");
+				ObjWell objWell1311 = (ObjWell) abstractWitsmlObject;
+				
+				List<WellElevationCoord> wellHeadElevation = (List<WellElevationCoord>) objWell1311.getWellheadElevation();
+				for (WellElevationCoord headElevation : wellHeadElevation) {
+					if (headElevation.getUom() == null
+							|| (headElevation.getUom() != null && headElevation.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<WellElevationCoord> groundElevation = (List<WellElevationCoord>) objWell1311.getGroundElevation();
+				for (WellElevationCoord elevation : groundElevation) {
+					if(elevation.getUom()==null||(elevation.getUom()!=null && elevation.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<LengthMeasure> waterDepth = (List<LengthMeasure>) objWell1311.getWaterDepth();
+				for (LengthMeasure depth : waterDepth) {
+					if(depth.getUom()==null||(depth.getUom()!=null && depth.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				
+
+			} else if (abstractWitsmlObject instanceof com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) {
+				if (abstractWitsmlObject.getUid() == null
+						|| (abstractWitsmlObject.getUid() != null && abstractWitsmlObject.getUid().isEmpty())) {
+					result = true;
+					break;
+				}
+				List<com.hashmapinc.tempus.WitsmlObjects.v1411.WellElevationCoord> wellHeadElevation = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.WellElevationCoord>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject)
+						.getWellheadElevation();
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.WellElevationCoord headElevation : wellHeadElevation) {
+					if (headElevation.getUom() == null
+							|| (headElevation.getUom() != null && headElevation.getUom().toString().isEmpty())) {
+						result = true;
+						break;
+					}
+				}
+				List<com.hashmapinc.tempus.WitsmlObjects.v1411.WellElevationCoord> groundElevation = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.WellElevationCoord>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getGroundElevation();
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.WellElevationCoord elevation : groundElevation) {
+					if(elevation.getUom()==null||(elevation.getUom()!=null && elevation.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<com.hashmapinc.tempus.WitsmlObjects.v1411.LengthMeasure> waterDepth = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.LengthMeasure>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject)
+						.getWaterDepth();
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.LengthMeasure depth : waterDepth) {
+					if(depth.getUom()==null||(depth.getUom()!=null && depth.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				
+			}
+		}
+
+		return result;
+	}
+	
+	static boolean checkNotNullUOMForDiffVersionWellBore(List<AbstractWitsmlObject> witsmlObjects) {
+
+		boolean result = false;
+
+		for (AbstractWitsmlObject abstractWitsmlObject : witsmlObjects) {
+			if (abstractWitsmlObject instanceof ObjWellbore) {
+				LOG.info("checking wellBore object ");
+				ObjWellbore objWellbore1311 = (ObjWellbore) abstractWitsmlObject;
+				
+				List<MeasuredDepthCoord> mdCurrent = (List<MeasuredDepthCoord>) objWellbore1311.getMdCurrent();
+				for (MeasuredDepthCoord current : mdCurrent) {
+					if (current.getUom() == null
+							|| (current.getUom() != null && current.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<WellVerticalDepthCoord> tvdCurrent = (List<WellVerticalDepthCoord>) objWellbore1311.getTvdCurrent();
+				for (WellVerticalDepthCoord vdCurrent : tvdCurrent) {
+					if(vdCurrent.getUom()==null||(vdCurrent.getUom()!=null && vdCurrent.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<MeasuredDepthCoord> mdKickoff = (List<MeasuredDepthCoord>) objWellbore1311.getMdKickoff();
+				for (MeasuredDepthCoord kickOff : mdKickoff) {
+					if (kickOff.getUom() == null
+							|| (kickOff.getUom() != null && kickOff.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<WellVerticalDepthCoord> tvdKickoff = (List<WellVerticalDepthCoord>) objWellbore1311.getTvdKickoff();
+				for (WellVerticalDepthCoord vdKickOff : tvdKickoff) {
+					if(vdKickOff.getUom()==null||(vdKickOff.getUom()!=null && vdKickOff.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<MeasuredDepthCoord> mdPlanned = (List<MeasuredDepthCoord>) objWellbore1311.getMdPlanned();
+				for (MeasuredDepthCoord planned : mdPlanned) {
+					if (planned.getUom() == null
+							|| (planned.getUom() != null && planned.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<WellVerticalDepthCoord> tvdPlanned = (List<WellVerticalDepthCoord>) objWellbore1311.getTvdPlanned();
+				for (WellVerticalDepthCoord vdPlanned : tvdPlanned) {
+					if(vdPlanned.getUom()==null||(vdPlanned.getUom()!=null && vdPlanned.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<MeasuredDepthCoord> mdSubSeaPlanned = (List<MeasuredDepthCoord>) objWellbore1311.getMdSubSeaPlanned();
+				for (MeasuredDepthCoord seaPlanned : mdSubSeaPlanned) {
+					if (seaPlanned.getUom() == null
+							|| (seaPlanned.getUom() != null && seaPlanned.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<WellVerticalDepthCoord> tvdSubSeaPlanned = (List<WellVerticalDepthCoord>) objWellbore1311.getTvdSubSeaPlanned();
+				for (WellVerticalDepthCoord tvSeaPlanned : tvdSubSeaPlanned) {
+					if(tvSeaPlanned.getUom()==null||(tvSeaPlanned.getUom()!=null && tvSeaPlanned.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<TimeMeasure> dayTarget = (List<TimeMeasure>) objWellbore1311.getDayTarget();
+				for (TimeMeasure target : dayTarget) {
+					if(target.getUom()==null||(target.getUom()!=null && target.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				
+
+			} else if (abstractWitsmlObject instanceof com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) {
+				
+				List<com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord> mdCurrent = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord>) ((ObjWellbore) abstractWitsmlObject).getMdCurrent();
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord current : mdCurrent) {
+					if (current.getUom() == null
+							|| (current.getUom() != null && current.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord> tvdCurrent = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord>) ((ObjWellbore) abstractWitsmlObject).getTvdCurrent();
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord vdCurrent : tvdCurrent) {
+					if(vdCurrent.getUom()==null||(vdCurrent.getUom()!=null && vdCurrent.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord> mdKickoff = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject).getMdKickoff();
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord kickOff : mdKickoff) {
+					if (kickOff.getUom() == null
+							|| (kickOff.getUom() != null && kickOff.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord> tvdKickoff = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject).getTvdKickoff();
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord vdKickOff : tvdKickoff) {
+					if(vdKickOff.getUom()==null||(vdKickOff.getUom()!=null && vdKickOff.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord> mdPlanned = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject).getMdPlanned();
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord planned : mdPlanned) {
+					if (planned.getUom() == null
+							|| (planned.getUom() != null && planned.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord> tvdPlanned = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject).getTvdPlanned();
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord vdPlanned : tvdPlanned) {
+					if(vdPlanned.getUom()==null||(vdPlanned.getUom()!=null && vdPlanned.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord> mdSubSeaPlanned = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject).getMdSubSeaPlanned();
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord seaPlanned : mdSubSeaPlanned) {
+					if (seaPlanned.getUom() == null
+							|| (seaPlanned.getUom() != null && seaPlanned.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord> tvdSubSeaPlanned = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject).getTvdSubSeaPlanned();
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord tvSeaPlanned : tvdSubSeaPlanned) {
+					if(tvSeaPlanned.getUom()==null||(tvSeaPlanned.getUom()!=null && tvSeaPlanned.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				List<com.hashmapinc.tempus.WitsmlObjects.v1411.TimeMeasure> dayTarget = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.TimeMeasure>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject).getDayTarget();
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.TimeMeasure target : dayTarget) {
+					if(target.getUom()==null||(target.getUom()!=null && target.getUom().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+				
+			}
+		}
+
+		return result;
+	}
 	/**
 	 * This method checks for UOM node value in XMLin.
 	 * 
