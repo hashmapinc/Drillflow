@@ -27,7 +27,6 @@ import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
 import org.json.JSONObject;
 
-import javax.json.JsonObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
