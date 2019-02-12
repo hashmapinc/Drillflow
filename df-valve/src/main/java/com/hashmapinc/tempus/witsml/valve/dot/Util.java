@@ -83,7 +83,7 @@ public class Util {
      * @param obj - object to examine
      * @return boolean - true if emptiness is confirmed, else false
      */
-    private static boolean isEmpty(Object obj) {
+    public static boolean isEmpty(Object obj) {
         // handle nulls
         if (JSONObject.NULL.equals(obj)) return true;
 
