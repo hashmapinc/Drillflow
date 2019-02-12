@@ -46,6 +46,13 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogCurveInfo;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.CsReferencePoint;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore;
+import com.hashmapinc.tempus.witsml.WitsmlException;
 import com.hashmapinc.tempus.witsml.WitsmlObjectParser;
 import com.hashmapinc.tempus.witsml.WitsmlUtil;
 import com.hashmapinc.tempus.witsml.server.api.QueryValidation.ERRORCODE;
@@ -63,8 +70,9 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	public static String LOG_XML_TAG = "logData";
 	public static String uidAttribute = "uid";
 	public static String uomAttribute = "uom";
-	public static List<AbstractWitsmlObject> witsmlObjects=null;
-	public static String version =null;
+	public static List<AbstractWitsmlObject> witsmlObjects = null;
+	public static String version = null;
+
 	static Validation error401() {
 		return holds(param -> !checkWell(param.getXMLin()), ERRORCODE.ERROR_401.value());
 	}
@@ -87,7 +95,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 
 	static Validation error406() {
-		return holds(param -> !checkNotNullUid(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_406.value());
+		return holds(param -> !checkNotNullUid(param.getXMLin(), param.getWMLtypeIn()), ERRORCODE.ERROR_406.value());
 	}
 
 	static Validation error407() {
@@ -124,27 +132,27 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 
 	static Validation error415() {
-		return holds(param -> !checkNotNullUid(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_415.value());
+		return holds(param -> !checkNotNullUid(param.getXMLin(), param.getWMLtypeIn()), ERRORCODE.ERROR_415.value());
 	}
 
 	static Validation error416() {
-		return holds(param -> !checkNotNullUid(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_416.value());
+		return holds(param -> !checkNotNullUid(param.getXMLin(), param.getWMLtypeIn()), ERRORCODE.ERROR_416.value());
 	}
 
 	static Validation error417() {
-		return holds(param -> !checkNotNullUOM(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_417.value());
+		return holds(param -> !checkNotNullUOM(param.getXMLin(), param.getWMLtypeIn()), ERRORCODE.ERROR_417.value());
 	}
 
 	static Validation error418() {
-		return holds(param -> !checkUniqueUid(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_418.value());
+		return holds(param -> !checkUniqueUid(param.getXMLin(), param.getWMLtypeIn()), ERRORCODE.ERROR_418.value());
 	}
 
 	static Validation error419() {
-		return holds(param -> !checkNodeValue(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_419.value());
+		return holds(param -> !checkNodeValue(param.getXMLin(), param.getWMLtypeIn()), ERRORCODE.ERROR_419.value());
 	}
 
 	static Validation error420() {
-		return holds(param -> !checkNodeValue(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_420.value());
+		return holds(param -> !checkNodeValue(param.getXMLin(), param.getWMLtypeIn()), ERRORCODE.ERROR_420.value());
 	}
 
 	// checks for return after delete call
@@ -176,7 +184,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 
 	static Validation error432() {
-		return holds(param -> !checkNotNullUid(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_432.value());
+		return holds(param -> !checkNotNullUid(param.getXMLin(), param.getWMLtypeIn()), ERRORCODE.ERROR_432.value());
 	}
 
 	static Validation error433() {
@@ -185,19 +193,22 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 
 	static Validation error434() {
-		return holds(param -> !checkNotNullUid(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_434.value());
+		return holds(param -> !checkNotNullUid(param.getXMLin(), param.getWMLtypeIn()), ERRORCODE.ERROR_434.value());
 	}
 
 	static Validation error437() {
-		return holds(param -> !checkMnemonicListUnique(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_437.value());
+		return holds(param -> !checkMnemonicListUnique(param.getXMLin(), param.getWMLtypeIn()),
+				ERRORCODE.ERROR_437.value());
 	}
 
 	static Validation error438() {
-		return holds(param -> checkMnemonicListUnique(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_438.value());
+		return holds(param -> checkMnemonicListUnique(param.getXMLin(), param.getWMLtypeIn()),
+				ERRORCODE.ERROR_438.value());
 	}
 
 	static Validation error439() {
-		return holds(param -> !checkMnemonicListNotEmpty(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_439.value());
+		return holds(param -> !checkMnemonicListNotEmpty(param.getXMLin(), param.getWMLtypeIn()),
+				ERRORCODE.ERROR_439.value());
 	}
 
 	static Validation error444() {
@@ -206,32 +217,33 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 
 	static Validation error445() {
-		return holds(param -> !checkNodeValue(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_445.value());
+		return holds(param -> !checkNodeValue(param.getXMLin(), param.getWMLtypeIn()), ERRORCODE.ERROR_445.value());
 	}
 
 	static Validation error446() {
-		return holds(param -> !checkUomNodeValue(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_446.value());
+		return holds(param -> !checkUomNodeValue(param.getXMLin(), param.getWMLtypeIn()), ERRORCODE.ERROR_446.value());
 	}
 
 	static Validation error447() {
-		return holds(param -> !checkUniqueUid(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_447.value());
+		return holds(param -> !checkUniqueUid(param.getXMLin(), param.getWMLtypeIn()), ERRORCODE.ERROR_447.value());
 	}
 
 	static Validation error448() {
-		return holds(param -> !checkNotNullUid(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_448.value());
+		return holds(param -> !checkNotNullUid(param.getXMLin(), param.getWMLtypeIn()), ERRORCODE.ERROR_448.value());
 	}
 
 	static Validation error449() {
-		return holds(param -> !checkMnemonicListNotEmpty(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_449.value());
+		return holds(param -> !checkMnemonicListNotEmpty(param.getXMLin(), param.getWMLtypeIn()),
+				ERRORCODE.ERROR_449.value());
 	}
 
 	static Validation error450() {
-		return holds(param -> !checkMnemonicListUnique(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_450.value());
+		return holds(param -> !checkMnemonicListUnique(param.getXMLin(), param.getWMLtypeIn()),
+				ERRORCODE.ERROR_450.value());
 	}
 
-	
 	static Validation error453() {
-		return holds(param -> !checkNotNullUOM(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_453.value());
+		return holds(param -> !checkNotNullUOM(param.getXMLin(), param.getWMLtypeIn()), ERRORCODE.ERROR_453.value());
 	}
 
 	static Validation error459() {
@@ -239,19 +251,21 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 
 	static Validation error461() {
-		return holds(param -> !checkMnemonicListNotEmpty(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_461.value());
+		return holds(param -> !checkMnemonicListNotEmpty(param.getXMLin(), param.getWMLtypeIn()),
+				ERRORCODE.ERROR_461.value());
 	}
 
 	static Validation error462() {
-		return holds(param -> !checkMnemonicListNotEmpty(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_462.value());
+		return holds(param -> !checkMnemonicListNotEmpty(param.getXMLin(), param.getWMLtypeIn()),
+				ERRORCODE.ERROR_462.value());
 	}
 
 	static Validation error463() {
-		return holds(param -> !checkUniqueUid(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_463.value());
+		return holds(param -> !checkUniqueUid(param.getXMLin(), param.getWMLtypeIn()), ERRORCODE.ERROR_463.value());
 	}
 
 	static Validation error464() {
-		return holds(param -> !checkUniqueUid(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_464.value());
+		return holds(param -> !checkUniqueUid(param.getXMLin(), param.getWMLtypeIn()), ERRORCODE.ERROR_464.value());
 	}
 
 	static Validation error468() {
@@ -272,7 +286,8 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 
 	static Validation error482() {
-		return holds(param -> !checkMnemonicListUnique(param.getXMLin(),param.getWMLtypeIn()), ERRORCODE.ERROR_482.value());
+		return holds(param -> !checkMnemonicListUnique(param.getXMLin(), param.getWMLtypeIn()),
+				ERRORCODE.ERROR_482.value());
 	}
 
 	static Validation error483() {
@@ -319,24 +334,21 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	 * @throws IOException
 	 * @throws ParserConfigurationException
 	 */
-	public static void WmlType(String WMLTypein)
-	{
+	public static void WmlType(String WMLTypein) {
 		String type = WMLTypein.toString();
-		System.out.println("The type is :"+type);
+		System.out.println("The type is :" + type);
 	}
-	
-	
+
 	public static Document getXMLDocument(String XMLin) throws Exception {
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder builder = factory.newDocumentBuilder();
-			InputSource is = new InputSource(new StringReader(XMLin));
-			Document doc = builder.parse(is);
-			doc.getDocumentElement().normalize();
-			
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		InputSource is = new InputSource(new StringReader(XMLin));
+		Document doc = builder.parse(is);
+		doc.getDocumentElement().normalize();
+
 		return doc;
 	}
-	
-	
+
 	/**
 	 * This method validates the XMLin against the schemaLocation.
 	 * 
@@ -368,7 +380,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	 */
 	static boolean checkWMLTypeEmpty(String WMLType) {
 		boolean result = false;
-		LOG.info("The WMLType in is : "+WMLType);
+		LOG.info("The WMLType in is : " + WMLType);
 		if (WMLType.trim().isEmpty()) {
 			result = true;
 		}
@@ -442,7 +454,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	 * @throws IOException
 	 * @throws XPathExpressionException
 	 */
-	
+
 	static boolean checkWellforDelete(String WMLtypeIn, String QueryIn, String OptionsIn, String CapabilitiesIn) {
 		boolean result = false;
 		WMLS_GetFromStoreResponse resp = new WMLS_GetFromStoreResponse();
@@ -469,13 +481,11 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	 */
 	static boolean checkWell(String XMLin) {
 		boolean result = false;
-	
+
 		try {
-			if(!XMLin.contains("wells"))
-			{
+			if (!XMLin.contains("wells")) {
 				result = true;
 			}
-			
 
 		} catch (Exception e) {
 			LOG.warning(e.getMessage());
@@ -524,7 +534,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 		boolean result = false;
 		try {
 			String version = WitsmlUtil.getVersionFromXML(XMLin);
-			if (version!="1.3.1.1"||version!="1.4.1.1") {
+			if (version != "1.3.1.1" || version != "1.4.1.1") {
 				result = true;
 			}
 		} catch (Exception e) {
@@ -569,7 +579,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	static boolean checkLogData(String XMLin) {
 		boolean result = false;
 		try {
-			
+
 			if (!XMLin.contains(LOG_XML_TAG)) {
 				result = true;
 			}
@@ -591,32 +601,165 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	 */
 	static boolean checkNotNullUid(String XMLin, String WMLTypein) {
 		boolean result = false;
-		Document doc;
 		List<AbstractWitsmlObject> witsmlObjects;
 		String version;
 		try {
 			version = WitsmlUtil.getVersionFromXML(XMLin);
+			LOG.info("the version is: " + version);
 			witsmlObjects = WitsmlObjectParser.parse(WMLTypein, XMLin, version);
-				
-			//String uid = obj.getUid();
-			//witsmlObjects.
-			doc = getXMLDocument(XMLin);
-			XPathFactory factory = XPathFactory.newInstance();
-
-			XPath xpath = factory.newXPath();
-			NodeList nodeList = (NodeList) xpath.evaluate(uidExpression, doc, XPathConstants.NODESET);
-			LOG.info("the uid expression is :" + uidExpression);
-			for (int i = 0; i < nodeList.getLength(); i++) {
-				Element eElement = (Element) nodeList.item(i);
-				if (eElement.getAttribute(uidAttribute).equalsIgnoreCase("")
-						|| eElement.getAttribute(uidAttribute).equalsIgnoreCase(null)) {
-					result = true;
-				}
+			switch (WMLTypein) {
+			case "log":
+				result = checkNotNullUidForDiffVersionLog(witsmlObjects);
+			case "trajectory":
+				//result = checkNotNullUidForDiffVersionTraj(witsmlObjects);
+			case "well":
+				result = checkNotNullUidForDiffVersionWell(witsmlObjects);
+			case "wellbore":
+				//result = checkNotNullUidForDiffVersionWellbore(witsmlObjects);
+			default:
+				throw new WitsmlException("unsupported witsml object type: " + WMLTypein);
 			}
 		} catch (Exception e) {
-			LOG.warning(e.getMessage());
+			LOG.warning("the error is " + e.getMessage());
 		}
 		return result;
+	}
+
+	static boolean checkNotNullUidForDiffVersionLog(List<AbstractWitsmlObject> witsmlObjects) {
+
+		boolean result = false;
+
+		for (AbstractWitsmlObject abstractWitsmlObject : witsmlObjects) {
+			if (abstractWitsmlObject instanceof ObjLog) {
+				if (abstractWitsmlObject.getUid() == null
+						|| (abstractWitsmlObject.getUid() != null && abstractWitsmlObject.getUid().isEmpty())) {
+					result = true;
+					break;
+				}
+				List<CsLogCurveInfo> logCurveInfos = ((ObjLog) abstractWitsmlObject).getLogCurveInfo();
+				for (CsLogCurveInfo csLogCurveInfo : logCurveInfos) {
+					if (csLogCurveInfo.getUid() == null
+							|| (csLogCurveInfo.getUid() != null && csLogCurveInfo.getUid().isEmpty())) {
+						result = true;
+						break;
+					}
+				}
+
+			} else if (abstractWitsmlObject instanceof com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) {
+				if (abstractWitsmlObject.getUid() == null
+						|| (abstractWitsmlObject.getUid() != null && abstractWitsmlObject.getUid().isEmpty())) {
+					result = true;
+					break;
+				}
+				List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> logCurveInfos = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) abstractWitsmlObject)
+						.getLogCurveInfo();
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo csLogCurveInfo : logCurveInfos) {
+					if (csLogCurveInfo.getUid() == null
+							|| (csLogCurveInfo.getUid() != null && csLogCurveInfo.getUid().isEmpty())) {
+						result = true;
+						break;
+					}
+				}
+			}
+		}
+
+		return result;
+	}
+	
+	static boolean checkNotNullUidForDiffVersionWell(List<AbstractWitsmlObject> witsmlObjects) {
+
+		boolean result = false;
+
+		for (AbstractWitsmlObject abstractWitsmlObject : witsmlObjects) {
+			if (abstractWitsmlObject instanceof ObjWell) {
+				LOG.info("checking well onject ");
+				ObjWell objWell1311 = (ObjWell) abstractWitsmlObject;
+				if (objWell1311.getUid() == null
+						|| (objWell1311.getUid() != null && objWell1311.getUid().isEmpty())) {
+					result=true;
+					break;
+				}
+				List<CsReferencePoint> wellRefrenceinfo = objWell1311.getReferencePoint();
+				for (CsReferencePoint refrencePoint : wellRefrenceinfo) {
+					if (refrencePoint.getUid() == null
+							|| (refrencePoint.getUid() != null && refrencePoint.getUid().isEmpty())) {
+						result=true;
+						break;
+					}
+				}
+
+			} else if (abstractWitsmlObject instanceof com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) {
+				if (abstractWitsmlObject.getUid() == null
+						|| (abstractWitsmlObject.getUid() != null && abstractWitsmlObject.getUid().isEmpty())) {
+					result = true;
+					break;
+				}
+				List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsReferencePoint> wellRefrenceinfo = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject)
+						.getReferencePoint();
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsReferencePoint refrencePoint : wellRefrenceinfo) {
+					if (refrencePoint.getUid() == null
+							|| (refrencePoint.getUid() != null && refrencePoint.getUid().isEmpty())) {
+						result = true;
+						break;
+					}
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * @param witsmlObjects
+	 * @param version
+	 * @return true if the UID is null or empty
+	 * @throws WitsmlException
+	 */
+	static boolean checkNotNullUidForDiffVersion(List<AbstractWitsmlObject> witsmlObjects, String version)
+			throws WitsmlException {
+		boolean result = true;
+		LOG.info("we are here");
+		switch (version) {
+		case "1.3.1.1":
+			for (AbstractWitsmlObject abstractWitsmlObject : witsmlObjects) {
+				if (abstractWitsmlObject instanceof ObjLog) {
+					ObjLog objLog1311 = (ObjLog) abstractWitsmlObject;
+					if (objLog1311.getUid() == null || (objLog1311.getUid() != null && objLog1311.getUid().isEmpty())) {
+						return result;
+					}
+					List<CsLogCurveInfo> logCurveInfos = objLog1311.getLogCurveInfo();
+					for (CsLogCurveInfo csLogCurveInfo : logCurveInfos) {
+						if (csLogCurveInfo.getUid() == null
+								|| (csLogCurveInfo.getUid() != null && csLogCurveInfo.getUid().isEmpty())) {
+							return result;
+						}
+					}
+				} else if (abstractWitsmlObject instanceof ObjTrajectory) {
+
+				} else if (abstractWitsmlObject instanceof ObjWell) {
+					LOG.info("checking well onject ");
+					ObjWell objWell1311 = (ObjWell) abstractWitsmlObject;
+					if (objWell1311.getUid() == null
+							|| (objWell1311.getUid() != null && objWell1311.getUid().isEmpty())) {
+						return result;
+					}
+					List<CsReferencePoint> wellRefrenceinfo = objWell1311.getReferencePoint();
+					for (CsReferencePoint refrencePoint : wellRefrenceinfo) {
+						if (refrencePoint.getUid() == null
+								|| (refrencePoint.getUid() != null && refrencePoint.getUid().isEmpty())) {
+							return result;
+						}
+					}
+
+				} else if (abstractWitsmlObject instanceof ObjWellbore) {
+
+				}
+			}
+		case "1.4.1.1":
+
+		default:
+			throw new WitsmlException("unsupported witsml version...");
+		}
 	}
 
 	/**
@@ -680,13 +823,13 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 		boolean result = false;
 		Document doc;
 		try {
-			doc = getXMLDocument(XMLin);		
+			doc = getXMLDocument(XMLin);
 			NodeList nodeList = getNodeListForExpression(doc, uidExpression);
 			Set<String> uids = new HashSet<String>();
 			for (int i = 0; i < nodeList.getLength(); i++) {
 				Element eElement = (Element) nodeList.item(i);
 				String uid = eElement.getAttribute(uidAttribute);
-				LOG.info("the uid is : "+uid);
+				LOG.info("the uid is : " + uid);
 				if (uids.contains(uid)) {
 					result = true;
 					break;
@@ -700,7 +843,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 
 		return result;
 	}
-		
+
 	/**
 	 * This method checks for existing UID's with getFromStore
 	 * 
@@ -851,7 +994,6 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 		return result;
 	}
 
-	
 	/**
 	 * This method checks for special characters in mnemonic list
 	 * 
@@ -864,15 +1006,13 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	 */
 	static boolean checkMnemonicForSpecialCharacters(String XMLin) {
 		boolean result = false;
-		
+
 		try {
-		
-				
+
 			String regex = "',><&//\\";
-			
-			if(!XMLin.matches(regex))
-			{
-				result=true;
+
+			if (!XMLin.matches(regex)) {
+				result = true;
 			}
 		} catch (Exception e) {
 			LOG.warning(e.getMessage());
@@ -912,7 +1052,6 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 		return result;
 	}
 
-	
 	static Validation checkErrorForAddtoStoreVersion1411() {
 		return error407().and(error408()).and(error409()).and(error401()).and(error406()).and(error464())
 				.and(error412()).and(error413()).and(error405()).and(error481()).and(error453()).and(error463())
