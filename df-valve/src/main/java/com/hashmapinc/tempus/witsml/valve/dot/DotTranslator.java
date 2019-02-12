@@ -88,7 +88,7 @@ public class DotTranslator {
         String objectType
     ) throws ValveException {
         // Merge the 2 objects
-        JSONObject result = Util.merge(query,response); // WARNING: this method modifies query internally
+        JSONObject result = JsonUtil.merge(query,response); // WARNING: this method modifies query internally
 
         // convert the queryJSON back to valid xml
         LOG.info("Converting merged query JSON to valid XML string");

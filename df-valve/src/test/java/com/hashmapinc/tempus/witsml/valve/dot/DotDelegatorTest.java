@@ -25,7 +25,12 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell;
+import org.json.JSONObject;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -65,6 +70,23 @@ public class DotDelegatorTest {
 
         // mock client
         this.client = mock(DotClient.class);
+    }
+
+    @Test
+    public void shouldCreateAnUpdateInStoreQueryWithoutEmptyArrays() throws Exception{
+        String query = TestUtilities.getResourceAsString("updateTest/WellCountryUpdate1311.xml");
+        ObjWells wells = WitsmlMarshal.deserialize(query, ObjWells.class);
+        ObjWell well = wells.getWell().get(0);
+        String expectedJson = TestUtilities.getResourceAsString("updateTest/WellCountryUpdateResult1311.json");
+
+        // get witsmlObj as json string for request payload
+        String payload = well.getJSONString("1.4.1.1");
+        payload = JsonUtil.removeEmpties(new JSONObject(payload));
+
+        ObjectMapper om = new ObjectMapper();
+        Map<String, Object> map1311 = (Map<String, Object>) (om.readValue(payload, Map.class));
+        Map<String, Object> expectedMap = (Map<String, Object>) (om.readValue(expectedJson, Map.class));
+        Assert.assertEquals(expectedMap, map1311);
     }
 
     @Test

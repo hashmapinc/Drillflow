@@ -27,6 +27,7 @@ import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
 import org.json.JSONObject;
 
+import javax.json.JsonObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
@@ -168,7 +169,7 @@ public class DotDelegator {
 
 		// get witsmlObj as json string for request payload
 		String payload = witsmlObj.getJSONString("1.4.1.1");
-		payload = removeEmpties(payload);
+		payload = JsonUtil.removeEmpties(new JSONObject(payload));
 
 		// build the request
 		HttpRequestWithBody request = Unirest.put(endpoint);
@@ -207,19 +208,6 @@ public class DotDelegator {
 			LOG.warning(valveLoggingResponse.toString());
 			throw new ValveException(response.getBody());
 		}
-	}
-
-	private String removeEmpties(String jsonQuery){
-    	JSONObject object = new JSONObject(jsonQuery);
-    	ArrayList<String> keysToRemove = new ArrayList<>();
-    	for (Object key : object.keySet()){
-    		if (Util.isEmpty(object.get(key.toString())))
-    			keysToRemove.add(key.toString());
-		}
-    	for (String key : keysToRemove){
-    		object.remove(key);
-		}
-    	return object.toString();
 	}
 
     /**
