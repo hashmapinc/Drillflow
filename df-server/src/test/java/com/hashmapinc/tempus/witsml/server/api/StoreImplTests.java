@@ -95,6 +95,6 @@ public class StoreImplTests {
         WMLS_AddToStoreResponse response = this.witsmlServer.addToStore("well", xmlString, "", "");
         System.out.println(response.getResult());
         assertNotNull(response);
-        assertEquals(response.getResult(), -464);
+        assertEquals(response.getResult(), -999);
 	}
 }

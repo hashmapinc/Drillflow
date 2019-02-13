@@ -463,26 +463,27 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 			case "log":
 				if (!XMLin.contains("logs")) {
 					result = true;
-					break;
 				}
+				break;
 
 			case "trajectory":
 				if (!XMLin.contains("trajectorys")) {
 					result = true;
-					break;
 				}
+				break;
 
 			case "well":
+				LOG.info("checking for wells:"+XMLin.contains("wells"));
 				if (!XMLin.contains("wells")) {
 					result = true;
-					break;
 				}
+				break;
 
 			case "wellbore":
 				if (!XMLin.contains("wellbores")) {
 					result = true;
-					break;
 				}
+				break;
 
 			default:
 				throw new WitsmlException("unsupported witsml object type: " + WMLTypein);
@@ -807,6 +808,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 				result = checkNotNullNodeTrjaectory(witsmlObjects);
 				break;
 			case "well":
+				LOG.info("checking node Value for well");
 				result = checkNotNullNodeWell(witsmlObjects);
 				break;
 			case "wellbore":
@@ -838,6 +840,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 					break;
 				} else if (objWell1311.getNameLegal() == null
 						|| (objWell1311.getNameLegal() != null && objWell1311.getNameLegal().isEmpty())) {
+					LOG.info("NameLegal");
 					result = true;
 					break;
 				} else if (objWell1311.getNumLicense() == null
@@ -3741,7 +3744,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 		String regex = ";";
 		if (!OptionsIn.matches(regex)) {
 			result = true;
-		}
+			}
 		return result;
 	}
 
