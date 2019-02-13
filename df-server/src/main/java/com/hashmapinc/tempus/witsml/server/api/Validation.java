@@ -1113,34 +1113,297 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 					result = true;
 					break;
 				}
-				List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsReferencePoint> wellRefrenceinfo = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject)
-						.getReferencePoint();
-				for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsReferencePoint refrencePoint : wellRefrenceinfo) {
-					if (refrencePoint.getUid() == null
-							|| (refrencePoint.getUid() != null && refrencePoint.getUid().isEmpty())) {
-						result = true;
-						break;
-					}
+				if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getUid() == null
+						|| (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getUid() != null && ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getUid().isEmpty())) {
+					result=true;
+					break;
+				}
+				else if(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getName()==null||(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getName() != null && ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getName().isEmpty())) {
+					result=true;
+					break;
+				}
+				else if(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getNameLegal()==null||(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getNameLegal() != null && ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getNameLegal().isEmpty())) {
+					result=true;
+					break;
+				}
+				else if(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getNumLicense()==null||(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getNumLicense() != null && ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getNumLicense().isEmpty())) {
+					result=true;
+					break;
+				}
+				else if(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getNumGovt()==null||(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getNumGovt() != null && ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getNumGovt().isEmpty())) {
+					result=true;
+					break;
+				}
+				else if(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getField()==null||(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getField() != null && ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getField().isEmpty())) {
+					result=true;
+					break;
+				}
+				else if(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getCountry()==null||(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getCountry() != null && ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getCountry().isEmpty())) {
+					result=true;
+					break;
+				}
+				else if(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getRegion()==null||(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getRegion() != null && ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getRegion().isEmpty())) {
+					result=true;
+					break;
+				}
+				else if(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getDistrict()==null||(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getDistrict() != null && ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getDistrict().isEmpty())) {
+					result=true;
+					break;
+				}
+				else if(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getBlock()==null||(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getBlock() != null && ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getBlock().isEmpty())) {
+					result=true;
+					break;
+				}
+				else if(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getTimeZone()==null||(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getTimeZone() != null && ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getTimeZone().isEmpty())) {
+					result=true;
+					break;
+				}
+				else if(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getOperator()==null||(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getOperator() != null && ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getOperator().isEmpty())) {
+					result=true;
+					break;
+				}
+				else if(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getOperatorDiv()==null||(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getOperatorDiv() != null && ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getOperatorDiv().isEmpty())) {
+					result=true;
+					break;
+				}
+				else if(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getPcInterest()==null||(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getPcInterest() != null && ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getPcInterest().toString().isEmpty())) {
+					result=true;
+					break;
+				}
+				else if(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getNumAPI()==null||(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getNumAPI() != null && ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getNumAPI().isEmpty())) {
+					result=true;
+					break;
+				}
+				else if(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getStatusWell()==null||(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getStatusWell() != null && ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getStatusWell().isEmpty())) {
+					result=true;
+					break;
+				}
+				else if(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getPurposeWell()==null||(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getPurposeWell() != null && ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getPurposeWell().isEmpty())) {					
+						result=true;
+					break;
+				}
+				else if(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getDTimSpud()==null||(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getDTimSpud() != null && ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getDTimSpud().isEmpty())) {
+					result=true;
+					break;
+				}
+				else if(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getDTimPa()==null||(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getDTimPa() != null && ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getDTimPa().isEmpty())) {					
+						result=true;
+					break;
+				}
+				else if(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getWellheadElevation()==null||(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getWellheadElevation() != null && ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getWellheadElevation().toString().isEmpty())) {					
+					result=true;
+				break;
+				}
+				else if(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getGroundElevation()==null||(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getGroundElevation() != null && ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getGroundElevation().toString().isEmpty())) {					
+					result=true;
+				break;
+				}
+				else if(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getWaterDepth()==null||(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getWaterDepth() != null && ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getWaterDepth().toString().isEmpty())) {					
+					result=true;
+				break;
 				}
 				List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsWellDatum> wellDatum = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getWellDatum();
-				for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsWellDatum datum : wellDatum) {
-					if(datum.getUid()==null||(datum.getUid()!=null && datum.getUid().isEmpty())) {
+				for(com.hashmapinc.tempus.WitsmlObjects.v1411.CsWellDatum datum : wellDatum) {
+					if(datum.getName()==null||(datum.getName()!=null&&datum.getName().isEmpty())) {
+						result=true;
+						break;
+					}
+					if(datum.getCode()==null||(datum.getCode()!=null&&datum.getCode().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+					if(datum.getElevation()==null||(datum.getElevation()!=null&&datum.getElevation().toString().isEmpty())) {
 						result=true;
 						break;
 					}
 				}
-				List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLocation> wellLocation = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject)
-						.getWellLocation();
-				for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsLocation location : wellLocation) {
-					if(location.getUid()==null||(location.getUid()!=null && location.getUid().isEmpty())) {
+				List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLocation> wellLocation = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getWellLocation();
+				for(com.hashmapinc.tempus.WitsmlObjects.v1411.CsLocation location : wellLocation) {
+					if(location.getWellCRS()==null||(location.getWellCRS()!=null&&location.getWellCRS().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+					if(location.getEasting()==null||(location.getEasting()!=null&&location.getEasting().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+					if(location.getNorthing()==null||(location.getNorthing()!=null&&location.getNorthing().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+					if(location.getDescription()==null||(location.getDescription()!=null&&location.getDescription().isEmpty())) {
 						result=true;
 						break;
 					}
 				}
-				List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsWellCRS> wellCRS = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject)
-						.getWellCRS();
-				for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsWellCRS crs : wellCRS) {
-					if(crs.getUid()==null||(crs.getUid()!=null && crs.getUid().isEmpty())) {
+				List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsReferencePoint> referencePoint = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getReferencePoint();
+				for(com.hashmapinc.tempus.WitsmlObjects.v1411.CsReferencePoint reference : referencePoint) {
+					if(reference.getName()==null||(reference.getName()!=null&&reference.getName().isEmpty())) {
+						result=true;
+						break;
+					}
+					if(reference.getType()==null||(reference.getType()!=null&&reference.getType().isEmpty())) {
+						result=true;
+						break;
+					}
+					if(reference.getElevation()==null||(reference.getElevation()!=null&&reference.getElevation().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+					if(reference.getMeasuredDepth()==null||(reference.getMeasuredDepth()!=null&&reference.getMeasuredDepth().toString().isEmpty())) {
+						result=true;
+						break;
+					}
+					List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLocation> location = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getWellLocation();
+					for(com.hashmapinc.tempus.WitsmlObjects.v1411.CsLocation loc : location) {
+						if(loc.getWellCRS()==null||(loc.getWellCRS()!=null&&loc.getWellCRS().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+						if(loc.getEasting()==null||(loc.getEasting()!=null&&loc.getEasting().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+						if(loc.getNorthing()==null||(loc.getNorthing()!=null&&loc.getNorthing().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+						if(loc.getLocalX()==null||(loc.getLocalX()!=null&&loc.getLocalX().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+						if(loc.getLocalY()==null||(loc.getLocalY()!=null&&loc.getLocalY().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+						if(loc.getDescription()==null||(loc.getDescription()!=null&&loc.getDescription().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+						if(loc.getLongitude()==null||(loc.getLongitude()!=null&&loc.getLongitude().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+						if(loc.getLatitude()==null||(loc.getLatitude()!=null&&loc.getLatitude().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+					}
+					
+				}
+				List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsWellCRS> wellCRS = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getWellCRS();
+				for(com.hashmapinc.tempus.WitsmlObjects.v1411.CsWellCRS crs : wellCRS) {
+					if(crs.getName()==null||(crs.getName()!=null&&crs.getName().isEmpty())) {
+						result=true;
+						break;
+					}
+					List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsGeodeticModel> geographic = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsGeodeticModel>) crs.getGeographic();
+					for(com.hashmapinc.tempus.WitsmlObjects.v1411.CsGeodeticModel geo : geographic) {
+						if(geo.getNameCRS()==null||(geo.getNameCRS()!=null&&geo.getNameCRS().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+						if(geo.getGeodeticDatumCode()==null||(geo.getGeodeticDatumCode()!=null&&geo.getGeodeticDatumCode().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+						if(geo.getXTranslation()==null||(geo.getXTranslation()!=null&&geo.getXTranslation().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+						if(geo.getYTranslation()==null||(geo.getYTranslation()!=null&&geo.getYTranslation().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+						if(geo.getZTranslation()==null||(geo.getZTranslation()!=null&&geo.getZTranslation().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+						if(geo.getXRotation()==null||(geo.getXRotation()!=null&&geo.getXRotation().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+						if(geo.getYRotation()==null||(geo.getYRotation()!=null&&geo.getYRotation().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+						if(geo.getZRotation()==null||(geo.getZRotation()!=null&&geo.getZRotation().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+						if(geo.getScaleFactor()==null||(geo.getScaleFactor()!=null&&geo.getScaleFactor().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+						if(geo.getEllipsoidCode()==null||(geo.getEllipsoidCode()!=null&&geo.getEllipsoidCode().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+						if(geo.getEllipsoidSemiMajorAxis()==null||(geo.getEllipsoidSemiMajorAxis()!=null&&geo.getEllipsoidSemiMajorAxis().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+						if(geo.getEllipsoidInverseFlattening()==null||(geo.getEllipsoidInverseFlattening()!=null&&geo.getEllipsoidInverseFlattening().toString().isEmpty())) {
+							result=true;
+							break;
+						}
+					}
+					List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsProjectionx> mapProjection = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsProjectionx>) crs.getMapProjection();
+					for(com.hashmapinc.tempus.WitsmlObjects.v1411.CsProjectionx projection : mapProjection) {
+						if(projection.getNameCRS()==null||projection.getNameCRS()!=null&&projection.getNameCRS().toString().isEmpty()) {
+							result=true;
+							break;
+						}
+						if(projection.getProjectionCode()==null||projection.getProjectionCode()!=null&&projection.getProjectionCode().toString().isEmpty()) {
+							result=true;
+							break;
+						}
+						if(projection.getProjectedFrom()==null||projection.getProjectedFrom()!=null&&projection.getProjectedFrom().toString().isEmpty()) {
+							result=true;
+							break;
+						}
+						if(projection.getZone()==null||projection.getZone()!=null&&projection.getZone().toString().isEmpty()) {
+							result=true;
+							break;
+						}
+					}
+					
+					List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLocalCRS> localCRS = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLocalCRS>) crs.getLocalCRS();
+					for(com.hashmapinc.tempus.WitsmlObjects.v1411.CsLocalCRS local : localCRS) {
+						if(local.getYAxisAzimuth()==null||local.getYAxisAzimuth()!=null&&local.getYAxisAzimuth().toString().isEmpty()) {
+							result=true;
+							break;
+						}
+						if(local.getYAxisDescription()==null||local.getYAxisDescription()!=null&&local.getYAxisDescription().toString().isEmpty()) {
+							result=true;
+							break;
+						}
+						if(local.isUsesWellAsOrigin()==null||local.isUsesWellAsOrigin()!=null&&local.isUsesWellAsOrigin().toString().isEmpty()) {
+							result=true;
+							break;
+						}
+						if(local.isXRotationCounterClockwise()==null||local.isXRotationCounterClockwise()!=null&&local.isXRotationCounterClockwise().toString().isEmpty()) {
+							result=true;
+							break;
+						}
+					}
+				}
+				List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsCommonData> commonData = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsCommonData>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject)
+						.getCommonData();
+				for(com.hashmapinc.tempus.WitsmlObjects.v1411.CsCommonData data : commonData) {
+					if(data.getDTimCreation()==null||data.getDTimCreation()!=null&&data.getDTimCreation().toString().isEmpty()) {
+						result=true;
+						break;
+					}
+					if(data.getDTimLastChange()==null||data.getDTimLastChange()!=null&&data.getDTimLastChange().toString().isEmpty()) {
+						result=true;
+						break;
+					}
+					if(data.getItemState()==null||data.getItemState()!=null&&data.getItemState().toString().isEmpty()) {
+						result=true;
+						break;
+					}
+					if(data.getComments()==null||data.getComments()!=null&&data.getComments().isEmpty()) {
 						result=true;
 						break;
 					}
