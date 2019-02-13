@@ -168,6 +168,7 @@ public class DotDelegator {
 
 		// get witsmlObj as json string for request payload
 		String payload = witsmlObj.getJSONString("1.4.1.1");
+		payload = JsonUtil.removeEmpties(new JSONObject(payload));
 
 		// build the request
 		HttpRequestWithBody request = Unirest.put(endpoint);
