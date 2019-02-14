@@ -146,10 +146,11 @@ class GraphQLQueryConverter {
 
 
         // ====================================================================
-        // get trajectory fields fragment
+        // get trajectory fields fragment (this is long and sucks, we know)
         // ====================================================================
         StringBuilder trajFieldsFragment = new StringBuilder();
         trajFieldsFragment.append("fragment trajFields on TrajectoryType {");
+
         if(trajectoryJson.has("aliases")) {
             trajFieldsFragment.append("    aliases {");
             if(JsonUtil.isEmpty(trajectoryJson.get("aliases")) || trajectoryJson.getJSONObject("aliases").has("authority"))
@@ -160,60 +161,152 @@ class GraphQLQueryConverter {
                 trajFieldsFragment.append("        identifier");
             trajFieldsFragment.append("    }");
         }
-        if(trajectoryJson.has("asdfasdfasdf"))
+
+        if(trajectoryJson.has("aziRef"))
             trajFieldsFragment.append("    aziRef");
-        if(trajectoryJson.has("asdfasdfasdf"))
+
+        if(trajectoryJson.has("aziVertSect")) {
             trajFieldsFragment.append("    aziVertSect {");
-        trajFieldsFragment.append("        uom");
-        trajFieldsFragment.append("        value");
-        trajFieldsFragment.append("    }");
-        if(trajectoryJson.has("asdfasdfasdf"))
+            if(JsonUtil.isEmpty(trajectoryJson.get("aziVertSect")) || trajectoryJson.getJSONObject("aziVertSect").has("uom"))
+                trajFieldsFragment.append("        uom");
+            if(JsonUtil.isEmpty(trajectoryJson.get("aziVertSect")) || trajectoryJson.getJSONObject("aziVertSect").has("value"))
+                trajFieldsFragment.append("        value");
+            trajFieldsFragment.append("    }");
+        }
+
+        if(trajectoryJson.has("citation")) {
             trajFieldsFragment.append("    citation {");
-        trajFieldsFragment.append("        creation");
-        trajFieldsFragment.append("        description");
-        trajFieldsFragment.append("        descriptiveKeywords");
-        trajFieldsFragment.append("        editor");
-        trajFieldsFragment.append("        format");
-        trajFieldsFragment.append("        lastUpdate");
-        trajFieldsFragment.append("        originator");
-        trajFieldsFragment.append("        title");
-        trajFieldsFragment.append("        versionString");
-        trajFieldsFragment.append("    }");
-        if(trajectoryJson.has("asdfasdfasdf"))
+            if(JsonUtil.isEmpty(trajectoryJson.get("citation")) || trajectoryJson.getJSONObject("citation").has("creation"))
+                trajFieldsFragment.append("        creation");
+            if(JsonUtil.isEmpty(trajectoryJson.get("citation")) || trajectoryJson.getJSONObject("citation").has("description"))
+                trajFieldsFragment.append("        description");
+            if(JsonUtil.isEmpty(trajectoryJson.get("citation")) || trajectoryJson.getJSONObject("citation").has("descriptiveKeywords"))
+                trajFieldsFragment.append("        descriptiveKeywords");
+            if(JsonUtil.isEmpty(trajectoryJson.get("citation")) || trajectoryJson.getJSONObject("citation").has("editor"))
+                trajFieldsFragment.append("        editor");
+            if(JsonUtil.isEmpty(trajectoryJson.get("citation")) || trajectoryJson.getJSONObject("citation").has("format"))
+                trajFieldsFragment.append("        format");
+            if(JsonUtil.isEmpty(trajectoryJson.get("citation")) || trajectoryJson.getJSONObject("citation").has("lastUpdate"))
+                trajFieldsFragment.append("        lastUpdate");
+            if(JsonUtil.isEmpty(trajectoryJson.get("citation")) || trajectoryJson.getJSONObject("citation").has("originator"))
+                trajFieldsFragment.append("        originator");
+            if(JsonUtil.isEmpty(trajectoryJson.get("citation")) || trajectoryJson.getJSONObject("citation").has("title"))
+                trajFieldsFragment.append("        title");
+            if(JsonUtil.isEmpty(trajectoryJson.get("citation")) || trajectoryJson.getJSONObject("citation").has("versionString"))
+                trajFieldsFragment.append("        versionString");
+            trajFieldsFragment.append("    }");
+        }
+
+        if(trajectoryJson.has("commonData")) {
             trajFieldsFragment.append("    commonData {");
-        trajFieldsFragment.append("        acquisitionTimeZone {");
-        trajFieldsFragment.append("            dTim");
-        trajFieldsFragment.append("            value");
-        trajFieldsFragment.append("        }");
-        trajFieldsFragment.append("        comments");
-        trajFieldsFragment.append("        defaultDatum {");
-        trajFieldsFragment.append("            uidRef");
-        trajFieldsFragment.append("            value");
-        trajFieldsFragment.append("        }");
-        trajFieldsFragment.append("        extensionAny");
-        trajFieldsFragment.append("        extensionNameValue {");
-        trajFieldsFragment.append("            dataType");
-        trajFieldsFragment.append("            description");
-        trajFieldsFragment.append("            dTim");
-        trajFieldsFragment.append("            index");
-        trajFieldsFragment.append("            md {");
-        trajFieldsFragment.append("                datum");
-        trajFieldsFragment.append("                uom");
-        trajFieldsFragment.append("                value");
-        trajFieldsFragment.append("            }");
-        trajFieldsFragment.append("            measureClass");
-        trajFieldsFragment.append("            name");
-        trajFieldsFragment.append("            uid");
-        trajFieldsFragment.append("            value {");
-        trajFieldsFragment.append("                uom");
-        trajFieldsFragment.append("                value");
-        trajFieldsFragment.append("            }");
-        trajFieldsFragment.append("        }");
-        trajFieldsFragment.append("        itemState");
-        trajFieldsFragment.append("        privateGroupOnly");
-        trajFieldsFragment.append("        serviceCategory");
-        trajFieldsFragment.append("        sourceName");
-        trajFieldsFragment.append("    }");
+
+            if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) || trajectoryJson.getJSONObject("commonData").has("acquisitionTimeZone")) {
+                trajFieldsFragment.append("        acquisitionTimeZone {");
+                if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) ||
+                        JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").get("acquisitionTimeZone")) ||
+                        trajectoryJson.getJSONObject("commonData").getJSONObject("acquisitionTimeZone").has("dTim")) {
+                    trajFieldsFragment.append("            dTim");
+                }
+                if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) ||
+                        JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").get("acquisitionTimeZone")) ||
+                        trajectoryJson.getJSONObject("commonData").getJSONObject("acquisitionTimeZone").has("value")) {
+                    trajFieldsFragment.append("            value");
+                }
+                trajFieldsFragment.append("        }");
+            }
+
+            if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) || trajectoryJson.getJSONObject("commonData").has("comments"))
+                trajFieldsFragment.append("        comments");
+
+
+            if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) || trajectoryJson.getJSONObject("commonData").has("defaultDatum")) {
+                trajFieldsFragment.append("        defaultDatum {");
+                if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) ||
+                        JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").get("defaultDatum")) ||
+                        trajectoryJson.getJSONObject("commonData").getJSONObject("defaultDatum").has("uidRef")) {
+                    trajFieldsFragment.append("            uidRef");
+                }
+                if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) ||
+                        JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").get("defaultDatum")) ||
+                        trajectoryJson.getJSONObject("commonData").getJSONObject("defaultDatum").has("value")) {
+                    trajFieldsFragment.append("            value");
+                }
+                trajFieldsFragment.append("        }");
+            }
+
+            if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) || trajectoryJson.getJSONObject("commonData").has("extensionAny"))
+                trajFieldsFragment.append("        extensionAny");
+
+            if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) || trajectoryJson.getJSONObject("commonData").has("extensionNameValue")) {
+                trajFieldsFragment.append("        extensionNameValue {");
+                if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) ||
+                        JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").get("extensionNameValue")) ||
+                        trajectoryJson.getJSONObject("commonData").getJSONObject("extensionNameValue").has("dataType")) {
+                    trajFieldsFragment.append("            dataType");
+                }
+                if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) ||
+                        JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").get("extensionNameValue")) ||
+                        trajectoryJson.getJSONObject("commonData").getJSONObject("extensionNameValue").has("description")) {
+                    trajFieldsFragment.append("            description");
+                }
+                if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) ||
+                        JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").get("extensionNameValue")) ||
+                        trajectoryJson.getJSONObject("commonData").getJSONObject("extensionNameValue").has("dTim")) {
+                    trajFieldsFragment.append("            dTim");
+                }
+                if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) ||
+                        JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").get("extensionNameValue")) ||
+                        trajectoryJson.getJSONObject("commonData").getJSONObject("extensionNameValue").has("index")) {
+                    trajFieldsFragment.append("            index");
+                }
+
+                if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) ||
+                        JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").get("extensionNameValue")) ||
+                        trajectoryJson.getJSONObject("commonData").getJSONObject("extensionNameValue").has("md")) {
+                    trajFieldsFragment.append("            md {");
+                    if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) ||
+                            JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").get("extensionNameValue")) ||
+                            JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").getJSONObject("extensionNameValue").get("md")) ||
+                            trajectoryJson.getJSONObject("commonData").getJSONObject("extensionNameValue").getJSONObject("md").has("datum")) {
+                        trajFieldsFragment.append("                datum");
+                    }if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) ||
+                            JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").get("extensionNameValue")) ||
+                            JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").getJSONObject("extensionNameValue").get("md")) ||
+                            trajectoryJson.getJSONObject("commonData").getJSONObject("extensionNameValue").getJSONObject("md").has("uom")) {
+                        trajFieldsFragment.append("                uom");
+                    }if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) ||
+                            JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").get("extensionNameValue")) ||
+                            JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").getJSONObject("extensionNameValue").get("md")) ||
+                            trajectoryJson.getJSONObject("commonData").getJSONObject("extensionNameValue").getJSONObject("md").has("value")) {
+                        trajFieldsFragment.append("                value");
+                    }
+                    trajFieldsFragment.append("            }");
+                }
+
+                trajFieldsFragment.append("            measureClass");
+                trajFieldsFragment.append("            name");
+                trajFieldsFragment.append("            uid");
+                trajFieldsFragment.append("            value {");
+                trajFieldsFragment.append("                uom");
+                trajFieldsFragment.append("                value");
+                trajFieldsFragment.append("            }");
+                trajFieldsFragment.append("        }");
+            }
+
+            if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) || trajectoryJson.getJSONObject("commonData").has("itemState"))
+                trajFieldsFragment.append("        itemState");
+
+            if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) || trajectoryJson.getJSONObject("commonData").has("privateGroupOnly"))
+                trajFieldsFragment.append("        privateGroupOnly");
+
+            if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) || trajectoryJson.getJSONObject("commonData").has("serviceCategory"))
+                trajFieldsFragment.append("        serviceCategory");
+
+            if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) || trajectoryJson.getJSONObject("commonData").has("sourceName"))
+                trajFieldsFragment.append("        sourceName");
+            trajFieldsFragment.append("    }");
+        }
+
         if(trajectoryJson.has("asdfasdfasdf"))
             trajFieldsFragment.append("    creationTimeUtc");
         if(trajectoryJson.has("asdfasdfasdf"))
