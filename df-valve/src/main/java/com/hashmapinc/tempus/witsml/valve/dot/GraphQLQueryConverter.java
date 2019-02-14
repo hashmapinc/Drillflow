@@ -419,92 +419,149 @@ class GraphQLQueryConverter {
             trajFieldsFragment.append("    }");
         }
 
-        if(trajectoryJson.has("asdfasdfasdf"))
+        if(trajectoryJson.has("finalTraj"))
             trajFieldsFragment.append("    finalTraj");
-        if(trajectoryJson.has("asdfasdfasdf"))
+
+        if(trajectoryJson.has("gridConUsed")) {
             trajFieldsFragment.append("    gridConUsed {");
-        trajFieldsFragment.append("        uom");
-        trajFieldsFragment.append("        value");
-        trajFieldsFragment.append("    }");
-        if(trajectoryJson.has("asdfasdfasdf"))
+            if(JsonUtil.isEmpty(trajectoryJson.get("gridConUsed")) || trajectoryJson.getJSONObject("gridConUsed").has("uom"))
+                trajFieldsFragment.append("        uom");
+            if(JsonUtil.isEmpty(trajectoryJson.get("gridConUsed")) || trajectoryJson.getJSONObject("gridConUsed").has("value"))
+                trajFieldsFragment.append("        value");
+            trajFieldsFragment.append("    }");
+        }
+
+        if(trajectoryJson.has("gridCorUsed")) {
             trajFieldsFragment.append("    gridCorUsed {");
-        trajFieldsFragment.append("        uom");
-        trajFieldsFragment.append("        value");
-        trajFieldsFragment.append("    }");
-        if(trajectoryJson.has("asdfasdfasdf"))
+            if(JsonUtil.isEmpty(trajectoryJson.get("gridCorUsed")) || trajectoryJson.getJSONObject("gridCorUsed").has("uom"))
+                trajFieldsFragment.append("        uom");
+            if(JsonUtil.isEmpty(trajectoryJson.get("gridCorUsed")) || trajectoryJson.getJSONObject("gridCorUsed").has("value"))
+                trajFieldsFragment.append("        value");
+            trajFieldsFragment.append("    }");
+        }
+
+        if(trajectoryJson.has("growingStatus"))
             trajFieldsFragment.append("    growingStatus");
-        if(trajectoryJson.has("asdfasdfasdf"))
+
+        if(trajectoryJson.has("lastUpdateTimeUtc"))
             trajFieldsFragment.append("    lastUpdateTimeUtc");
-        if(trajectoryJson.has("asdfasdfasdf"))
+
+        if(trajectoryJson.has("magDeclUsed")) {
             trajFieldsFragment.append("    magDeclUsed {");
-        trajFieldsFragment.append("        uom");
-        trajFieldsFragment.append("        value");
-        trajFieldsFragment.append("    }");
-        if(trajectoryJson.has("asdfasdfasdf"))
+            if(JsonUtil.isEmpty(trajectoryJson.get("magDeclUsed")) || trajectoryJson.getJSONObject("magDeclUsed").has("uom"))
+                trajFieldsFragment.append("        uom");
+            if(JsonUtil.isEmpty(trajectoryJson.get("magDeclUsed")) || trajectoryJson.getJSONObject("magDeclUsed").has("value"))
+                trajFieldsFragment.append("        value");
+            trajFieldsFragment.append("    }");
+        }
+
+        if(trajectoryJson.has("mdMn")) {
             trajFieldsFragment.append("    mdMn {");
-        trajFieldsFragment.append("        datum");
-        trajFieldsFragment.append("        uom");
-        trajFieldsFragment.append("        value");
-        trajFieldsFragment.append("    }");
-        if(trajectoryJson.has("asdfasdfasdf"))
+            if(JsonUtil.isEmpty(trajectoryJson.get("mdMn")) || trajectoryJson.getJSONObject("mdMn").has("datum"))
+                trajFieldsFragment.append("        datum");
+            if(JsonUtil.isEmpty(trajectoryJson.get("mdMn")) || trajectoryJson.getJSONObject("mdMn").has("uom"))
+                trajFieldsFragment.append("        uom");
+            if(JsonUtil.isEmpty(trajectoryJson.get("mdMn")) || trajectoryJson.getJSONObject("mdMn").has("value"))
+                trajFieldsFragment.append("        value");
+            trajFieldsFragment.append("    }");
+        }
+
+        if(trajectoryJson.has("mdMx")) {
             trajFieldsFragment.append("    mdMx {");
-        trajFieldsFragment.append("        datum");
-        trajFieldsFragment.append("        uom");
-        trajFieldsFragment.append("        value");
-        trajFieldsFragment.append("    }");
-        if(trajectoryJson.has("asdfasdfasdf"))
+            if(JsonUtil.isEmpty(trajectoryJson.get("mdMx")) || trajectoryJson.getJSONObject("mdMx").has("datum"))
+                trajFieldsFragment.append("        datum");
+            if(JsonUtil.isEmpty(trajectoryJson.get("mdMx")) || trajectoryJson.getJSONObject("mdMx").has("uom"))
+                trajFieldsFragment.append("        uom");
+            if(JsonUtil.isEmpty(trajectoryJson.get("mdMx")) || trajectoryJson.getJSONObject("mdMx").has("value"))
+                trajFieldsFragment.append("        value");
+            trajFieldsFragment.append("    }");
+        }
+
+        if(trajectoryJson.has("memory"))
             trajFieldsFragment.append("    memory");
-        if(trajectoryJson.has("asdfasdfasdf"))
+
+        if(trajectoryJson.has("name"))
             trajFieldsFragment.append("    name");
-        if(trajectoryJson.has("asdfasdfasdf"))
+
+        if(trajectoryJson.has("nameWell"))
             trajFieldsFragment.append("    nameWell");
-        if(trajectoryJson.has("asdfasdfasdf"))
+
+        if(trajectoryJson.has("nameWellbore"))
             trajFieldsFragment.append("    nameWellbore");
-        if(trajectoryJson.has("asdfasdfasdf"))
+
+        if(trajectoryJson.has("objectVersion"))
             trajFieldsFragment.append("    objectVersion");
-        if(trajectoryJson.has("asdfasdfasdf"))
+
+        if(trajectoryJson.has("parentTrajectory")) {
             trajFieldsFragment.append("    parentTrajectory {");
-        trajFieldsFragment.append("        contentType");
-        trajFieldsFragment.append("        title");
-        trajFieldsFragment.append("        uidRef");
-        trajFieldsFragment.append("        uri");
-        trajFieldsFragment.append("        uuid");
-        trajFieldsFragment.append("        uuidAuthority");
-        trajFieldsFragment.append("        versionString");
-        trajFieldsFragment.append("    }");
-        if(trajectoryJson.has("asdfasdfasdf"))
+            if(JsonUtil.isEmpty(trajectoryJson.get("parentTrajectory")) || trajectoryJson.getJSONObject("parentTrajectory").has("contentType"))
+                trajFieldsFragment.append("        contentType");
+            if(JsonUtil.isEmpty(trajectoryJson.get("parentTrajectory")) || trajectoryJson.getJSONObject("parentTrajectory").has("title"))
+                trajFieldsFragment.append("        title");
+            if(JsonUtil.isEmpty(trajectoryJson.get("parentTrajectory")) || trajectoryJson.getJSONObject("parentTrajectory").has("uidRef"))
+                trajFieldsFragment.append("        uidRef");
+            if(JsonUtil.isEmpty(trajectoryJson.get("parentTrajectory")) || trajectoryJson.getJSONObject("parentTrajectory").has("uri"))
+                trajFieldsFragment.append("        uri");
+            if(JsonUtil.isEmpty(trajectoryJson.get("parentTrajectory")) || trajectoryJson.getJSONObject("parentTrajectory").has("uuid"))
+                trajFieldsFragment.append("        uuid");
+            if(JsonUtil.isEmpty(trajectoryJson.get("parentTrajectory")) || trajectoryJson.getJSONObject("parentTrajectory").has("uuidAuthority"))
+                trajFieldsFragment.append("        uuidAuthority");
+            if(JsonUtil.isEmpty(trajectoryJson.get("parentTrajectory")) || trajectoryJson.getJSONObject("parentTrajectory").has("versionString"))
+                trajFieldsFragment.append("        versionString");
+            trajFieldsFragment.append("    }");
+        }
+
+        if(trajectoryJson.has("schemaVersion"))
             trajFieldsFragment.append("    schemaVersion");
-        if(trajectoryJson.has("asdfasdfasdf"))
+
+        if(trajectoryJson.has("serviceCompany"))
             trajFieldsFragment.append("    serviceCompany");
-        if(trajectoryJson.has("asdfasdfasdf"))
-            trajFieldsFragment.append("    uid");
-        if(trajectoryJson.has("asdfasdfasdf"))
+
+        // always snag uid
+        trajFieldsFragment.append("    uid");
+
+        if(trajectoryJson.has("uuid"))
             trajFieldsFragment.append("    uuid");
-        if(trajectoryJson.has("asdfasdfasdf"))
+
+        if(trajectoryJson.has("uuidWell"))
             trajFieldsFragment.append("    uuidWell");
-        if(trajectoryJson.has("asdfasdfasdf"))
+
+        if(trajectoryJson.has("uuidWellbore"))
             trajFieldsFragment.append("    uuidWellbore");
-        if(trajectoryJson.has("asdfasdfasdf"))
+
+        if(trajectoryJson.has("wellbore")) {
             trajFieldsFragment.append("    wellbore {");
-        trajFieldsFragment.append("        contentType");
-        trajFieldsFragment.append("        title");
-        trajFieldsFragment.append("        uidRef");
-        trajFieldsFragment.append("        uri");
-        trajFieldsFragment.append("        uuid");
-        trajFieldsFragment.append("        uuidAuthority");
-        trajFieldsFragment.append("        versionString");
-        trajFieldsFragment.append("    }");
-        if(trajectoryJson.has("asdfasdfasdf"))
-            trajFieldsFragment.append("    trajectoryStation(trajectoryStationArgument: $trajStationArg) {");
+            if(JsonUtil.isEmpty(trajectoryJson.get("wellbore")) || trajectoryJson.getJSONObject("wellbore").has("contentType"))
+                trajFieldsFragment.append("        contentType");
+            if(JsonUtil.isEmpty(trajectoryJson.get("wellbore")) || trajectoryJson.getJSONObject("wellbore").has("title"))
+                trajFieldsFragment.append("        title");
+            if(JsonUtil.isEmpty(trajectoryJson.get("wellbore")) || trajectoryJson.getJSONObject("wellbore").has("uidRef"))
+                trajFieldsFragment.append("        uidRef");
+            if(JsonUtil.isEmpty(trajectoryJson.get("wellbore")) || trajectoryJson.getJSONObject("wellbore").has("uri"))
+                trajFieldsFragment.append("        uri");
+            if(JsonUtil.isEmpty(trajectoryJson.get("wellbore")) || trajectoryJson.getJSONObject("wellbore").has("uuid"))
+                trajFieldsFragment.append("        uuid");
+            if(JsonUtil.isEmpty(trajectoryJson.get("wellbore")) || trajectoryJson.getJSONObject("wellbore").has("uuidAuthority"))
+                trajFieldsFragment.append("        uuidAuthority");
+            if(JsonUtil.isEmpty(trajectoryJson.get("wellbore")) || trajectoryJson.getJSONObject("wellbore").has("versionString"))
+                trajFieldsFragment.append("        versionString");
+            trajFieldsFragment.append("    }");
+        }
+
+        trajFieldsFragment.append("    trajectoryStation(trajectoryStationArgument: $trajStationArg) {");
         trajFieldsFragment.append("        ...stationFields");
         trajFieldsFragment.append("    }");
         trajFieldsFragment.append("}");
         // ====================================================================
 
 
+
+        // ====================================================================
         // get station response fields
+        // ====================================================================
         StringBuilder stationFieldsFragment = new StringBuilder();
 
+        // ====================================================================
 
         // build variables section
         payload.put("variables", variables);
