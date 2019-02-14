@@ -65,10 +65,6 @@ class GraphQLQueryConverter {
         // payload json object for building full query
         JSONObject payload = new JSONObject();
 
-        // fields to return
-        ArrayList<String> trajFields = new ArrayList<>();
-        ArrayList<String> stationFields = new ArrayList<>();
-
         // parse json string
         JSONObject trajectoryJson = new JSONObject(jsonString);
 
@@ -149,10 +145,201 @@ class GraphQLQueryConverter {
         // ====================================================================
 
 
-        // get trajectory response fields
+        // ====================================================================
+        // get trajectory fields fragment
+        // ====================================================================
+        StringBuilder trajFieldsFragment = new StringBuilder();
+        trajFieldsFragment.append("fragment trajFields on TrajectoryType {");
+        if(trajectoryJson.has("aliases")) {
+            trajFieldsFragment.append("    aliases {");
+            if(JsonUtil.isEmpty(trajectoryJson.get("aliases")) || trajectoryJson.getJSONObject("aliases").has("authority"))
+                trajFieldsFragment.append("        authority");
+            if(JsonUtil.isEmpty(trajectoryJson.get("aliases")) || trajectoryJson.getJSONObject("aliases").has("description"))
+                trajFieldsFragment.append("        description");
+            if(JsonUtil.isEmpty(trajectoryJson.get("aliases")) || trajectoryJson.getJSONObject("aliases").has("identifier"))
+                trajFieldsFragment.append("        identifier");
+            trajFieldsFragment.append("    }");
+        }
+        if(trajectoryJson.has("asdfasdfasdf"))
+            trajFieldsFragment.append("    aziRef");
+        if(trajectoryJson.has("asdfasdfasdf"))
+            trajFieldsFragment.append("    aziVertSect {");
+        trajFieldsFragment.append("        uom");
+        trajFieldsFragment.append("        value");
+        trajFieldsFragment.append("    }");
+        if(trajectoryJson.has("asdfasdfasdf"))
+            trajFieldsFragment.append("    citation {");
+        trajFieldsFragment.append("        creation");
+        trajFieldsFragment.append("        description");
+        trajFieldsFragment.append("        descriptiveKeywords");
+        trajFieldsFragment.append("        editor");
+        trajFieldsFragment.append("        format");
+        trajFieldsFragment.append("        lastUpdate");
+        trajFieldsFragment.append("        originator");
+        trajFieldsFragment.append("        title");
+        trajFieldsFragment.append("        versionString");
+        trajFieldsFragment.append("    }");
+        if(trajectoryJson.has("asdfasdfasdf"))
+            trajFieldsFragment.append("    commonData {");
+        trajFieldsFragment.append("        acquisitionTimeZone {");
+        trajFieldsFragment.append("            dTim");
+        trajFieldsFragment.append("            value");
+        trajFieldsFragment.append("        }");
+        trajFieldsFragment.append("        comments");
+        trajFieldsFragment.append("        defaultDatum {");
+        trajFieldsFragment.append("            uidRef");
+        trajFieldsFragment.append("            value");
+        trajFieldsFragment.append("        }");
+        trajFieldsFragment.append("        extensionAny");
+        trajFieldsFragment.append("        extensionNameValue {");
+        trajFieldsFragment.append("            dataType");
+        trajFieldsFragment.append("            description");
+        trajFieldsFragment.append("            dTim");
+        trajFieldsFragment.append("            index");
+        trajFieldsFragment.append("            md {");
+        trajFieldsFragment.append("                datum");
+        trajFieldsFragment.append("                uom");
+        trajFieldsFragment.append("                value");
+        trajFieldsFragment.append("            }");
+        trajFieldsFragment.append("            measureClass");
+        trajFieldsFragment.append("            name");
+        trajFieldsFragment.append("            uid");
+        trajFieldsFragment.append("            value {");
+        trajFieldsFragment.append("                uom");
+        trajFieldsFragment.append("                value");
+        trajFieldsFragment.append("            }");
+        trajFieldsFragment.append("        }");
+        trajFieldsFragment.append("        itemState");
+        trajFieldsFragment.append("        privateGroupOnly");
+        trajFieldsFragment.append("        serviceCategory");
+        trajFieldsFragment.append("        sourceName");
+        trajFieldsFragment.append("    }");
+        if(trajectoryJson.has("asdfasdfasdf"))
+            trajFieldsFragment.append("    creationTimeUtc");
+        if(trajectoryJson.has("asdfasdfasdf"))
+            trajFieldsFragment.append("    customData");
+        if(trajectoryJson.has("asdfasdfasdf"))
+            trajFieldsFragment.append("    definitive");
+        if(trajectoryJson.has("asdfasdfasdf"))
+            trajFieldsFragment.append("    dispEwVertSectOrig {");
+        trajFieldsFragment.append("        uom");
+        trajFieldsFragment.append("        value");
+        trajFieldsFragment.append("    }");
+        if(trajectoryJson.has("asdfasdfasdf"))
+            trajFieldsFragment.append("    dispNsVertSectOrig {");
+        trajFieldsFragment.append("        uom");
+        trajFieldsFragment.append("        value");
+        trajFieldsFragment.append("    }");
+        if(trajectoryJson.has("asdfasdfasdf"))
+            trajFieldsFragment.append("    dTimTrajEnd");
+        if(trajectoryJson.has("asdfasdfasdf"))
+            trajFieldsFragment.append("    dTimTrajStart");
+        if(trajectoryJson.has("asdfasdfasdf"))
+            trajFieldsFragment.append("    existenceKind");
+        if(trajectoryJson.has("asdfasdfasdf"))
+            trajFieldsFragment.append("    extensionNameValue {");
+        trajFieldsFragment.append("        dataType");
+        trajFieldsFragment.append("        description");
+        trajFieldsFragment.append("        dTim");
+        trajFieldsFragment.append("        index");
+        trajFieldsFragment.append("        md {");
+        trajFieldsFragment.append("            datum");
+        trajFieldsFragment.append("            uom");
+        trajFieldsFragment.append("            value");
+        trajFieldsFragment.append("        }");
+        trajFieldsFragment.append("        measureClass");
+        trajFieldsFragment.append("        name");
+        trajFieldsFragment.append("        uid");
+        trajFieldsFragment.append("        value {");
+        trajFieldsFragment.append("            uom");
+        trajFieldsFragment.append("            value");
+        trajFieldsFragment.append("        }");
+        trajFieldsFragment.append("    }");
+        if(trajectoryJson.has("asdfasdfasdf"))
+            trajFieldsFragment.append("    finalTraj");
+        if(trajectoryJson.has("asdfasdfasdf"))
+            trajFieldsFragment.append("    gridConUsed {");
+        trajFieldsFragment.append("        uom");
+        trajFieldsFragment.append("        value");
+        trajFieldsFragment.append("    }");
+        if(trajectoryJson.has("asdfasdfasdf"))
+            trajFieldsFragment.append("    gridCorUsed {");
+        trajFieldsFragment.append("        uom");
+        trajFieldsFragment.append("        value");
+        trajFieldsFragment.append("    }");
+        if(trajectoryJson.has("asdfasdfasdf"))
+            trajFieldsFragment.append("    growingStatus");
+        if(trajectoryJson.has("asdfasdfasdf"))
+            trajFieldsFragment.append("    lastUpdateTimeUtc");
+        if(trajectoryJson.has("asdfasdfasdf"))
+            trajFieldsFragment.append("    magDeclUsed {");
+        trajFieldsFragment.append("        uom");
+        trajFieldsFragment.append("        value");
+        trajFieldsFragment.append("    }");
+        if(trajectoryJson.has("asdfasdfasdf"))
+            trajFieldsFragment.append("    mdMn {");
+        trajFieldsFragment.append("        datum");
+        trajFieldsFragment.append("        uom");
+        trajFieldsFragment.append("        value");
+        trajFieldsFragment.append("    }");
+        if(trajectoryJson.has("asdfasdfasdf"))
+            trajFieldsFragment.append("    mdMx {");
+        trajFieldsFragment.append("        datum");
+        trajFieldsFragment.append("        uom");
+        trajFieldsFragment.append("        value");
+        trajFieldsFragment.append("    }");
+        if(trajectoryJson.has("asdfasdfasdf"))
+            trajFieldsFragment.append("    memory");
+        if(trajectoryJson.has("asdfasdfasdf"))
+            trajFieldsFragment.append("    name");
+        if(trajectoryJson.has("asdfasdfasdf"))
+            trajFieldsFragment.append("    nameWell");
+        if(trajectoryJson.has("asdfasdfasdf"))
+            trajFieldsFragment.append("    nameWellbore");
+        if(trajectoryJson.has("asdfasdfasdf"))
+            trajFieldsFragment.append("    objectVersion");
+        if(trajectoryJson.has("asdfasdfasdf"))
+            trajFieldsFragment.append("    parentTrajectory {");
+        trajFieldsFragment.append("        contentType");
+        trajFieldsFragment.append("        title");
+        trajFieldsFragment.append("        uidRef");
+        trajFieldsFragment.append("        uri");
+        trajFieldsFragment.append("        uuid");
+        trajFieldsFragment.append("        uuidAuthority");
+        trajFieldsFragment.append("        versionString");
+        trajFieldsFragment.append("    }");
+        if(trajectoryJson.has("asdfasdfasdf"))
+            trajFieldsFragment.append("    schemaVersion");
+        if(trajectoryJson.has("asdfasdfasdf"))
+            trajFieldsFragment.append("    serviceCompany");
+        if(trajectoryJson.has("asdfasdfasdf"))
+            trajFieldsFragment.append("    uid");
+        if(trajectoryJson.has("asdfasdfasdf"))
+            trajFieldsFragment.append("    uuid");
+        if(trajectoryJson.has("asdfasdfasdf"))
+            trajFieldsFragment.append("    uuidWell");
+        if(trajectoryJson.has("asdfasdfasdf"))
+            trajFieldsFragment.append("    uuidWellbore");
+        if(trajectoryJson.has("asdfasdfasdf"))
+            trajFieldsFragment.append("    wellbore {");
+        trajFieldsFragment.append("        contentType");
+        trajFieldsFragment.append("        title");
+        trajFieldsFragment.append("        uidRef");
+        trajFieldsFragment.append("        uri");
+        trajFieldsFragment.append("        uuid");
+        trajFieldsFragment.append("        uuidAuthority");
+        trajFieldsFragment.append("        versionString");
+        trajFieldsFragment.append("    }");
+        if(trajectoryJson.has("asdfasdfasdf"))
+            trajFieldsFragment.append("    trajectoryStation(trajectoryStationArgument: $trajStationArg) {");
+        trajFieldsFragment.append("        ...stationFields");
+        trajFieldsFragment.append("    }");
+        trajFieldsFragment.append("}");
+        // ====================================================================
 
 
         // get station response fields
+        StringBuilder stationFieldsFragment = new StringBuilder();
 
 
         // build variables section
