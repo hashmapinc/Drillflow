@@ -31,6 +31,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DotDelegator {
     private static final Logger LOG = Logger.getLogger(DotDelegator.class.getName());
@@ -108,6 +110,14 @@ public class DotDelegator {
     ) throws ValveException, UnirestException, ValveAuthException {
         String uid = witsmlObj.getUid(); // get uid for delete call
         String objectType = witsmlObj.getObjectType(); // get obj type for exception handling
+
+		// Test for object deletion or element deletion
+		String xmlObj = witsmlObj.getXMLString("1.4.1.1");
+		if (!isObjectDelete(objectType, xmlObj)){
+            updateObject(witsmlObj, username, password, exchangeID, client);
+            return;
+        }
+
         String endpoint = this.getEndpoint(objectType) + uid; // add uid for delete call
  
         // create request
@@ -146,6 +156,12 @@ public class DotDelegator {
         }
     }
 
+    private boolean isObjectDelete(String dataObjectType, String data){
+        Pattern singularPattern = Pattern.compile("<([" + dataObjectType + "])[^<]*?/>");
+        Matcher m = singularPattern.matcher(data);
+        return m.find();
+    }
+
     /**
      * updates the object in DoT
      *
@@ -162,13 +178,25 @@ public class DotDelegator {
 		String exchangeID, 
 		DotClient client
 	) throws ValveException, ValveAuthException, UnirestException {
+		updateObject(witsmlObj, username, password, exchangeID, client, false);
+	}
+
+	private void updateObject(
+			AbstractWitsmlObject witsmlObj,
+			String username,
+			String password,
+			String exchangeID,
+			DotClient client,
+			boolean fromDelete
+	) throws ValveException, ValveAuthException, UnirestException {
 		String uid = witsmlObj.getUid();
 		String objectType = witsmlObj.getObjectType();
 		String endpoint = this.getEndpoint(objectType) + uid;
 
 		// get witsmlObj as json string for request payload
 		String payload = witsmlObj.getJSONString("1.4.1.1");
-		payload = JsonUtil.removeEmpties(new JSONObject(payload));
+		if (!fromDelete)
+			payload = JsonUtil.removeEmpties(new JSONObject(payload));
 
 		// build the request
 		HttpRequestWithBody request = Unirest.put(endpoint);
@@ -199,11 +227,11 @@ public class DotDelegator {
 		int status = response.getStatus();
 		if (201 == status || 200 == status) {
 			ValveLogging valveLoggingResponse = new ValveLogging(exchangeID,
-				logResponse(response, "UPDATE for " + witsmlObj + " was successful"), witsmlObj);
+					logResponse(response, "UPDATE for " + witsmlObj + " was successful"), witsmlObj);
 			LOG.info(valveLoggingResponse.toString());
 		} else {
 			ValveLogging valveLoggingResponse = new ValveLogging(exchangeID,
-				logResponse(response, "Received failure status code from DoT PUT"), witsmlObj);
+					logResponse(response, "Received failure status code from DoT PUT"), witsmlObj);
 			LOG.warning(valveLoggingResponse.toString());
 			throw new ValveException(response.getBody());
 		}
