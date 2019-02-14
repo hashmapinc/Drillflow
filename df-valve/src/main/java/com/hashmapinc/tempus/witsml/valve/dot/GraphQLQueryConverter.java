@@ -120,27 +120,19 @@ class GraphQLQueryConverter {
         // uid-based station query
         if (!JsonUtil.isEmpty(stationsJson) && stationsJson.getJSONObject(0).get("uid") != null) {
             // get list of UIDs
-            ArrayList<String> stationUids = new ArrayList<>();
+            JSONArray stationUids = new JSONArray();
             for (int i = 0; i < stationsJson.length(); i++) {
-                stationUids.add(stationsJson.getJSONObject(i).getString("uid"));
+                stationUids.put(stationsJson.getJSONObject(i).getString("uid"));
             }
-
+            stationQueryFields.put("uids", stationUids);
         // non uid-based station query
         } else {
+            // lastUpdateTimeUtc
 
+            // mdMn
+
+            // mdMx
         }
-
-        // lastUpdateTimeUtc
-        if (trajectoryJson.has("uuid") && !JsonUtil.isEmpty(trajectoryJson.get("uuid")))
-            trajQueryFields.put("uuid", trajectoryJson.get("uuid"));
-
-        // mdMn
-        if (trajectoryJson.has("uuid") && !JsonUtil.isEmpty(trajectoryJson.get("uuid")))
-            trajQueryFields.put("uuid", trajectoryJson.get("uuid"));
-
-        // mdMx
-        if (trajectoryJson.has("uuid") && !JsonUtil.isEmpty(trajectoryJson.get("uuid")))
-            trajQueryFields.put("uuid", trajectoryJson.get("uuid"));
 
         // ====================================================================
 
@@ -560,10 +552,405 @@ class GraphQLQueryConverter {
         // get station response fields
         // ====================================================================
         StringBuilder stationFieldsFragment = new StringBuilder();
+        stationFieldsFragment.append("fragment stationFields on TrajectoryStation {");
 
+        if (!JsonUtil.isEmpty(stationsJson) && stationsJson.getJSONObject(0).has("axialMagInterferenceCorUsed"))
+            stationFieldsFragment.append("    axialMagInterferenceCorUsed");
+
+        stationFieldsFragment.append("    azi {");
+        stationFieldsFragment.append("        uom");
+        stationFieldsFragment.append("        value");
+        stationFieldsFragment.append("    }");
+        stationFieldsFragment.append("    calcAlgorithm");
+        stationFieldsFragment.append("    commonData {");
+        stationFieldsFragment.append("        acquisitionTimeZone {"); // array
+        stationFieldsFragment.append("            dTim");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        comments");
+        stationFieldsFragment.append("        defaultDatum {");
+        stationFieldsFragment.append("            uidRef");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        extensionAny");
+        stationFieldsFragment.append("        extensionNameValue {"); // array
+        stationFieldsFragment.append("            dataType");
+        stationFieldsFragment.append("            description");
+        stationFieldsFragment.append("            dTim");
+        stationFieldsFragment.append("            index");
+        stationFieldsFragment.append("            md {");
+        stationFieldsFragment.append("                datum");
+        stationFieldsFragment.append("                uom");
+        stationFieldsFragment.append("                value");
+        stationFieldsFragment.append("            }");
+        stationFieldsFragment.append("            measureClass");
+        stationFieldsFragment.append("            name");
+        stationFieldsFragment.append("            uid");
+        stationFieldsFragment.append("            value {");
+        stationFieldsFragment.append("                uom");
+        stationFieldsFragment.append("                value");
+        stationFieldsFragment.append("            }");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        itemState");
+        stationFieldsFragment.append("        privateGroupOnly");
+        stationFieldsFragment.append("        serviceCategory");
+        stationFieldsFragment.append("        sourceName");
+        stationFieldsFragment.append("    }");
+        stationFieldsFragment.append("    corUsed {");
+        stationFieldsFragment.append("        dirSensorOffset {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        gravAxialAccelCor {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        gravTran1AccelCor {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        gravTran2AccelCor {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        magAxialDrlstrCor {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        magAxialMSACor {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        magTran1DrlstrCor {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        magTran1MSACor {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        magTran2DrlstrCor {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        magTran2MSACor {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        sagAziCor {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        sagIncCor {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        stnGridConUsed {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        stnGridCorUsed {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        stnMagDeclUsed {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("    }");
+        stationFieldsFragment.append("    cosagCorUsed");
+        stationFieldsFragment.append("    creationTimeUtc");
+        stationFieldsFragment.append("    dipAngleUncert {");
+        stationFieldsFragment.append("        uom");
+        stationFieldsFragment.append("        value");
+        stationFieldsFragment.append("    }");
+        stationFieldsFragment.append("    dispEw {");
+        stationFieldsFragment.append("        uom");
+        stationFieldsFragment.append("        value");
+        stationFieldsFragment.append("    }");
+        stationFieldsFragment.append("    dispNs {");
+        stationFieldsFragment.append("        uom");
+        stationFieldsFragment.append("        value");
+        stationFieldsFragment.append("    }");
+        stationFieldsFragment.append("    dls {");
+        stationFieldsFragment.append("        uom");
+        stationFieldsFragment.append("        value");
+        stationFieldsFragment.append("    }");
+        stationFieldsFragment.append("    dTimStn");
+        stationFieldsFragment.append("    extensionNameValue {");
+        stationFieldsFragment.append("        dataType");
+        stationFieldsFragment.append("        description");
+        stationFieldsFragment.append("        dTim");
+        stationFieldsFragment.append("        index");
+        stationFieldsFragment.append("        md {");
+        stationFieldsFragment.append("            datum");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        measureClass");
+        stationFieldsFragment.append("        name");
+        stationFieldsFragment.append("        uid");
+        stationFieldsFragment.append("        value {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("    }");
+        stationFieldsFragment.append("    geoModelUsed");
+        stationFieldsFragment.append("    gravAccelCorUsed");
+        stationFieldsFragment.append("    gravTotalFieldReference {");
+        stationFieldsFragment.append("        uom");
+        stationFieldsFragment.append("        value");
+        stationFieldsFragment.append("    }");
+        stationFieldsFragment.append("    gravTotalUncert {");
+        stationFieldsFragment.append("        uom");
+        stationFieldsFragment.append("        value");
+        stationFieldsFragment.append("    }");
+        stationFieldsFragment.append("    gtf {");
+        stationFieldsFragment.append("        uom");
+        stationFieldsFragment.append("        value");
+        stationFieldsFragment.append("    }");
+        stationFieldsFragment.append("    incl {");
+        stationFieldsFragment.append("        uom");
+        stationFieldsFragment.append("        value");
+        stationFieldsFragment.append("    }");
+        stationFieldsFragment.append("    infieldRefCorUsed");
+        stationFieldsFragment.append("    inHoleRefCorUsed");
+        stationFieldsFragment.append("    interpolatedInfieldRefCorUsed");
+        stationFieldsFragment.append("    iscwsaToolErrorModel {");
+        stationFieldsFragment.append("        contentType");
+        stationFieldsFragment.append("        title");
+        stationFieldsFragment.append("        uidRef");
+        stationFieldsFragment.append("        uri");
+        stationFieldsFragment.append("        uuid");
+        stationFieldsFragment.append("        uuidAuthority");
+        stationFieldsFragment.append("        versionString");
+        stationFieldsFragment.append("    }");
+        stationFieldsFragment.append("    lastUpdateTimeUtc");
+        stationFieldsFragment.append("    location {");
+        stationFieldsFragment.append("        description");
+        stationFieldsFragment.append("        easting {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        extensionNameValue {");
+        stationFieldsFragment.append("            dataType");
+        stationFieldsFragment.append("            description");
+        stationFieldsFragment.append("            dTim");
+        stationFieldsFragment.append("            index");
+        stationFieldsFragment.append("            md {");
+        stationFieldsFragment.append("                datum");
+        stationFieldsFragment.append("                uom");
+        stationFieldsFragment.append("                value");
+        stationFieldsFragment.append("            }");
+        stationFieldsFragment.append("            measureClass");
+        stationFieldsFragment.append("            name");
+        stationFieldsFragment.append("            uid");
+        stationFieldsFragment.append("            value {");
+        stationFieldsFragment.append("                uom");
+        stationFieldsFragment.append("                value");
+        stationFieldsFragment.append("            }");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        latitude {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        localX {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        localY {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        longitude {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        northing {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        original");
+        stationFieldsFragment.append("        projectedX {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        projectedY {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        southing {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        uid");
+        stationFieldsFragment.append("        wellCRS {");
+        stationFieldsFragment.append("            uidRef");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        westing {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("    }");
+        stationFieldsFragment.append("    magDipAngleReference {");
+        stationFieldsFragment.append("        uom");
+        stationFieldsFragment.append("        value");
+        stationFieldsFragment.append("    }");
+        stationFieldsFragment.append("    magDrlstrCorUsed");
+        stationFieldsFragment.append("    magModelUsed");
+        stationFieldsFragment.append("    magModelValid");
+        stationFieldsFragment.append("    magTotalFieldReference {");
+        stationFieldsFragment.append("        uom");
+        stationFieldsFragment.append("        value");
+        stationFieldsFragment.append("    }");
+        stationFieldsFragment.append("    magTotalUncert {");
+        stationFieldsFragment.append("        uom");
+        stationFieldsFragment.append("        value");
+        stationFieldsFragment.append("    }");
+        stationFieldsFragment.append("    magXAxialCorUsed");
+        stationFieldsFragment.append("    manuallyEntered");
+        stationFieldsFragment.append("    matrixCov {");
+        stationFieldsFragment.append("        biasE {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        biasN {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        biasVert {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        varianceEE {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        varianceEVert {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        varianceNE {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        varianceNN {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        varianceNVert {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        varianceVertVert {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("    }");
+        stationFieldsFragment.append("    md {");
+        stationFieldsFragment.append("        datum");
+        stationFieldsFragment.append("        uom");
+        stationFieldsFragment.append("        value");
+        stationFieldsFragment.append("    }");
+        stationFieldsFragment.append("    mdDelta {");
+        stationFieldsFragment.append("        uom");
+        stationFieldsFragment.append("        value");
+        stationFieldsFragment.append("    }");
+        stationFieldsFragment.append("    modelToolError");
+        stationFieldsFragment.append("    mSACorUsed");
+        stationFieldsFragment.append("    mtf {");
+        stationFieldsFragment.append("        uom");
+        stationFieldsFragment.append("        value");
+        stationFieldsFragment.append("    }");
+        stationFieldsFragment.append("    rateBuild {");
+        stationFieldsFragment.append("        uom");
+        stationFieldsFragment.append("        value");
+        stationFieldsFragment.append("    }");
+        stationFieldsFragment.append("    rateTurn {");
+        stationFieldsFragment.append("        uom");
+        stationFieldsFragment.append("        value");
+        stationFieldsFragment.append("    }");
+        stationFieldsFragment.append("    rawData {");
+        stationFieldsFragment.append("        gravAxialRaw {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        gravTran1Raw {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        gravTran2Raw {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        magAxialRaw {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        magTran1Raw {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        magTran2Raw {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("    }");
+        stationFieldsFragment.append("    sagCorUsed");
+        stationFieldsFragment.append("    sourceStation {");
+        stationFieldsFragment.append("        stationReference");
+        stationFieldsFragment.append("        trajectoryParent {");
+        stationFieldsFragment.append("            uidRef");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        wellboreParent {");
+        stationFieldsFragment.append("            uidRef");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("    }");
+        stationFieldsFragment.append("    statusTrajStation");
+        stationFieldsFragment.append("    target {");
+        stationFieldsFragment.append("        uidRef");
+        stationFieldsFragment.append("        value");
+        stationFieldsFragment.append("    }");
+        stationFieldsFragment.append("    tvd {");
+        stationFieldsFragment.append("        datum");
+        stationFieldsFragment.append("        uom");
+        stationFieldsFragment.append("        value");
+        stationFieldsFragment.append("    }");
+        stationFieldsFragment.append("    tvdDelta {");
+        stationFieldsFragment.append("        uom");
+        stationFieldsFragment.append("        value");
+        stationFieldsFragment.append("    }");
+        stationFieldsFragment.append("    typeSurveyTool");
+        stationFieldsFragment.append("    typeTrajStation");
+        stationFieldsFragment.append("    uid");
+        stationFieldsFragment.append("    valid {");
+        stationFieldsFragment.append("        gravTotalFieldCalc {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        magDipAngleCalc {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("        magTotalFieldCalc {");
+        stationFieldsFragment.append("            uom");
+        stationFieldsFragment.append("            value");
+        stationFieldsFragment.append("        }");
+        stationFieldsFragment.append("    }");
+        stationFieldsFragment.append("    vertSect {");
+        stationFieldsFragment.append("        uom");
+        stationFieldsFragment.append("        value");
+        stationFieldsFragment.append("    }");
+        stationFieldsFragment.append("}");
         // ====================================================================
 
         // build variables section
+        JSONObject variables = new JSONObject();
+        variables.put("trajArg", trajQueryFields);
+        variables.put("trajStationArg", stationQueryFields);
         payload.put("variables", variables);
 
         // build query section of payload
@@ -574,16 +961,9 @@ class GraphQLQueryConverter {
                 "	}",
                 "}",
                 "",
-                "fragment trajFields on TrajectoryType {",
-                String.join("\n    ", trajFields),
-                "    trajectoryStation(trajectoryStationArgument: $trajStationArg) {",
-                "        ...stationFields",
-                "    }",
-                "}",
+                trajFieldsFragment.toString(),
                 "",
-                "fragment stationFields on TrajectoryStation {",
-                String.join("\n    ", stationFields),
-                "}"
+                stationFieldsFragment.toString()
         );
 
         payload.put("query", queryString);
