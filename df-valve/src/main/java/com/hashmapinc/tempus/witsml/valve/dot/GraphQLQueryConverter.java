@@ -151,13 +151,13 @@ class GraphQLQueryConverter {
         StringBuilder trajFieldsFragment = new StringBuilder();
         trajFieldsFragment.append("fragment trajFields on TrajectoryType {");
 
-        if(trajectoryJson.has("aliases")) {
+        if(trajectoryJson.has("aliases")) { // array
             trajFieldsFragment.append("    aliases {");
-            if(JsonUtil.isEmpty(trajectoryJson.get("aliases")) || trajectoryJson.getJSONObject("aliases").has("authority"))
+            if(JsonUtil.isEmpty(trajectoryJson.get("aliases")) || trajectoryJson.getJSONArray("aliases").getJSONObject(0).has("authority"))
                 trajFieldsFragment.append("        authority");
-            if(JsonUtil.isEmpty(trajectoryJson.get("aliases")) || trajectoryJson.getJSONObject("aliases").has("description"))
+            if(JsonUtil.isEmpty(trajectoryJson.get("aliases")) || trajectoryJson.getJSONArray("aliases").getJSONObject(0).has("description"))
                 trajFieldsFragment.append("        description");
-            if(JsonUtil.isEmpty(trajectoryJson.get("aliases")) || trajectoryJson.getJSONObject("aliases").has("identifier"))
+            if(JsonUtil.isEmpty(trajectoryJson.get("aliases")) || trajectoryJson.getJSONArray("aliases").getJSONObject(0).has("identifier"))
                 trajFieldsFragment.append("        identifier");
             trajFieldsFragment.append("    }");
         }
@@ -201,15 +201,15 @@ class GraphQLQueryConverter {
             trajFieldsFragment.append("    commonData {");
 
             if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) || trajectoryJson.getJSONObject("commonData").has("acquisitionTimeZone")) {
-                trajFieldsFragment.append("        acquisitionTimeZone {");
+                trajFieldsFragment.append("        acquisitionTimeZone {"); // array
                 if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) ||
                         JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").get("acquisitionTimeZone")) ||
-                        trajectoryJson.getJSONObject("commonData").getJSONObject("acquisitionTimeZone").has("dTim")) {
+                        trajectoryJson.getJSONObject("commonData").getJSONArray("acquisitionTimeZone").getJSONObject(0).has("dTim")) {
                     trajFieldsFragment.append("            dTim");
                 }
                 if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) ||
                         JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").get("acquisitionTimeZone")) ||
-                        trajectoryJson.getJSONObject("commonData").getJSONObject("acquisitionTimeZone").has("value")) {
+                        trajectoryJson.getJSONObject("commonData").getJSONArray("acquisitionTimeZone").getJSONObject(0).has("value")) {
                     trajFieldsFragment.append("            value");
                 }
                 trajFieldsFragment.append("        }");
@@ -238,58 +238,82 @@ class GraphQLQueryConverter {
                 trajFieldsFragment.append("        extensionAny");
 
             if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) || trajectoryJson.getJSONObject("commonData").has("extensionNameValue")) {
-                trajFieldsFragment.append("        extensionNameValue {");
+                trajFieldsFragment.append("        extensionNameValue {"); // array
                 if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) ||
                         JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").get("extensionNameValue")) ||
-                        trajectoryJson.getJSONObject("commonData").getJSONObject("extensionNameValue").has("dataType")) {
+                        trajectoryJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).has("dataType")) {
                     trajFieldsFragment.append("            dataType");
                 }
                 if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) ||
                         JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").get("extensionNameValue")) ||
-                        trajectoryJson.getJSONObject("commonData").getJSONObject("extensionNameValue").has("description")) {
+                        trajectoryJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).has("description")) {
                     trajFieldsFragment.append("            description");
                 }
                 if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) ||
                         JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").get("extensionNameValue")) ||
-                        trajectoryJson.getJSONObject("commonData").getJSONObject("extensionNameValue").has("dTim")) {
+                        trajectoryJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).has("dTim")) {
                     trajFieldsFragment.append("            dTim");
                 }
                 if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) ||
                         JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").get("extensionNameValue")) ||
-                        trajectoryJson.getJSONObject("commonData").getJSONObject("extensionNameValue").has("index")) {
+                        trajectoryJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).has("index")) {
                     trajFieldsFragment.append("            index");
                 }
-
                 if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) ||
                         JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").get("extensionNameValue")) ||
-                        trajectoryJson.getJSONObject("commonData").getJSONObject("extensionNameValue").has("md")) {
+                        trajectoryJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).has("md")) {
                     trajFieldsFragment.append("            md {");
                     if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) ||
                             JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").get("extensionNameValue")) ||
-                            JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").getJSONObject("extensionNameValue").get("md")) ||
-                            trajectoryJson.getJSONObject("commonData").getJSONObject("extensionNameValue").getJSONObject("md").has("datum")) {
+                            JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).get("md")) ||
+                            trajectoryJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).getJSONObject("md").has("datum")) {
                         trajFieldsFragment.append("                datum");
                     }if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) ||
                             JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").get("extensionNameValue")) ||
-                            JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").getJSONObject("extensionNameValue").get("md")) ||
-                            trajectoryJson.getJSONObject("commonData").getJSONObject("extensionNameValue").getJSONObject("md").has("uom")) {
+                            JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).get("md")) ||
+                            trajectoryJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).getJSONObject("md").has("uom")) {
                         trajFieldsFragment.append("                uom");
                     }if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) ||
                             JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").get("extensionNameValue")) ||
-                            JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").getJSONObject("extensionNameValue").get("md")) ||
-                            trajectoryJson.getJSONObject("commonData").getJSONObject("extensionNameValue").getJSONObject("md").has("value")) {
+                            JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).get("md")) ||
+                            trajectoryJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).getJSONObject("md").has("value")) {
                         trajFieldsFragment.append("                value");
                     }
                     trajFieldsFragment.append("            }");
                 }
-
-                trajFieldsFragment.append("            measureClass");
-                trajFieldsFragment.append("            name");
-                trajFieldsFragment.append("            uid");
-                trajFieldsFragment.append("            value {");
-                trajFieldsFragment.append("                uom");
-                trajFieldsFragment.append("                value");
-                trajFieldsFragment.append("            }");
+                if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) ||
+                        JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").get("extensionNameValue")) ||
+                        trajectoryJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).has("measureClass")) {
+                    trajFieldsFragment.append("            measureClass");
+                }
+                if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) ||
+                        JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").get("extensionNameValue")) ||
+                        trajectoryJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).has("name")) {
+                    trajFieldsFragment.append("            name");
+                }
+                if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) ||
+                        JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").get("extensionNameValue")) ||
+                        trajectoryJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).has("uid")) {
+                    trajFieldsFragment.append("            uid");
+                }
+                if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) ||
+                        JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").get("extensionNameValue")) ||
+                        trajectoryJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).has("value")) {
+                    trajFieldsFragment.append("            value {");
+                    if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) ||
+                            JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").get("extensionNameValue")) ||
+                            JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).get("value")) ||
+                            trajectoryJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).getJSONObject("value").has("uom")) {
+                        trajFieldsFragment.append("                uom");
+                    }
+                    if(JsonUtil.isEmpty(trajectoryJson.get("commonData")) ||
+                            JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").get("extensionNameValue")) ||
+                            JsonUtil.isEmpty(trajectoryJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).get("value")) ||
+                            trajectoryJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).getJSONObject("value").has("value")) {
+                        trajFieldsFragment.append("                value");
+                    }
+                    trajFieldsFragment.append("            }");
+                }
                 trajFieldsFragment.append("        }");
             }
 
@@ -307,47 +331,94 @@ class GraphQLQueryConverter {
             trajFieldsFragment.append("    }");
         }
 
-        if(trajectoryJson.has("asdfasdfasdf"))
+        if(trajectoryJson.has("creationTimeUtc"))
             trajFieldsFragment.append("    creationTimeUtc");
-        if(trajectoryJson.has("asdfasdfasdf"))
+
+        if(trajectoryJson.has("customData"))
             trajFieldsFragment.append("    customData");
-        if(trajectoryJson.has("asdfasdfasdf"))
+
+        if(trajectoryJson.has("definitive"))
             trajFieldsFragment.append("    definitive");
-        if(trajectoryJson.has("asdfasdfasdf"))
+
+        if(trajectoryJson.has("dispEwVertSectOrig")) {
             trajFieldsFragment.append("    dispEwVertSectOrig {");
-        trajFieldsFragment.append("        uom");
-        trajFieldsFragment.append("        value");
-        trajFieldsFragment.append("    }");
-        if(trajectoryJson.has("asdfasdfasdf"))
+            if(JsonUtil.isEmpty(trajectoryJson.get("dispEwVertSectOrig")) || trajectoryJson.getJSONObject("dispEwVertSectOrig").has("uom"))
+                trajFieldsFragment.append("        uom");
+            if(JsonUtil.isEmpty(trajectoryJson.get("dispEwVertSectOrig")) || trajectoryJson.getJSONObject("dispEwVertSectOrig").has("value"))
+                trajFieldsFragment.append("        value");
+            trajFieldsFragment.append("    }");
+        }
+
+        if(trajectoryJson.has("dispNsVertSectOrig")) {
             trajFieldsFragment.append("    dispNsVertSectOrig {");
-        trajFieldsFragment.append("        uom");
-        trajFieldsFragment.append("        value");
-        trajFieldsFragment.append("    }");
-        if(trajectoryJson.has("asdfasdfasdf"))
+            if(JsonUtil.isEmpty(trajectoryJson.get("dispEwVertSectOrig")) || trajectoryJson.getJSONObject("dispEwVertSectOrig").has("uom"))
+                trajFieldsFragment.append("        uom");
+            if(JsonUtil.isEmpty(trajectoryJson.get("dispEwVertSectOrig")) || trajectoryJson.getJSONObject("dispEwVertSectOrig").has("value"))
+                trajFieldsFragment.append("        value");
+            trajFieldsFragment.append("    }");
+        }
+
+        if(trajectoryJson.has("dTimTrajEnd"))
             trajFieldsFragment.append("    dTimTrajEnd");
-        if(trajectoryJson.has("asdfasdfasdf"))
+
+        if(trajectoryJson.has("dTimTrajStart"))
             trajFieldsFragment.append("    dTimTrajStart");
-        if(trajectoryJson.has("asdfasdfasdf"))
+
+        if(trajectoryJson.has("existenceKind"))
             trajFieldsFragment.append("    existenceKind");
-        if(trajectoryJson.has("asdfasdfasdf"))
+
+        if(trajectoryJson.has("extensionNameValue")) { // array
             trajFieldsFragment.append("    extensionNameValue {");
-        trajFieldsFragment.append("        dataType");
-        trajFieldsFragment.append("        description");
-        trajFieldsFragment.append("        dTim");
-        trajFieldsFragment.append("        index");
-        trajFieldsFragment.append("        md {");
-        trajFieldsFragment.append("            datum");
-        trajFieldsFragment.append("            uom");
-        trajFieldsFragment.append("            value");
-        trajFieldsFragment.append("        }");
-        trajFieldsFragment.append("        measureClass");
-        trajFieldsFragment.append("        name");
-        trajFieldsFragment.append("        uid");
-        trajFieldsFragment.append("        value {");
-        trajFieldsFragment.append("            uom");
-        trajFieldsFragment.append("            value");
-        trajFieldsFragment.append("        }");
-        trajFieldsFragment.append("    }");
+            if(JsonUtil.isEmpty(trajectoryJson.get("extensionNameValue")) || trajectoryJson.getJSONArray("extensionNameValue").getJSONObject(0).has("dataType"))
+                trajFieldsFragment.append("        dataType");
+            if(JsonUtil.isEmpty(trajectoryJson.get("extensionNameValue")) || trajectoryJson.getJSONArray("extensionNameValue").getJSONObject(0).has("description"))
+                trajFieldsFragment.append("        description");
+            if(JsonUtil.isEmpty(trajectoryJson.get("extensionNameValue")) || trajectoryJson.getJSONArray("extensionNameValue").getJSONObject(0).has("dTim"))
+                trajFieldsFragment.append("        dTim");
+            if(JsonUtil.isEmpty(trajectoryJson.get("extensionNameValue")) || trajectoryJson.getJSONArray("extensionNameValue").getJSONObject(0).has("index"))
+                trajFieldsFragment.append("        index");
+            if(JsonUtil.isEmpty(trajectoryJson.get("extensionNameValue")) || trajectoryJson.getJSONArray("extensionNameValue").getJSONObject(0).has("md")) {
+                trajFieldsFragment.append("        md {");
+                if(JsonUtil.isEmpty(trajectoryJson.get("extensionNameValue")) ||
+                        JsonUtil.isEmpty(trajectoryJson.getJSONArray("extensionNameValue").getJSONObject(0).get("md")) ||
+                        trajectoryJson.getJSONArray("extensionNameValue").getJSONObject(0).getJSONObject("md").has("datum")) {
+                    trajFieldsFragment.append("            datum");
+                }
+                if(JsonUtil.isEmpty(trajectoryJson.get("extensionNameValue")) ||
+                        JsonUtil.isEmpty(trajectoryJson.getJSONArray("extensionNameValue").getJSONObject(0).get("md")) ||
+                        trajectoryJson.getJSONArray("extensionNameValue").getJSONObject(0).getJSONObject("md").has("uom")) {
+                    trajFieldsFragment.append("            uom");
+                }
+                if(JsonUtil.isEmpty(trajectoryJson.get("extensionNameValue")) ||
+                        JsonUtil.isEmpty(trajectoryJson.getJSONArray("extensionNameValue").getJSONObject(0).get("md")) ||
+                        trajectoryJson.getJSONArray("extensionNameValue").getJSONObject(0).getJSONObject("md").has("value")) {
+                    trajFieldsFragment.append("            value");
+                }
+                trajFieldsFragment.append("        }");
+            }
+            if(JsonUtil.isEmpty(trajectoryJson.get("extensionNameValue")) || trajectoryJson.getJSONArray("extensionNameValue").getJSONObject(0).has("measureClass"))
+                trajFieldsFragment.append("        measureClass");
+            if(JsonUtil.isEmpty(trajectoryJson.get("extensionNameValue")) || trajectoryJson.getJSONArray("extensionNameValue").getJSONObject(0).has("name"))
+            trajFieldsFragment.append("        name");
+            if(JsonUtil.isEmpty(trajectoryJson.get("extensionNameValue")) || trajectoryJson.getJSONArray("extensionNameValue").getJSONObject(0).has("uid"))
+            trajFieldsFragment.append("        uid");
+            if(JsonUtil.isEmpty(trajectoryJson.get("extensionNameValue")) || trajectoryJson.getJSONArray("extensionNameValue").getJSONObject(0).has("value")) {
+                trajFieldsFragment.append("        value {");
+                if(JsonUtil.isEmpty(trajectoryJson.get("extensionNameValue")) ||
+                        JsonUtil.isEmpty(trajectoryJson.getJSONArray("extensionNameValue").getJSONObject(0).get("value")) ||
+                        trajectoryJson.getJSONArray("extensionNameValue").getJSONObject(0).getJSONObject("value").has("uom")) {
+                    trajFieldsFragment.append("            uom");
+                }
+                if(JsonUtil.isEmpty(trajectoryJson.get("extensionNameValue")) ||
+                        JsonUtil.isEmpty(trajectoryJson.getJSONArray("extensionNameValue").getJSONObject(0).get("value")) ||
+                        trajectoryJson.getJSONArray("extensionNameValue").getJSONObject(0).getJSONObject("value").has("value")) {
+                    trajFieldsFragment.append("            value");
+                }
+                trajFieldsFragment.append("        }");
+            }
+            trajFieldsFragment.append("    }");
+        }
+
         if(trajectoryJson.has("asdfasdfasdf"))
             trajFieldsFragment.append("    finalTraj");
         if(trajectoryJson.has("asdfasdfasdf"))
