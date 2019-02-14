@@ -21,7 +21,7 @@ import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class Util {
+public class JsonUtil {
 
     /**
      * This function merges the fields from src that
@@ -119,5 +119,22 @@ public class Util {
         }
 
         return false;
+    }
+
+    /**
+     * Checks for empty Json elements and removes them
+     * @param src the source JSON object that needs to have empty elements removed
+     * @return The resultant json string with no empty elements
+     */
+    public static String removeEmpties(JSONObject src){
+        ArrayList<String> keysToRemove = new ArrayList<>();
+        for (Object key : src.keySet()){
+            if (JsonUtil.isEmpty(src.get(key.toString())))
+                keysToRemove.add(key.toString());
+        }
+        for (String key : keysToRemove){
+            src.remove(key);
+        }
+        return src.toString();
     }
 }

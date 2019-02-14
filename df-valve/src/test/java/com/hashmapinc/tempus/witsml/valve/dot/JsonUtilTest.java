@@ -25,7 +25,7 @@ import org.junit.Test;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.reflect.Whitebox;
 
-public class UtilTest {
+public class JsonUtilTest {
 
     @Test
     public void shouldProperlyMerge1311Well() throws Exception {
@@ -35,7 +35,7 @@ public class UtilTest {
         JSONObject dest = new JSONObject(destString);
         JSONObject src = new JSONObject(srcString);
 
-        JSONObject merged = Util.merge(dest, src);
+        JSONObject merged = JsonUtil.merge(dest, src);
 
         String actual = merged.toString(2);
         String expected = new String(Files.readAllBytes(Paths.get("src/test/resources/utilTest/well1311merged.json")));
@@ -51,7 +51,7 @@ public class UtilTest {
 
         JSONObject dest = new JSONObject(destString);
         JSONObject src = new JSONObject(srcString);
-        JSONObject merged = Util.merge(dest, src);
+        JSONObject merged = JsonUtil.merge(dest, src);
 
         String actual = merged.toString(2);
         String expected = "{}";
@@ -61,7 +61,7 @@ public class UtilTest {
     
 	@Test
 	public void checkIsEmpty() throws Exception {
-		Util spy = PowerMockito.spy(new Util());
+		JsonUtil spy = PowerMockito.spy(new JsonUtil());
 		String methodToTest = "isEmpty";
 
 		String srcString = new String(Files.readAllBytes(Paths.get("src/test/resources/utilTest/well1311src.json")));

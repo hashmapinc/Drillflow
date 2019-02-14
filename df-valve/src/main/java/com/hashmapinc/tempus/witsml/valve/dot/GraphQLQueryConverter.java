@@ -37,7 +37,7 @@ class GraphQLQueryConverter {
      * @return the object
      * @throws IOException Thrown if there is an error in creation of the query
      */
-    public static String convertQuery(AbstractWitsmlObject wmlObject) throws IOException {
+    public String convertQuery(AbstractWitsmlObject wmlObject) throws IOException {
         switch (wmlObject.getObjectType()){
             case "well":
                 this.createWellQuery(wmlObject.getJSONString("1.4.1.1"));
@@ -47,7 +47,7 @@ class GraphQLQueryConverter {
                 break;
             case "trajectory":
                 String json = wmlObject.getJSONString("2.0");
-                return this.getTrajectoryQuery(json);
+                return getTrajectoryQuery(json);
             default:
                 return null;
         }
@@ -77,35 +77,35 @@ class GraphQLQueryConverter {
         // ====================================================================
         JSONObject trajQueryFields = new JSONObject();
         // uuid
-        if (trajectoryJson.has("uuid") && !Util.isEmpty(trajectoryJson.get("uuid")))
+        if (trajectoryJson.has("uuid") && !JsonUtil.isEmpty(trajectoryJson.get("uuid")))
             trajQueryFields.put("uuid", trajectoryJson.get("uuid"));
 
         // uuidWell
-        if (trajectoryJson.has("uuidWell") && !Util.isEmpty(trajectoryJson.get("uuidWell")))
+        if (trajectoryJson.has("uuidWell") && !JsonUtil.isEmpty(trajectoryJson.get("uuidWell")))
             trajQueryFields.put("uuidWell", trajectoryJson.get("uuidWell"));
 
         // uuidWellbore
-        if (trajectoryJson.has("uuidWellbore") && !Util.isEmpty(trajectoryJson.get("uuidWellbore")))
+        if (trajectoryJson.has("uuidWellbore") && !JsonUtil.isEmpty(trajectoryJson.get("uuidWellbore")))
             trajQueryFields.put("uuidWellbore", trajectoryJson.get("uuidWellbore"));
 
         // name
-        if (trajectoryJson.has("name") && !Util.isEmpty(trajectoryJson.get("name")))
+        if (trajectoryJson.has("name") && !JsonUtil.isEmpty(trajectoryJson.get("name")))
             trajQueryFields.put("name", trajectoryJson.get("name"));
 
         // nameWell
-        if (trajectoryJson.has("nameWell") && !Util.isEmpty(trajectoryJson.get("nameWell")))
+        if (trajectoryJson.has("nameWell") && !JsonUtil.isEmpty(trajectoryJson.get("nameWell")))
             trajQueryFields.put("nameWell", trajectoryJson.get("nameWell"));
 
         // nameWellbore
-        if (trajectoryJson.has("nameWellbore") && !Util.isEmpty(trajectoryJson.get("nameWellbore")))
+        if (trajectoryJson.has("nameWellbore") && !JsonUtil.isEmpty(trajectoryJson.get("nameWellbore")))
             trajQueryFields.put("nameWellbore", trajectoryJson.get("nameWellbore"));
 
         // growingStatus
-        if (trajectoryJson.has("growingStatus") && !Util.isEmpty(trajectoryJson.get("growingStatus")))
+        if (trajectoryJson.has("growingStatus") && !JsonUtil.isEmpty(trajectoryJson.get("growingStatus")))
             trajQueryFields.put("growingStatus", trajectoryJson.get("growingStatus"));
 
         // lastUpdateTimeUtc
-        if (trajectoryJson.has("lastUpdateTimeUtc") && !Util.isEmpty(trajectoryJson.get("lastUpdateTimeUtc")))
+        if (trajectoryJson.has("lastUpdateTimeUtc") && !JsonUtil.isEmpty(trajectoryJson.get("lastUpdateTimeUtc")))
             trajQueryFields.put("lastUpdateTimeUtc", trajectoryJson.get("lastUpdateTimeUtc"));
         // ====================================================================
 
@@ -122,11 +122,11 @@ class GraphQLQueryConverter {
 
         // support query by uid OR query by filters, not both
         // uid-based station query
-        if (!Util.isEmpty(stationsJson) && stationsJson.getJSONObject(0).get("uid") != null) {
+        if (!JsonUtil.isEmpty(stationsJson) && stationsJson.getJSONObject(0).get("uid") != null) {
             // get list of UIDs
             ArrayList<String> stationUids = new ArrayList<>();
             for (int i = 0; i < stationsJson.length(); i++) {
-                stationUids.add(stationsJson.getJSONObject(i).get("uid"));
+                stationUids.add(stationsJson.getJSONObject(i).getString("uid"));
             }
 
         // non uid-based station query
@@ -135,15 +135,15 @@ class GraphQLQueryConverter {
         }
 
         // lastUpdateTimeUtc
-        if (trajectoryJson.has("uuid") && !Util.isEmpty(trajectoryJson.get("uuid")))
+        if (trajectoryJson.has("uuid") && !JsonUtil.isEmpty(trajectoryJson.get("uuid")))
             trajQueryFields.put("uuid", trajectoryJson.get("uuid"));
 
         // mdMn
-        if (trajectoryJson.has("uuid") && !Util.isEmpty(trajectoryJson.get("uuid")))
+        if (trajectoryJson.has("uuid") && !JsonUtil.isEmpty(trajectoryJson.get("uuid")))
             trajQueryFields.put("uuid", trajectoryJson.get("uuid"));
 
         // mdMx
-        if (trajectoryJson.has("uuid") && !Util.isEmpty(trajectoryJson.get("uuid")))
+        if (trajectoryJson.has("uuid") && !JsonUtil.isEmpty(trajectoryJson.get("uuid")))
             trajQueryFields.put("uuid", trajectoryJson.get("uuid"));
 
         // ====================================================================
