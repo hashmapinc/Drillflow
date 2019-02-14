@@ -51,7 +51,7 @@ import com.hashmapinc.tempus.WitsmlObjects.v1311.CsStnTrajValid;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.CsTrajectoryStation;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.CsWellCRS;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.CsWellDatum;
-import com.hashmapinc.tempus.WitsmlObjects.v1311.LengthMeasure;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.DimensionlessMeasure;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.MeasuredDepthCoord;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory;
@@ -64,7 +64,6 @@ import com.hashmapinc.tempus.witsml.WitsmlException;
 import com.hashmapinc.tempus.witsml.WitsmlObjectParser;
 import com.hashmapinc.tempus.witsml.WitsmlUtil;
 import com.hashmapinc.tempus.witsml.server.api.QueryValidation.ERRORCODE;
-import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetFromStoreResponse;
 
 interface Validation extends Function<ValidateParam, ValidationResult> {
 
@@ -95,11 +94,6 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 
 	static Validation error404() {
 		return holds(param -> !param.getWMLtypeIn().trim().isEmpty(), ERRORCODE.ERROR_404.value());
-	}
-
-	static Validation error405() {
-		return holds(param -> !checkExistingUID(param.getWMLtypeIn(), param.getXMLin(), param.getOptionsIn(),
-				param.getCapabilitiesIn()), ERRORCODE.ERROR_405.value());
 	}
 
 	static Validation error406() {
@@ -195,11 +189,6 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 		return holds(param -> !checkNotNullUid(param.getXMLin(), param.getWMLtypeIn()), ERRORCODE.ERROR_432.value());
 	}
 
-	static Validation error433() {
-		return holds(param -> !checkExistingUID(param.getWMLtypeIn(), param.getXMLin(), param.getOptionsIn(),
-				param.getCapabilitiesIn()), ERRORCODE.ERROR_433.value());
-	}
-
 	static Validation error434() {
 		return holds(param -> !checkNotNullUid(param.getXMLin(), param.getWMLtypeIn()), ERRORCODE.ERROR_434.value());
 	}
@@ -217,11 +206,6 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	static Validation error439() {
 		return holds(param -> !checkMnemonicListNotEmpty(param.getXMLin(), param.getWMLtypeIn()),
 				ERRORCODE.ERROR_439.value());
-	}
-
-	static Validation error444() {
-		return holds(param -> !checkWellforDelete(param.getWMLtypeIn(), param.getXMLin(), param.getOptionsIn(),
-				param.getCapabilitiesIn()), ERRORCODE.ERROR_444.value());
 	}
 
 	static Validation error445() {
@@ -278,11 +262,6 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 
 	static Validation error475() {
 		return holds(param -> !checkWell(param.getXMLin(), param.getWMLtypeIn()), ERRORCODE.ERROR_475.value());
-	}
-
-	static Validation error481() {
-		return holds(param -> !checkExistingUID(param.getWMLtypeIn(), param.getXMLin(), param.getOptionsIn(),
-				param.getCapabilitiesIn()), ERRORCODE.ERROR_481.value());
 	}
 
 	static Validation error482() {
@@ -417,31 +396,6 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 
 	/**
-	 * This method checks for well tag for deleteFromStore
-	 * 
-	 * @param XMLin
-	 * @return true if available else false
-	 * @throws ParserConfigurationException
-	 * @throws SAXException
-	 * @throws IOException
-	 * @throws XPathExpressionException
-	 */
-
-	static boolean checkWellforDelete(String WMLtypeIn, String QueryIn, String OptionsIn, String CapabilitiesIn) {
-		boolean result = false;
-		WMLS_GetFromStoreResponse resp = new WMLS_GetFromStoreResponse();
-		try {
-			resp = store.getFromStore(WMLtypeIn, QueryIn, OptionsIn, CapabilitiesIn);
-			if (resp.getResult() == 1) {
-				result = true;
-			}
-		} catch (Exception e) {
-			LOG.warning(e.getMessage());
-		}
-		return result;
-	}
-
-	/**
 	 * This method checks for multiple well tag in XMLin
 	 * 
 	 * @param XMLin
@@ -453,12 +407,11 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	 */
 	static boolean checkWell(String XMLin, String WMLTypein) {
 		boolean result = false;
-		List<AbstractWitsmlObject> witsmlObjects;
+		
 		String version;
 		try {
 			version = WitsmlUtil.getVersionFromXML(XMLin);
 			LOG.info("the version is: " + version);
-			witsmlObjects = WitsmlObjectParser.parse(WMLTypein, XMLin, version);
 			switch (WMLTypein) {
 			case "log":
 				if (!XMLin.contains("logs")) {
@@ -473,7 +426,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 				break;
 
 			case "well":
-				LOG.info("checking for wells:"+XMLin.contains("wells"));
+				LOG.info("checking for wells:" + XMLin.contains("wells"));
 				if (!XMLin.contains("wells")) {
 					result = true;
 				}
@@ -1030,8 +983,8 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 						result = true;
 						break;
 					}
-					List<CsGeodeticModel> geographic = (List<CsGeodeticModel>) crs.getGeographic();
-					for (CsGeodeticModel geo : geographic) {
+					CsGeodeticModel geo = (CsGeodeticModel) crs.getGeographic();
+					
 						if (geo.getNameCRS() == null
 								|| (geo.getNameCRS() != null && geo.getNameCRS().toString().isEmpty())) {
 							result = true;
@@ -1092,9 +1045,9 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 							result = true;
 							break;
 						}
-					}
-					List<CsProjectionx> mapProjection = (List<CsProjectionx>) crs.getMapProjection();
-					for (CsProjectionx projection : mapProjection) {
+					
+					CsProjectionx projection = (CsProjectionx) crs.getMapProjection();
+					
 						if (projection.getNameCRS() == null
 								|| projection.getNameCRS() != null && projection.getNameCRS().toString().isEmpty()) {
 							result = true;
@@ -1115,10 +1068,10 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 							result = true;
 							break;
 						}
-					}
+					
 
-					List<CsLocalCRS> localCRS = (List<CsLocalCRS>) crs.getLocalCRS();
-					for (CsLocalCRS local : localCRS) {
+					CsLocalCRS local = (CsLocalCRS) crs.getLocalCRS();
+					
 						if (local.getYAxisAzimuth() == null
 								|| local.getYAxisAzimuth() != null && local.getYAxisAzimuth().toString().isEmpty()) {
 							result = true;
@@ -1140,29 +1093,29 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 							break;
 						}
 					}
-				}
-				List<CsCommonData> commonData = (List<CsCommonData>) objWell1311.getCommonData();
-				for (CsCommonData data : commonData) {
-					if (data.getDTimCreation() == null
-							|| data.getDTimCreation() != null && data.getDTimCreation().toString().isEmpty()) {
+				
+				CsCommonData commonData = (CsCommonData) objWell1311.getCommonData();
+				
+					if (commonData.getDTimCreation() == null
+							|| commonData.getDTimCreation() != null && commonData.getDTimCreation().toString().isEmpty()) {
 						result = true;
 						break;
 					}
-					if (data.getDTimLastChange() == null
-							|| data.getDTimLastChange() != null && data.getDTimLastChange().toString().isEmpty()) {
+					if (commonData.getDTimLastChange() == null
+							|| commonData.getDTimLastChange() != null && commonData.getDTimLastChange().toString().isEmpty()) {
 						result = true;
 						break;
 					}
-					if (data.getItemState() == null
-							|| data.getItemState() != null && data.getItemState().toString().isEmpty()) {
+					if (commonData.getItemState() == null
+							|| commonData.getItemState() != null && commonData.getItemState().toString().isEmpty()) {
 						result = true;
 						break;
 					}
-					if (data.getComments() == null || data.getComments() != null && data.getComments().isEmpty()) {
+					if (commonData.getComments() == null || commonData.getComments() != null && commonData.getComments().isEmpty()) {
 						result = true;
 						break;
 					}
-				}
+				
 
 			} else if (abstractWitsmlObject instanceof com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) {
 				if (abstractWitsmlObject.getUid() == null
@@ -1456,9 +1409,9 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 						result = true;
 						break;
 					}
-					List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsGeodeticModel> geographic = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsGeodeticModel>) crs
+					com.hashmapinc.tempus.WitsmlObjects.v1411.CsGeodeticModel geo = (com.hashmapinc.tempus.WitsmlObjects.v1411.CsGeodeticModel) crs
 							.getGeographic();
-					for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsGeodeticModel geo : geographic) {
+					
 						if (geo.getNameCRS() == null
 								|| (geo.getNameCRS() != null && geo.getNameCRS().toString().isEmpty())) {
 							result = true;
@@ -1519,80 +1472,80 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 							result = true;
 							break;
 						}
-					}
-					List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsProjectionx> mapProjection = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsProjectionx>) crs
+					
+					com.hashmapinc.tempus.WitsmlObjects.v1411.CsProjectionx mapProjection = (com.hashmapinc.tempus.WitsmlObjects.v1411.CsProjectionx) crs
 							.getMapProjection();
-					for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsProjectionx projection : mapProjection) {
-						if (projection.getNameCRS() == null
-								|| projection.getNameCRS() != null && projection.getNameCRS().toString().isEmpty()) {
+					
+						if (mapProjection.getNameCRS() == null
+								|| mapProjection.getNameCRS() != null && mapProjection.getNameCRS().toString().isEmpty()) {
 							result = true;
 							break;
 						}
-						if (projection.getProjectionCode() == null || projection.getProjectionCode() != null
-								&& projection.getProjectionCode().toString().isEmpty()) {
+						if (mapProjection.getProjectionCode() == null || mapProjection.getProjectionCode() != null
+								&& mapProjection.getProjectionCode().toString().isEmpty()) {
 							result = true;
 							break;
 						}
-						if (projection.getProjectedFrom() == null || projection.getProjectedFrom() != null
-								&& projection.getProjectedFrom().toString().isEmpty()) {
+						if (mapProjection.getProjectedFrom() == null || mapProjection.getProjectedFrom() != null
+								&& mapProjection.getProjectedFrom().toString().isEmpty()) {
 							result = true;
 							break;
 						}
-						if (projection.getZone() == null
-								|| projection.getZone() != null && projection.getZone().toString().isEmpty()) {
+						if (mapProjection.getZone() == null
+								|| mapProjection.getZone() != null && mapProjection.getZone().toString().isEmpty()) {
 							result = true;
 							break;
 						}
-					}
+					
 
-					List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLocalCRS> localCRS = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLocalCRS>) crs
+					com.hashmapinc.tempus.WitsmlObjects.v1411.CsLocalCRS localCRS = (com.hashmapinc.tempus.WitsmlObjects.v1411.CsLocalCRS) crs
 							.getLocalCRS();
-					for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsLocalCRS local : localCRS) {
-						if (local.getYAxisAzimuth() == null
-								|| local.getYAxisAzimuth() != null && local.getYAxisAzimuth().toString().isEmpty()) {
+				
+						if (localCRS.getYAxisAzimuth() == null
+								|| localCRS.getYAxisAzimuth() != null && localCRS.getYAxisAzimuth().toString().isEmpty()) {
 							result = true;
 							break;
 						}
-						if (local.getYAxisDescription() == null || local.getYAxisDescription() != null
-								&& local.getYAxisDescription().toString().isEmpty()) {
+						if (localCRS.getYAxisDescription() == null || localCRS.getYAxisDescription() != null
+								&& localCRS.getYAxisDescription().toString().isEmpty()) {
 							result = true;
 							break;
 						}
-						if (local.isUsesWellAsOrigin() == null || local.isUsesWellAsOrigin() != null
-								&& local.isUsesWellAsOrigin().toString().isEmpty()) {
+						if (localCRS.isUsesWellAsOrigin() == null || localCRS.isUsesWellAsOrigin() != null
+								&& localCRS.isUsesWellAsOrigin().toString().isEmpty()) {
 							result = true;
 							break;
 						}
-						if (local.isXRotationCounterClockwise() == null || local.isXRotationCounterClockwise() != null
-								&& local.isXRotationCounterClockwise().toString().isEmpty()) {
+						if (localCRS.isXRotationCounterClockwise() == null || localCRS.isXRotationCounterClockwise() != null
+								&& localCRS.isXRotationCounterClockwise().toString().isEmpty()) {
 							result = true;
 							break;
 						}
-					}
+					
 				}
-				List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsCommonData> commonData = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsCommonData>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject)
+				com.hashmapinc.tempus.WitsmlObjects.v1411.CsCommonData commonData = (com.hashmapinc.tempus.WitsmlObjects.v1411.CsCommonData) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject)
 						.getCommonData();
-				for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsCommonData data : commonData) {
-					if (data.getDTimCreation() == null
-							|| data.getDTimCreation() != null && data.getDTimCreation().toString().isEmpty()) {
+				
+					if (commonData.getDTimCreation() == null
+							|| commonData.getDTimCreation() != null && commonData.getDTimCreation().toString().isEmpty()) {
 						result = true;
 						break;
 					}
-					if (data.getDTimLastChange() == null
-							|| data.getDTimLastChange() != null && data.getDTimLastChange().toString().isEmpty()) {
+					if (commonData.getDTimLastChange() == null
+							|| commonData.getDTimLastChange() != null && commonData.getDTimLastChange().toString().isEmpty()) {
 						result = true;
 						break;
 					}
-					if (data.getItemState() == null
-							|| data.getItemState() != null && data.getItemState().toString().isEmpty()) {
+					if (commonData.getItemState() == null
+							|| commonData.getItemState() != null && commonData.getItemState().toString().isEmpty()) {
 						result = true;
 						break;
 					}
-					if (data.getComments() == null || data.getComments() != null && data.getComments().isEmpty()) {
+					if (commonData.getComments() == null || commonData.getComments() != null && commonData.getComments().isEmpty()) {
 						result = true;
 						break;
 					}
-				}
+				
 			}
 		}
 
@@ -1698,29 +1651,29 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 					result = true;
 					break;
 				}
-				List<CsCommonData> commonData = (List<CsCommonData>) objWellbore1311.getCommonData();
-				for (CsCommonData data : commonData) {
-					if (data.getDTimCreation() == null
-							|| data.getDTimCreation() != null && data.getDTimCreation().toString().isEmpty()) {
+				CsCommonData commonData = (CsCommonData) objWellbore1311.getCommonData();
+				
+					if (commonData.getDTimCreation() == null
+							|| commonData.getDTimCreation() != null && commonData.getDTimCreation().toString().isEmpty()) {
 						result = true;
 						break;
 					}
-					if (data.getDTimLastChange() == null
-							|| data.getDTimLastChange() != null && data.getDTimLastChange().toString().isEmpty()) {
+					if (commonData.getDTimLastChange() == null
+							|| commonData.getDTimLastChange() != null && commonData.getDTimLastChange().toString().isEmpty()) {
 						result = true;
 						break;
 					}
-					if (data.getItemState() == null
-							|| data.getItemState() != null && data.getItemState().toString().isEmpty()) {
+					if (commonData.getItemState() == null
+							|| commonData.getItemState() != null && commonData.getItemState().toString().isEmpty()) {
 						result = true;
 						break;
 					}
-					if (data.getComments() == null
-							|| data.getComments() != null && data.getComments().toString().isEmpty()) {
+					if (commonData.getComments() == null
+							|| commonData.getComments() != null && commonData.getComments().toString().isEmpty()) {
 						result = true;
 						break;
 					}
-				}
+				
 
 			} else if (abstractWitsmlObject instanceof com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) {
 
@@ -1806,29 +1759,30 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 					result = true;
 					break;
 				}
-				List<CsCommonData> commonData = (List<CsCommonData>) objWellbore1411.getCommonData();
-				for (CsCommonData data : commonData) {
-					if (data.getDTimCreation() == null
-							|| data.getDTimCreation() != null && data.getDTimCreation().toString().isEmpty()) {
+				com.hashmapinc.tempus.WitsmlObjects.v1411.CsCommonData  commonData = (com.hashmapinc.tempus.WitsmlObjects.v1411.CsCommonData) objWellbore1411.getCommonData();
+				
+				
+					if (commonData.getDTimCreation() == null
+							|| commonData.getDTimCreation() != null && commonData.getDTimCreation().toString().isEmpty()) {
 						result = true;
 						break;
 					}
-					if (data.getDTimLastChange() == null
-							|| data.getDTimLastChange() != null && data.getDTimLastChange().toString().isEmpty()) {
+					if (commonData.getDTimLastChange() == null
+							|| commonData.getDTimLastChange() != null && commonData.getDTimLastChange().toString().isEmpty()) {
 						result = true;
 						break;
 					}
-					if (data.getItemState() == null
-							|| data.getItemState() != null && data.getItemState().toString().isEmpty()) {
+					if (commonData.getItemState() == null
+							|| commonData.getItemState() != null && commonData.getItemState().toString().isEmpty()) {
 						result = true;
 						break;
 					}
-					if (data.getComments() == null
-							|| data.getComments() != null && data.getComments().toString().isEmpty()) {
+					if (commonData.getComments() == null
+							|| commonData.getComments() != null && commonData.getComments().toString().isEmpty()) {
 						result = true;
 						break;
 					}
-				}
+				
 
 			}
 		}
@@ -2424,30 +2378,6 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 
 	/**
-	 * This method checks for existing UID's with getFromStore
-	 * 
-	 * @param WMLtypeIn
-	 * @param QueryIn
-	 * @param OptionsIn
-	 * @param CapabilitiesIn
-	 * @return true if exists else false
-	 * @throws Exception
-	 */
-	static boolean checkExistingUID(String WMLtypeIn, String QueryIn, String OptionsIn, String CapabilitiesIn) {
-		boolean result = false;
-		WMLS_GetFromStoreResponse resp = new WMLS_GetFromStoreResponse();
-		try {
-			resp = store.getFromStore(WMLtypeIn, QueryIn, OptionsIn, CapabilitiesIn);
-			if (resp.getResult() == 1) {
-				result = true;
-			}
-		} catch (Exception e) {
-			LOG.warning(e.getMessage());
-		}
-		return result;
-	}
-
-	/**
 	 * This method checks for UOM attribute to be null.
 	 * 
 	 * @param XMLin
@@ -2473,6 +2403,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 				result = checkNotNullUOMForDiffVersionTrajectory(witsmlObjects);
 				break;
 			case "well":
+				LOG.info("checking UON null");
 				result = checkNotNullUOMForDiffVersionWell(witsmlObjects);
 				break;
 			case "wellbore":
@@ -2623,8 +2554,8 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 						result = true;
 						break;
 					}
-					List<CsStnTrajRawData> rawData = (List<CsStnTrajRawData>) trajStation.getRawData();
-					for (CsStnTrajRawData trajRawData : rawData) {
+					CsStnTrajRawData trajRawData = (CsStnTrajRawData) trajStation.getRawData();
+					
 						if (trajRawData.getGravAxialRaw().getUom() == null
 								|| trajRawData.getGravAxialRaw().getUom() != null
 										&& trajRawData.getGravAxialRaw().getUom().toString().isEmpty()) {
@@ -2661,10 +2592,10 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 							result = true;
 							break;
 						}
-					}
+					
 
-					List<CsStnTrajCorUsed> corUsed = (List<CsStnTrajCorUsed>) trajStation.getCorUsed();
-					for (CsStnTrajCorUsed crUSed : corUsed) {
+					CsStnTrajCorUsed crUSed = (CsStnTrajCorUsed) trajStation.getCorUsed();
+					
 						if (crUSed.getGravAxialAccelCor().getUom() == null
 								|| crUSed.getGravAxialAccelCor().getUom() != null
 										&& crUSed.getGravAxialAccelCor().getUom().toString().isEmpty()) {
@@ -2726,31 +2657,31 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 							result = true;
 							break;
 						}
-					}
+					
 
-					List<CsStnTrajValid> stnValid = (List<CsStnTrajValid>) trajStation.getValid();
-					for (CsStnTrajValid valid : stnValid) {
-						if (valid.getMagTotalFieldCalc().getUom() == null
-								|| valid.getMagTotalFieldCalc().getUom() != null
-										&& valid.getMagTotalFieldCalc().getUom().toString().isEmpty()) {
+					CsStnTrajValid stnValid = (CsStnTrajValid) trajStation.getValid();
+					
+						if (stnValid.getMagTotalFieldCalc().getUom() == null
+								|| stnValid.getMagTotalFieldCalc().getUom() != null
+										&& stnValid.getMagTotalFieldCalc().getUom().toString().isEmpty()) {
 							result = true;
 							break;
 						}
-						if (valid.getMagDipAngleCalc().getUom() == null || valid.getMagDipAngleCalc().getUom() != null
-								&& valid.getMagDipAngleCalc().getUom().toString().isEmpty()) {
+						if (stnValid.getMagDipAngleCalc().getUom() == null || stnValid.getMagDipAngleCalc().getUom() != null
+								&& stnValid.getMagDipAngleCalc().getUom().toString().isEmpty()) {
 							result = true;
 							break;
 						}
-						if (valid.getGravTotalFieldCalc().getUom() == null
-								|| valid.getGravTotalFieldCalc().getUom() != null
-										&& valid.getGravTotalFieldCalc().getUom().toString().isEmpty()) {
+						if (stnValid.getGravTotalFieldCalc().getUom() == null
+								|| stnValid.getGravTotalFieldCalc().getUom() != null
+										&& stnValid.getGravTotalFieldCalc().getUom().toString().isEmpty()) {
 							result = true;
 							break;
 						}
-					}
+					
 
-					List<CsStnTrajMatrixCov> matricCov = (List<CsStnTrajMatrixCov>) trajStation.getMatrixCov();
-					for (CsStnTrajMatrixCov matric : matricCov) {
+					CsStnTrajMatrixCov matric = (CsStnTrajMatrixCov) trajStation.getMatrixCov();
+					
 						if (matric.getVarianceEE().getUom() == null || matric.getVarianceEE().getUom() != null
 								&& matric.getVarianceEE().getUom().toString().isEmpty()) {
 							result = true;
@@ -2797,7 +2728,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 							result = true;
 							break;
 						}
-					}
+					
 					List<CsLocation> location = trajStation.getLocation();
 					for (CsLocation loc : location) {
 						if (loc.getLatitude().getUom() == null || loc.getLatitude().getUom() != null
@@ -2989,9 +2920,9 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 						result = true;
 						break;
 					}
-					List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsStnTrajRawData> rawData = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsStnTrajRawData>) trajStation
+					com.hashmapinc.tempus.WitsmlObjects.v1411.CsStnTrajRawData trajRawData = (com.hashmapinc.tempus.WitsmlObjects.v1411.CsStnTrajRawData) trajStation
 							.getRawData();
-					for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsStnTrajRawData trajRawData : rawData) {
+					
 						if (trajRawData.getGravAxialRaw().getUom() == null
 								|| trajRawData.getGravAxialRaw().getUom() != null
 										&& trajRawData.getGravAxialRaw().getUom().toString().isEmpty()) {
@@ -3028,11 +2959,11 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 							result = true;
 							break;
 						}
-					}
+					
 
-					List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsStnTrajCorUsed> corUsed = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsStnTrajCorUsed>) trajStation
+					com.hashmapinc.tempus.WitsmlObjects.v1411.CsStnTrajCorUsed crUSed = (com.hashmapinc.tempus.WitsmlObjects.v1411.CsStnTrajCorUsed) trajStation
 							.getCorUsed();
-					for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsStnTrajCorUsed crUSed : corUsed) {
+					
 						if (crUSed.getGravAxialAccelCor().getUom() == null
 								|| crUSed.getGravAxialAccelCor().getUom() != null
 										&& crUSed.getGravAxialAccelCor().getUom().toString().isEmpty()) {
@@ -3094,33 +3025,33 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 							result = true;
 							break;
 						}
-					}
+					
 
-					List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsStnTrajValid> stnValid = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsStnTrajValid>) trajStation
+					com.hashmapinc.tempus.WitsmlObjects.v1411.CsStnTrajValid stnValid = (com.hashmapinc.tempus.WitsmlObjects.v1411.CsStnTrajValid) trajStation
 							.getValid();
-					for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsStnTrajValid valid : stnValid) {
-						if (valid.getMagTotalFieldCalc().getUom() == null
-								|| valid.getMagTotalFieldCalc().getUom() != null
-										&& valid.getMagTotalFieldCalc().getUom().toString().isEmpty()) {
+					
+						if (stnValid.getMagTotalFieldCalc().getUom() == null
+								|| stnValid.getMagTotalFieldCalc().getUom() != null
+										&& stnValid.getMagTotalFieldCalc().getUom().toString().isEmpty()) {
 							result = true;
 							break;
 						}
-						if (valid.getMagDipAngleCalc().getUom() == null || valid.getMagDipAngleCalc().getUom() != null
-								&& valid.getMagDipAngleCalc().getUom().toString().isEmpty()) {
+						if (stnValid.getMagDipAngleCalc().getUom() == null || stnValid.getMagDipAngleCalc().getUom() != null
+								&& stnValid.getMagDipAngleCalc().getUom().toString().isEmpty()) {
 							result = true;
 							break;
 						}
-						if (valid.getGravTotalFieldCalc().getUom() == null
-								|| valid.getGravTotalFieldCalc().getUom() != null
-										&& valid.getGravTotalFieldCalc().getUom().toString().isEmpty()) {
+						if (stnValid.getGravTotalFieldCalc().getUom() == null
+								|| stnValid.getGravTotalFieldCalc().getUom() != null
+										&& stnValid.getGravTotalFieldCalc().getUom().toString().isEmpty()) {
 							result = true;
 							break;
 						}
-					}
+					
 
-					List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsStnTrajMatrixCov> matricCov = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsStnTrajMatrixCov>) trajStation
+					com.hashmapinc.tempus.WitsmlObjects.v1411.CsStnTrajMatrixCov matric = (com.hashmapinc.tempus.WitsmlObjects.v1411.CsStnTrajMatrixCov) trajStation
 							.getMatrixCov();
-					for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsStnTrajMatrixCov matric : matricCov) {
+					
 						if (matric.getVarianceEE().getUom() == null || matric.getVarianceEE().getUom() != null
 								&& matric.getVarianceEE().getUom().toString().isEmpty()) {
 							result = true;
@@ -3167,7 +3098,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 							result = true;
 							break;
 						}
-					}
+					
 					List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLocation> location = trajStation.getLocation();
 					for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsLocation loc : location) {
 						if (loc.getLatitude().getUom() == null || loc.getLatitude().getUom() != null
@@ -3313,31 +3244,39 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 			if (abstractWitsmlObject instanceof ObjWell) {
 				LOG.info("checking well object ");
 				ObjWell objWell1311 = (ObjWell) abstractWitsmlObject;
-
-				List<WellElevationCoord> wellHeadElevation = (List<WellElevationCoord>) objWell1311
+				
+				DimensionlessMeasure pcInterest = (DimensionlessMeasure) objWell1311.getPcInterest();
+				if(pcInterest.getUom()== null
+						|| (pcInterest.getUom() != null && pcInterest.getUom().toString().isEmpty())) {
+					result=true;
+					break;
+				}
+				
+				WellElevationCoord wellHeadElevation = (WellElevationCoord) objWell1311
 						.getWellheadElevation();
-				for (WellElevationCoord headElevation : wellHeadElevation) {
-					if (headElevation.getUom() == null
-							|| (headElevation.getUom() != null && headElevation.getUom().toString().isEmpty())) {
+				
+					if (wellHeadElevation.getUom() == null
+							|| (wellHeadElevation.getUom() != null && wellHeadElevation.getUom().toString().isEmpty())) {
 						result = true;
 						break;
 					}
-				}
-				List<WellElevationCoord> groundElevation = (List<WellElevationCoord>) objWell1311.getGroundElevation();
-				for (WellElevationCoord elevation : groundElevation) {
-					if (elevation.getUom() == null
-							|| (elevation.getUom() != null && elevation.getUom().toString().isEmpty())) {
+				
+				
+				WellElevationCoord groundElevation = (WellElevationCoord) objWell1311.getGroundElevation();
+				
+					if (groundElevation.getUom() == null
+							|| (groundElevation.getUom() != null && groundElevation.getUom().toString().isEmpty())) {
 						result = true;
 						break;
 					}
-				}
-				List<LengthMeasure> waterDepth = (List<LengthMeasure>) objWell1311.getWaterDepth();
-				for (LengthMeasure depth : waterDepth) {
-					if (depth.getUom() == null || (depth.getUom() != null && depth.getUom().toString().isEmpty())) {
+				
+				WellVerticalDepthCoord waterDepth = (WellVerticalDepthCoord) objWell1311.getWaterDepth();
+				
+					if (waterDepth.getUom() == null || (waterDepth.getUom() != null && waterDepth.getUom().toString().isEmpty())) {
 						result = true;
 						break;
 					}
-				}
+				
 
 			} else if (abstractWitsmlObject instanceof com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) {
 				if (abstractWitsmlObject.getUid() == null
@@ -3345,32 +3284,31 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 					result = true;
 					break;
 				}
-				List<com.hashmapinc.tempus.WitsmlObjects.v1411.WellElevationCoord> wellHeadElevation = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.WellElevationCoord>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject)
+				com.hashmapinc.tempus.WitsmlObjects.v1411.WellElevationCoord wellHeadElevation = (com.hashmapinc.tempus.WitsmlObjects.v1411.WellElevationCoord)((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell)abstractWitsmlObject)
 						.getWellheadElevation();
-				for (com.hashmapinc.tempus.WitsmlObjects.v1411.WellElevationCoord headElevation : wellHeadElevation) {
-					if (headElevation.getUom() == null
-							|| (headElevation.getUom() != null && headElevation.getUom().toString().isEmpty())) {
+				
+					if (wellHeadElevation.getUom() == null
+							|| (wellHeadElevation.getUom() != null && wellHeadElevation.getUom().toString().isEmpty())) {
 						result = true;
 						break;
 					}
-				}
-				List<com.hashmapinc.tempus.WitsmlObjects.v1411.WellElevationCoord> groundElevation = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.WellElevationCoord>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject)
+				
+					com.hashmapinc.tempus.WitsmlObjects.v1411.WellElevationCoord groundElevation = (com.hashmapinc.tempus.WitsmlObjects.v1411.WellElevationCoord)((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell)abstractWitsmlObject)
 						.getGroundElevation();
-				for (com.hashmapinc.tempus.WitsmlObjects.v1411.WellElevationCoord elevation : groundElevation) {
-					if (elevation.getUom() == null
-							|| (elevation.getUom() != null && elevation.getUom().toString().isEmpty())) {
+				
+					if (groundElevation.getUom() == null
+							|| (groundElevation.getUom() != null && groundElevation.getUom().toString().isEmpty())) {
 						result = true;
 						break;
 					}
-				}
-				List<com.hashmapinc.tempus.WitsmlObjects.v1411.LengthMeasure> waterDepth = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.LengthMeasure>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject)
-						.getWaterDepth();
-				for (com.hashmapinc.tempus.WitsmlObjects.v1411.LengthMeasure depth : waterDepth) {
-					if (depth.getUom() == null || (depth.getUom() != null && depth.getUom().toString().isEmpty())) {
+				
+					com.hashmapinc.tempus.WitsmlObjects.v1411.LengthMeasure waterDepth = (com.hashmapinc.tempus.WitsmlObjects.v1411.LengthMeasure)((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell)abstractWitsmlObject).getWaterDepth();
+				
+					if (waterDepth.getUom() == null || (waterDepth.getUom() != null && waterDepth.getUom().toString().isEmpty())) {
 						result = true;
 						break;
 					}
-				}
+				
 
 			}
 		}
@@ -3387,165 +3325,182 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 				LOG.info("checking wellBore object ");
 				ObjWellbore objWellbore1311 = (ObjWellbore) abstractWitsmlObject;
 
-				List<MeasuredDepthCoord> mdCurrent = (List<MeasuredDepthCoord>) objWellbore1311.getMdCurrent();
-				for (MeasuredDepthCoord current : mdCurrent) {
-					if (current.getUom() == null
-							|| (current.getUom() != null && current.getUom().toString().isEmpty())) {
+				MeasuredDepthCoord mdCurrent = (MeasuredDepthCoord) objWellbore1311.getMdCurrent();
+				
+					if (mdCurrent.getUom() == null
+							|| (mdCurrent.getUom() != null && mdCurrent.getUom().toString().isEmpty())) {
 						result = true;
 						break;
 					}
-				}
-				List<WellVerticalDepthCoord> tvdCurrent = (List<WellVerticalDepthCoord>) objWellbore1311
+				
+				WellVerticalDepthCoord tvdCurrent = (WellVerticalDepthCoord) objWellbore1311
 						.getTvdCurrent();
-				for (WellVerticalDepthCoord vdCurrent : tvdCurrent) {
-					if (vdCurrent.getUom() == null
-							|| (vdCurrent.getUom() != null && vdCurrent.getUom().toString().isEmpty())) {
+				
+					if (tvdCurrent.getUom() == null
+							|| (tvdCurrent.getUom() != null && tvdCurrent.getUom().toString().isEmpty())) {
 						result = true;
 						break;
 					}
-				}
-				List<MeasuredDepthCoord> mdKickoff = (List<MeasuredDepthCoord>) objWellbore1311.getMdKickoff();
-				for (MeasuredDepthCoord kickOff : mdKickoff) {
-					if (kickOff.getUom() == null
-							|| (kickOff.getUom() != null && kickOff.getUom().toString().isEmpty())) {
+				
+				MeasuredDepthCoord mdKickoff = (MeasuredDepthCoord) objWellbore1311.getMdKickoff();
+				
+					if (mdKickoff.getUom() == null
+							|| (mdKickoff.getUom() != null && mdKickoff.getUom().toString().isEmpty())) {
 						result = true;
 						break;
 					}
-				}
-				List<WellVerticalDepthCoord> tvdKickoff = (List<WellVerticalDepthCoord>) objWellbore1311
+				
+				WellVerticalDepthCoord tvdKickoff = (WellVerticalDepthCoord) objWellbore1311
 						.getTvdKickoff();
-				for (WellVerticalDepthCoord vdKickOff : tvdKickoff) {
-					if (vdKickOff.getUom() == null
-							|| (vdKickOff.getUom() != null && vdKickOff.getUom().toString().isEmpty())) {
+				
+					if (tvdKickoff.getUom() == null
+							|| (tvdKickoff.getUom() != null && tvdKickoff.getUom().toString().isEmpty())) {
 						result = true;
 						break;
 					}
-				}
-				List<MeasuredDepthCoord> mdPlanned = (List<MeasuredDepthCoord>) objWellbore1311.getMdPlanned();
-				for (MeasuredDepthCoord planned : mdPlanned) {
-					if (planned.getUom() == null
-							|| (planned.getUom() != null && planned.getUom().toString().isEmpty())) {
+				
+				MeasuredDepthCoord mdPlanned = (MeasuredDepthCoord) objWellbore1311.getMdPlanned();
+				
+					if (mdPlanned.getUom() == null
+							|| (mdPlanned.getUom() != null && mdPlanned.getUom().toString().isEmpty())) {
 						result = true;
 						break;
 					}
-				}
-				List<WellVerticalDepthCoord> tvdPlanned = (List<WellVerticalDepthCoord>) objWellbore1311
+				
+				WellVerticalDepthCoord vdPlanned = (WellVerticalDepthCoord) objWellbore1311
 						.getTvdPlanned();
-				for (WellVerticalDepthCoord vdPlanned : tvdPlanned) {
+				
 					if (vdPlanned.getUom() == null
 							|| (vdPlanned.getUom() != null && vdPlanned.getUom().toString().isEmpty())) {
 						result = true;
 						break;
 					}
-				}
-				List<MeasuredDepthCoord> mdSubSeaPlanned = (List<MeasuredDepthCoord>) objWellbore1311
+			
+				MeasuredDepthCoord seaPlanned = (MeasuredDepthCoord) objWellbore1311
 						.getMdSubSeaPlanned();
-				for (MeasuredDepthCoord seaPlanned : mdSubSeaPlanned) {
+				
 					if (seaPlanned.getUom() == null
 							|| (seaPlanned.getUom() != null && seaPlanned.getUom().toString().isEmpty())) {
 						result = true;
 						break;
 					}
-				}
-				List<WellVerticalDepthCoord> tvdSubSeaPlanned = (List<WellVerticalDepthCoord>) objWellbore1311
+				
+				WellVerticalDepthCoord tvSeaPlanned = (WellVerticalDepthCoord) objWellbore1311
 						.getTvdSubSeaPlanned();
-				for (WellVerticalDepthCoord tvSeaPlanned : tvdSubSeaPlanned) {
+				
 					if (tvSeaPlanned.getUom() == null
 							|| (tvSeaPlanned.getUom() != null && tvSeaPlanned.getUom().toString().isEmpty())) {
 						result = true;
 						break;
 					}
-				}
-				List<TimeMeasure> dayTarget = (List<TimeMeasure>) objWellbore1311.getDayTarget();
-				for (TimeMeasure target : dayTarget) {
-					if (target.getUom() == null || (target.getUom() != null && target.getUom().toString().isEmpty())) {
+				
+				TimeMeasure dayTarget = (TimeMeasure) objWellbore1311.getDayTarget();
+				
+					if (dayTarget.getUom() == null || (dayTarget.getUom() != null && dayTarget.getUom().toString().isEmpty())) {
 						result = true;
 						break;
 					}
-				}
+				
 
 			} else if (abstractWitsmlObject instanceof com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) {
 
-				List<com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord> mdCurrent = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord>) ((ObjWellbore) abstractWitsmlObject)
-						.getMdCurrent();
-				for (com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord current : mdCurrent) {
-					if (current.getUom() == null
-							|| (current.getUom() != null && current.getUom().toString().isEmpty())) {
+				com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord md = (com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject)
+						.getMd();
+				
+					if (md.getUom() == null
+							|| (md.getUom() != null && md.getUom().toString().isEmpty())) {
 						result = true;
 						break;
 					}
-				}
-				List<com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord> tvdCurrent = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord>) ((ObjWellbore) abstractWitsmlObject)
-						.getTvdCurrent();
-				for (com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord vdCurrent : tvdCurrent) {
-					if (vdCurrent.getUom() == null
-							|| (vdCurrent.getUom() != null && vdCurrent.getUom().toString().isEmpty())) {
+				
+				com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord tvd = (com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject)
+						.getTvd();
+				
+					if (tvd.getUom() == null
+							|| (tvd.getUom() != null && tvd.getUom().toString().isEmpty())) {
 						result = true;
 						break;
 					}
-				}
-				List<com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord> mdKickoff = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject)
+					com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord mbBit = (com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject)
+							.getMdBit();
+					
+						if (mbBit.getUom() == null
+								|| (mbBit.getUom() != null && mbBit.getUom().toString().isEmpty())) {
+							result = true;
+							break;
+						}
+					
+					com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord tvdBit = (com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject)
+							.getTvdBit();
+					
+						if (tvdBit.getUom() == null
+								|| (tvdBit.getUom() != null && tvdBit.getUom().toString().isEmpty())) {
+							result = true;
+							break;
+						}
+				
+				com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord mdKickoff = (com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject)
 						.getMdKickoff();
-				for (com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord kickOff : mdKickoff) {
-					if (kickOff.getUom() == null
-							|| (kickOff.getUom() != null && kickOff.getUom().toString().isEmpty())) {
+				
+					if (mdKickoff.getUom() == null
+							|| (mdKickoff.getUom() != null && mdKickoff.getUom().toString().isEmpty())) {
 						result = true;
 						break;
 					}
-				}
-				List<com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord> tvdKickoff = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject)
+				
+				com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord tvdKickoff = (com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject)
 						.getTvdKickoff();
-				for (com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord vdKickOff : tvdKickoff) {
-					if (vdKickOff.getUom() == null
-							|| (vdKickOff.getUom() != null && vdKickOff.getUom().toString().isEmpty())) {
+				
+					if (tvdKickoff.getUom() == null
+							|| (tvdKickoff.getUom() != null && tvdKickoff.getUom().toString().isEmpty())) {
 						result = true;
 						break;
 					}
-				}
-				List<com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord> mdPlanned = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject)
+				
+				com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord mdPlanned = (com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject)
 						.getMdPlanned();
-				for (com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord planned : mdPlanned) {
-					if (planned.getUom() == null
-							|| (planned.getUom() != null && planned.getUom().toString().isEmpty())) {
+				
+					if (mdPlanned.getUom() == null
+							|| (mdPlanned.getUom() != null && mdPlanned.getUom().toString().isEmpty())) {
 						result = true;
 						break;
 					}
-				}
-				List<com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord> tvdPlanned = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject)
+				
+				com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord tvdPlanned = (com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject)
 						.getTvdPlanned();
-				for (com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord vdPlanned : tvdPlanned) {
-					if (vdPlanned.getUom() == null
-							|| (vdPlanned.getUom() != null && vdPlanned.getUom().toString().isEmpty())) {
+				
+					if (tvdPlanned.getUom() == null
+							|| (tvdPlanned.getUom() != null && tvdPlanned.getUom().toString().isEmpty())) {
 						result = true;
 						break;
 					}
-				}
-				List<com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord> mdSubSeaPlanned = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject)
+				
+				com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord mdSubSeaPlanned = (com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject)
 						.getMdSubSeaPlanned();
-				for (com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord seaPlanned : mdSubSeaPlanned) {
-					if (seaPlanned.getUom() == null
-							|| (seaPlanned.getUom() != null && seaPlanned.getUom().toString().isEmpty())) {
+				
+					if (mdSubSeaPlanned.getUom() == null
+							|| (mdSubSeaPlanned.getUom() != null && mdSubSeaPlanned.getUom().toString().isEmpty())) {
 						result = true;
 						break;
 					}
-				}
-				List<com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord> tvdSubSeaPlanned = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject)
+				
+				com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord tvdSubSeaPlanned = (com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject)
 						.getTvdSubSeaPlanned();
-				for (com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord tvSeaPlanned : tvdSubSeaPlanned) {
-					if (tvSeaPlanned.getUom() == null
-							|| (tvSeaPlanned.getUom() != null && tvSeaPlanned.getUom().toString().isEmpty())) {
+				
+					if (tvdSubSeaPlanned.getUom() == null
+							|| (tvdSubSeaPlanned.getUom() != null && tvdSubSeaPlanned.getUom().toString().isEmpty())) {
 						result = true;
 						break;
 					}
-				}
-				List<com.hashmapinc.tempus.WitsmlObjects.v1411.TimeMeasure> dayTarget = (List<com.hashmapinc.tempus.WitsmlObjects.v1411.TimeMeasure>) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject)
+				
+				com.hashmapinc.tempus.WitsmlObjects.v1411.TimeMeasure dayTarget = (com.hashmapinc.tempus.WitsmlObjects.v1411.TimeMeasure) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject)
 						.getDayTarget();
-				for (com.hashmapinc.tempus.WitsmlObjects.v1411.TimeMeasure target : dayTarget) {
-					if (target.getUom() == null || (target.getUom() != null && target.getUom().toString().isEmpty())) {
+				
+					if (dayTarget.getUom() == null || (dayTarget.getUom() != null && dayTarget.getUom().toString().isEmpty())) {
 						result = true;
 						break;
 					}
-				}
+				
 
 			}
 		}
@@ -3744,53 +3699,49 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 		String regex = ";";
 		if (!OptionsIn.matches(regex)) {
 			result = true;
-			}
+		}
 		return result;
 	}
 
 	static Validation checkErrorForAddtoStoreVersion1411() {
-		return error407().and(error405()).and(error408()).and(error409()).and(error401()).and(error406())
-				.and(error464()).and(error412()).and(error413()).and(error405()).and(error481()).and(error453())
-				.and(error463()).and(error999());
+		return error407().and(error408()).and(error409()).and(error401()).and(error406()).and(error464())
+				.and(error412()).and(error413()).and(error453()).and(error463());
 	}
 
 	static Validation checkErrorForAddtoStoreVersion1311() {
-		return error407().and(error405()).and(error408()).and(error409()).and(error401()).and(error406())
-				.and(error464()).and(error412()).and(error413()).and(error405()).and(error481()).and(error453())
-				.and(error463()).and(error999());
+		return error407().and(error408()).and(error409()).and(error401()).and(error406()).and(error464())
+				.and(error412()).and(error413()).and(error453()).and(error463());
 	}
 
 	static Validation checkErrorForGetFromStoreVersion1411() {
 		return error407().and(error408()).and(error409()).and(error410()).and(error425()).and(error475())
-				.and(error402()).and(error461()).and(error462()).and(error429()).and(error482()).and(error999());
+				.and(error402()).and(error461()).and(error462()).and(error429()).and(error482());
 	}
 
 	static Validation checkErrorForGetFromStoreVersion1311() {
 		return error407().and(error408()).and(error409()).and(error410()).and(error425()).and(error475())
-				.and(error402()).and(error461()).and(error462()).and(error429()).and(error482()).and(error999());
+				.and(error402()).and(error461()).and(error462()).and(error429()).and(error482());
 	}
 
 	static Validation checkErrorForUpdateInStoreVersion1411() {
-		return error407().and(error405()).and(error408()).and(error409()).and(error433()).and(error464())
-				.and(error415()).and(error444()).and(error401()).and(error445()).and(error464()).and(error453())
-				.and(error463()).and(error434()).and(error449()).and(error999());
+		return error407().and(error408()).and(error409()).and(error464()).and(error415()).and(error401())
+				.and(error445()).and(error464()).and(error453()).and(error463()).and(error434()).and(error449())
+				;
 	}
 
 	static Validation checkErrorForUpdateInStoreVersion1311() {
-		return error407().and(error405()).and(error408()).and(error409()).and(error433()).and(error464())
-				.and(error415()).and(error444()).and(error401()).and(error445()).and(error464()).and(error453())
-				.and(error463()).and(error434()).and(error449()).and(error999());
+		return error407().and(error408()).and(error409()).and(error464()).and(error415()).and(error401())
+				.and(error445()).and(error464()).and(error453()).and(error463()).and(error434()).and(error449())
+				;
 	}
 
 	static Validation checkErrorForDeleteInStoreVersion1411() {
-		return error407().and(error408()).and(error433()).and(error414()).and(error415()).and(error444())
-				.and(error416()).and(error417()).and(error418()).and(error419()).and(error420()).and(error437())
-				.and(error999());
+		return error407().and(error408()).and(error414()).and(error415()).and(error416()).and(error417())
+				.and(error418()).and(error419()).and(error420()).and(error437());
 	}
 
 	static Validation checkErrorForDeleteInStoreVersion1311() {
-		return error407().and(error408()).and(error433()).and(error414()).and(error415()).and(error444())
-				.and(error416()).and(error417()).and(error418()).and(error419()).and(error420()).and(error437())
-				.and(error999());
+		return error407().and(error408()).and(error414()).and(error415()).and(error416()).and(error417())
+				.and(error418()).and(error419()).and(error420()).and(error437());
 	}
 }

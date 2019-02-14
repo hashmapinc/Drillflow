@@ -178,15 +178,15 @@ public class QueryValidation {
 	 */
 	private static Short validateAddtoStoreVersion1411(String WMLtypeIn, String XMLin, String OptionsIn,
 			String CapabilitiesIn) throws IOException {
-		Optional<Short> errorCode = null;
+		Optional<Short> errorCode = Optional.empty();
 		// error checking for input parameters for version 1.4.1.1
-		final ValidateParam validateParam = new ValidateParam(WMLtypeIn, XMLin, OptionsIn, CapabilitiesIn);
-		Validation validation = Validation.checkErrorForAddtoStoreVersion1411();
-		ValidationResult result = validation.apply(validateParam);
+				final ValidateParam validateParam = new ValidateParam(WMLtypeIn, XMLin, OptionsIn, CapabilitiesIn);
+				Validation validation = Validation.checkErrorForAddtoStoreVersion1411();
+				ValidationResult result = validation.apply(validateParam);
 
 		errorCode = result.getReason();
-		if (errorCode != null && errorCode.isPresent()) {
-			return errorCode.get();
+		if (errorCode != null) {
+		return errorCode.orElse(new Short((short) 1));
 		}
 
 		return null;
@@ -204,19 +204,19 @@ public class QueryValidation {
 	 */
 	private static Short validateAddtoStoreVersion1311(String WMLtypeIn, String XMLin, String OptionsIn,
 			String CapabilitiesIn) throws IOException {
-		Optional<Short> errorCode = null;
-		// error checking for input parameters for version 1.3.1.1
-		final ValidateParam validateParam = new ValidateParam(WMLtypeIn, XMLin, OptionsIn, CapabilitiesIn);
-		
-		Validation validation = Validation.checkErrorForAddtoStoreVersion1311();
-		ValidationResult result = validation.apply(validateParam);
+	    Optional<Short> errorCode = Optional.empty();
+			// error checking for input parameters for version 1.3.1.1
+			final ValidateParam validateParam = new ValidateParam(WMLtypeIn, XMLin, OptionsIn, CapabilitiesIn);
+			
+			Validation validation = Validation.checkErrorForAddtoStoreVersion1311();
+			ValidationResult result = validation.apply(validateParam);
 
-		errorCode = result.getReason();
-		if (errorCode != null && errorCode.isPresent()) {
-			return errorCode.get();
-		}
+			errorCode = result.getReason();
+	        if (errorCode != null) {
+	            return errorCode.orElse(new Short((short) 1));
+			}
 
-		return null;
+	        return null;
 	}
 
 	/**
@@ -231,15 +231,15 @@ public class QueryValidation {
 	 */
 	private static Short validateGetFromStoreVersion1411(String WMLtypeIn, String XMLin, String OptionsIn,
 			String CapabilitiesIn) throws IOException {
-		Optional<Short> errorCode = null;
+		Optional<Short> errorCode = Optional.empty();
 		// error checking for input parameters for version 1.4.1.1
 		final ValidateParam validateParam = new ValidateParam(WMLtypeIn, XMLin, OptionsIn, CapabilitiesIn);
 		Validation validation = Validation.checkErrorForGetFromStoreVersion1411();
 		ValidationResult result = validation.apply(validateParam);
 
 		errorCode = result.getReason();
-		if (errorCode != null && errorCode.isPresent()) {
-			return errorCode.get();
+		if (errorCode != null) {
+		return errorCode.orElse(new Short((short) 1));
 		}
 
 		return null;
@@ -257,15 +257,15 @@ public class QueryValidation {
 	 */
 	private static Short validateGetFromStoreVersion1311(String WMLtypeIn, String XMLin, String OptionsIn,
 			String CapabilitiesIn) throws IOException {
-		Optional<Short> errorCode = null;
-		// error checking for input parameters for version 1.4.1.1
-		final ValidateParam validateParam = new ValidateParam(WMLtypeIn, XMLin, OptionsIn, CapabilitiesIn);
-		Validation validation = Validation.checkErrorForGetFromStoreVersion1311();
-		ValidationResult result = validation.apply(validateParam);
+		Optional<Short> errorCode = Optional.empty();
+		// error checking for input parameters for version 1.3.1.1
+				final ValidateParam validateParam = new ValidateParam(WMLtypeIn, XMLin, OptionsIn, CapabilitiesIn);
+				Validation validation = Validation.checkErrorForGetFromStoreVersion1311();
+				ValidationResult result = validation.apply(validateParam);
 
 		errorCode = result.getReason();
-		if (errorCode != null && errorCode.isPresent()) {
-			return errorCode.get();
+		if (errorCode != null) {
+		return errorCode.orElse(new Short((short) 1));
 		}
 
 		return null;
@@ -283,15 +283,15 @@ public class QueryValidation {
 	 */
 	private static Short validateUpdateInStoreVersion1411(String WMLtypeIn, String XMLin, String OptionsIn,
 			String CapabilitiesIn) throws IOException {
-		Optional<Short> errorCode = null;
+		Optional<Short> errorCode = Optional.empty();
 		// error checking for input parameters for version 1.4.1.1
-		final ValidateParam validateParam = new ValidateParam(WMLtypeIn, XMLin, OptionsIn, CapabilitiesIn);
-		Validation validation = Validation.checkErrorForUpdateInStoreVersion1411();
-		ValidationResult result = validation.apply(validateParam);
+					final ValidateParam validateParam = new ValidateParam(WMLtypeIn, XMLin, OptionsIn, CapabilitiesIn);
+				Validation validation = Validation.checkErrorForUpdateInStoreVersion1411();
+				ValidationResult result = validation.apply(validateParam);
 
 		errorCode = result.getReason();
-		if (errorCode != null && errorCode.isPresent()) {
-			return errorCode.get();
+		if (errorCode != null) {
+		return errorCode.orElse(new Short((short) 1));
 		}
 
 		return null;
@@ -309,22 +309,22 @@ public class QueryValidation {
 	 */
 	private static Short validateUpdateInStoreVersion1311(String WMLtypeIn, String XMLin, String OptionsIn,
 			String CapabilitiesIn) throws IOException {
-		Optional<Short> errorCode = null;
-		// error checking for input parameters for version 1.4.1.1
-		final ValidateParam validateParam = new ValidateParam(WMLtypeIn, XMLin, OptionsIn, CapabilitiesIn);
-		Validation validation = Validation.checkErrorForUpdateInStoreVersion1311();
-		ValidationResult result = validation.apply(validateParam);
+		Optional<Short> errorCode = Optional.empty();
+		// error checking for input parameters for version 1.3.1.1
+				final ValidateParam validateParam = new ValidateParam(WMLtypeIn, XMLin, OptionsIn, CapabilitiesIn);
+				Validation validation = Validation.checkErrorForUpdateInStoreVersion1311();
+				ValidationResult result = validation.apply(validateParam);
 
 		errorCode = result.getReason();
-		if (errorCode != null && errorCode.isPresent()) {
-			return errorCode.get();
+		if (errorCode != null) {
+		return errorCode.orElse(new Short((short) 1));
 		}
 
 		return null;
 	}
 
 	/**
-	 * Validate Delte in store for version 1.4.1.1
+	 * Validate Delete in store for version 1.4.1.1
 	 * 
 	 * @param WMLtypeIn
 	 * @param XMLin
@@ -335,15 +335,15 @@ public class QueryValidation {
 	 */
 	private static Short validateDeleteInStoreVersion1411(String WMLtypeIn, String XMLin, String OptionsIn,
 			String CapabilitiesIn) throws IOException {
-		Optional<Short> errorCode = null;
+		Optional<Short> errorCode = Optional.empty();
 		// error checking for input parameters for version 1.4.1.1
-		final ValidateParam validateParam = new ValidateParam(WMLtypeIn, XMLin, OptionsIn, CapabilitiesIn);
-		Validation validation = Validation.checkErrorForDeleteInStoreVersion1411();
-		ValidationResult result = validation.apply(validateParam);
+				final ValidateParam validateParam = new ValidateParam(WMLtypeIn, XMLin, OptionsIn, CapabilitiesIn);
+				Validation validation = Validation.checkErrorForDeleteInStoreVersion1411();
+				ValidationResult result = validation.apply(validateParam);
 
 		errorCode = result.getReason();
-		if (errorCode != null && errorCode.isPresent()) {
-			return errorCode.get();
+		if (errorCode != null) {
+		return errorCode.orElse(new Short((short) 1));
 		}
 
 		return null;
@@ -361,15 +361,15 @@ public class QueryValidation {
 	 */
 	private static Short validateDeleteInStoreVersion1311(String WMLtypeIn, String XMLin, String OptionsIn,
 			String CapabilitiesIn) throws IOException {
-		Optional<Short> errorCode = null;
-		// error checking for input parameters for version 1.4.1.1
-		final ValidateParam validateParam = new ValidateParam(WMLtypeIn, XMLin, OptionsIn, CapabilitiesIn);
-		Validation validation = Validation.checkErrorForDeleteInStoreVersion1311();
-		ValidationResult result = validation.apply(validateParam);
+		Optional<Short> errorCode = Optional.empty();
+		// error checking for input parameters for version 1.3.1.1
+				final ValidateParam validateParam = new ValidateParam(WMLtypeIn, XMLin, OptionsIn, CapabilitiesIn);
+				Validation validation = Validation.checkErrorForDeleteInStoreVersion1311();
+				ValidationResult result = validation.apply(validateParam);
 
 		errorCode = result.getReason();
-		if (errorCode != null && errorCode.isPresent()) {
-			return errorCode.get();
+		if (errorCode != null) {
+		return errorCode.orElse(new Short((short) 1));
 		}
 
 		return null;
@@ -463,7 +463,7 @@ public class QueryValidation {
 		ERROR_472("-472"), ERROR_473("-473"), ERROR_474("-474"), ERROR_475("-475"), ERROR_476("-476"),
 		ERROR_477("-477"), ERROR_478("-478"), ERROR_479("-479"), ERROR_480("-480"), ERROR_481("-481"),
 		ERROR_482("-482"), ERROR_483("-483"), ERROR_484("-484"), ERROR_485("-485"), ERROR_486("-486"),
-		ERROR_487("-487"), ERROR_999("-999");
+		ERROR_487("-487"), ERROR_999("-999"), ERROR_1("1");
 
 		private String value;
 
