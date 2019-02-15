@@ -30,6 +30,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_AddToStoreResponse;
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_DeleteFromStoreResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse;
 
 @RunWith(SpringRunner.class)
@@ -90,11 +91,29 @@ public class StoreImplTests {
 	}
 	
 	@Test
-    public void validate1311wellTest() throws IOException {
-        String xmlString = new String(Files.readAllBytes(Paths.get("src/test/resources/well1311Test.xml")));
+    public void validate1311wellAddTest() throws IOException {
+        String xmlString = new String(Files.readAllBytes(Paths.get("src/test/resources/well1311.xml")));
         WMLS_AddToStoreResponse response = this.witsmlServer.addToStore("well", xmlString, "", "");
         System.out.println(response.getResult());
         assertNotNull(response);
-        assertEquals(response.getResult(), -999);
+        assertEquals(response.getResult(), -1);
+	}
+	
+	@Test
+    public void validate1411wellAddTest() throws IOException {
+        String xmlString = new String(Files.readAllBytes(Paths.get("src/test/resources/well1411.xml")));
+        WMLS_AddToStoreResponse response = this.witsmlServer.addToStore("well", xmlString, "", "");
+        System.out.println(response.getResult());
+        assertNotNull(response);
+        assertEquals(response.getResult(), -1);
+	}
+	
+	@Test
+    public void validate1311wellDeleteTest() throws IOException {
+        String xmlString = new String(Files.readAllBytes(Paths.get("src/test/resources/well1311Test.xml")));
+        WMLS_DeleteFromStoreResponse response = this.witsmlServer.deleteFromStore("well", xmlString, "", "");
+        System.out.println(response.getResult());
+        assertNotNull(response);
+        assertEquals(response.getResult().longValue(), 1);
 	}
 }

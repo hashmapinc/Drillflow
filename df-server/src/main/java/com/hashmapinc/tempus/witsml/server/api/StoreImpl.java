@@ -242,11 +242,6 @@ public class StoreImpl implements IStore {
 		try {
 			// construct query context
 			Map<String, String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
-			ValveUser user = (ValveUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-			QueryContext qc = new QueryContext(null, // client version not needed
-					WMLtypeIn, optionsMap, QueryIn, witsmlObjects, user.getUserName(), user.getPassword(),
-					getExchangeId());
 			short errorCode = QueryValidation.validateDeleteFromStore(WMLtypeIn, QueryIn, OptionsIn, CapabilitiesIn,
 					clientVersion);
 			resp.setSuppMsgOut(QueryValidation.getErrorMessage(errorCode));
@@ -254,6 +249,13 @@ public class StoreImpl implements IStore {
 			if (errorCode != 1) {
 				 return resp;
 			}
+			ValveUser user = (ValveUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+			QueryContext qc = new QueryContext(null, // client version not needed
+					WMLtypeIn, optionsMap, QueryIn, witsmlObjects, user.getUserName(), user.getPassword(),
+					getExchangeId());
+			LOG.info("checking QueryContext");
+			
 			this.valve.deleteObject(qc).get();
 			resp.setResult((short) 1);
 		} catch (IOException e1) {
