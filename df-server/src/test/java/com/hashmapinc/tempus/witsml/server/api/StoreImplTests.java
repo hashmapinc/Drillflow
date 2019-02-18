@@ -92,7 +92,7 @@ public class StoreImplTests {
 	
 	@Test
     public void validate1311wellAddTest() throws IOException {
-        String xmlString = new String(Files.readAllBytes(Paths.get("src/test/resources/well1311.xml")));
+        String xmlString = new String(Files.readAllBytes(Paths.get("src/test/resources/well1311Test.xml")));
         WMLS_AddToStoreResponse response = this.witsmlServer.addToStore("well", xmlString, "", "");
         System.out.println(response.getResult());
         assertNotNull(response);

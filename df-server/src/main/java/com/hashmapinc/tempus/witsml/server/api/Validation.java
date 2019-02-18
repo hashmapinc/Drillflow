@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import javax.xml.XMLConstants;
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -79,7 +80,9 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	public static String uomAttribute = "uom";
 	public static List<AbstractWitsmlObject> witsmlObjects = null;
 	public static String version = null;
-
+	public static String uom1311units = "1/H,1/K,1/kg,1/m,1/m2,1/m3,1/N,1/Pa,1/s,1/V,A,A.m2,A/m,A/m2,10 dB,10 dB/m,1/s,Bq,Bq/kg,C,C.m,C/kg,C/m2,C/m3,cd,cd/m2,eq,eq/kg,eq/m3,100%,F,F/m,gAPI,Gy,H,H/m,Hz,1/s,c/s,J,J/K,J/kg,J/kg.K,J/m3,J/mol,J/mol.K,K,K.m2/W,K/m,K/s,K/W,kg,kg.m,kg.m/s,kg.m2,kg/J,kg/m,kg/m2,kg/m2.s,kg/m3,kg/m4,kg/s,lm,lm.s,lm/W,lx,lx.s,m,m/K,m/s,m/s2,m2,m2/kg,m2/mol,m2/Pa.s,m2/s,m3,m3/J,m3/kg,m3/mol,m3/Pa.s,m3/Pa/s,m3/Pa/s,m3/Pa.s,m3/Pa2.s2,m3/s,m3/s2,m4,m4/s,mol,mol/m2,mol/m2.s,mol/m3,mol/s,N,N.m2,N/m,N/m3,N4/kg.m7,nAPI,O,ohm,ohm.m,ohm/m,Pa,Pa.s,Pa.s/m3,Pa.s/m6,Pa/m,Pa/m3,Pa/s,Pa2,rad,rad/m,rad/m3,rad/s,rad/s2,S,s,S/m,s/m,s/m3,sr,Sv,T,V,V/B,V/m,W,W/K,W/m.K,W/m2,W/m2.K,W/m2.sr,W/m3,W/m3.K,W/sr,Wb,Wb.m,Wb/m,%,cEuc,pu,1/a,1/bar,1/bbl,1/cm,1/d,1/degC,1/degF,1/degR,1/ft,1/ft2,1/ft3,1/g,1/galUK,1/galUS,1/h,1/in,1/km2,1/kPa,1/L,1/lbf,1/lbm,1/mi,1/mi2,1/min,1/mm,1/nm,1/pPa,1/psi,1/upsi,1/uV,km3/(d.m),km3/(h.m),yr(100k),a,A.h,A/cm2,A/ft2,A/mm,A/mm2,acre,acre.ft,ag,aJ,atm,atm/ft,atm/h,atm/m,b,b/cm3,bar,bar/h,bar/km,bar/m,bar2,bar2/cP,bbl,bbl/acre,bbl/acre.ft,bbl/bbl,bbl/cP.d.psi,bbl/d,bbl/d.acre.ft,bbl/d.ft,bbl/(d.ft),bbl/d.ft.psi,bbl/d.psi,bbl/psi.d,bbl/d2,bbl/ft,bbl/ft3,bbl/hr,bbl/hr2,bbl/in,bbl/kPa.d,bbl/(d.kPa),bbl/mi,bbl/min,bbl/psi.d,bbl/(d.psi),bbl/d.psi,bbl/tonUK,bbl/tonUS,Btu,Btu.in/h.ft2.degF,Btu/bbl,Btu/ft3,Btu/galUK,Btu/galUS,Btu/h,Btu/h.ft.degF,Btu/h.ft2,Btu/h.ft2.degF,Btu/hr.ft2.degR,Btu/h.ft3,Btu/h.ft3.degF,Btu/h.m2.degC,Btu/lbm,Btu/lbm.degF,Btu/lbm.degR,Btu/min,Btu/s,Btu/s.ft2,Btu/s.ft2.degF,Btu/s.ft3,Btu/s.ft3.degF,c,C/cm2,C/cm3,C/g,C/mm2,C/mm3,c/s,rev/s,cal,cal/cm3,cal/g,cal/g.K,cal/h.cm.degC,cal/h.cm2,cal/h.cm2.degC,cal/h.cm3,cal/kg,cal/lbm,cal/mL,cal/mm3,cal/s.cm.degC,cal/s.cm2.degC,cal/s.cm3,%,%,Ci,curie,cm,cm/a,cm/s,cm/s2,cm2,cm2/g,cm2/s,cm3,cm3/cm3,cm3/g,cm3/h,cm3/m3,cm3/min,cm3/s,cm4,cP,cu,ft3,ft3(std,60F),in3,in3,1/27 ft3,yd3,mi3,mi3,Ci,Ci,D,d,D.ft,D.m,d/bbl,d/ft3,d/m3,dAPI,dB,dB/ft,dB/m,degC,degF,K,degR,dega,dega/ft(100),dega/ft,dega/100ft,dega/h,dega/m,dega/min,dega/s,degC,degC.m2.h/kcal,degC/ft,degC/h,degC/km,degC/m,degC/min,degC/s,degF,degF.ft2.h/Btu,degF/ft(100),degF/ft,degF/100ft,degF/h,degF/m,degF/min,degF/s,degR,dm,dm/s,dm3,L,L,dm3/km(100),dm3/kg,dm3/100km,dm3/kW.h,dm3/m,dm3/m3,dm3/MJ,dm3/mol,dm3/s,dm3/s2,dm3/t,dN.m,.1 Pa,(dyne/cm)4/gcm3,(N/m)4/kg.m3,ehp,EJ,EJ/a,eq/L,mN/m,eV,fC,flozUK,flozUS,1/s,flops,fl ozUK,fl ozUS,fm,ft,ft.lbf,ft.lbf/bbl,ft.lbf/galUS,ft.lbf/lbm,ft.lbf/min,ft.lbf/s,ft.lbm,ft/bbl,ft/d,ft/degF,ft/ft,ft/ft3,ft/galUS,ft/h,ft/in,ft/m,ft/mi,ft/min,ft/ms,ft/s,ft/s2,ft/us,ft2,sq ft,ft2/h,ft2/in3,ft2/s,ft3,cu ft,scf(60F),ft3/bbl,ft3/d,ft3/d.ft.psi,ft3/d2,ft3/ft,ft3/ft3,ft3/h,ft3/h2,ft3/kg,ft3/lbm,ft3/min,ft3/min.ft2,ft3/min2,ft3/s,ft3/s.ft2,ft3/s2,ftCla,ftAM,ftUS,g,g.ft/cm3.s,g/cm3,g/cm4,g/dm3,g/galUK,g/galUS,g/kg,g/L,g/dm3,g/m3,g/s,galUK,galUK/d,galUK/ft3,galUK/h,galUK/h.ft,galUK/h.ft2,galUK/h.in,galUK/h.in2,galUK/h2,galUK/lbm,galUK/mi,galUK/min,galUK/min.ft,galUK/min.ft2,galUK/min2,galUS,galUS/bbl,galUS/d,galUS/ft,galUS/ft3,galUS/h,galUS/h.ft,galUS/h.ft2,galUS/h.in,galUS/h.in2,galUS/h2,galUS/lbm,galUS/mi,galUS/min,galUS/min.ft,galUS/min.ft2,galUS/min2,galUS/tonUK,galUS/tonUS,GBq,GeV,gf,GHz,GJ,gn,Gohm,GPa,GPa/cm,GPa2,grad,Grad,grain/ft3(100),grain/100ft3,GS,GW,GW.h,h,h/ft3,h/km,h/m3,ha,ha.m,hbar,hhp,hhp/in2,hL,hp,hp.h,hp.h/bbl,hp.h/lbm,hp/ft3,hp/in2,in,1/16 in,1/32 in,1/64 in,in/a,in/in.degF,in/min,in/s,in2|sq in,sq in,in2/ft2,in2/in2,in2/s,in3|cu in,cu in,in3/ft,in4,inUS,J/cm2,J/dm3,J/g,J/g.K,J/m,J/m2,J/s.m2.degC,K.m2/kW,kA,Mbbl/d,kC,kcal,kcal.m/cm2,kcal/cm3,kcal/g,kcal/h,kcal/h.m.degC,kcal/h.m2.degC,kcal/kg,kcal/kg.degC,kcal/m3,kcd,keV,kg.m/cm2,kg/d,kg/dm3,kg/dm4,kg/h,kg/kg,kg/kW.h,kg/L,kg/dm3,kg/m.s,kg/min,kg/MJ,kgf,kgf.m,kgf.m/cm2,kgf.m/m,kgf.m2,kgf.s/m2,kgf/cm,kgf/cm2,kgf/kgf,kgf/mm2,kHz,kJ,kJ.m/h.m2.K,kJ/dm3,kJ/h.m2.K,kJ/kg,kJ/kg.K,kJ/m3,kJ/mol,kJ/mol.K,klx,km,km/cm,km/dm3,km/h,km/L,km/s,km2,km3,kmol,kN,kN.m,kN.m2,kN/m,kN/m2,kohm,kohm.m,kPa,kPa.s/m,kPa/hm,kPa/h,kPa/m,kPa/min,kPa2,kPa2/cP,kS,kV,kW,kW.h,kW.h/dm3,kW.h/kg,kW.h/kg.degC,kW.h/m3,kW/cm2,kW/m2,kW/m2.K,kW/m3,kW/m3.K,L,dm3,dm3,L/km(100),(L/min)/bar,L/h,L/kg,L/100km,L/m,L/m3,L/min,L/mol,L/s,L/s2,L/t,L/tonUK,lbf,lbf.ft,lbf.ft/bbl,lbf.ft/in,lbf.ft/in2,lbf.ft/lbm,lbf.in,lbf.in/in,lbf.in2,lbf.s/ft2,lbf.s/in2,lbf/ft2(100),lbf/ft,lbf/ft2,lbf/100ft2,lbf/ft3,lbf/galUS,lbf/in,lbf/in2,lbf/lbf,lbm,lbm.ft/s,lbm.ft2,lbm.ft2/s2,Mlbm/yr,lbm/galUK(1000),lbm/galUS(1000),lbm/bbl,lbm/d,lbm/ft,lbm/h.ft,lbm/h.ft,lbm/s.ft,lbm/s.ft2,lbm/ft2,lbm/ft3,lbm/ft4,lbm/galUK,lbm/galUK.ft,lbm/1000galUK,lbm/galUS,lbm/galUS.ft,lbm/1000galUS,lbm/h,lbm/h.ft,lbm/ft.h,lbm/h.ft2,lbm/hp.h,lbm/in3,lbm/min,lbm/s,lbm/s.ft,lbm/ft.s,lbm/s.ft2,lm/m2,lm/m2,m/cm,m/d,m/h,m/km,m/m,m/m.K,m/m3,m/min,m/ms,m2/cm3,m2/d.kPa,m2/g,m2/h,m2/m2,m2/m3,m3/bar.d,m3/(d.bar),m3/bar.d,m3.bar.h,m3/(h.bar),m3/bar.h,m3/bar.min,m3/(min.bar),m3/bar.min,m3/cP.d.kPa,m3/cP.Pa.s,m3/d,m3/d.kPa,m3/d.kPa,m3/kPa.d,m3/(d.kPa),m3/d.m,m3/(d.m),m3/d2,m3/g,m3/h,m3/h.m,m3/(h.m),m3/ha.m,m3/km,m3/kPa.d,m3/(d.kPa),m3/d.kPa,m3/k.kPa,m3/kPa.h,(m3/h)/kPa,m3/kW.h,m3/m,m3/m2,m3/m3,m3/min,m3/mol(kg),m3/mol,m3/psi.d,m3/(d.psi),m3/s.ft,m3/(s.ft),m3/s.m,m3/s.m2,m3/t,m3/tonUK,m3/tonUS,mA,Ma,MA,mA/cm2,mA/ft2,mbar,Mbbl,Mbbl.ft/d,kbbl/d,MBq,Mbyte,mC,mC/m2,mCi,mcurie,mCi,mD,mD.ft,mD.ft2/lbf.s,mD.in2/lbf.s,mD.m,mD/cP,mD/Pa.s,meq,meq/cm3,meq/g,ppk,ppk,permil,MeV,Mg,mg,Mg/a,Mg/d,mg/dm3,mg/galUS,Mg/h,Mg/in,mg/J,mg/kg,mg/L,Mg/m2,mg/m3,Mg/m3,mGal,mgn,mGy,mH,mho,mho/m,MHz,mHz,mi,mi/galUK,mi/galUS,mi/h,mi/in,mi2,sq mi,mi3,cubem,in/1000,min,min/ft,min/m,mina,miUS,miUS2,MJ,mJ,MJ/a,mJ/cm2,MJ/kg,MJ/m,mJ/m2,MJ/m3,MJ/mol,mL,mL/galUK,mL/galUS,mL/mL,mm,Mm,mm/a,mm/mm.K,mm/s,mm2,mm2/mm2,mm2/s,mm3,mm3/J,M(ft3),mmho/m,mmol,Mscm3,MN,mN,mN.m2,mN/km,mN/m,Mohm,mohm,mol,mol/h,mol/m3,mol/s,mPa,MPa,mPa.s,MPa.s/m,MPa/h,MPa/m,Mpsi,mrad,Mrad,mS,ms,ms/cm,ms/ft,ms/in,mS/m,ms/m,ms/s,MMscm(15C),mSv,mT,MV,mV,mV/ft,mV/m,MW,mW,MW.h,MW.h/kg,MW.h/m3,mW/m2,mWb,MA,Ma,N.m,N.m/m,N.s/m2,N/m2,N/mm2,nA,nC,nCi,ncurie,nCi,nH,nJ,nm,nm/s,nohm,ns,ns/ft,ns/m,nT,nW,Oe,ohm.cm,ozf,ozm,P,pA,Pa.s2/m3,Pa/h,pC,pCi,pcurie,pCi/g,pCi,pCi,ppk,permil,mEuc,pF,pm,pPa,ppk,permil,mEuc,ppm,uEuc,ppm/degC,ppm/degF,ps,pS,lbf/ft2,lbf/ft3,psi,lbf/in2,lbf/in2,psi.d/bbl,psi.s,psi/ft(100),psi/ft,psi/100ft,psi/h,psi/m,psi/min,psi2,psi2.d/cP.ft3,psi2.d/cp.ft3,psi2.d/cP.ft3,psi2.d/cP.ft3,psi2.d2/cP.ft6,psi2.d2/cp.ft6,psi2.d2/cP.ft6,psi2.d2/cP.ft6,psi2/cP,rad/ft,rad/ft3,rpm,c/s,c/s,rev/min,s/cm,s/ft,s/ft3,s/in,s/L,scf(60F),seca,cu,cu,ft2,ft2,in2,in2,mi2,mi2,yd2,yd2,t,t/a,t/d,t/h,t/min,lm.s,TBq,TeV,therm/galUK,therm/lbm,TJ,TJ/a,Tohm,tonfUS.mi,tonUK,tonUK/a,tonUK/d,tonUK/h,tonUK/min,tonUS,tonUS/a,tonUS/d,tonUS/ft2,tonUS/h,tonUS/min,TW,TW.h,uA,uA/cm2,uA/in2,ubar,uC,uCi,ucurie,uCi,ppm,uEuc,uF,uF/m,ug,ug/cm3,uH,uH/m,uHz,uJ,um,um/s,um2,um2.m,umol,uN,Euc,uohm,uohm/ft,uohm/m,uPa,upsi,urad,uS,us,us/ft,us/m,uT,uV,uV/ft,uV/m,uW,uW/m3,uWb,V/dB,%,%,cEuc,ppm,ppm,W/cm2,W/kW,W/mm2,W/W,Wb/mm,%,%,cEuc,ppm,ppm,uEuc,1/27 ft3";
+	public static String uom1411units = "1/H,1/K,1/kg,1/m,1/m2,1/m3,1/N,1/Pa,1/s,1/V,A,A.m2,A/m,A/m2,10 dB,10 dB/m,1/s,Bd,Bq,Bq/kg,C,C.m,C/kg,C/m2,C/m3,cd,cd/m2,eq,eq/kg,eq/m3,100%,F,F/m,gAPI,Gy,H,H/m,Hz,1/s,c/s,J,J/K,J/kg,J/kg.K,J/m3,J/mol,J/mol.K,K,K.m2/W,K/m,K/s,K/W,kg,kg.m,kg.m/s,kg.m2,kg/J,kg/m,kg/m2,kg/m2.s,kg/m3,kg/m4,kg/s,lm,lm.s,lm/W,lx,lx.s,m,m/K,m/s,m/s2,m2,m2/kg,m2/mol,m2/Pa.s,m2/s,m3,m3/J,m3/kg,m3/mol,m3/Pa.s,m3/Pa/s,m3/Pa/s,m3/Pa.s,m3/Pa2.s2,m3/s,m3/s2,m4,m4/s,mol,mol/m2,mol/m2.s,mol/m3,mol/s,N,N.m2,N/m,N/m3,N4/kg.m7,nAPI,O,ohm,ohm.m,ohm/m,Pa,Pa.s,Pa.s/m3,Pa.s/m6,Pa/m,Pa/m3,Pa/s,Pa2,rad,rad/m,rad/m3,rad/s,rad/s2,S,s,S/m,s/m,s/m3,sr,Sv,T,V,V/B,V/m,W,W/K,W/m.K,W/m2,W/m2.K,W/m2.sr,W/m3,W/m3.K,W/sr,Wb,Wb.m,Wb/m,%,cEuc,pu,1/a,1/bar,1/bbl,1/cm,1/d,1/degC,1/degF,1/degR,1/ft,1/ft2,1/ft3,1/g,1/galUK,1/galUS,1/h,1/in,1/km2,1/kPa,1/L,1/lbf,1/lbm,1/mi,1/mi2,1/min,1/mm,1/nm,1/pPa,1/psi,1/upsi,1/uV,km3/(d.m),km3/(h.m),yr(100k),a,A.h,A/cm2,A/ft2,A/mm,A/mm2,acre,acre.ft,ag,aJ,atm,atm/ft,atm/h,atm/m,b,b/cm3,bar,bar/h,bar/km,bar/m,bar2,bar2/cP,bbl,bbl/acre,bbl/acre.ft,bbl/bbl,bbl/cP.d.psi,bbl/d,bbl/d.acre.ft,bbl/d.ft,bbl/(d.ft),bbl/d.ft.psi,bbl/d.psi,bbl/psi.d,bbl/d2,bbl/ft,bbl/ft3,bbl/hr,bbl/hr2,bbl/in,bbl/kPa.d,bbl/(d.kPa),bbl/mi,bbl/min,bbl/psi.d,bbl/(d.psi),bbl/d.psi,bbl/tonUK,bbl/tonUS,Btu,Btu.in/h.ft2.degF,Btu/bbl,Btu/ft3,Btu/galUK,Btu/galUS,Btu/h,Btu/h.ft.degF,Btu/h.ft2,Btu/h.ft2.degF,Btu/hr.ft2.degR,Btu/h.ft3,Btu/h.ft3.degF,Btu/h.m2.degC,Btu/lbm,Btu/lbm.degF,Btu/lbm.degR,Btu/min,Btu/s,Btu/s.ft2,Btu/s.ft2.degF,Btu/s.ft3,Btu/s.ft3.degF,c,C/cm2,C/cm3,C/g,C/mm2,C/mm3,c/s,rev/s,cal,cal/cm3,cal/g,cal/g.K,cal/h.cm.degC,cal/h.cm2,cal/h.cm2.degC,cal/h.cm3,cal/kg,cal/lbm,cal/mL,cal/mm3,cal/s.cm.degC,cal/s.cm2.degC,cal/s.cm3,%,%,Ci,curie,cm,cm/a,cm/s,cm/s2,cm2,cm2/g,cm2/s,cm3,cm3/cm3,cm3/g,cm3/h,cm3/m3,cm3/min,cm3/s,cm4,cP,cu,ft3,ft3(std,60F),in3,in3,1/27 ft3,yd3,mi3,mi3,Ci,Ci,D,d,D.ft,D.m,d/bbl,d/ft3,d/m3,dAPI,dB,dB/ft,dB/m,dB/km,degC,degF,K,degR,dega,dega/ft(100),dega/ft,dega/100ft,dega/h,dega/m,dega/min,dega/s,degC,degC.m2.h/kcal,degC/ft,degC/h,degC/km,degC/m,degC/min,degC/s,degF,degF.ft2.h/Btu,degF/ft(100),degF/ft,degF/100ft,degF/h,degF/m,degF/min,degF/s,degR,dm,dm/s,dm3,L,L,dm3/km(100),dm3/kg,dm3/100km,dm3/kW.h,dm3/m,dm3/m3,dm3/MJ,dm3/mol,dm3/s,dm3/s2,dm3/t,dN.m,.1 Pa,(dyne/cm)4/gcm3,(N/m)4/kg.m3,ehp,EJ,EJ/a,eq/L,mN/m,eV,fC,flozUK,flozUS,1/s,flops,fl ozUK,fl ozUS,fm,ft,ft.lbf,ft.lbf/bbl,ft.lbf/galUS,ft.lbf/lbm,ft.lbf/min,ft.lbf/s,ft.lbm,ft/bbl,ft/d,ft/degF,ft/ft,ft/ft3,ft/galUS,ft/h,ft/in,ft/m,ft/mi,ft/min,ft/ms,ft/s,ft/s2,ft/us,ft2,sq ft,ft2/h,ft2/in3,ft2/s,ft3,cu ft,scf(60F),ft3/bbl,ft3/d,ft3/d.ft.psi,ft3/d2,ft3/ft,ft3/ft3,ft3/h,ft3/h2,ft3/kg,ft3/lbm,ft3/min,ft3/min.ft2,ft3/min2,ft3/s,ft3/s.ft2,ft3/s2,ftCla,ftAM,ftUS,g,g.ft/cm3.s,g/cm3,g/cm4,g/dm3,g/galUK,g/galUS,g/kg,g/L,g/dm3,g/m3,g/s,galUK,galUK/d,galUK/ft3,galUK/h,galUK/h.ft,galUK/h.ft2,galUK/h.in,galUK/h.in2,galUK/h2,galUK/lbm,galUK/mi,galUK/min,galUK/min.ft,galUK/min.ft2,galUK/min2,galUS,galUS/bbl,galUS/d,galUS/ft,galUS/ft3,galUS/h,galUS/h.ft,galUS/h.ft2,galUS/h.in,galUS/h.in2,galUS/h2,galUS/lbm,galUS/mi,galUS/min,galUS/min.ft,galUS/min.ft2,galUS/min2,galUS/tonUK,galUS/tonUS,GBq,GeV,gf,GHz,GJ,gn,Gohm,GPa,GPa/cm,GPa2,grad,Grad,grain/ft3(100),grain/100ft3,GS,GW,GW.h,h,h/ft3,h/km,h/m3,ha,ha.m,hbar,hhp,hhp/in2,hL,hp,hp.h,hp.h/bbl,hp.h/lbm,hp/ft3,hp/in2,in,1/16 in,1/32 in,1/64 in,in/a,in/in.degF,in/min,in/s,in2|sq in,sq in,in2/ft2,in2/in2,in2/s,in3|cu in,cu in,in3/ft,in4,inUS,J/cm2,J/dm3,J/g,J/g.K,J/m,J/m2,J/s.m2.degC,K.m2/kW,kA,Mbbl/d,kC,kcal,kcal.m/cm2,kcal/cm3,kcal/g,kcal/h,kcal/h.m.degC,kcal/h.m2.degC,kcal/kg,kcal/kg.degC,kcal/m3,kcd,keV,kg.m/cm2,kg/d,kg/dm3,kg/dm4,kg/h,kg/kg,kg/kW.h,kg/L,kg/dm3,kg/m.s,kg/min,kg/MJ,kgf,kgf.m,kgf.m/cm2,kgf.m/m,kgf.m2,kgf.s/m2,kgf/cm,kgf/cm2,kgf/kgf,kgf/mm2,kHz,kJ,kJ.m/h.m2.K,kJ/dm3,kJ/h.m2.K,kJ/kg,kJ/kg.K,kJ/m3,kJ/mol,kJ/mol,kJ/kmol.K,kJ/mol.K,klx,km,km/cm,km/dm3,km/h,km/L,km/s,km2,km3,kmol,kN,kN.m,kN.m2,kN/m,kN/m2,kohm,kohm.m,kPa,kPa.s/m,kPa/hm,kPa/h,kPa/m,kPa/min,kPa2,kPa2/cP,kS,kV,kW,kW.h,kW.h/dm3,kW.h/kg,kW.h/kg.degC,kW.h/m3,kW/cm2,kW/m2,kW/m2.K,kW/m3,kW/m3.K,L,dm3,dm3,L/km(100),(L/min)/bar,L/h,L/kg,L/100km,L/m,L/m3,L/min,L/mol,L/mol,L/s,L/s2,L/t,L/tonUK,lbf,lbf.ft,lbf.ft/bbl,lbf.ft/in,lbf.ft/in2,lbf.ft/lbm,lbf.in,lbf.in/in,lbf.in2,lbf.s/ft2,lbf.s/in2,lbf/ft2(100),lbf/ft,lbf/ft2,lbf/100ft2,lbf/ft3,lbf/galUS,lbf/in,lbf/in2,lbf/lbf,lbm,lbm.ft/s,lbm.ft2,lbm.ft2/s2,Mlbm/yr,lbm/galUK(1000),lbm/galUS(1000),lbm/bbl,lbm/d,lbm/ft,lbm/h.ft,lbm/h.ft,lbm/s.ft,lbm/s.ft2,lbm/ft2,lbm/ft3,lbm/ft4,lbm/galUK,lbm/galUK.ft,lbm/1000galUK,lbm/galUS,lbm/galUS.ft,lbm/1000galUS,lbm/h,lbm/h.ft,lbm/ft.h,lbm/h.ft2,lbm/hp.h,lbm/in3,lbm/min,lbm/s,lbm/s.ft,lbm/ft.s,lbm/s.ft2,lm/m2,lm/m2,m/cm,m/d,m/h,m/km,m/m,m/m.K,m/m3,m/min,m/ms,m2/cm3,m2/d.kPa,m2/g,m2/h,m2/m2,m2/m3,m3/bar.d,m3/(d.bar),m3/bar.d,m3.bar.h,m3/(h.bar),m3/bar.h,m3/bar.min,m3/(min.bar),m3/bar.min,m3/cP.d.kPa,m3/cP.Pa.s,m3/d,m3/d.kPa,m3/d.kPa,m3/kPa.d,m3/(d.kPa),m3/d.m,m3/(d.m),m3/d2,m3/g,m3/h,m3/h.m,m3/(h.m),m3/ha.m,m3/km,m3/kPa.d,m3/(d.kPa),m3/d.kPa,m3/k.kPa,m3/kPa.h,(m3/h)/kPa,m3/kW.h,m3/m,m3/m2,m3/m3,m3/min,m3/mol(kg),m3/mol,m3/mol(kg),m3/mol,m3/psi.d,m3/(d.psi),m3/s.ft,m3/(s.ft),m3/s.m,m3/s.m2,m3/t,m3/tonUK,m3/tonUS,mA,Ma,MA,mA/cm2,mA/ft2,mbar,Mbbl,Mbbl.ft/d,kbbl/d,MBq,Mbyte,mC,mC/m2,mCi,mcurie,mCi,mD,mD.ft,mD.ft2/lbf.s,mD.in2/lbf.s,mD.m,mD/cP,mD/Pa.s,meq,meq/cm3,meq/g,ppk,ppk,permil,MeV,Mg,mg,Mg/a,Mg/d,mg/dm3,mg/galUS,Mg/h,Mg/in,mg/J,mg/kg,mg/L,Mg/m2,mg/m3,Mg/m3,mGal,mgn,mGy,mH,mho,mho/m,MHz,mHz,mi,mi/galUK,mi/galUS,mi/h,mi/in,mi2,sq mi,mi3,cubem,in/1000,min,min/ft,min/m,mina,miUS,miUS2,MJ,mJ,MJ/a,mJ/cm2,MJ/kg,MJ/m,mJ/m2,MJ/m3,MJ/mol,MJ/mol,mL,mL/galUK,mL/galUS,mL/mL,mm,Mm,mm/a,mm/mm.K,mm/s,mm2,mm2/mm2,mm2/s,mm3,mm3/J,M(ft3),mmho/m,mmol,Mscm3,MN,mN,mN.m2,mN/km,mN/m,Mohm,mohm,mol,mol/h,mol/h,mol/m3,mol/m3,mol/s,mol/s,mPa,MPa,mPa.s,MPa.s/m,MPa/h,MPa/m,Mpsi,mrad,Mrad,mS,ms,ms/cm,ms/ft,ms/in,mS/m,ms/m,ms/s,MMscm(15C),mSv,mT,MV,mV,mV/ft,mV/m,MW,mW,MW.h,MW.h/kg,MW.h/m3,mW/m2,mWb,MA,Ma,N.m,N.m/m,N.s/m2,N/m2,N/mm2,nA,nC,nCi,ncurie,nCi,nH,nJ,nm,nm/s,nohm,ns,ns/ft,ns/m,nT,nW,Oe,ohm.cm,ozf,ozm,P,pA,Pa.s2/m3,Pa/h,pC,pCi,pcurie,pCi/g,pCi,pCi,ppk,permil,mEuc,pF,pm,pPa,ppk,permil,mEuc,ppm,uEuc,ppm/degC,ppm/degF,ps,pS,lbf/ft2,lbf/ft3,psi,lbf/in2,lbf/in2,psi.d/bbl,psi.s,psi/ft(100),psi/ft,psi/100ft,psi/h,psi/m,psi/min,psi2,psi2.d/cP.ft3,psi2.d/cp.ft3,psi2.d/cP.ft3,psi2.d/cP.ft3,psi2.d2/cP.ft6,psi2.d2/cp.ft6,psi2.d2/cP.ft6,psi2.d2/cP.ft6,psi2/cP,rad/ft,rad/ft3,rpm,c/s,c/s,rev/min,s/cm,s/ft,s/ft3,s/in,s/L,scf(60F),seca,cu,cu,ft2,ft2,in2,in2,mi2,mi2,yd2,yd2,t,t/a,t/d,t/h,t/min,lm.s,TBq,TeV,therm/galUK,therm/lbm,TJ,TJ/a,Tohm,tonfUS.mi,tonUK,tonUK/a,tonUK/d,tonUK/h,tonUK/min,tonUS,tonUS/a,tonUS/d,tonUS/ft2,tonUS/h,tonUS/min,TW,TW.h,uA,uA/cm2,uA/in2,ubar,uC,uCi,ucurie,uCi,ppm,uEuc,uF,uF/m,ug,ug/cm3,uH,uH/m,uHz,uJ,um,um/s,um2,um2.m,umol,uN,Euc,uohm,uohm/ft,uohm/m,uPa,upsi,urad,uS,us,us/ft,us/m,uT,uV,uV/ft,uV/m,uW,uW/m3,uWb,V/dB,%,%,cEuc,ppm,ppm,W/cm2,W/kW,W/mm2,W/W,Wb/mm,%,%,cEuc,ppm,ppm,uEuc,1/27 ft3";
+	
 	static Validation error401() {
 		return holds(param -> !checkWell(param.getXMLin(), param.getWMLtypeIn()), ERRORCODE.ERROR_401.value());
 	}
@@ -209,8 +212,8 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 	
 	static Validation error443() {
-		return holds(param -> !checkMnemonicListNotEmpty(param.getXMLin(), param.getWMLtypeIn()),
-				ERRORCODE.ERROR_439.value());
+		return holds(param -> !checkUOMWithUnitDirectory(param.getXMLin(), param.getWMLtypeIn()),
+				ERRORCODE.ERROR_443.value());
 	}
 
 	static Validation error445() {
@@ -304,7 +307,394 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 			return result.isValid() ? other.apply(user) : result;
 		};
 	}
+	
+	static boolean checkUOMUnit(String uomPattern, String uomUnit) {
+		 
+		 String regex = "(?<=^|,)" + uomPattern + "(?=,|$)";
+		boolean result = Pattern.compile(regex).matcher(uomUnit).find();
+		return result;
+	}
+	
+	static boolean checkUOMWithUnitDirectory(String XMLin, String WMLTypein) {
+		boolean result = false;
+		List<AbstractWitsmlObject> witsmlObjects;
+		String version;
+		try {
+			version = WitsmlUtil.getVersionFromXML(XMLin);
+			LOG.info("the version is: " + version);
+			witsmlObjects = WitsmlObjectParser.parse(WMLTypein, XMLin, version);
+			switch (WMLTypein) {
+			case "log":
+				//result = checkUOMWithUnitDirectoryLog(witsmlObjects);
+				break;
+			case "trajectory":
+				//result = checkUOMWithUnitDirectoryTrajectory(witsmlObjects);
+				break;
+			case "well":
+				result = checkUOMWithUnitDirectoryWell(witsmlObjects);
+				break;
+			case "wellbore":
+				//result = checkUOMWithUnitDirectoryWellBore(witsmlObjects);
+				break;
+			default:
+				throw new WitsmlException("unsupported witsml object type: " + WMLTypein);
+			}
+		} catch (Exception e) {
+			LOG.warning("the error is " + e.getMessage());
+		}
+		return result;
+	}
+	
+	static boolean checkUOMWithUnitDirectoryWell(List<AbstractWitsmlObject> witsmlObjects) {
 
+		boolean result = false;
+
+		for (AbstractWitsmlObject abstractWitsmlObject : witsmlObjects) {
+			if (abstractWitsmlObject instanceof ObjWell) {
+				LOG.info("checking well object ");
+				ObjWell objWell1311 = (ObjWell) abstractWitsmlObject;
+
+				DimensionlessMeasure pcInterest = (DimensionlessMeasure) objWell1311.getPcInterest();
+				
+				if(checkUOMUnit(pcInterest.getUom(), uom1311units)==false) {
+					result = true;
+					break;
+				}
+
+				WellElevationCoord wellHeadElevation = (WellElevationCoord) objWell1311.getWellheadElevation();
+
+				if(checkUOMUnit(wellHeadElevation.getUom().toString(), uom1311units)==false) {
+					result = true;
+					break;
+				}
+
+				WellElevationCoord groundElevation = (WellElevationCoord) objWell1311.getGroundElevation();
+
+				if(checkUOMUnit(groundElevation.getUom().toString(), uom1311units)==false) {
+					result = true;
+					break;
+				}
+
+
+				WellVerticalDepthCoord waterDepth = (WellVerticalDepthCoord) objWell1311.getWaterDepth();
+
+				if(checkUOMUnit(waterDepth.getUom().toString(), uom1311units)==false) {
+					result = true;
+					break;
+				}
+
+
+			} else if (abstractWitsmlObject instanceof com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) {
+				if (abstractWitsmlObject.getUid() == null
+						|| (abstractWitsmlObject.getUid() != null && abstractWitsmlObject.getUid().isEmpty())) {
+					result = true;
+					break;
+				}
+
+				com.hashmapinc.tempus.WitsmlObjects.v1411.DimensionlessMeasure pcInterest = (com.hashmapinc.tempus.WitsmlObjects.v1411.DimensionlessMeasure) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject)
+						.getPcInterest();
+
+				if(checkUOMUnit(pcInterest.getUom(), uom1411units)==false) {
+					result = true;
+					break;
+				}
+
+
+				com.hashmapinc.tempus.WitsmlObjects.v1411.WellElevationCoord wellHeadElevation = (com.hashmapinc.tempus.WitsmlObjects.v1411.WellElevationCoord) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject)
+						.getWellheadElevation();
+
+			
+				if(checkUOMUnit(wellHeadElevation.getUom().toString(), uom1411units)==false) {
+					result = true;
+					break;
+				}
+
+
+				com.hashmapinc.tempus.WitsmlObjects.v1411.WellElevationCoord groundElevation = (com.hashmapinc.tempus.WitsmlObjects.v1411.WellElevationCoord) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject)
+						.getGroundElevation();
+				
+				if(checkUOMUnit(groundElevation.getUom().toString(), uom1411units)==false) {
+					result = true;
+					break;
+				}
+
+
+				com.hashmapinc.tempus.WitsmlObjects.v1411.LengthMeasure waterDepth = (com.hashmapinc.tempus.WitsmlObjects.v1411.LengthMeasure) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject)
+						.getWaterDepth();
+
+				if(checkUOMUnit(waterDepth.getUom().toString(), uom1411units)==false) {
+					result = true;
+					break;
+				}
+
+
+			}
+		}
+
+		return result;
+	}
+	
+	static boolean checkUOMWithUnitDirectoryWellBore(List<AbstractWitsmlObject> witsmlObjects) {
+
+		boolean result = false;
+
+		for (AbstractWitsmlObject abstractWitsmlObject : witsmlObjects) {
+			if (abstractWitsmlObject instanceof ObjWellbore) {
+				LOG.info("checking wellBore object ");
+				ObjWellbore objWellbore1311 = (ObjWellbore) abstractWitsmlObject;
+
+				MeasuredDepthCoord mdCurrent = (MeasuredDepthCoord) objWellbore1311.getMdCurrent();
+
+								
+				if(checkUOMUnit(mdCurrent.getUom().toString(), uom1311units)==false) {
+					result = true;
+					break;
+				}
+
+				WellVerticalDepthCoord tvdCurrent = (WellVerticalDepthCoord) objWellbore1311.getTvdCurrent();
+
+				if(checkUOMUnit(tvdCurrent.getUom().toString(), uom1311units)==false) {
+					result = true;
+					break;
+				}
+
+				MeasuredDepthCoord mdKickoff = (MeasuredDepthCoord) objWellbore1311.getMdKickoff();
+
+				if(checkUOMUnit(mdKickoff.getUom().toString(), uom1311units)==false) {
+					result = true;
+					break;
+				}
+
+				WellVerticalDepthCoord tvdKickoff = (WellVerticalDepthCoord) objWellbore1311.getTvdKickoff();
+
+				if(checkUOMUnit(tvdKickoff.getUom().toString(), uom1311units)==false) {
+					result = true;
+					break;
+				}
+
+				MeasuredDepthCoord mdPlanned = (MeasuredDepthCoord) objWellbore1311.getMdPlanned();
+
+				if(checkUOMUnit(mdPlanned.getUom().toString(), uom1311units)==false) {
+					result = true;
+					break;
+				}
+
+				WellVerticalDepthCoord vdPlanned = (WellVerticalDepthCoord) objWellbore1311.getTvdPlanned();
+
+				if(checkUOMUnit(vdPlanned.getUom().toString(), uom1311units)==false) {
+					result = true;
+					break;
+				}
+
+				MeasuredDepthCoord seaPlanned = (MeasuredDepthCoord) objWellbore1311.getMdSubSeaPlanned();
+
+				if(checkUOMUnit(seaPlanned.getUom().toString(), uom1311units)==false) {
+					result = true;
+					break;
+				}
+
+				WellVerticalDepthCoord tvSeaPlanned = (WellVerticalDepthCoord) objWellbore1311.getTvdSubSeaPlanned();
+
+				if(checkUOMUnit(tvSeaPlanned.getUom().toString(), uom1311units)==false) {
+					result = true;
+					break;
+				}
+
+				TimeMeasure dayTarget = (TimeMeasure) objWellbore1311.getDayTarget();
+
+				if(checkUOMUnit(dayTarget.getUom().toString(), uom1311units)==false) {
+					result = true;
+					break;
+				}
+
+			} else if (abstractWitsmlObject instanceof com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) {
+
+				com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord md = (com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject)
+						.getMd();
+
+				if(checkUOMUnit(md.getUom().toString(), uom1411units)==false) {
+					result = true;
+					break;
+				}
+
+				com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord tvd = (com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject)
+						.getTvd();
+
+				if(checkUOMUnit(tvd.getUom().toString(), uom1411units)==false) {
+					result = true;
+					break;
+				}
+				
+				com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord mbBit = (com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject)
+						.getMdBit();
+
+				if(checkUOMUnit(mbBit.getUom().toString(), uom1411units)==false) {
+					result = true;
+					break;
+				}
+
+				com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord tvdBit = (com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject)
+						.getTvdBit();
+
+				if(checkUOMUnit(tvdBit.getUom().toString(), uom1411units)==false) {
+					result = true;
+					break;
+				}
+
+				com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord mdKickoff = (com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject)
+						.getMdKickoff();
+
+				if(checkUOMUnit(mdKickoff.getUom().toString(), uom1411units)==false) {
+					result = true;
+					break;
+				}
+
+				com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord tvdKickoff = (com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject)
+						.getTvdKickoff();
+
+				if(checkUOMUnit(tvdKickoff.getUom().toString(), uom1411units)==false) {
+					result = true;
+					break;
+				}
+
+				com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord mdPlanned = (com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject)
+						.getMdPlanned();
+
+				if(checkUOMUnit(mdPlanned.getUom().toString(), uom1411units)==false) {
+					result = true;
+					break;
+				}
+
+				com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord tvdPlanned = (com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject)
+						.getTvdPlanned();
+
+				if(checkUOMUnit(tvdPlanned.getUom().toString(), uom1411units)==false) {
+					result = true;
+					break;
+				}
+
+				com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord mdSubSeaPlanned = (com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject)
+						.getMdSubSeaPlanned();
+
+				if(checkUOMUnit(mdSubSeaPlanned.getUom().toString(), uom1411units)==false) {
+					result = true;
+					break;
+				}
+
+				com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord tvdSubSeaPlanned = (com.hashmapinc.tempus.WitsmlObjects.v1411.WellVerticalDepthCoord) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject)
+						.getTvdSubSeaPlanned();
+
+				if(checkUOMUnit(tvdSubSeaPlanned.getUom().toString(), uom1411units)==false) {
+					result = true;
+					break;
+				}
+
+				com.hashmapinc.tempus.WitsmlObjects.v1411.TimeMeasure dayTarget = (com.hashmapinc.tempus.WitsmlObjects.v1411.TimeMeasure) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) abstractWitsmlObject)
+						.getDayTarget();
+
+				if(checkUOMUnit(dayTarget.getUom().toString(), uom1411units)==false) {
+					result = true;
+					break;
+				}
+
+			}
+		}
+
+		return result;
+	}
+	
+	static boolean checkUOMWithUnitDirectoryLog(List<AbstractWitsmlObject> witsmlObjects) {
+
+		boolean result = false;
+
+		for (AbstractWitsmlObject abstractWitsmlObject : witsmlObjects) {
+			if (abstractWitsmlObject instanceof ObjLog) {
+				LOG.info("checking log object");
+				ObjLog objLog1311 = (ObjLog) abstractWitsmlObject;
+				
+				
+				
+				if(checkUOMUnit(objLog1311.getStartIndex().getUom().toString(), uom1311units)==false) {
+					result = true;
+					break;
+				}
+				
+			
+				if(checkUOMUnit(objLog1311.getEndIndex().getUom().toString(), uom1311units)==false) {
+					result = true;
+					break;
+				}
+				
+				if(checkUOMUnit(objLog1311.getStepIncrement().getUom().toString(), uom1311units)==false) {
+					result = true;
+					break;
+				}
+				List<CsLogCurveInfo> logCurveInfo = objLog1311.getLogCurveInfo();
+				for (CsLogCurveInfo curveInfo : logCurveInfo) {
+					
+					if(checkUOMUnit(curveInfo.getMinIndex().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(curveInfo.getMaxIndex().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					if (curveInfo.getSensorOffset().getUom() == null || curveInfo.getSensorOffset().getUom() != null
+							&& curveInfo.getSensorOffset().getUom().isEmpty()) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(curveInfo.getSensorOffset().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+				}
+
+			} else if (abstractWitsmlObject instanceof com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) {
+				
+				if(checkUOMUnit(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) abstractWitsmlObject).getStartIndex()
+						.getUom().toString(), uom1411units)==false) {
+					result = true;
+					break;
+				}
+				
+				if(checkUOMUnit(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) abstractWitsmlObject).getEndIndex()
+						.getUom().toString(), uom1411units)==false) {
+					result = true;
+					break;
+				}
+				if(checkUOMUnit(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) abstractWitsmlObject).getStepIncrement()
+						.getUom().toString(), uom1411units)==false) {
+					result = true;
+					break;
+				}
+				List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> logCurveInfo = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) abstractWitsmlObject)
+						.getLogCurveInfo();
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo curveInfo : logCurveInfo) {
+					
+					if(checkUOMUnit(curveInfo.getMinIndex().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(curveInfo.getMaxIndex().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(curveInfo.getSensorOffset().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+				}
+			}
+		}
+
+		return result;
+	}
+	
+	
 	/**
 	 * This method validates the XMLin against the schemaLocation.
 	 * 
@@ -3677,7 +4067,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 
 	static Validation checkErrorForAddtoStoreVersion1311() {
 		return error407().and(error408()).and(error409()).and(error401()).and(error406()).and(error464())
-				.and(error412()).and(error413()).and(error453()).and(error463());
+				.and(error412()).and(error413()).and(error443()).and(error453()).and(error463());
 	}
 
 	static Validation checkErrorForGetFromStoreVersion1411() {
