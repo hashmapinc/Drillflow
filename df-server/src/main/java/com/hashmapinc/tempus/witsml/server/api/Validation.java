@@ -694,7 +694,615 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 		return result;
 	}
 	
-	
+	static boolean checkUOMWithUnitDirectoryTrajectory(List<AbstractWitsmlObject> witsmlObjects) {
+
+		boolean result = false;
+
+		for (AbstractWitsmlObject abstractWitsmlObject : witsmlObjects) {
+			if (abstractWitsmlObject instanceof ObjTrajectory) {
+				LOG.info("checking Trajectory object");
+				ObjTrajectory objTraj1311 = (ObjTrajectory) abstractWitsmlObject;
+
+				
+				if(checkUOMUnit(objTraj1311.getMdMn().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+				
+				if(checkUOMUnit(objTraj1311.getMdMx().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+				
+				if(checkUOMUnit(objTraj1311.getMagDeclUsed().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+				
+								
+				if(checkUOMUnit(objTraj1311.getGridCorUsed().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+			
+				if(checkUOMUnit(objTraj1311.getAziVertSect().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+				
+				if(checkUOMUnit(objTraj1311.getDispNsVertSectOrig().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+				
+				if(checkUOMUnit(objTraj1311.getDispEwVertSectOrig().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+				List<CsTrajectoryStation> trajectoryStation = objTraj1311.getTrajectoryStation();
+				for (CsTrajectoryStation trajStation : trajectoryStation) {
+					
+					if(checkUOMUnit(trajStation.getMd().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(trajStation.getTvd().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(trajStation.getIncl().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+				
+					if(checkUOMUnit(trajStation.getAzi().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(trajStation.getMtf().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(trajStation.getGtf().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(trajStation.getDispEw().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(trajStation.getDispNs().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(trajStation.getVertSect().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+				
+					if(checkUOMUnit(trajStation.getDls().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(trajStation.getRateTurn().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(trajStation.getRateBuild().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(trajStation.getMdDelta().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(trajStation.getTvdDelta().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(trajStation.getGravTotalUncert().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(trajStation.getDipAngleUncert().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(trajStation.getMagTotalUncert().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					
+				
+					CsStnTrajRawData trajRawData = (CsStnTrajRawData) trajStation.getRawData();
+
+					
+					if(checkUOMUnit(trajRawData.getGravAxialRaw().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(trajRawData.getGravTran1Raw().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(trajRawData.getGravTran2Raw().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(trajRawData.getMagAxialRaw().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(trajRawData.getMagTran1Raw().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(trajRawData.getMagTran2Raw().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					
+					
+
+					CsStnTrajCorUsed crUSed = (CsStnTrajCorUsed) trajStation.getCorUsed();
+
+					
+					if(checkUOMUnit(crUSed.getGravAxialAccelCor().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(crUSed.getGravTran1AccelCor().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(crUSed.getGravTran2AccelCor().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(crUSed.getMagAxialDrlstrCor().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(crUSed.getMagTran1DrlstrCor().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(crUSed.getMagTran2DrlstrCor().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(crUSed.getSagAziCor().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(crUSed.getSagIncCor().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(crUSed.getStnGridCorUsed().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(crUSed.getStnMagDeclUsed().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(crUSed.getDirSensorOffset().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					
+				
+
+					CsStnTrajValid stnValid = (CsStnTrajValid) trajStation.getValid();
+
+				
+					if(checkUOMUnit(stnValid.getMagTotalFieldCalc().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(stnValid.getMagDipAngleCalc().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(stnValid.getGravTotalFieldCalc().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					
+
+					CsStnTrajMatrixCov matric = (CsStnTrajMatrixCov) trajStation.getMatrixCov();
+
+					
+					if(checkUOMUnit(matric.getVarianceEE().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(matric.getVarianceNN().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(matric.getVarianceEVert().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(matric.getVarianceNVert().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(matric.getVarianceVertVert().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(matric.getBiasE().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(matric.getBiasN().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(matric.getBiasVert().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					
+
+					List<CsLocation> location = trajStation.getLocation();
+					for (CsLocation loc : location) {
+						
+					if(checkUOMUnit(loc.getLatitude().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(loc.getLongitude().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(loc.getEasting().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(loc.getNorthing().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(loc.getLocalX().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(loc.getLocalY().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+						
+				}
+
+				}
+
+			} else if (abstractWitsmlObject instanceof com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory) {
+			
+				if(checkUOMUnit(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory) abstractWitsmlObject).getMdMn()
+						.getUom().toString(), uom1411units)==false) {
+					result = true;
+					break;
+				}
+				if(checkUOMUnit(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory) abstractWitsmlObject).getMdMx()
+						.getUom().toString(), uom1411units)==false) {
+					result = true;
+					break;
+				}
+				if(checkUOMUnit(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory) abstractWitsmlObject).getMagDeclUsed()
+						.getUom().toString(), uom1411units)==false) {
+					result = true;
+					break;
+				}
+				if(checkUOMUnit(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory) abstractWitsmlObject).getGridCorUsed()
+						.getUom().toString(), uom1411units)==false) {
+					result = true;
+					break;
+				}
+				if(checkUOMUnit(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory) abstractWitsmlObject).getAziVertSect()
+						.getUom().toString(), uom1411units)==false) {
+					result = true;
+					break;
+				}
+				if(checkUOMUnit(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory) abstractWitsmlObject).getDispNsVertSectOrig()
+						.getUom().toString(), uom1411units)==false) {
+					result = true;
+					break;
+				}
+				if(checkUOMUnit(((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory) abstractWitsmlObject).getDispEwVertSectOrig()
+						.getUom().toString(), uom1411units)==false) {
+					result = true;
+					break;
+				}
+				
+				
+				
+				
+				List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsTrajectoryStation> trajectoryStation = (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory) abstractWitsmlObject)
+						.getTrajectoryStation());
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsTrajectoryStation trajStation : trajectoryStation) {
+					if(checkUOMUnit(trajStation.getMd().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(trajStation.getTvd().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(trajStation.getIncl().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+				
+					if(checkUOMUnit(trajStation.getAzi().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(trajStation.getMtf().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(trajStation.getGtf().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(trajStation.getDispEw().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(trajStation.getDispNs().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(trajStation.getVertSect().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+				
+					if(checkUOMUnit(trajStation.getDls().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(trajStation.getRateTurn().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(trajStation.getRateBuild().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(trajStation.getMdDelta().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(trajStation.getTvdDelta().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(trajStation.getGravTotalUncert().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(trajStation.getDipAngleUncert().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(trajStation.getMagTotalUncert().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					
+					com.hashmapinc.tempus.WitsmlObjects.v1411.CsStnTrajRawData trajRawData = (com.hashmapinc.tempus.WitsmlObjects.v1411.CsStnTrajRawData) trajStation
+							.getRawData();
+
+					
+					
+
+					
+					if(checkUOMUnit(trajRawData.getGravAxialRaw().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(trajRawData.getGravTran1Raw().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(trajRawData.getGravTran2Raw().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(trajRawData.getMagAxialRaw().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(trajRawData.getMagTran1Raw().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(trajRawData.getMagTran2Raw().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+
+					com.hashmapinc.tempus.WitsmlObjects.v1411.CsStnTrajCorUsed crUSed = (com.hashmapinc.tempus.WitsmlObjects.v1411.CsStnTrajCorUsed) trajStation
+							.getCorUsed();
+
+					if(checkUOMUnit(crUSed.getGravAxialAccelCor().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(crUSed.getGravTran1AccelCor().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(crUSed.getGravTran2AccelCor().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(crUSed.getMagAxialDrlstrCor().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(crUSed.getMagTran1DrlstrCor().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(crUSed.getMagTran2DrlstrCor().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(crUSed.getSagAziCor().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(crUSed.getSagIncCor().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(crUSed.getStnGridCorUsed().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(crUSed.getStnMagDeclUsed().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(crUSed.getDirSensorOffset().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+
+					com.hashmapinc.tempus.WitsmlObjects.v1411.CsStnTrajValid stnValid = (com.hashmapinc.tempus.WitsmlObjects.v1411.CsStnTrajValid) trajStation
+							.getValid();
+
+					if(checkUOMUnit(stnValid.getMagTotalFieldCalc().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(stnValid.getMagDipAngleCalc().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(stnValid.getGravTotalFieldCalc().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+
+					com.hashmapinc.tempus.WitsmlObjects.v1411.CsStnTrajMatrixCov matric = (com.hashmapinc.tempus.WitsmlObjects.v1411.CsStnTrajMatrixCov) trajStation
+							.getMatrixCov();
+
+					if(checkUOMUnit(matric.getVarianceEE().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(matric.getVarianceNN().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(matric.getVarianceEVert().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(matric.getVarianceNVert().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(matric.getVarianceVertVert().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(matric.getBiasE().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(matric.getBiasN().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					
+					if(checkUOMUnit(matric.getBiasVert().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+
+					List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLocation> location = trajStation.getLocation();
+					for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsLocation loc : location) {
+						if(checkUOMUnit(loc.getLatitude().getUom().toString(), uom1311units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(loc.getLongitude().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(loc.getEasting().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(loc.getNorthing().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(loc.getLocalX().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					if(checkUOMUnit(loc.getLocalY().getUom().toString(), uom1411units)==false) {
+						result = true;
+						break;
+					}
+					}
+
+				}
+			}
+		}
+
+		return result;
+	}
 	/**
 	 * This method validates the XMLin against the schemaLocation.
 	 * 
