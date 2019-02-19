@@ -557,17 +557,34 @@ class GraphQLQueryConverter {
         // ====================================================================
         // get station response fields
         // ====================================================================
+        // get first station entry for building fragment
+        JSONObject stationJson = JsonUtil.isEmpty(stationsJson) ? new JSONObject() : stationsJson.getJSONObject(0);
+        if (stationJson.has("uid"))
+            stationJson.remove("uid"); // discard this before building query
+
+        // give descriptive boolean name to the case when all station fields should be included
+        boolean includeAllStationFields = JsonUtil.isEmpty(stationJson);
+
+        // get string builder for constructing the fragment
         StringBuilder stationFieldsFragment = new StringBuilder();
         stationFieldsFragment.append("fragment stationFields on TrajectoryStation {");
 
-        if (!JsonUtil.isEmpty(stationsJson) && stationsJson.getJSONObject(0).has("axialMagInterferenceCorUsed"))
+
+        if (includeAllStationFields || stationJson.has("axialMagInterferenceCorUsed"))
             stationFieldsFragment.append("    axialMagInterferenceCorUsed");
 
-        stationFieldsFragment.append("    azi {");
-        stationFieldsFragment.append("        uom");
-        stationFieldsFragment.append("        value");
-        stationFieldsFragment.append("    }");
-        stationFieldsFragment.append("    calcAlgorithm");
+        if (includeAllStationFields || stationJson.has("azi")) {
+            stationFieldsFragment.append("    azi {");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("azi")) || stationJson.getJSONObject("azi").has("uom"))
+                stationFieldsFragment.append("        uom");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("azi")) || stationJson.getJSONObject("azi").has("value"))
+                stationFieldsFragment.append("        value");
+            stationFieldsFragment.append("    }");
+        }
+
+        if (includeAllStationFields || stationJson.has("calcAlgorithm"))
+            stationFieldsFragment.append("    calcAlgorithm");
+
         stationFieldsFragment.append("    commonData {");
         stationFieldsFragment.append("        acquisitionTimeZone {"); // array
         stationFieldsFragment.append("            dTim");
@@ -732,13 +749,13 @@ class GraphQLQueryConverter {
         stationFieldsFragment.append("        versionString");
         stationFieldsFragment.append("    }");
         stationFieldsFragment.append("    lastUpdateTimeUtc");
-        stationFieldsFragment.append("    location {");
+        stationFieldsFragment.append("    location {"); // array
         stationFieldsFragment.append("        description");
         stationFieldsFragment.append("        easting {");
         stationFieldsFragment.append("            uom");
         stationFieldsFragment.append("            value");
         stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        extensionNameValue {");
+        stationFieldsFragment.append("        extensionNameValue {"); // array
         stationFieldsFragment.append("            dataType");
         stationFieldsFragment.append("            description");
         stationFieldsFragment.append("            dTim");
