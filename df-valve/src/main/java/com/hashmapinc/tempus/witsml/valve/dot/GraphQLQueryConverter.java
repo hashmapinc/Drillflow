@@ -1142,90 +1142,326 @@ class GraphQLQueryConverter {
         if (includeAllStationFields || stationJson.has("lastUpdateTimeUtc"))
             stationFieldsFragment.append("    lastUpdateTimeUtc");
 
-        stationFieldsFragment.append("    location {"); // array
-        stationFieldsFragment.append("        description");
-        stationFieldsFragment.append("        easting {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        extensionNameValue {"); // array
-        stationFieldsFragment.append("            dataType");
-        stationFieldsFragment.append("            description");
-        stationFieldsFragment.append("            dTim");
-        stationFieldsFragment.append("            index");
-        stationFieldsFragment.append("            md {");
-        stationFieldsFragment.append("                datum");
-        stationFieldsFragment.append("                uom");
-        stationFieldsFragment.append("                value");
-        stationFieldsFragment.append("            }");
-        stationFieldsFragment.append("            measureClass");
-        stationFieldsFragment.append("            name");
-        stationFieldsFragment.append("            uid");
-        stationFieldsFragment.append("            value {");
-        stationFieldsFragment.append("                uom");
-        stationFieldsFragment.append("                value");
-        stationFieldsFragment.append("            }");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        latitude {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        localX {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        localY {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        longitude {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        northing {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        original");
-        stationFieldsFragment.append("        projectedX {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        projectedY {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        southing {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        uid");
-        stationFieldsFragment.append("        wellCRS {");
-        stationFieldsFragment.append("            uidRef");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        westing {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("    }");
+        if (includeAllStationFields || stationJson.has("location")) {
+            stationFieldsFragment.append("    location {"); // array
+            if (includeAllStationFields ||
+                    JsonUtil.isEmpty(stationJson.get("location")) ||
+                    stationJson.getJSONArray("location").getJSONObject(0).has("description"))
+                stationFieldsFragment.append("        description");
+
+            if (includeAllStationFields ||
+                    JsonUtil.isEmpty(stationJson.get("location")) ||
+                    stationJson.getJSONArray("location").getJSONObject(0).has("easting")) {
+                stationFieldsFragment.append("        easting {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("location")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).get("easting")) ||
+                        stationJson.getJSONArray("location").getJSONObject(0).getJSONObject("easting").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("location")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).get("easting")) ||
+                        stationJson.getJSONArray("location").getJSONObject(0).getJSONObject("easting").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+
+            if (includeAllStationFields ||
+                    JsonUtil.isEmpty(stationJson.get("location")) ||
+                    stationJson.getJSONArray("location").getJSONObject(0).has("extensionNameValue")) {
+                stationFieldsFragment.append("        extensionNameValue {"); // array
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("location")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).get("extensionNameValue")) ||
+                        stationJson.getJSONArray("location").getJSONObject(0).getJSONArray("extensionNameValue").getJSONObject(0).has("dataType"))
+                    stationFieldsFragment.append("            dataType");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("location")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).get("extensionNameValue")) ||
+                        stationJson.getJSONArray("location").getJSONObject(0).getJSONArray("extensionNameValue").getJSONObject(0).has("description"))
+                    stationFieldsFragment.append("            description");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("location")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).get("extensionNameValue")) ||
+                        stationJson.getJSONArray("location").getJSONObject(0).getJSONArray("extensionNameValue").getJSONObject(0).has("dTim"))
+                    stationFieldsFragment.append("            dTim");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("location")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).get("extensionNameValue")) ||
+                        stationJson.getJSONArray("location").getJSONObject(0).getJSONArray("extensionNameValue").getJSONObject(0).has("index"))
+                    stationFieldsFragment.append("            index");
+
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("location")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).get("extensionNameValue")) ||
+                        stationJson.getJSONArray("location").getJSONObject(0).getJSONArray("extensionNameValue").getJSONObject(0).has("md")) {
+                    stationFieldsFragment.append("            md {");
+                    if (includeAllStationFields ||
+                            JsonUtil.isEmpty(stationJson.get("location")) ||
+                            JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).get("extensionNameValue")) ||
+                            JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).getJSONArray("extensionNameValue").getJSONObject(0).getJSONObject("md")) ||
+                            stationJson.getJSONArray("location").getJSONObject(0).getJSONArray("extensionNameValue").getJSONObject(0).getJSONObject("md").has("datum"))
+                        stationFieldsFragment.append("                datum");
+                    if (includeAllStationFields ||
+                            JsonUtil.isEmpty(stationJson.get("location")) ||
+                            JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).get("extensionNameValue")) ||
+                            JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).getJSONArray("extensionNameValue").getJSONObject(0).getJSONObject("md")) ||
+                            stationJson.getJSONArray("location").getJSONObject(0).getJSONArray("extensionNameValue").getJSONObject(0).getJSONObject("md").has("uom"))
+                        stationFieldsFragment.append("                uom");
+                    if (includeAllStationFields ||
+                            JsonUtil.isEmpty(stationJson.get("location")) ||
+                            JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).get("extensionNameValue")) ||
+                            JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).getJSONArray("extensionNameValue").getJSONObject(0).getJSONObject("md")) ||
+                            stationJson.getJSONArray("location").getJSONObject(0).getJSONArray("extensionNameValue").getJSONObject(0).getJSONObject("md").has("value"))
+                        stationFieldsFragment.append("                value");
+                    stationFieldsFragment.append("            }");
+                }
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("location")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).get("extensionNameValue")) ||
+                        stationJson.getJSONArray("location").getJSONObject(0).getJSONArray("extensionNameValue").getJSONObject(0).has("measureClass"))
+                    stationFieldsFragment.append("            measureClass");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("location")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).get("extensionNameValue")) ||
+                        stationJson.getJSONArray("location").getJSONObject(0).getJSONArray("extensionNameValue").getJSONObject(0).has("name"))
+                    stationFieldsFragment.append("            name");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("location")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).get("extensionNameValue")) ||
+                        stationJson.getJSONArray("location").getJSONObject(0).getJSONArray("extensionNameValue").getJSONObject(0).has("uid"))
+                    stationFieldsFragment.append("            uid");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("location")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).get("extensionNameValue")) ||
+                        stationJson.getJSONArray("location").getJSONObject(0).getJSONArray("extensionNameValue").getJSONObject(0).has("value")) {
+                    stationFieldsFragment.append("            value {");
+                    if (includeAllStationFields ||
+                            JsonUtil.isEmpty(stationJson.get("location")) ||
+                            JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).get("extensionNameValue")) ||
+                            JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).getJSONArray("extensionNameValue").getJSONObject(0).getJSONObject("value")) ||
+                            stationJson.getJSONArray("location").getJSONObject(0).getJSONArray("extensionNameValue").getJSONObject(0).getJSONObject("value").has("uom"))
+                        stationFieldsFragment.append("                uom");
+                    if (includeAllStationFields ||
+                            JsonUtil.isEmpty(stationJson.get("location")) ||
+                            JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).get("extensionNameValue")) ||
+                            JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).getJSONArray("extensionNameValue").getJSONObject(0).getJSONObject("value")) ||
+                            stationJson.getJSONArray("location").getJSONObject(0).getJSONArray("extensionNameValue").getJSONObject(0).getJSONObject("value").has("value"))
+                        stationFieldsFragment.append("                value");
+                    stationFieldsFragment.append("            }");
+                }
+                stationFieldsFragment.append("        }");
+            }
+
+            if (includeAllStationFields ||
+                    JsonUtil.isEmpty(stationJson.get("location")) ||
+                    stationJson.getJSONArray("location").getJSONObject(0).has("latitude")) {
+                stationFieldsFragment.append("        latitude {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("location")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).get("latitude")) ||
+                        stationJson.getJSONArray("location").getJSONObject(0).getJSONObject("latitude").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("location")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).get("latitude")) ||
+                        stationJson.getJSONArray("location").getJSONObject(0).getJSONObject("latitude").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+
+            if (includeAllStationFields ||
+                    JsonUtil.isEmpty(stationJson.get("location")) ||
+                    stationJson.getJSONArray("location").getJSONObject(0).has("localX")) {
+                stationFieldsFragment.append("        localX {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("location")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).get("localX")) ||
+                        stationJson.getJSONArray("location").getJSONObject(0).getJSONObject("localX").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("location")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).get("localX")) ||
+                        stationJson.getJSONArray("location").getJSONObject(0).getJSONObject("localX").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+
+            if (includeAllStationFields ||
+                    JsonUtil.isEmpty(stationJson.get("location")) ||
+                    stationJson.getJSONArray("location").getJSONObject(0).has("localY")) {
+                stationFieldsFragment.append("        localY {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("location")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).get("localY")) ||
+                        stationJson.getJSONArray("location").getJSONObject(0).getJSONObject("localY").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("location")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).get("localY")) ||
+                        stationJson.getJSONArray("location").getJSONObject(0).getJSONObject("localY").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+
+            if (includeAllStationFields ||
+                    JsonUtil.isEmpty(stationJson.get("location")) ||
+                    stationJson.getJSONArray("location").getJSONObject(0).has("longitude")) {
+                stationFieldsFragment.append("        longitude {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("location")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).get("longitude")) ||
+                        stationJson.getJSONArray("location").getJSONObject(0).getJSONObject("longitude").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("location")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).get("longitude")) ||
+                        stationJson.getJSONArray("location").getJSONObject(0).getJSONObject("longitude").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+
+            if (includeAllStationFields ||
+                    JsonUtil.isEmpty(stationJson.get("location")) ||
+                    stationJson.getJSONArray("location").getJSONObject(0).has("northing")) {
+                stationFieldsFragment.append("        northing {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("location")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).get("northing")) ||
+                        stationJson.getJSONArray("location").getJSONObject(0).getJSONObject("northing").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("location")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).get("northing")) ||
+                        stationJson.getJSONArray("location").getJSONObject(0).getJSONObject("northing").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+
+            if (includeAllStationFields ||
+                    JsonUtil.isEmpty(stationJson.get("location")) ||
+                    stationJson.getJSONArray("location").getJSONObject(0).has("original"))
+                stationFieldsFragment.append("        original");
+
+            if (includeAllStationFields ||
+                    JsonUtil.isEmpty(stationJson.get("location")) ||
+                    stationJson.getJSONArray("location").getJSONObject(0).has("projectedX")) {
+                stationFieldsFragment.append("        projectedX {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("location")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).get("projectedX")) ||
+                        stationJson.getJSONArray("location").getJSONObject(0).getJSONObject("projectedX").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("location")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).get("projectedX")) ||
+                        stationJson.getJSONArray("location").getJSONObject(0).getJSONObject("projectedX").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+
+            if (includeAllStationFields ||
+                    JsonUtil.isEmpty(stationJson.get("location")) ||
+                    stationJson.getJSONArray("location").getJSONObject(0).has("projectedY")) {
+                stationFieldsFragment.append("        projectedY {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("location")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).get("projectedY")) ||
+                        stationJson.getJSONArray("location").getJSONObject(0).getJSONObject("projectedY").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("location")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).get("projectedY")) ||
+                        stationJson.getJSONArray("location").getJSONObject(0).getJSONObject("projectedY").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+
+            if (includeAllStationFields ||
+                    JsonUtil.isEmpty(stationJson.get("location")) ||
+                    stationJson.getJSONArray("location").getJSONObject(0).has("southing")) {
+                stationFieldsFragment.append("        southing {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("location")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).get("southing")) ||
+                        stationJson.getJSONArray("location").getJSONObject(0).getJSONObject("southing").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("location")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).get("southing")) ||
+                        stationJson.getJSONArray("location").getJSONObject(0).getJSONObject("southing").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+
+            if (includeAllStationFields ||
+                    JsonUtil.isEmpty(stationJson.get("location")) ||
+                    stationJson.getJSONArray("location").getJSONObject(0).has("uid"))
+                stationFieldsFragment.append("        uid");
+
+            if (includeAllStationFields ||
+                    JsonUtil.isEmpty(stationJson.get("location")) ||
+                    stationJson.getJSONArray("location").getJSONObject(0).has("wellCRS")) {
+                stationFieldsFragment.append("        wellCRS {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("location")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).get("southing")) ||
+                        stationJson.getJSONArray("location").getJSONObject(0).getJSONObject("wellCRS").has("uidRef"))
+                    stationFieldsFragment.append("            uidRef");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("location")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).get("southing")) ||
+                        stationJson.getJSONArray("location").getJSONObject(0).getJSONObject("wellCRS").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+
+
+
+            if (includeAllStationFields ||
+                    JsonUtil.isEmpty(stationJson.get("location")) ||
+                    stationJson.getJSONArray("location").getJSONObject(0).has("westing")) {
+                stationFieldsFragment.append("        westing {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("location")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).get("westing")) ||
+                        stationJson.getJSONArray("location").getJSONObject(0).getJSONObject("westing").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("location")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONArray("location").getJSONObject(0).get("westing")) ||
+                        stationJson.getJSONArray("location").getJSONObject(0).getJSONObject("westing").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+            stationFieldsFragment.append("    }");
+        }
+
         stationFieldsFragment.append("    magDipAngleReference {");
         stationFieldsFragment.append("        uom");
         stationFieldsFragment.append("        value");
         stationFieldsFragment.append("    }");
+
         stationFieldsFragment.append("    magDrlstrCorUsed");
+
         stationFieldsFragment.append("    magModelUsed");
+
         stationFieldsFragment.append("    magModelValid");
+
         stationFieldsFragment.append("    magTotalFieldReference {");
         stationFieldsFragment.append("        uom");
         stationFieldsFragment.append("        value");
         stationFieldsFragment.append("    }");
+
         stationFieldsFragment.append("    magTotalUncert {");
         stationFieldsFragment.append("        uom");
         stationFieldsFragment.append("        value");
         stationFieldsFragment.append("    }");
+
         stationFieldsFragment.append("    magXAxialCorUsed");
+
         stationFieldsFragment.append("    manuallyEntered");
+
         stationFieldsFragment.append("    matrixCov {");
         stationFieldsFragment.append("        biasE {");
         stationFieldsFragment.append("            uom");
@@ -1264,29 +1500,37 @@ class GraphQLQueryConverter {
         stationFieldsFragment.append("            value");
         stationFieldsFragment.append("        }");
         stationFieldsFragment.append("    }");
+
         stationFieldsFragment.append("    md {");
         stationFieldsFragment.append("        datum");
         stationFieldsFragment.append("        uom");
         stationFieldsFragment.append("        value");
         stationFieldsFragment.append("    }");
+
         stationFieldsFragment.append("    mdDelta {");
         stationFieldsFragment.append("        uom");
         stationFieldsFragment.append("        value");
         stationFieldsFragment.append("    }");
+
         stationFieldsFragment.append("    modelToolError");
+
         stationFieldsFragment.append("    mSACorUsed");
+
         stationFieldsFragment.append("    mtf {");
         stationFieldsFragment.append("        uom");
         stationFieldsFragment.append("        value");
         stationFieldsFragment.append("    }");
+
         stationFieldsFragment.append("    rateBuild {");
         stationFieldsFragment.append("        uom");
         stationFieldsFragment.append("        value");
         stationFieldsFragment.append("    }");
+
         stationFieldsFragment.append("    rateTurn {");
         stationFieldsFragment.append("        uom");
         stationFieldsFragment.append("        value");
         stationFieldsFragment.append("    }");
+
         stationFieldsFragment.append("    rawData {");
         stationFieldsFragment.append("        gravAxialRaw {");
         stationFieldsFragment.append("            uom");
@@ -1313,7 +1557,9 @@ class GraphQLQueryConverter {
         stationFieldsFragment.append("            value");
         stationFieldsFragment.append("        }");
         stationFieldsFragment.append("    }");
+
         stationFieldsFragment.append("    sagCorUsed");
+
         stationFieldsFragment.append("    sourceStation {");
         stationFieldsFragment.append("        stationReference");
         stationFieldsFragment.append("        trajectoryParent {");
@@ -1325,23 +1571,31 @@ class GraphQLQueryConverter {
         stationFieldsFragment.append("            value");
         stationFieldsFragment.append("        }");
         stationFieldsFragment.append("    }");
+
         stationFieldsFragment.append("    statusTrajStation");
+
         stationFieldsFragment.append("    target {");
         stationFieldsFragment.append("        uidRef");
         stationFieldsFragment.append("        value");
         stationFieldsFragment.append("    }");
+
         stationFieldsFragment.append("    tvd {");
         stationFieldsFragment.append("        datum");
         stationFieldsFragment.append("        uom");
         stationFieldsFragment.append("        value");
         stationFieldsFragment.append("    }");
+
         stationFieldsFragment.append("    tvdDelta {");
         stationFieldsFragment.append("        uom");
         stationFieldsFragment.append("        value");
         stationFieldsFragment.append("    }");
+
         stationFieldsFragment.append("    typeSurveyTool");
+
         stationFieldsFragment.append("    typeTrajStation");
+
         stationFieldsFragment.append("    uid");
+
         stationFieldsFragment.append("    valid {");
         stationFieldsFragment.append("        gravTotalFieldCalc {");
         stationFieldsFragment.append("            uom");
@@ -1356,6 +1610,7 @@ class GraphQLQueryConverter {
         stationFieldsFragment.append("            value");
         stationFieldsFragment.append("        }");
         stationFieldsFragment.append("    }");
+
         stationFieldsFragment.append("    vertSect {");
         stationFieldsFragment.append("        uom");
         stationFieldsFragment.append("        value");
