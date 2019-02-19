@@ -1069,47 +1069,78 @@ class GraphQLQueryConverter {
             stationFieldsFragment.append("    }");
         }
 
-        stationFieldsFragment.append("    geoModelUsed");
+        if (includeAllStationFields || stationJson.has("geoModelUsed"))
+            stationFieldsFragment.append("    geoModelUsed");
 
-        stationFieldsFragment.append("    gravAccelCorUsed");
+        if (includeAllStationFields || stationJson.has("gravAccelCorUsed"))
+            stationFieldsFragment.append("    gravAccelCorUsed");
 
-        stationFieldsFragment.append("    gravTotalFieldReference {");
-        stationFieldsFragment.append("        uom");
-        stationFieldsFragment.append("        value");
-        stationFieldsFragment.append("    }");
+        if (includeAllStationFields || stationJson.has("gravTotalFieldReference")) {
+            stationFieldsFragment.append("    gravTotalFieldReference {");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("gravTotalFieldReference")) || stationJson.getJSONObject("gravTotalFieldReference").has("uom"))
+                stationFieldsFragment.append("        uom");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("gravTotalFieldReference")) || stationJson.getJSONObject("gravTotalFieldReference").has("value"))
+                stationFieldsFragment.append("        value");
+            stationFieldsFragment.append("    }");
+        }
 
-        stationFieldsFragment.append("    gravTotalUncert {");
-        stationFieldsFragment.append("        uom");
-        stationFieldsFragment.append("        value");
-        stationFieldsFragment.append("    }");
+        if (includeAllStationFields || stationJson.has("gravTotalUncert")) {
+            stationFieldsFragment.append("    gravTotalUncert {");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("gravTotalUncert")) || stationJson.getJSONObject("gravTotalUncert").has("uom"))
+                stationFieldsFragment.append("        uom");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("gravTotalUncert")) || stationJson.getJSONObject("gravTotalUncert").has("value"))
+                stationFieldsFragment.append("        value");
+            stationFieldsFragment.append("    }");
+        }
 
-        stationFieldsFragment.append("    gtf {");
-        stationFieldsFragment.append("        uom");
-        stationFieldsFragment.append("        value");
-        stationFieldsFragment.append("    }");
+        if (includeAllStationFields || stationJson.has("gtf")) {
+            stationFieldsFragment.append("    gtf {");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("gtf")) || stationJson.getJSONObject("gtf").has("uom"))
+                stationFieldsFragment.append("        uom");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("gtf")) || stationJson.getJSONObject("gtf").has("value"))
+                stationFieldsFragment.append("        value");
+            stationFieldsFragment.append("    }");
+        }
 
-        stationFieldsFragment.append("    incl {");
-        stationFieldsFragment.append("        uom");
-        stationFieldsFragment.append("        value");
-        stationFieldsFragment.append("    }");
+        if (includeAllStationFields || stationJson.has("incl")) {
+            stationFieldsFragment.append("    incl {");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("incl")) || stationJson.getJSONObject("incl").has("uom"))
+                stationFieldsFragment.append("        uom");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("incl")) || stationJson.getJSONObject("incl").has("value"))
+                stationFieldsFragment.append("        value");
+            stationFieldsFragment.append("    }");
+        }
 
-        stationFieldsFragment.append("    infieldRefCorUsed");
+        if (includeAllStationFields || stationJson.has("infieldRefCorUsed"))
+            stationFieldsFragment.append("    infieldRefCorUsed");
 
-        stationFieldsFragment.append("    inHoleRefCorUsed");
+        if (includeAllStationFields || stationJson.has("inHoleRefCorUsed"))
+            stationFieldsFragment.append("    inHoleRefCorUsed");
 
-        stationFieldsFragment.append("    interpolatedInfieldRefCorUsed");
+        if (includeAllStationFields || stationJson.has("interpolatedInfieldRefCorUsed"))
+            stationFieldsFragment.append("    interpolatedInfieldRefCorUsed");
 
-        stationFieldsFragment.append("    iscwsaToolErrorModel {");
-        stationFieldsFragment.append("        contentType");
-        stationFieldsFragment.append("        title");
-        stationFieldsFragment.append("        uidRef");
-        stationFieldsFragment.append("        uri");
-        stationFieldsFragment.append("        uuid");
-        stationFieldsFragment.append("        uuidAuthority");
-        stationFieldsFragment.append("        versionString");
-        stationFieldsFragment.append("    }");
+        if (includeAllStationFields || stationJson.has("iscwsaToolErrorModel")) {
+            stationFieldsFragment.append("    iscwsaToolErrorModel {");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("iscwsaToolErrorModel")) || stationJson.getJSONObject("iscwsaToolErrorModel").has("contentType"))
+                stationFieldsFragment.append("        contentType");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("iscwsaToolErrorModel")) || stationJson.getJSONObject("iscwsaToolErrorModel").has("title"))
+                stationFieldsFragment.append("        title");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("iscwsaToolErrorModel")) || stationJson.getJSONObject("iscwsaToolErrorModel").has("uidRef"))
+                stationFieldsFragment.append("        uidRef");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("iscwsaToolErrorModel")) || stationJson.getJSONObject("iscwsaToolErrorModel").has("uri"))
+                stationFieldsFragment.append("        uri");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("iscwsaToolErrorModel")) || stationJson.getJSONObject("iscwsaToolErrorModel").has("uuid"))
+                stationFieldsFragment.append("        uuid");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("iscwsaToolErrorModel")) || stationJson.getJSONObject("iscwsaToolErrorModel").has("uuidAuthority"))
+                stationFieldsFragment.append("        uuidAuthority");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("iscwsaToolErrorModel")) || stationJson.getJSONObject("iscwsaToolErrorModel").has("versionString"))
+                stationFieldsFragment.append("        versionString");
+            stationFieldsFragment.append("    }");
+        }
 
-        stationFieldsFragment.append("    lastUpdateTimeUtc");
+        if (includeAllStationFields || stationJson.has("lastUpdateTimeUtc"))
+            stationFieldsFragment.append("    lastUpdateTimeUtc");
 
         stationFieldsFragment.append("    location {"); // array
         stationFieldsFragment.append("        description");
