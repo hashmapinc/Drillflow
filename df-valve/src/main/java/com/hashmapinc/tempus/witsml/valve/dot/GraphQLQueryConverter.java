@@ -128,10 +128,16 @@ class GraphQLQueryConverter {
         // non uid-based station query
         } else {
             // lastUpdateTimeUtc
+            if (trajectoryJson.has("lastUpdateTimeUtc") && !JsonUtil.isEmpty(trajectoryJson.get("lastUpdateTimeUtc")))
+                stationQueryFields.put("lastUpdateTimeUtc", trajectoryJson.get("lastUpdateTimeUtc"));
 
             // mdMn
+            if (trajectoryJson.has("mdMn") && !JsonUtil.isEmpty(trajectoryJson.get("mdMn")))
+                stationQueryFields.put("mdMn", trajectoryJson.get("mdMn"));
 
             // mdMx
+            if (trajectoryJson.has("mdMx") && !JsonUtil.isEmpty(trajectoryJson.get("mdMx")))
+                stationQueryFields.put("mdMx", trajectoryJson.get("mdMx"));
         }
 
         // ====================================================================
