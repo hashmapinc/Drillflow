@@ -116,4 +116,13 @@ public class StoreImplTests {
         assertNotNull(response);
         assertEquals(response.getResult().longValue(), 1);
 	}
+	
+	@Test
+    public void validate1411wellDeleteTest() throws IOException {
+        String xmlString = new String(Files.readAllBytes(Paths.get("src/test/resources/well1411.xml")));
+        WMLS_DeleteFromStoreResponse response = this.witsmlServer.deleteFromStore("well", xmlString, "", "");
+        System.out.println(response.getResult());
+        assertNotNull(response);
+        assertEquals(response.getResult().longValue(), 1);
+	}
 }

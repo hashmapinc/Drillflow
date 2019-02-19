@@ -39,7 +39,7 @@ They totally artificial and are not intended to demonstrate best practices.
 		<purposeWell>exploration</purposeWell>
 		<dTimSpud>2001-05-31T08:15:00.000Z</dTimSpud>
 		<dTimPa>2001-07-15T15:30:00.000Z</dTimPa>
-		<wellheadElevation uom="ft">500</wellheadElevation>
+		<wellheadElevation uom="%">500</wellheadElevation>
 		<wellDatum uid="KB">
 			<name>Kelly Bushing</name>
 			<code>KB</code>
