@@ -585,7 +585,7 @@ class GraphQLQueryConverter {
         if (includeAllStationFields || stationJson.has("calcAlgorithm"))
             stationFieldsFragment.append("    calcAlgorithm");
 
-        
+
         if(includeAllStationFields || stationJson.has("commonData")) {
             trajFieldsFragment.append("    commonData {");
 
@@ -741,68 +741,236 @@ class GraphQLQueryConverter {
         }
 
 
-        stationFieldsFragment.append("    corUsed {");
-        stationFieldsFragment.append("        dirSensorOffset {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        gravAxialAccelCor {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        gravTran1AccelCor {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        gravTran2AccelCor {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        magAxialDrlstrCor {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        magAxialMSACor {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        magTran1DrlstrCor {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        magTran1MSACor {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        magTran2DrlstrCor {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        magTran2MSACor {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        sagAziCor {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        sagIncCor {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        stnGridConUsed {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        stnGridCorUsed {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        stnMagDeclUsed {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("    }");
+        if (includeAllStationFields || stationJson.has("corUsed")) {
+            stationFieldsFragment.append("    corUsed {");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("corUsed")) || stationJson.getJSONObject("corUsed").has("dirSensorOffset")) {
+                stationFieldsFragment.append("        dirSensorOffset {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("corUsed")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("corUsed").get("dirSensorOffset")) ||
+                        stationJson.getJSONObject("corUsed").getJSONObject("dirSensorOffset").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("corUsed")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("corUsed").get("dirSensorOffset")) ||
+                        stationJson.getJSONObject("corUsed").getJSONObject("dirSensorOffset").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("corUsed")) || stationJson.getJSONObject("corUsed").has("gravAxialAccelCor")) {
+                stationFieldsFragment.append("        gravAxialAccelCor {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("corUsed")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("corUsed").get("gravAxialAccelCor")) ||
+                        stationJson.getJSONObject("corUsed").getJSONObject("gravAxialAccelCor").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("corUsed")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("corUsed").get("gravAxialAccelCor")) ||
+                        stationJson.getJSONObject("corUsed").getJSONObject("gravAxialAccelCor").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("corUsed")) || stationJson.getJSONObject("corUsed").has("gravTran1AccelCor")) {
+                stationFieldsFragment.append("        gravTran1AccelCor {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("corUsed")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("corUsed").get("gravTran1AccelCor")) ||
+                        stationJson.getJSONObject("corUsed").getJSONObject("gravTran1AccelCor").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("corUsed")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("corUsed").get("gravTran1AccelCor")) ||
+                        stationJson.getJSONObject("corUsed").getJSONObject("gravTran1AccelCor").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+
+
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("corUsed")) || stationJson.getJSONObject("corUsed").has("gravTran2AccelCor")) {
+                stationFieldsFragment.append("        gravTran2AccelCor {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("corUsed")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("corUsed").get("gravTran2AccelCor")) ||
+                        stationJson.getJSONObject("corUsed").getJSONObject("gravTran2AccelCor").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("corUsed")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("corUsed").get("gravTran2AccelCor")) ||
+                        stationJson.getJSONObject("corUsed").getJSONObject("gravTran2AccelCor").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("corUsed")) || stationJson.getJSONObject("corUsed").has("magAxialDrlstrCor")) {
+                stationFieldsFragment.append("        magAxialDrlstrCor {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("corUsed")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("corUsed").get("magAxialDrlstrCor")) ||
+                        stationJson.getJSONObject("corUsed").getJSONObject("magAxialDrlstrCor").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("corUsed")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("corUsed").get("magAxialDrlstrCor")) ||
+                        stationJson.getJSONObject("corUsed").getJSONObject("magAxialDrlstrCor").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("corUsed")) || stationJson.getJSONObject("corUsed").has("magAxialMSACor")) {
+                stationFieldsFragment.append("        magAxialMSACor {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("corUsed")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("corUsed").get("magAxialMSACor")) ||
+                        stationJson.getJSONObject("corUsed").getJSONObject("magAxialMSACor").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("corUsed")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("corUsed").get("magAxialMSACor")) ||
+                        stationJson.getJSONObject("corUsed").getJSONObject("magAxialMSACor").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("corUsed")) || stationJson.getJSONObject("corUsed").has("magTran1DrlstrCor")) {
+                stationFieldsFragment.append("        magTran1DrlstrCor {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("corUsed")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("corUsed").get("magTran1DrlstrCor")) ||
+                        stationJson.getJSONObject("corUsed").getJSONObject("magTran1DrlstrCor").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("corUsed")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("corUsed").get("magTran1DrlstrCor")) ||
+                        stationJson.getJSONObject("corUsed").getJSONObject("magTran1DrlstrCor").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("corUsed")) || stationJson.getJSONObject("corUsed").has("magTran1MSACor")) {
+                stationFieldsFragment.append("        magTran1MSACor {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("corUsed")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("corUsed").get("magTran1MSACor")) ||
+                        stationJson.getJSONObject("corUsed").getJSONObject("magTran1MSACor").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("corUsed")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("corUsed").get("magTran1MSACor")) ||
+                        stationJson.getJSONObject("corUsed").getJSONObject("magTran1MSACor").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("corUsed")) || stationJson.getJSONObject("corUsed").has("magTran2DrlstrCor")) {
+                stationFieldsFragment.append("        magTran2DrlstrCor {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("corUsed")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("corUsed").get("magTran2DrlstrCor")) ||
+                        stationJson.getJSONObject("corUsed").getJSONObject("magTran2DrlstrCor").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("corUsed")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("corUsed").get("magTran2DrlstrCor")) ||
+                        stationJson.getJSONObject("corUsed").getJSONObject("magTran2DrlstrCor").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("corUsed")) || stationJson.getJSONObject("corUsed").has("magTran2MSACor")) {
+                stationFieldsFragment.append("        magTran2MSACor {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("corUsed")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("corUsed").get("magTran2MSACor")) ||
+                        stationJson.getJSONObject("corUsed").getJSONObject("magTran2MSACor").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("corUsed")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("corUsed").get("magTran2MSACor")) ||
+                        stationJson.getJSONObject("corUsed").getJSONObject("magTran2MSACor").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("corUsed")) || stationJson.getJSONObject("corUsed").has("sagAziCor")) {
+                stationFieldsFragment.append("        sagAziCor {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("corUsed")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("corUsed").get("sagAziCor")) ||
+                        stationJson.getJSONObject("corUsed").getJSONObject("sagAziCor").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("corUsed")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("corUsed").get("sagAziCor")) ||
+                        stationJson.getJSONObject("corUsed").getJSONObject("sagAziCor").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("corUsed")) || stationJson.getJSONObject("corUsed").has("sagIncCor")) {
+                stationFieldsFragment.append("        sagIncCor {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("corUsed")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("corUsed").get("sagIncCor")) ||
+                        stationJson.getJSONObject("corUsed").getJSONObject("sagIncCor").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("corUsed")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("corUsed").get("sagIncCor")) ||
+                        stationJson.getJSONObject("corUsed").getJSONObject("sagIncCor").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("corUsed")) || stationJson.getJSONObject("corUsed").has("stnGridConUsed")) {
+                stationFieldsFragment.append("        stnGridConUsed {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("corUsed")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("corUsed").get("stnGridConUsed")) ||
+                        stationJson.getJSONObject("corUsed").getJSONObject("stnGridConUsed").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("corUsed")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("corUsed").get("stnGridConUsed")) ||
+                        stationJson.getJSONObject("corUsed").getJSONObject("stnGridConUsed").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("corUsed")) || stationJson.getJSONObject("corUsed").has("stnGridCorUsed")) {
+                stationFieldsFragment.append("        stnGridCorUsed {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("corUsed")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("corUsed").get("stnGridCorUsed")) ||
+                        stationJson.getJSONObject("corUsed").getJSONObject("stnGridCorUsed").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("corUsed")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("corUsed").get("stnGridCorUsed")) ||
+                        stationJson.getJSONObject("corUsed").getJSONObject("stnGridCorUsed").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("corUsed")) || stationJson.getJSONObject("corUsed").has("stnMagDeclUsed")) {
+                stationFieldsFragment.append("        stnMagDeclUsed {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("corUsed")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("corUsed").get("stnMagDeclUsed")) ||
+                        stationJson.getJSONObject("corUsed").getJSONObject("stnMagDeclUsed").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("corUsed")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("corUsed").get("stnMagDeclUsed")) ||
+                        stationJson.getJSONObject("corUsed").getJSONObject("stnMagDeclUsed").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+
+            stationFieldsFragment.append("    }");
+        }
 
         stationFieldsFragment.append("    cosagCorUsed");
 
