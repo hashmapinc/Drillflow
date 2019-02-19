@@ -555,7 +555,7 @@ class GraphQLQueryConverter {
 
 
         // ====================================================================
-        // get station response fields
+        // get station response fields (also long, also sucks. Please let us know if you can do this better).
         // ====================================================================
         // get first station entry for building fragment
         JSONObject stationJson = JsonUtil.isEmpty(stationsJson) ? new JSONObject() : stationsJson.getJSONObject(0);
@@ -587,157 +587,157 @@ class GraphQLQueryConverter {
 
 
         if(includeAllStationFields || stationJson.has("commonData")) {
-            trajFieldsFragment.append("    commonData {");
+            stationFieldsFragment.append("    commonData {");
 
             if(includeAllStationFields ||
                     JsonUtil.isEmpty(stationJson.get("commonData")) ||
                     stationJson.getJSONObject("commonData").has("acquisitionTimeZone")) {
-                trajFieldsFragment.append("        acquisitionTimeZone {"); // array
+                stationFieldsFragment.append("        acquisitionTimeZone {"); // array
                 if(includeAllStationFields ||
                         JsonUtil.isEmpty(stationJson.get("commonData")) ||
                         JsonUtil.isEmpty(stationJson.getJSONObject("commonData").get("acquisitionTimeZone")) ||
                         stationJson.getJSONObject("commonData").getJSONArray("acquisitionTimeZone").getJSONObject(0).has("dTim")) {
-                    trajFieldsFragment.append("            dTim");
+                    stationFieldsFragment.append("            dTim");
                 }
                 if(includeAllStationFields ||
                         JsonUtil.isEmpty(stationJson.get("commonData")) ||
                         JsonUtil.isEmpty(stationJson.getJSONObject("commonData").get("acquisitionTimeZone")) ||
                         stationJson.getJSONObject("commonData").getJSONArray("acquisitionTimeZone").getJSONObject(0).has("value")) {
-                    trajFieldsFragment.append("            value");
+                    stationFieldsFragment.append("            value");
                 }
-                trajFieldsFragment.append("        }");
+                stationFieldsFragment.append("        }");
             }
 
             if(includeAllStationFields ||
                     JsonUtil.isEmpty(stationJson.get("commonData")) ||
                     stationJson.getJSONObject("commonData").has("comments"))
-                trajFieldsFragment.append("        comments");
+                stationFieldsFragment.append("        comments");
 
 
             if(includeAllStationFields || JsonUtil.isEmpty(stationJson.get("commonData")) || stationJson.getJSONObject("commonData").has("defaultDatum")) {
-                trajFieldsFragment.append("        defaultDatum {");
+                stationFieldsFragment.append("        defaultDatum {");
                 if(includeAllStationFields || JsonUtil.isEmpty(stationJson.get("commonData")) ||
                         JsonUtil.isEmpty(stationJson.getJSONObject("commonData").get("defaultDatum")) ||
                         stationJson.getJSONObject("commonData").getJSONObject("defaultDatum").has("uidRef")) {
-                    trajFieldsFragment.append("            uidRef");
+                    stationFieldsFragment.append("            uidRef");
                 }
                 if(includeAllStationFields || JsonUtil.isEmpty(stationJson.get("commonData")) ||
                         JsonUtil.isEmpty(stationJson.getJSONObject("commonData").get("defaultDatum")) ||
                         stationJson.getJSONObject("commonData").getJSONObject("defaultDatum").has("value")) {
-                    trajFieldsFragment.append("            value");
+                    stationFieldsFragment.append("            value");
                 }
-                trajFieldsFragment.append("        }");
+                stationFieldsFragment.append("        }");
             }
 
             if(includeAllStationFields || JsonUtil.isEmpty(stationJson.get("commonData")) || stationJson.getJSONObject("commonData").has("extensionAny"))
-                trajFieldsFragment.append("        extensionAny");
+                stationFieldsFragment.append("        extensionAny");
 
             if(includeAllStationFields || JsonUtil.isEmpty(stationJson.get("commonData")) || stationJson.getJSONObject("commonData").has("extensionNameValue")) {
-                trajFieldsFragment.append("        extensionNameValue {"); // array
+                stationFieldsFragment.append("        extensionNameValue {"); // array
                 if(includeAllStationFields ||
                         JsonUtil.isEmpty(stationJson.get("commonData")) ||
                         JsonUtil.isEmpty(stationJson.getJSONObject("commonData").get("extensionNameValue")) ||
                         stationJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).has("dataType")) {
-                    trajFieldsFragment.append("            dataType");
+                    stationFieldsFragment.append("            dataType");
                 }
                 if(includeAllStationFields ||
                         JsonUtil.isEmpty(stationJson.get("commonData")) ||
                         JsonUtil.isEmpty(stationJson.getJSONObject("commonData").get("extensionNameValue")) ||
                         stationJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).has("description")) {
-                    trajFieldsFragment.append("            description");
+                    stationFieldsFragment.append("            description");
                 }
                 if(includeAllStationFields ||
                         JsonUtil.isEmpty(stationJson.get("commonData")) ||
                         JsonUtil.isEmpty(stationJson.getJSONObject("commonData").get("extensionNameValue")) ||
                         stationJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).has("dTim")) {
-                    trajFieldsFragment.append("            dTim");
+                    stationFieldsFragment.append("            dTim");
                 }
                 if(includeAllStationFields ||
                         JsonUtil.isEmpty(stationJson.get("commonData")) ||
                         JsonUtil.isEmpty(stationJson.getJSONObject("commonData").get("extensionNameValue")) ||
                         stationJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).has("index")) {
-                    trajFieldsFragment.append("            index");
+                    stationFieldsFragment.append("            index");
                 }
                 if(includeAllStationFields ||
                         JsonUtil.isEmpty(stationJson.get("commonData")) ||
                         JsonUtil.isEmpty(stationJson.getJSONObject("commonData").get("extensionNameValue")) ||
                         stationJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).has("md")) {
-                    trajFieldsFragment.append("            md {");
+                    stationFieldsFragment.append("            md {");
                     if(includeAllStationFields ||
                             JsonUtil.isEmpty(stationJson.get("commonData")) ||
                             JsonUtil.isEmpty(stationJson.getJSONObject("commonData").get("extensionNameValue")) ||
                             JsonUtil.isEmpty(stationJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).get("md")) ||
                             stationJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).getJSONObject("md").has("datum")) {
-                        trajFieldsFragment.append("                datum");
+                        stationFieldsFragment.append("                datum");
                     }if(includeAllStationFields ||
                             JsonUtil.isEmpty(stationJson.get("commonData")) ||
                             JsonUtil.isEmpty(stationJson.getJSONObject("commonData").get("extensionNameValue")) ||
                             JsonUtil.isEmpty(stationJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).get("md")) ||
                             stationJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).getJSONObject("md").has("uom")) {
-                        trajFieldsFragment.append("                uom");
+                        stationFieldsFragment.append("                uom");
                     }if(includeAllStationFields ||
                             JsonUtil.isEmpty(stationJson.get("commonData")) ||
                             JsonUtil.isEmpty(stationJson.getJSONObject("commonData").get("extensionNameValue")) ||
                             JsonUtil.isEmpty(stationJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).get("md")) ||
                             stationJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).getJSONObject("md").has("value")) {
-                        trajFieldsFragment.append("                value");
+                        stationFieldsFragment.append("                value");
                     }
-                    trajFieldsFragment.append("            }");
+                    stationFieldsFragment.append("            }");
                 }
                 if(includeAllStationFields ||
                         JsonUtil.isEmpty(stationJson.get("commonData")) ||
                         JsonUtil.isEmpty(stationJson.getJSONObject("commonData").get("extensionNameValue")) ||
                         stationJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).has("measureClass")) {
-                    trajFieldsFragment.append("            measureClass");
+                    stationFieldsFragment.append("            measureClass");
                 }
                 if(includeAllStationFields ||
                         JsonUtil.isEmpty(stationJson.get("commonData")) ||
                         JsonUtil.isEmpty(stationJson.getJSONObject("commonData").get("extensionNameValue")) ||
                         stationJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).has("name")) {
-                    trajFieldsFragment.append("            name");
+                    stationFieldsFragment.append("            name");
                 }
                 if(includeAllStationFields ||
                         JsonUtil.isEmpty(stationJson.get("commonData")) ||
                         JsonUtil.isEmpty(stationJson.getJSONObject("commonData").get("extensionNameValue")) ||
                         stationJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).has("uid")) {
-                    trajFieldsFragment.append("            uid");
+                    stationFieldsFragment.append("            uid");
                 }
                 if(includeAllStationFields ||
                         JsonUtil.isEmpty(stationJson.get("commonData")) ||
                         JsonUtil.isEmpty(stationJson.getJSONObject("commonData").get("extensionNameValue")) ||
                         stationJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).has("value")) {
-                    trajFieldsFragment.append("            value {");
+                    stationFieldsFragment.append("            value {");
                     if(includeAllStationFields ||
                             JsonUtil.isEmpty(stationJson.get("commonData")) ||
                             JsonUtil.isEmpty(stationJson.getJSONObject("commonData").get("extensionNameValue")) ||
                             JsonUtil.isEmpty(stationJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).get("value")) ||
                             stationJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).getJSONObject("value").has("uom")) {
-                        trajFieldsFragment.append("                uom");
+                        stationFieldsFragment.append("                uom");
                     }
                     if(includeAllStationFields ||
                             JsonUtil.isEmpty(stationJson.get("commonData")) ||
                             JsonUtil.isEmpty(stationJson.getJSONObject("commonData").get("extensionNameValue")) ||
                             JsonUtil.isEmpty(stationJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).get("value")) ||
                             stationJson.getJSONObject("commonData").getJSONArray("extensionNameValue").getJSONObject(0).getJSONObject("value").has("value")) {
-                        trajFieldsFragment.append("                value");
+                        stationFieldsFragment.append("                value");
                     }
-                    trajFieldsFragment.append("            }");
+                    stationFieldsFragment.append("            }");
                 }
-                trajFieldsFragment.append("        }");
+                stationFieldsFragment.append("        }");
             }
 
             if(includeAllStationFields || JsonUtil.isEmpty(stationJson.get("commonData")) || stationJson.getJSONObject("commonData").has("itemState"))
-                trajFieldsFragment.append("        itemState");
+                stationFieldsFragment.append("        itemState");
 
             if(includeAllStationFields || JsonUtil.isEmpty(stationJson.get("commonData")) || stationJson.getJSONObject("commonData").has("privateGroupOnly"))
-                trajFieldsFragment.append("        privateGroupOnly");
+                stationFieldsFragment.append("        privateGroupOnly");
 
             if(includeAllStationFields || JsonUtil.isEmpty(stationJson.get("commonData")) || stationJson.getJSONObject("commonData").has("serviceCategory"))
-                trajFieldsFragment.append("        serviceCategory");
+                stationFieldsFragment.append("        serviceCategory");
 
             if(includeAllStationFields || JsonUtil.isEmpty(stationJson.get("commonData")) || stationJson.getJSONObject("commonData").has("sourceName"))
-                trajFieldsFragment.append("        sourceName");
-            trajFieldsFragment.append("    }");
+                stationFieldsFragment.append("        sourceName");
+            stationFieldsFragment.append("    }");
         }
 
 
@@ -787,7 +787,6 @@ class GraphQLQueryConverter {
                     stationFieldsFragment.append("            value");
                 stationFieldsFragment.append("        }");
             }
-
 
             if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("corUsed")) || stationJson.getJSONObject("corUsed").has("gravTran2AccelCor")) {
                 stationFieldsFragment.append("        gravTran2AccelCor {");
@@ -972,50 +971,103 @@ class GraphQLQueryConverter {
             stationFieldsFragment.append("    }");
         }
 
-        stationFieldsFragment.append("    cosagCorUsed");
+        if (includeAllStationFields || stationJson.has("cosagCorUsed"))
+            stationFieldsFragment.append("    cosagCorUsed");
 
-        stationFieldsFragment.append("    creationTimeUtc");
+        if (includeAllStationFields || stationJson.has("creationTimeUtc"))
+            stationFieldsFragment.append("    creationTimeUtc");
 
-        stationFieldsFragment.append("    dipAngleUncert {");
-        stationFieldsFragment.append("        uom");
-        stationFieldsFragment.append("        value");
-        stationFieldsFragment.append("    }");
+        if (includeAllStationFields || stationJson.has("dipAngleUncert")) {
+            stationFieldsFragment.append("    dipAngleUncert {");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("dipAngleUncert")) || stationJson.getJSONObject("dipAngleUncert").has("uom"))
+                stationFieldsFragment.append("        uom");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("dipAngleUncert")) || stationJson.getJSONObject("dipAngleUncert").has("value"))
+                stationFieldsFragment.append("        value");
+            stationFieldsFragment.append("    }");
+        }
 
-        stationFieldsFragment.append("    dispEw {");
-        stationFieldsFragment.append("        uom");
-        stationFieldsFragment.append("        value");
-        stationFieldsFragment.append("    }");
+        if (includeAllStationFields || stationJson.has("dispEw")) {
+            stationFieldsFragment.append("    dispEw {");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("dispEw")) || stationJson.getJSONObject("dispEw").has("uom"))
+                stationFieldsFragment.append("        uom");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("dispEw")) || stationJson.getJSONObject("dispEw").has("value"))
+                stationFieldsFragment.append("        value");
+            stationFieldsFragment.append("    }");
+        }
 
-        stationFieldsFragment.append("    dispNs {");
-        stationFieldsFragment.append("        uom");
-        stationFieldsFragment.append("        value");
-        stationFieldsFragment.append("    }");
+        if (includeAllStationFields || stationJson.has("dispNs")) {
+            stationFieldsFragment.append("    dispNs {");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("dispNs")) || stationJson.getJSONObject("dispNs").has("uom"))
+                stationFieldsFragment.append("        uom");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("dispNs")) || stationJson.getJSONObject("dispNs").has("value"))
+                stationFieldsFragment.append("        value");
+            stationFieldsFragment.append("    }");
+        }
 
-        stationFieldsFragment.append("    dls {");
-        stationFieldsFragment.append("        uom");
-        stationFieldsFragment.append("        value");
-        stationFieldsFragment.append("    }");
+        if (includeAllStationFields || stationJson.has("dls")) {
+            stationFieldsFragment.append("    dls {");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("dls")) || stationJson.getJSONObject("dls").has("uom"))
+                stationFieldsFragment.append("        uom");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("dls")) || stationJson.getJSONObject("dls").has("value"))
+                stationFieldsFragment.append("        value");
+            stationFieldsFragment.append("    }");
+        }
 
-        stationFieldsFragment.append("    dTimStn");
+        if (includeAllStationFields || stationJson.has("dTimStn"))
+            stationFieldsFragment.append("    dTimStn");
 
-        stationFieldsFragment.append("    extensionNameValue {");
-        stationFieldsFragment.append("        dataType");
-        stationFieldsFragment.append("        description");
-        stationFieldsFragment.append("        dTim");
-        stationFieldsFragment.append("        index");
-        stationFieldsFragment.append("        md {");
-        stationFieldsFragment.append("            datum");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        measureClass");
-        stationFieldsFragment.append("        name");
-        stationFieldsFragment.append("        uid");
-        stationFieldsFragment.append("        value {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("    }");
+
+        if (includeAllStationFields || stationJson.has("extensionNameValue")) { // array
+            stationFieldsFragment.append("    extensionNameValue {");
+            if(includeAllStationFields || JsonUtil.isEmpty(stationJson.get("extensionNameValue")) || stationJson.getJSONArray("extensionNameValue").getJSONObject(0).has("dataType"))
+                stationFieldsFragment.append("        dataType");
+            if(includeAllStationFields || JsonUtil.isEmpty(stationJson.get("extensionNameValue")) || stationJson.getJSONArray("extensionNameValue").getJSONObject(0).has("description"))
+                stationFieldsFragment.append("        description");
+            if(includeAllStationFields || JsonUtil.isEmpty(stationJson.get("extensionNameValue")) || stationJson.getJSONArray("extensionNameValue").getJSONObject(0).has("dTim"))
+                stationFieldsFragment.append("        dTim");
+            if(includeAllStationFields || JsonUtil.isEmpty(stationJson.get("extensionNameValue")) || stationJson.getJSONArray("extensionNameValue").getJSONObject(0).has("index"))
+                stationFieldsFragment.append("        index");
+            if(includeAllStationFields || JsonUtil.isEmpty(stationJson.get("extensionNameValue")) || stationJson.getJSONArray("extensionNameValue").getJSONObject(0).has("md")) {
+                stationFieldsFragment.append("        md {");
+                if(includeAllStationFields || JsonUtil.isEmpty(stationJson.get("extensionNameValue")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONArray("extensionNameValue").getJSONObject(0).get("md")) ||
+                        stationJson.getJSONArray("extensionNameValue").getJSONObject(0).getJSONObject("md").has("datum")) {
+                    stationFieldsFragment.append("            datum");
+                }
+                if(includeAllStationFields || JsonUtil.isEmpty(stationJson.get("extensionNameValue")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONArray("extensionNameValue").getJSONObject(0).get("md")) ||
+                        stationJson.getJSONArray("extensionNameValue").getJSONObject(0).getJSONObject("md").has("uom")) {
+                    stationFieldsFragment.append("            uom");
+                }
+                if(includeAllStationFields || JsonUtil.isEmpty(stationJson.get("extensionNameValue")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONArray("extensionNameValue").getJSONObject(0).get("md")) ||
+                        stationJson.getJSONArray("extensionNameValue").getJSONObject(0).getJSONObject("md").has("value")) {
+                    stationFieldsFragment.append("            value");
+                }
+                stationFieldsFragment.append("        }");
+            }
+            if(includeAllStationFields || JsonUtil.isEmpty(stationJson.get("extensionNameValue")) || stationJson.getJSONArray("extensionNameValue").getJSONObject(0).has("measureClass"))
+                stationFieldsFragment.append("        measureClass");
+            if(includeAllStationFields || JsonUtil.isEmpty(stationJson.get("extensionNameValue")) || stationJson.getJSONArray("extensionNameValue").getJSONObject(0).has("name"))
+                stationFieldsFragment.append("        name");
+            if(includeAllStationFields || JsonUtil.isEmpty(stationJson.get("extensionNameValue")) || stationJson.getJSONArray("extensionNameValue").getJSONObject(0).has("uid"))
+                stationFieldsFragment.append("        uid");
+            if(includeAllStationFields || JsonUtil.isEmpty(stationJson.get("extensionNameValue")) || stationJson.getJSONArray("extensionNameValue").getJSONObject(0).has("value")) {
+                stationFieldsFragment.append("        value {");
+                if(includeAllStationFields || JsonUtil.isEmpty(stationJson.get("extensionNameValue")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONArray("extensionNameValue").getJSONObject(0).get("value")) ||
+                        stationJson.getJSONArray("extensionNameValue").getJSONObject(0).getJSONObject("value").has("uom")) {
+                    stationFieldsFragment.append("            uom");
+                }
+                if(includeAllStationFields || JsonUtil.isEmpty(stationJson.get("extensionNameValue")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONArray("extensionNameValue").getJSONObject(0).get("value")) ||
+                        stationJson.getJSONArray("extensionNameValue").getJSONObject(0).getJSONObject("value").has("value")) {
+                    stationFieldsFragment.append("            value");
+                }
+                stationFieldsFragment.append("        }");
+            }
+            stationFieldsFragment.append("    }");
+        }
 
         stationFieldsFragment.append("    geoModelUsed");
 
