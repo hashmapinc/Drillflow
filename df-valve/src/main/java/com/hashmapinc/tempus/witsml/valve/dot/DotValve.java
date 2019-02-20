@@ -206,7 +206,7 @@ public class DotValve implements IValve {
 
 			if (!isObjectDelete(wmlObject.getObjectType(), qc.QUERY_XML)){
 				// This is an element delete so re-route to delegator update
-				this.DELEGATOR.updateObjectForDelete(wmlObject, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.CLIENT);
+				this.DELEGATOR.performElementDelete(wmlObject, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.CLIENT);
 				result = true;
 			} else {
 				// This is an object delete, so straight delete

@@ -25,7 +25,6 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -112,13 +111,7 @@ public class DotDelegator {
         String uid = witsmlObj.getUid(); // get uid for delete call
         String objectType = witsmlObj.getObjectType(); // get obj type for exception handling
 
-		// Test for object deletion or element deletion
-		String xmlObj = witsmlObj.getXMLString("1.4.1.1");
-		if (!isObjectDelete(objectType, xmlObj)){
-            updateObjectForDelete(witsmlObj, username, password, exchangeID, client);
-            return;
-        }
-
+		// It is an object delete, so re-route there
         String endpoint = this.getEndpoint(objectType) + uid; // add uid for delete call
  
         // create request
@@ -163,28 +156,32 @@ public class DotDelegator {
         return m.find();
     }
 
-    public void updateObjectForDelete(AbstractWitsmlObject witsmlObj,
-									  String username,
-									  String password,
-									  String exchangeID,
-									  DotClient client
+    public void performElementDelete(AbstractWitsmlObject witsmlObj,
+									 String username,
+									 String password,
+									 String exchangeID,
+									 DotClient client
 	) throws ValveException, ValveAuthException, UnirestException {
 		// Throwing valve exception as this is currently not supported by DoT until the Patch API is implemented
 		// We dont want to delete the object because someone thought something was implemented.
 		throw new ValveException("Element delete not currently supported");
 	}
 
-	public void performObjectUpdate(AbstractWitsmlObject witsmlObj,
-									String username,
-									String password,
-									String payload,
-									String exchangeID,
-									DotClient client
-		) throws ValveException, ValveAuthException, UnirestException
-	{
+	public void updateObject(
+			AbstractWitsmlObject witsmlObj,
+			String username,
+			String password,
+			String exchangeID,
+			DotClient client
+	) throws ValveException, ValveAuthException, UnirestException {
+
 		String uid = witsmlObj.getUid();
 		String objectType = witsmlObj.getObjectType();
 		String endpoint = this.getEndpoint(objectType) + uid;
+
+		// get witsmlObj as json string for request payload
+		String payload = witsmlObj.getJSONString("1.4.1.1");
+		payload = JsonUtil.removeEmpties(new JSONObject(payload));
 
 		// build the request
 		HttpRequestWithBody request = Unirest.put(endpoint);
@@ -223,19 +220,6 @@ public class DotDelegator {
 			LOG.warning(valveLoggingResponse.toString());
 			throw new ValveException(response.getBody());
 		}
-	}
-
-	public void updateObject(
-			AbstractWitsmlObject witsmlObj,
-			String username,
-			String password,
-			String exchangeID,
-			DotClient client
-	) throws ValveException, ValveAuthException, UnirestException {
-		// get witsmlObj as json string for request payload
-		String payload = witsmlObj.getJSONString("1.4.1.1");
-		payload = JsonUtil.removeEmpties(new JSONObject(payload));
-		performObjectUpdate(witsmlObj, username, password, payload, exchangeID, client);
 	}
 
     /**
