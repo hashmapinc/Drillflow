@@ -1416,8 +1416,6 @@ class GraphQLQueryConverter {
                 stationFieldsFragment.append("        }");
             }
 
-
-
             if (includeAllStationFields ||
                     JsonUtil.isEmpty(stationJson.get("location")) ||
                     stationJson.getJSONArray("location").getJSONObject(0).has("westing")) {
@@ -1437,69 +1435,187 @@ class GraphQLQueryConverter {
             stationFieldsFragment.append("    }");
         }
 
-        stationFieldsFragment.append("    magDipAngleReference {");
-        stationFieldsFragment.append("        uom");
-        stationFieldsFragment.append("        value");
-        stationFieldsFragment.append("    }");
 
-        stationFieldsFragment.append("    magDrlstrCorUsed");
+        if (includeAllStationFields || stationJson.has("magDipAngleReference")) {
+            stationFieldsFragment.append("    magDipAngleReference {");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("magDipAngleReference")) || stationJson.getJSONObject("magDipAngleReference").has("uom"))
+                stationFieldsFragment.append("        uom");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("magDipAngleReference")) || stationJson.getJSONObject("magDipAngleReference").has("value"))
+                stationFieldsFragment.append("        value");
+            stationFieldsFragment.append("    }");
+        }
 
-        stationFieldsFragment.append("    magModelUsed");
+        if (includeAllStationFields || stationJson.has("magDrlstrCorUsed"))
+            stationFieldsFragment.append("    magDrlstrCorUsed");
 
-        stationFieldsFragment.append("    magModelValid");
+        if (includeAllStationFields || stationJson.has("magModelUsed"))
+            stationFieldsFragment.append("    magModelUsed");
 
-        stationFieldsFragment.append("    magTotalFieldReference {");
-        stationFieldsFragment.append("        uom");
-        stationFieldsFragment.append("        value");
-        stationFieldsFragment.append("    }");
+        if (includeAllStationFields || stationJson.has("magModelValid"))
+            stationFieldsFragment.append("    magModelValid");
 
-        stationFieldsFragment.append("    magTotalUncert {");
-        stationFieldsFragment.append("        uom");
-        stationFieldsFragment.append("        value");
-        stationFieldsFragment.append("    }");
+        if (includeAllStationFields || stationJson.has("magTotalFieldReference")) {
+            stationFieldsFragment.append("    magTotalFieldReference {");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("magTotalFieldReference")) || stationJson.getJSONObject("magTotalFieldReference").has("uom"))
+                stationFieldsFragment.append("        uom");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("magTotalFieldReference")) || stationJson.getJSONObject("magTotalFieldReference").has("value"))
+                stationFieldsFragment.append("        value");
+            stationFieldsFragment.append("    }");
+        }
 
-        stationFieldsFragment.append("    magXAxialCorUsed");
+        if (includeAllStationFields || stationJson.has("magTotalUncert")) {
+            stationFieldsFragment.append("    magTotalUncert {");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("magTotalUncert")) || stationJson.getJSONObject("magTotalUncert").has("uom"))
+                stationFieldsFragment.append("        uom");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("magTotalUncert")) || stationJson.getJSONObject("magTotalUncert").has("value"))
+                stationFieldsFragment.append("        value");
+            stationFieldsFragment.append("    }");
+        }
 
-        stationFieldsFragment.append("    manuallyEntered");
+        if (includeAllStationFields || stationJson.has("magXAxialCorUsed"))
+            stationFieldsFragment.append("    magXAxialCorUsed");
 
-        stationFieldsFragment.append("    matrixCov {");
-        stationFieldsFragment.append("        biasE {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        biasN {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        biasVert {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        varianceEE {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        varianceEVert {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        varianceNE {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        varianceNN {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        varianceNVert {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        varianceVertVert {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("    }");
+        if (includeAllStationFields || stationJson.has("manuallyEntered"))
+            stationFieldsFragment.append("    manuallyEntered");
+
+        if (includeAllStationFields || stationJson.has("matrixCov")) {
+            stationFieldsFragment.append("    matrixCov {");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("matrixCov")) || stationJson.getJSONObject("magTotalUncert").has("biasE")) {
+                stationFieldsFragment.append("        biasE {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("matrixCov")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("matrixCov").get("biasE")) ||
+                        stationJson.getJSONObject("matrixCov").getJSONObject("biasE").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("matrixCov")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("matrixCov").get("biasE")) ||
+                        stationJson.getJSONObject("matrixCov").getJSONObject("biasE").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("matrixCov")) || stationJson.getJSONObject("magTotalUncert").has("biasN")) {
+                stationFieldsFragment.append("        biasN {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("matrixCov")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("matrixCov").get("biasN")) ||
+                        stationJson.getJSONObject("matrixCov").getJSONObject("biasN").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("matrixCov")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("matrixCov").get("biasN")) ||
+                        stationJson.getJSONObject("matrixCov").getJSONObject("biasN").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("matrixCov")) || stationJson.getJSONObject("magTotalUncert").has("biasVert")) {
+                stationFieldsFragment.append("        biasVert {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("matrixCov")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("matrixCov").get("biasVert")) ||
+                        stationJson.getJSONObject("matrixCov").getJSONObject("biasVert").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("matrixCov")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("matrixCov").get("biasVert")) ||
+                        stationJson.getJSONObject("matrixCov").getJSONObject("biasVert").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("matrixCov")) || stationJson.getJSONObject("magTotalUncert").has("varianceEE")) {
+                stationFieldsFragment.append("        varianceEE {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("matrixCov")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("matrixCov").get("varianceEE")) ||
+                        stationJson.getJSONObject("matrixCov").getJSONObject("varianceEE").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("matrixCov")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("matrixCov").get("varianceEE")) ||
+                        stationJson.getJSONObject("matrixCov").getJSONObject("varianceEE").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("matrixCov")) || stationJson.getJSONObject("magTotalUncert").has("varianceEVert")) {
+                stationFieldsFragment.append("        varianceEVert {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("matrixCov")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("matrixCov").get("varianceEVert")) ||
+                        stationJson.getJSONObject("matrixCov").getJSONObject("varianceEVert").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("matrixCov")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("matrixCov").get("varianceEVert")) ||
+                        stationJson.getJSONObject("matrixCov").getJSONObject("varianceEVert").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("matrixCov")) || stationJson.getJSONObject("magTotalUncert").has("varianceNE")) {
+                stationFieldsFragment.append("        varianceNE {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("matrixCov")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("matrixCov").get("varianceNE")) ||
+                        stationJson.getJSONObject("matrixCov").getJSONObject("varianceNE").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("matrixCov")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("matrixCov").get("varianceNE")) ||
+                        stationJson.getJSONObject("matrixCov").getJSONObject("varianceNE").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("matrixCov")) || stationJson.getJSONObject("magTotalUncert").has("varianceNN")) {
+                stationFieldsFragment.append("        varianceNN {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("matrixCov")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("matrixCov").get("varianceNN")) ||
+                        stationJson.getJSONObject("matrixCov").getJSONObject("varianceNN").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("matrixCov")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("matrixCov").get("varianceNN")) ||
+                        stationJson.getJSONObject("matrixCov").getJSONObject("varianceNN").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("matrixCov")) || stationJson.getJSONObject("magTotalUncert").has("varianceNVert")) {
+                stationFieldsFragment.append("        varianceNVert {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("matrixCov")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("matrixCov").get("varianceNVert")) ||
+                        stationJson.getJSONObject("matrixCov").getJSONObject("varianceNVert").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("matrixCov")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("matrixCov").get("varianceNVert")) ||
+                        stationJson.getJSONObject("matrixCov").getJSONObject("varianceNVert").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("matrixCov")) || stationJson.getJSONObject("magTotalUncert").has("varianceVertVert")) {
+                stationFieldsFragment.append("        varianceVertVert {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("matrixCov")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("matrixCov").get("varianceVertVert")) ||
+                        stationJson.getJSONObject("matrixCov").getJSONObject("varianceVertVert").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("matrixCov")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("matrixCov").get("varianceVertVert")) ||
+                        stationJson.getJSONObject("matrixCov").getJSONObject("varianceVertVert").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+            stationFieldsFragment.append("    }");
+        }
 
         stationFieldsFragment.append("    md {");
         stationFieldsFragment.append("        datum");
@@ -1594,7 +1710,7 @@ class GraphQLQueryConverter {
 
         stationFieldsFragment.append("    typeTrajStation");
 
-        stationFieldsFragment.append("    uid");
+        stationFieldsFragment.append("    uid"); // always get station uid
 
         stationFieldsFragment.append("    valid {");
         stationFieldsFragment.append("        gravTotalFieldCalc {");
