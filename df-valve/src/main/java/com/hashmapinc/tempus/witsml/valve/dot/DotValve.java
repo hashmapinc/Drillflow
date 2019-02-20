@@ -229,7 +229,7 @@ public class DotValve implements IValve {
 	private boolean isObjectDelete(String dataObjectType, String data){
 		// This regex matches (for dataObjectType: well) <well uid="xxx" /> and <well uid="xxx"></well> and is multiline capable
 		Pattern singularPattern =
-				Pattern.compile("(<[" + dataObjectType + "][^<]*?/>)|<([" + dataObjectType + "][^<]*?></" + dataObjectType + ">)");
+				Pattern.compile("(<[" + dataObjectType + "][^<]*?/>)|<([" + dataObjectType + "][^<]*?>*[\\s\\S]</" + dataObjectType + ">)");
 		Matcher m = singularPattern.matcher(data);
 		return m.find();
 	}
