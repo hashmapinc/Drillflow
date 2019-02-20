@@ -25,6 +25,7 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -114,7 +115,7 @@ public class DotDelegator {
 		// Test for object deletion or element deletion
 		String xmlObj = witsmlObj.getXMLString("1.4.1.1");
 		if (!isObjectDelete(objectType, xmlObj)){
-            updateObject(witsmlObj, username, password, exchangeID, client);
+            updateObjectForDelete(witsmlObj, username, password, exchangeID, client);
             return;
         }
 
@@ -162,41 +163,43 @@ public class DotDelegator {
         return m.find();
     }
 
-    /**
-     * updates the object in DoT
-     *
-     * @param witsmlObj - object to delete
-     * @param username - auth username
-     * @param password - auth password
-	 * @param exchangeID - unique string for tracking which exchange called this method
-     * @param client - DotClient to execute requests with
-     */
-    public void updateObject(
-		AbstractWitsmlObject witsmlObj, 
-		String username, 
-		String password,
-		String exchangeID, 
-		DotClient client
+    public void updateObjectForDelete(AbstractWitsmlObject witsmlObj,
+									  String username,
+									  String password,
+									  String exchangeID,
+									  DotClient client
 	) throws ValveException, ValveAuthException, UnirestException {
-		updateObject(witsmlObj, username, password, exchangeID, client, false);
+		String payload = witsmlObj.getJSONString("1.4.1.1");
+		JSONObject jsonObjPayload = new JSONObject(payload);
+		ArrayList<String> keysToRemove = new ArrayList<>();
+
+		for (Object key : jsonObjPayload.keySet()){
+			if (JsonUtil.isEmptyArray(jsonObjPayload.get(key.toString())))
+				keysToRemove.add(key.toString());
+		}
+		for (String key : keysToRemove){
+			jsonObjPayload.remove(key);
+		}
+		String revisedPayload = jsonObjPayload.toString();
+		revisedPayload = revisedPayload.replace("\"\"", "null");
+		performObjectUpdate(witsmlObj, username, password, revisedPayload, exchangeID, client);
 	}
 
-	private void updateObject(
-			AbstractWitsmlObject witsmlObj,
-			String username,
-			String password,
-			String exchangeID,
-			DotClient client,
-			boolean fromDelete
-	) throws ValveException, ValveAuthException, UnirestException {
+	public void performObjectUpdate(AbstractWitsmlObject witsmlObj,
+									String username,
+									String password,
+									String payload,
+									String exchangeID,
+									DotClient client
+		) throws ValveException, ValveAuthException, UnirestException
+	{
 		String uid = witsmlObj.getUid();
 		String objectType = witsmlObj.getObjectType();
 		String endpoint = this.getEndpoint(objectType) + uid;
 
 		// get witsmlObj as json string for request payload
-		String payload = witsmlObj.getJSONString("1.4.1.1");
-		if (!fromDelete)
-			payload = JsonUtil.removeEmpties(new JSONObject(payload));
+		//String payload = witsmlObj.getJSONString("1.4.1.1");
+		//payload = JsonUtil.removeEmpties(new JSONObject(payload));
 
 		// build the request
 		HttpRequestWithBody request = Unirest.put(endpoint);
@@ -235,6 +238,19 @@ public class DotDelegator {
 			LOG.warning(valveLoggingResponse.toString());
 			throw new ValveException(response.getBody());
 		}
+	}
+
+	public void updateObject(
+			AbstractWitsmlObject witsmlObj,
+			String username,
+			String password,
+			String exchangeID,
+			DotClient client
+	) throws ValveException, ValveAuthException, UnirestException {
+		// get witsmlObj as json string for request payload
+		String payload = witsmlObj.getJSONString("1.4.1.1");
+		payload = JsonUtil.removeEmpties(new JSONObject(payload));
+		performObjectUpdate(witsmlObj, username, password, payload, exchangeID, client);
 	}
 
     /**

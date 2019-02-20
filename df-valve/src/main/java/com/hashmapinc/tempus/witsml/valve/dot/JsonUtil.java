@@ -122,6 +122,22 @@ public class JsonUtil {
     }
 
     /**
+     * Checks to see if this JSONObject is an empty array. This is useful for checking if it should be
+     * serialized in a JSON output or not.
+     *
+     * @param obj The Object to examine
+     * @return boolean - true if is array AND empty, false if is not array or not empty
+     */
+    public static boolean isEmptyArray(Object obj){
+        // handle JSONArrays
+        if (obj instanceof JSONArray) {
+            return isEmpty(obj);
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Checks for empty Json elements and removes them
      * @param src the source JSON object that needs to have empty elements removed
      * @return The resultant json string with no empty elements
