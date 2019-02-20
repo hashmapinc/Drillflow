@@ -169,20 +169,9 @@ public class DotDelegator {
 									  String exchangeID,
 									  DotClient client
 	) throws ValveException, ValveAuthException, UnirestException {
-		String payload = witsmlObj.getJSONString("1.4.1.1");
-		JSONObject jsonObjPayload = new JSONObject(payload);
-		ArrayList<String> keysToRemove = new ArrayList<>();
-
-		for (Object key : jsonObjPayload.keySet()){
-			if (JsonUtil.isEmptyArray(jsonObjPayload.get(key.toString())))
-				keysToRemove.add(key.toString());
-		}
-		for (String key : keysToRemove){
-			jsonObjPayload.remove(key);
-		}
-		String revisedPayload = jsonObjPayload.toString();
-		revisedPayload = revisedPayload.replace("\"\"", "null");
-		performObjectUpdate(witsmlObj, username, password, revisedPayload, exchangeID, client);
+		// Throwing valve exception as this is currently not supported by DoT until the Patch API is implemented
+		// We dont want to delete the object because someone thought something was implemented.
+		throw new ValveException("Element delete not currently supported");
 	}
 
 	public void performObjectUpdate(AbstractWitsmlObject witsmlObj,
@@ -196,10 +185,6 @@ public class DotDelegator {
 		String uid = witsmlObj.getUid();
 		String objectType = witsmlObj.getObjectType();
 		String endpoint = this.getEndpoint(objectType) + uid;
-
-		// get witsmlObj as json string for request payload
-		//String payload = witsmlObj.getJSONString("1.4.1.1");
-		//payload = JsonUtil.removeEmpties(new JSONObject(payload));
 
 		// build the request
 		HttpRequestWithBody request = Unirest.put(endpoint);
