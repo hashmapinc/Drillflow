@@ -34,7 +34,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class DotDelegator {
+	public class DotDelegator {
     private static final Logger LOG = Logger.getLogger(DotDelegator.class.getName());
 
     private final String URL;
@@ -148,12 +148,6 @@ public class DotDelegator {
 			LOG.warning(valveLoggingResponse.toString());
             throw new ValveException("DELETE DoT REST call failed with status code: " + status);
         }
-    }
-
-    private boolean isObjectDelete(String dataObjectType, String data){
-        Pattern singularPattern = Pattern.compile("<([" + dataObjectType + "])[^<]*?/>");
-        Matcher m = singularPattern.matcher(data);
-        return m.find();
     }
 
     public void performElementDelete(AbstractWitsmlObject witsmlObj,
