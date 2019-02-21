@@ -199,7 +199,6 @@ public class DotDelegatorTest {
         // build object
         ObjTrajectory traj = new ObjTrajectory();
         traj.setUid("traj-a");
-        traj.setName("traj-a");
         traj.setUidWellbore("wellbore-a");
         traj.setUidWell("well-a");
 

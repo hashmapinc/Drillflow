@@ -31,8 +31,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-public class DotDelegator {
+	public class DotDelegator {
     private static final Logger LOG = Logger.getLogger(DotDelegator.class.getName());
 
     private final String URL;
@@ -108,6 +110,8 @@ public class DotDelegator {
     ) throws ValveException, UnirestException, ValveAuthException {
         String uid = witsmlObj.getUid(); // get uid for delete call
         String objectType = witsmlObj.getObjectType(); // get obj type for exception handling
+
+		// It is an object delete, so re-route there
         String endpoint = this.getEndpoint(objectType) + uid; // add uid for delete call
  
         // create request
@@ -146,22 +150,25 @@ public class DotDelegator {
         }
     }
 
-    /**
-     * updates the object in DoT
-     *
-     * @param witsmlObj - object to delete
-     * @param username - auth username
-     * @param password - auth password
-	 * @param exchangeID - unique string for tracking which exchange called this method
-     * @param client - DotClient to execute requests with
-     */
-    public void updateObject(
-		AbstractWitsmlObject witsmlObj, 
-		String username, 
-		String password,
-		String exchangeID, 
-		DotClient client
+    public void performElementDelete(AbstractWitsmlObject witsmlObj,
+									 String username,
+									 String password,
+									 String exchangeID,
+									 DotClient client
 	) throws ValveException, ValveAuthException, UnirestException {
+		// Throwing valve exception as this is currently not supported by DoT until the Patch API is implemented
+		// We dont want to delete the object because someone thought something was implemented.
+		throw new ValveException("Element delete not currently supported");
+	}
+
+	public void updateObject(
+			AbstractWitsmlObject witsmlObj,
+			String username,
+			String password,
+			String exchangeID,
+			DotClient client
+	) throws ValveException, ValveAuthException, UnirestException {
+
 		String uid = witsmlObj.getUid();
 		String objectType = witsmlObj.getObjectType();
 		String endpoint = this.getEndpoint(objectType) + uid;
@@ -199,11 +206,11 @@ public class DotDelegator {
 		int status = response.getStatus();
 		if (201 == status || 200 == status) {
 			ValveLogging valveLoggingResponse = new ValveLogging(exchangeID,
-				logResponse(response, "UPDATE for " + witsmlObj + " was successful"), witsmlObj);
+					logResponse(response, "UPDATE for " + witsmlObj + " was successful"), witsmlObj);
 			LOG.info(valveLoggingResponse.toString());
 		} else {
 			ValveLogging valveLoggingResponse = new ValveLogging(exchangeID,
-				logResponse(response, "Received failure status code from DoT PUT"), witsmlObj);
+					logResponse(response, "Received failure status code from DoT PUT"), witsmlObj);
 			LOG.warning(valveLoggingResponse.toString());
 			throw new ValveException(response.getBody());
 		}

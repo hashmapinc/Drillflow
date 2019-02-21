@@ -18,12 +18,10 @@ package com.hashmapinc.tempus.witsml.valve.dot;
 import com.auth0.jwt.JWT;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
-import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell;
-import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore;
-import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells;
-import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.*;
 import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
+import com.hashmapinc.tempus.witsml.valve.ValveException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -294,11 +292,12 @@ public class DotValveTest {
 		// build witsmlObjects list
 		ArrayList<AbstractWitsmlObject> witsmlObjects;
 		witsmlObjects = new ArrayList<>();
+		ObjWellbores wmlObjWellbores = new ObjWellbores();
 
 		ObjWellbore wellboreA = new ObjWellbore();
-		wellboreA.setName("wellbore-A");
 		wellboreA.setUid("wellbore-A");
 		witsmlObjects.add(wellboreA);
+		wmlObjWellbores.addWellbore(wellboreA);
 
 
 		// build query context
@@ -306,7 +305,7 @@ public class DotValveTest {
 			"1.3.1.1",
 			"wellbore",
 			null,
-			"",
+			WitsmlMarshal.serialize(wmlObjWellbores),
 			witsmlObjects,
 			"goodUsername",
 			"goodPassword",
@@ -329,24 +328,27 @@ public class DotValveTest {
 		ArrayList<AbstractWitsmlObject> trajs1311 = new ArrayList<>();
 		ArrayList<AbstractWitsmlObject> trajs1411 = new ArrayList<>();
 
+		ObjTrajectorys trajsObj1311 = new ObjTrajectorys();
+		com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys trajsObj1411 = new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys();
+
 		// get traj 1311
 		ObjTrajectory traj1311 = new ObjTrajectory();
-		traj1311.setName("traj-1311");
 		traj1311.setUid("traj-1311");
 		trajs1311.add(traj1311);
+		trajsObj1311.addTrajectory(traj1311);
 
 		// get traj 1411
 		com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory traj1411 = new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory();
-		traj1411.setName("traj-1411");
 		traj1411.setUid("traj-1411");
 		trajs1411.add(traj1411);
+		trajsObj1411.addTrajectory(traj1411);
 
 		// build query contexts
 		QueryContext qc1311 = new QueryContext(
 			"1.3.1.1",
 			"trajectory",
 			null,
-			"",
+			WitsmlMarshal.serialize(trajsObj1311),
 			trajs1311,
 			"goodUsername",
 			"goodPassword",
@@ -356,7 +358,7 @@ public class DotValveTest {
 			"1.4.1.1",
 			"trajectory",
 			null,
-			"",
+				WitsmlMarshal.serialize(trajsObj1411),
 			trajs1411,
 			"goodUsername",
 			"goodPassword",
@@ -375,20 +377,22 @@ public class DotValveTest {
 		verifyNoMoreInteractions(this.mockDelegator);
 	}
 
-	@Test
-	public void shouldDeletePluralObject() throws Exception {
+	@Test(expected = ValveException.class)
+	public void shouldNotDeletePluralObjectAndThrowException() throws Exception {
 		// build witsmlObjects list
 		ArrayList<AbstractWitsmlObject> witsmlObjects;
 		witsmlObjects = new ArrayList<>();
 
+		ObjWellbores wmlObjWellbores = new ObjWellbores();
+
 		ObjWellbore wellboreA = new ObjWellbore();
-		wellboreA.setName("wellbore-A");
 		wellboreA.setUid("wellbore-A");
 		witsmlObjects.add(wellboreA);
+		wmlObjWellbores.addWellbore(wellboreA);
 
 		ObjWellbore wellboreB = new ObjWellbore();
-		wellboreB.setName("wellbore-B");
 		wellboreB.setUid("wellbore-B");
+		wmlObjWellbores.addWellbore(wellboreB);
 		witsmlObjects.add(wellboreB);
 
 
@@ -397,7 +401,7 @@ public class DotValveTest {
 			"1.3.1.1",
 			"wellbore",
 			null,
-			"",
+			WitsmlMarshal.serialize(wmlObjWellbores),
 			witsmlObjects,
 			"goodUsername",
 			"goodPassword",
