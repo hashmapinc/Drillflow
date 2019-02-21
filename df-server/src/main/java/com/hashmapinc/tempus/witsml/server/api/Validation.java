@@ -16,7 +16,6 @@
 package com.hashmapinc.tempus.witsml.server.api;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
@@ -34,11 +33,8 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
@@ -5134,20 +5130,6 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	 * @return true if nested objects are not found
 	 * 
 	 */
-	static boolean checkOptionsInHeader(String OptionsIn, String checkParam) {
-		boolean result = false;
-		XPath xpath = XPathFactory.newInstance().newXPath();
-		InputSource inputSource = new InputSource(new StringReader(OptionsIn)); // ??? = InputStream or Reader
-		try {
-			if (xpath.evaluate(checkParam, inputSource).isEmpty() || xpath.evaluate(checkParam, inputSource) == null) {
-				result = true;
-			}
-		} catch (XPathExpressionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return result;
-	}
 
 	static boolean checkOptions(String WMLTypein, String OptionsIn) {
 		boolean result = false;
@@ -5158,21 +5140,23 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 			case "log":
 				if (OptionsIn.equalsIgnoreCase("returnElements=data-only")) {
 					result = true;
-					break;
 				}
+				break;
 
 			case "well":
+				LOG.info("checking options param");
 				if (OptionsIn.equalsIgnoreCase("returnElements=data-only")
 						|| OptionsIn.equalsIgnoreCase("returnElements=header-only")) {
-					result = false;
-					break;
+					result = true;
+
 				}
+				break;
 			case "wellbore":
 				if (OptionsIn.equalsIgnoreCase("returnElements=data-only")
 						|| OptionsIn.equalsIgnoreCase("returnElements=header-only")) {
-					result = false;
-					
+					result = true;
 				}
+				break;
 			default:
 				throw new WitsmlException("unsupported witsml object type: " + WMLTypein);
 			}

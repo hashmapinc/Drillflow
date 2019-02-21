@@ -32,6 +32,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_AddToStoreResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_DeleteFromStoreResponse;
 import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse;
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetFromStoreResponse;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -102,7 +103,7 @@ public class StoreImplTests {
 	@Test
     public void validate1411wellAddTest() throws IOException {
         String xmlString = new String(Files.readAllBytes(Paths.get("src/test/resources/well1411.xml")));
-        WMLS_AddToStoreResponse response = this.witsmlServer.addToStore("well", xmlString, "", "");
+        WMLS_AddToStoreResponse response = this.witsmlServer.addToStore("well", xmlString, "returnElements=data-only", "");
         System.out.println(response.getResult());
         assertNotNull(response);
         assertEquals(response.getResult(), -1);
@@ -124,5 +125,13 @@ public class StoreImplTests {
         System.out.println(response.getResult());
         assertNotNull(response);
         assertEquals(response.getResult().longValue(), 1);
+	}
+	@Test
+    public void validate1411wellGetTest() throws IOException {
+        String xmlString = new String(Files.readAllBytes(Paths.get("src/test/resources/well1411.xml")));
+        WMLS_GetFromStoreResponse response = this.witsmlServer.getFromStore("well", xmlString, "returnElements=data-only;returnElements=header-only", "");
+        System.out.println(response.getResult());
+        assertNotNull(response);
+        assertEquals(response.getResult().longValue(), -425);
 	}
 }
