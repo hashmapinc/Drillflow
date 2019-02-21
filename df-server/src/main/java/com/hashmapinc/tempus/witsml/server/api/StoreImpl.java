@@ -126,6 +126,10 @@ public class StoreImpl implements IStore {
         try {
             // build the query context
             Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
+            short validationResult = StoreValidator.validateAddToStore(WMLtypeIn, XMLin, optionsMap);
+            if (validationResult != 1){
+                response.setResult(validationResult);
+            }
             String version = WitsmlUtil.getVersionFromXML(XMLin);
             witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, XMLin, version);
             ValveUser user = (ValveUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -182,6 +186,10 @@ public class StoreImpl implements IStore {
         try {
             // build the query context
             Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
+            short validationResult = StoreValidator.validateUpdateInStore(WMLtypeIn, XMLin, optionsMap);
+            if (validationResult != 1){
+                response.setResult(validationResult);
+            }
             String version = WitsmlUtil.getVersionFromXML(XMLin);
             witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, XMLin, version);
             ValveUser user = (ValveUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -232,6 +240,11 @@ public class StoreImpl implements IStore {
         // set initial ERROR state for resp
         resp.setResult((short) -1);
 
+        Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
+        short validationResult = StoreValidator.validateDeleteFromStore(WMLtypeIn, QueryIn, optionsMap);
+        if (validationResult != 1){
+            resp.setResult(validationResult);
+        }
         // try to deserialize
         List<AbstractWitsmlObject> witsmlObjects;
         try {
@@ -252,7 +265,7 @@ public class StoreImpl implements IStore {
         // try to delete
         try {
             // construct query context
-            Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
+
             ValveUser user = (ValveUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             QueryContext qc = new QueryContext(
                     null, // client version not needed
@@ -330,6 +343,11 @@ public class StoreImpl implements IStore {
         LOG.info("Executing GetFromStore");
         WMLS_GetFromStoreResponse resp = new WMLS_GetFromStoreResponse();
         // try to deserialize
+        Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
+        short validationResult = StoreValidator.validateGetFromStore(WMLtypeIn, QueryIn, optionsMap);
+        if (validationResult != 1){
+            resp.setResult(validationResult);
+        }
         List<AbstractWitsmlObject> witsmlObjects;
         String clientVersion;
         try {
@@ -352,7 +370,7 @@ public class StoreImpl implements IStore {
         // try to query
         try {
             // construct query context
-            Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
+
             ValveUser user = (ValveUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             QueryContext qc = new QueryContext(
                 clientVersion,
