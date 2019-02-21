@@ -4,7 +4,7 @@
     <trajectory>
         <nameWell/>
         <nameWellbore/>
-        <name/>
+        <name>HM_Plan #2</name>
         <dTimTrajStart/>
         <dTimTrajEnd/>
         <mdMn/>
@@ -19,7 +19,7 @@
         <memory/>
         <finalTraj/>
         <aziRef/>
-        <trajectoryStation/>
+        <trajectoryStation uid="34ht5"/>
         <commonData>
             <itemState/>
             <comments/>

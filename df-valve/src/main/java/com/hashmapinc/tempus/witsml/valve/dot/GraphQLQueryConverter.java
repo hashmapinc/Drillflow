@@ -46,8 +46,9 @@ class GraphQLQueryConverter {
                 this.createWellboreQuery(wmlObject.getJSONString("1.4.1.1"));
                 break;
             case "trajectory":
-                String json = wmlObject.getJSONString("2.0");
-                return getTrajectoryQuery(json);
+                String json1411 = wmlObject.getJSONString("1.4.1.1"); // needed for some query args. some fields are lost in 2.0
+                String json20 = wmlObject.getJSONString("2.0");
+                return getTrajectoryQuery(json1411, json20);
             default:
                 return null;
         }
@@ -58,15 +59,18 @@ class GraphQLQueryConverter {
      * this function converts 2.0 trajectory json
      * into a graphql query
      *
-     * @param jsonString - json string version of the query to execute
+     * @param jsonString1411 - json 1411 string of object to query for
+     * @param jsonString20 - json 20 string of object to query for
+     *
      * @return graphql query string
      */
-    private static String getTrajectoryQuery(String jsonString) {
+    private static String getTrajectoryQuery(String jsonString1411, String jsonString20) {
         // payload json object for building full query
         JSONObject payload = new JSONObject();
 
-        // parse json string
-        JSONObject trajectoryJson = new JSONObject(jsonString);
+        // parse json strings
+        JSONObject objTrajectoryJson = new JSONObject(jsonString1411); // 1.4.1.1
+        JSONObject trajectoryJson = new JSONObject(jsonString20); // 2.0
 
         // ====================================================================
         // get trajectory query fields
@@ -85,16 +89,16 @@ class GraphQLQueryConverter {
             trajQueryFields.put("uuidWellbore", trajectoryJson.get("uuidWellbore"));
 
         // name
-        if (trajectoryJson.has("name") && !JsonUtil.isEmpty(trajectoryJson.get("name")))
-            trajQueryFields.put("name", trajectoryJson.get("name"));
+        if (objTrajectoryJson.has("name") && !JsonUtil.isEmpty(objTrajectoryJson.get("name")))
+            trajQueryFields.put("name", objTrajectoryJson.get("name"));
 
         // nameWell
-        if (trajectoryJson.has("nameWell") && !JsonUtil.isEmpty(trajectoryJson.get("nameWell")))
-            trajQueryFields.put("nameWell", trajectoryJson.get("nameWell"));
+        if (objTrajectoryJson.has("nameWell") && !JsonUtil.isEmpty(objTrajectoryJson.get("nameWell")))
+            trajQueryFields.put("nameWell", objTrajectoryJson.get("nameWell"));
 
         // nameWellbore
-        if (trajectoryJson.has("nameWellbore") && !JsonUtil.isEmpty(trajectoryJson.get("nameWellbore")))
-            trajQueryFields.put("nameWellbore", trajectoryJson.get("nameWellbore"));
+        if (objTrajectoryJson.has("nameWellbore") && !JsonUtil.isEmpty(objTrajectoryJson.get("nameWellbore")))
+            trajQueryFields.put("nameWellbore", objTrajectoryJson.get("nameWellbore"));
 
         // growingStatus
         if (trajectoryJson.has("growingStatus") && !JsonUtil.isEmpty(trajectoryJson.get("growingStatus")))

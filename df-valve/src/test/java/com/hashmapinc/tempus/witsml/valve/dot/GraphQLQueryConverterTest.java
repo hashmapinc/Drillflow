@@ -51,7 +51,7 @@ public class GraphQLQueryConverterTest {
 
     @Test
     public void generateProperGraphQLQueryForTrajectory() throws Exception {
-        String queryXML = TestUtilities.getResourceAsString("trajectoryOpenQuery1411.xml");
+        String queryXML = TestUtilities.getResourceAsString("trajectoryGraphql/trajectoryGraphqlQuery1411.xml");
         ObjTrajectory obj = ((ObjTrajectorys) WitsmlMarshal.deserialize(queryXML, ObjTrajectorys.class)).getTrajectory().get(0);
         GraphQLQueryConverter converter = new GraphQLQueryConverter();
         String graphQLQuery = converter.convertQuery(obj);
