@@ -1687,92 +1687,221 @@ class GraphQLQueryConverter {
                 stationFieldsFragment.append("        }");
             }
 
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("rawData")) || stationJson.getJSONObject("rawData").has("gravTran1Raw")) {
+                stationFieldsFragment.append("        gravTran1Raw {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("rawData")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("rawData").get("gravTran1Raw")) ||
+                        stationJson.getJSONObject("rawData").getJSONObject("gravTran1Raw").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("rawData")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("rawData").get("gravTran1Raw")) ||
+                        stationJson.getJSONObject("rawData").getJSONObject("gravTran1Raw").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
 
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("rawData")) || stationJson.getJSONObject("rawData").has("gravTran2Raw")) {
+                stationFieldsFragment.append("        gravTran2Raw {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("rawData")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("rawData").get("gravTran2Raw")) ||
+                        stationJson.getJSONObject("rawData").getJSONObject("gravTran2Raw").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("rawData")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("rawData").get("gravTran2Raw")) ||
+                        stationJson.getJSONObject("rawData").getJSONObject("gravTran2Raw").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
 
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("rawData")) || stationJson.getJSONObject("rawData").has("magAxialRaw")) {
+                stationFieldsFragment.append("        magAxialRaw {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("rawData")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("rawData").get("magAxialRaw")) ||
+                        stationJson.getJSONObject("rawData").getJSONObject("magAxialRaw").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("rawData")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("rawData").get("magAxialRaw")) ||
+                        stationJson.getJSONObject("rawData").getJSONObject("magAxialRaw").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
 
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("rawData")) || stationJson.getJSONObject("rawData").has("magTran1Raw")) {
+                stationFieldsFragment.append("        magTran1Raw {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("rawData")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("rawData").get("magTran1Raw")) ||
+                        stationJson.getJSONObject("rawData").getJSONObject("magTran1Raw").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("rawData")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("rawData").get("magTran1Raw")) ||
+                        stationJson.getJSONObject("rawData").getJSONObject("magTran1Raw").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
 
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("rawData")) || stationJson.getJSONObject("rawData").has("magTran2Raw")) {
+                stationFieldsFragment.append("        magTran2Raw {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("rawData")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("rawData").get("magTran2Raw")) ||
+                        stationJson.getJSONObject("rawData").getJSONObject("magTran2Raw").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("rawData")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("rawData").get("magTran2Raw")) ||
+                        stationJson.getJSONObject("rawData").getJSONObject("magTran2Raw").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
 
-            
-            stationFieldsFragment.append("        gravTran1Raw {");
-            stationFieldsFragment.append("            uom");
-            stationFieldsFragment.append("            value");
-            stationFieldsFragment.append("        }");
-            stationFieldsFragment.append("        gravTran2Raw {");
-            stationFieldsFragment.append("            uom");
-            stationFieldsFragment.append("            value");
-            stationFieldsFragment.append("        }");
-            stationFieldsFragment.append("        magAxialRaw {");
-            stationFieldsFragment.append("            uom");
-            stationFieldsFragment.append("            value");
-            stationFieldsFragment.append("        }");
-            stationFieldsFragment.append("        magTran1Raw {");
-            stationFieldsFragment.append("            uom");
-            stationFieldsFragment.append("            value");
-            stationFieldsFragment.append("        }");
-            stationFieldsFragment.append("        magTran2Raw {");
-            stationFieldsFragment.append("            uom");
-            stationFieldsFragment.append("            value");
-            stationFieldsFragment.append("        }");
             stationFieldsFragment.append("    }");
         }
 
-        stationFieldsFragment.append("    sagCorUsed");
+        if (includeAllStationFields || stationJson.has("sagCorUsed"))
+            stationFieldsFragment.append("    sagCorUsed");
 
-        stationFieldsFragment.append("    sourceStation {");
-        stationFieldsFragment.append("        stationReference");
-        stationFieldsFragment.append("        trajectoryParent {");
-        stationFieldsFragment.append("            uidRef");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        wellboreParent {");
-        stationFieldsFragment.append("            uidRef");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("    }");
+        if (includeAllStationFields || stationJson.has("sourceStation")) {
+            stationFieldsFragment.append("    sourceStation {");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("sourceStation")) || stationJson.getJSONObject("sourceStation").has("stationReference"))
+                stationFieldsFragment.append("        stationReference");
 
-        stationFieldsFragment.append("    statusTrajStation");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("sourceStation")) || stationJson.getJSONObject("sourceStation").has("trajectoryParent")) {
+                stationFieldsFragment.append("        trajectoryParent {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("sourceStation")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("sourceStation").get("trajectoryParent")) ||
+                        stationJson.getJSONObject("sourceStation").getJSONObject("trajectoryParent").has("uidRef"))
+                    stationFieldsFragment.append("            uidRef");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("sourceStation")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("sourceStation").get("trajectoryParent")) ||
+                        stationJson.getJSONObject("sourceStation").getJSONObject("trajectoryParent").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
 
-        stationFieldsFragment.append("    target {");
-        stationFieldsFragment.append("        uidRef");
-        stationFieldsFragment.append("        value");
-        stationFieldsFragment.append("    }");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("sourceStation")) || stationJson.getJSONObject("sourceStation").has("wellboreParent")) {
+                stationFieldsFragment.append("        wellboreParent {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("sourceStation")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("sourceStation").get("wellboreParent")) ||
+                        stationJson.getJSONObject("sourceStation").getJSONObject("wellboreParent").has("uidRef"))
+                    stationFieldsFragment.append("            uidRef");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("sourceStation")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("sourceStation").get("wellboreParent")) ||
+                        stationJson.getJSONObject("sourceStation").getJSONObject("wellboreParent").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+            stationFieldsFragment.append("    }");
+        }
 
-        stationFieldsFragment.append("    tvd {");
-        stationFieldsFragment.append("        datum");
-        stationFieldsFragment.append("        uom");
-        stationFieldsFragment.append("        value");
-        stationFieldsFragment.append("    }");
+        if (includeAllStationFields || stationJson.has("statusTrajStation"))
+            stationFieldsFragment.append("    statusTrajStation");
 
-        stationFieldsFragment.append("    tvdDelta {");
-        stationFieldsFragment.append("        uom");
-        stationFieldsFragment.append("        value");
-        stationFieldsFragment.append("    }");
+        if (includeAllStationFields || stationJson.has("target")) {
+            stationFieldsFragment.append("    target {");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("target")) || stationJson.getJSONObject("target").has("uidRef"))
+                stationFieldsFragment.append("        uidRef");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("target")) || stationJson.getJSONObject("target").has("value"))
+                stationFieldsFragment.append("        value");
+            stationFieldsFragment.append("    }");
+        }
 
-        stationFieldsFragment.append("    typeSurveyTool");
+        if (includeAllStationFields || stationJson.has("tvd")) {
+            stationFieldsFragment.append("    tvd {");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("tvd")) || stationJson.getJSONObject("tvd").has("datum"))
+                stationFieldsFragment.append("        datum");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("tvd")) || stationJson.getJSONObject("tvd").has("uom"))
+                stationFieldsFragment.append("        uom");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("tvd")) || stationJson.getJSONObject("tvd").has("value"))
+                stationFieldsFragment.append("        value");
+            stationFieldsFragment.append("    }");
+        }
 
-        stationFieldsFragment.append("    typeTrajStation");
+        if (includeAllStationFields || stationJson.has("tvdDelta")) {
+            stationFieldsFragment.append("    tvdDelta {");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("tvdDelta")) || stationJson.getJSONObject("tvdDelta").has("uom"))
+                stationFieldsFragment.append("        uom");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("tvdDelta")) || stationJson.getJSONObject("tvdDelta").has("value"))
+                stationFieldsFragment.append("        value");
+            stationFieldsFragment.append("    }");
+        }
+
+        if (includeAllStationFields || stationJson.has("typeSurveyTool"))
+            stationFieldsFragment.append("    typeSurveyTool");
+
+        if (includeAllStationFields || stationJson.has("typeTrajStation"))
+            stationFieldsFragment.append("    typeTrajStation");
 
         stationFieldsFragment.append("    uid"); // always get station uid
 
-        stationFieldsFragment.append("    valid {");
-        stationFieldsFragment.append("        gravTotalFieldCalc {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        magDipAngleCalc {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("        magTotalFieldCalc {");
-        stationFieldsFragment.append("            uom");
-        stationFieldsFragment.append("            value");
-        stationFieldsFragment.append("        }");
-        stationFieldsFragment.append("    }");
+        if (includeAllStationFields || stationJson.has("valid")) {
+            stationFieldsFragment.append("    valid {");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("valid")) || stationJson.getJSONObject("valid").has("gravTotalFieldCalc")) {
+                stationFieldsFragment.append("        gravTotalFieldCalc {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("valid")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("valid").get("gravTotalFieldCalc")) ||
+                        stationJson.getJSONObject("valid").getJSONObject("gravTotalFieldCalc").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("valid")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("valid").get("gravTotalFieldCalc")) ||
+                        stationJson.getJSONObject("valid").getJSONObject("gravTotalFieldCalc").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
 
-        stationFieldsFragment.append("    vertSect {");
-        stationFieldsFragment.append("        uom");
-        stationFieldsFragment.append("        value");
-        stationFieldsFragment.append("    }");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("valid")) || stationJson.getJSONObject("valid").has("magDipAngleCalc")) {
+                stationFieldsFragment.append("        magDipAngleCalc {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("valid")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("valid").get("magDipAngleCalc")) ||
+                        stationJson.getJSONObject("valid").getJSONObject("magDipAngleCalc").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("valid")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("valid").get("magDipAngleCalc")) ||
+                        stationJson.getJSONObject("valid").getJSONObject("magDipAngleCalc").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("valid")) || stationJson.getJSONObject("valid").has("magTotalFieldCalc")) {
+                stationFieldsFragment.append("        magTotalFieldCalc {");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("valid")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("valid").get("magTotalFieldCalc")) ||
+                        stationJson.getJSONObject("valid").getJSONObject("magTotalFieldCalc").has("uom"))
+                    stationFieldsFragment.append("            uom");
+                if (includeAllStationFields ||
+                        JsonUtil.isEmpty(stationJson.get("valid")) ||
+                        JsonUtil.isEmpty(stationJson.getJSONObject("valid").get("magTotalFieldCalc")) ||
+                        stationJson.getJSONObject("valid").getJSONObject("magTotalFieldCalc").has("value"))
+                    stationFieldsFragment.append("            value");
+                stationFieldsFragment.append("        }");
+            }
+            stationFieldsFragment.append("    }");
+        }
+
+        if (includeAllStationFields || stationJson.has("vertSect")) {
+            stationFieldsFragment.append("    vertSect {");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("vertSect")) || stationJson.getJSONObject("vertSect").has("uom"))
+                stationFieldsFragment.append("        uom");
+            if (includeAllStationFields || JsonUtil.isEmpty(stationJson.get("vertSect")) || stationJson.getJSONObject("vertSect").has("value"))
+                stationFieldsFragment.append("        value");
+            stationFieldsFragment.append("    }");
+        }
         stationFieldsFragment.append("}");
         // ====================================================================
 
