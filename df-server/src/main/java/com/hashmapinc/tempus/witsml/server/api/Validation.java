@@ -16,6 +16,7 @@
 package com.hashmapinc.tempus.witsml.server.api;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
@@ -33,8 +34,11 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
+import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
@@ -76,7 +80,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	public static String uomExpression = "//*[@uom]";
 	public static String WELL_XML_TAG = "well";
 	public static String WELLS_XML_TAG = "wells";
-	public static String LOG_XML_TAG = "logData";
+	public static String LOG_XML_TAG = "<logData>";
 	public static String uidAttribute = "uid";
 	public static String uomAttribute = "uom";
 	public static List<AbstractWitsmlObject> witsmlObjects = null;
@@ -182,11 +186,11 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 
 	static Validation error425() {
-		return holds(param -> !checkOptionsInHeader(param.getOptionsIn()), ERRORCODE.ERROR_425.value());
+		return holds(param -> !checkOptions(param.getWMLtypeIn(), param.getOptionsIn()), ERRORCODE.ERROR_425.value());
 	}
 
 	static Validation error429() {
-		return holds(param -> !checkLogData(param.getXMLin()), ERRORCODE.ERROR_429.value());
+		return holds(param -> !checkLogData(param.getXMLin(), param.getWMLtypeIn()), ERRORCODE.ERROR_429.value());
 	}
 
 	static Validation error432() {
@@ -270,7 +274,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	}
 
 	static Validation error475() {
-		return holds(param -> !checkWell(param.getXMLin(), param.getWMLtypeIn()), ERRORCODE.ERROR_475.value());
+		return holds(param -> !checkTrajForsubUID(param.getXMLin(), param.getWMLtypeIn()), ERRORCODE.ERROR_475.value());
 	}
 
 	static Validation error482() {
@@ -1542,8 +1546,42 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	 */
 	static boolean checkIfXMLEqualsWMLObj(String XMLin, String WMLType) {
 		boolean result = false;
-		if (XMLin.equals(WMLType)) {
-			result = true;
+
+		String version;
+		try {
+			version = WitsmlUtil.getVersionFromXML(XMLin);
+			LOG.info("the version is: " + version);
+			switch (WMLType) {
+			case "log":
+				if (!XMLin.contains("log")) {
+					result = true;
+				}
+				break;
+
+			case "trajectory":
+				if (!XMLin.contains("trajectory")) {
+					result = true;
+				}
+				break;
+
+			case "well":
+
+				if (!XMLin.contains("well")) {
+					result = true;
+				}
+				break;
+
+			case "wellbore":
+				if (!XMLin.contains("wellbore")) {
+					result = true;
+				}
+				break;
+
+			default:
+				throw new WitsmlException("unsupported witsml object type: " + WMLType);
+			}
+		} catch (Exception e) {
+			LOG.warning("the error is " + e.getMessage());
 		}
 		return result;
 	}
@@ -1656,11 +1694,40 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	 * @throws IOException
 	 * @throws XPathExpressionException
 	 */
-	static boolean checkLogData(String XMLin) {
+	static boolean checkLogData(String XMLin, String WMLTypein) {
+		boolean result = false;
+
+		String version;
+		try {
+			version = WitsmlUtil.getVersionFromXML(XMLin);
+			LOG.info("the version is: " + version);
+
+			switch (WMLTypein) {
+			case "log":
+				result = checkLogDataforLOG(XMLin);
+				break;
+			case "trajectory":
+				result = false;
+				break;
+			case "well":
+				result = false;
+				break;
+			case "wellbore":
+				result = false;
+				break;
+			default:
+				throw new WitsmlException("unsupported witsml object type: " + WMLTypein);
+			}
+		} catch (Exception e) {
+			LOG.warning("the error is " + e.getMessage());
+		}
+		return result;
+	}
+
+	static boolean checkLogDataforLOG(String XMLin) {
 		boolean result = false;
 		try {
-
-			if (!XMLin.contains(LOG_XML_TAG)) {
+			if (XMLin.split(LOG_XML_TAG).length > 2) {
 				result = true;
 			}
 		} catch (Exception e) {
@@ -4525,17 +4592,17 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 
 				if (pcInterest.getUom() == null
 						|| (pcInterest.getUom() != null && pcInterest.getUom().toString().isEmpty())) {
-					
+
 					result = true;
 					break;
 				}
 
 				com.hashmapinc.tempus.WitsmlObjects.v1411.WellElevationCoord wellHeadElevation = (com.hashmapinc.tempus.WitsmlObjects.v1411.WellElevationCoord) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject)
 						.getWellheadElevation();
-				
+
 				if (wellHeadElevation.getUom().toString() == null
 						|| (wellHeadElevation.getUom() != null && wellHeadElevation.getUom().toString().isEmpty())) {
-					
+
 					result = true;
 					break;
 				}
@@ -4545,7 +4612,7 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 
 				if (groundElevation.getUom() == null
 						|| (groundElevation.getUom() != null && groundElevation.getUom().toString().isEmpty())) {
-					
+
 					result = true;
 					break;
 				}
@@ -4555,109 +4622,142 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 
 				if (waterDepth.getUom() == null
 						|| (waterDepth.getUom() != null && waterDepth.getUom().toString().isEmpty())) {
-					
+
 					result = true;
 					break;
 				}
-				
-				com.hashmapinc.tempus.WitsmlObjects.v1411.CsWellDatum wellDatum = (com.hashmapinc.tempus.WitsmlObjects.v1411.CsWellDatum) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getWellDatum();
-				if(wellDatum.getElevation().getUom()==null || (wellDatum.getElevation().getUom() != null && wellDatum.getElevation().getUom().toString().isEmpty())) {
-					result=true;
-					break;
-				}
-				
-				com.hashmapinc.tempus.WitsmlObjects.v1411.CsLocation wellLocation = (com.hashmapinc.tempus.WitsmlObjects.v1411.CsLocation) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getWellLocation();
-				if(wellLocation.getEasting().getUom()==null || (wellLocation.getEasting().getUom() != null && wellLocation.getEasting().getUom().toString().isEmpty())) {
-					result=true;
-					break;
-				}
-				if(wellLocation.getNorthing().getUom()==null || (wellLocation.getNorthing().getUom() != null && wellLocation.getNorthing().getUom().toString().isEmpty())) {
-					result=true;
-					break;
-				}
-				if(wellLocation.getLatitude().getUom()==null || (wellLocation.getLatitude().getUom() != null && wellLocation.getLatitude().getUom().toString().isEmpty())) {
-					result=true;
-					break;
-				}
-				if(wellLocation.getLongitude().getUom()==null || (wellLocation.getLongitude().getUom() != null && wellLocation.getLongitude().getUom().toString().isEmpty())) {
-					result=true;
-					break;
-				}
-				if(wellLocation.getLocalX().getUom()==null || (wellLocation.getLocalX().getUom() != null && wellLocation.getLocalX().getUom().toString().isEmpty())) {
-					result=true;
-					break;
-				}
-				if(wellLocation.getLocalY().getUom()==null || (wellLocation.getLocalY().getUom() != null && wellLocation.getLocalY().getUom().toString().isEmpty())) {
-					result=true;
-					break;
-				}
-				
-				com.hashmapinc.tempus.WitsmlObjects.v1411.CsReferencePoint refrencePoint = (com.hashmapinc.tempus.WitsmlObjects.v1411.CsReferencePoint) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getReferencePoint();
-				if(refrencePoint.getElevation().getUom()==null || (refrencePoint.getElevation().getUom() != null && refrencePoint.getElevation().getUom().toString().isEmpty())) {
-					result=true;
-					break;
-				}
-				if(refrencePoint.getMeasuredDepth().getUom()==null || (refrencePoint.getMeasuredDepth().getUom() != null && refrencePoint.getMeasuredDepth().getUom().toString().isEmpty())) {
-					result=true;
-					break;
-				}
-				com.hashmapinc.tempus.WitsmlObjects.v1411.CsLocation location = (com.hashmapinc.tempus.WitsmlObjects.v1411.CsLocation) refrencePoint.getLocation();
-				if(location.getEasting().getUom()==null || (location.getEasting().getUom() != null && location.getEasting().getUom().toString().isEmpty())) {
-					result=true;
-					break;
-				}
-				if(location.getNorthing().getUom()==null || (location.getNorthing().getUom() != null && location.getNorthing().getUom().toString().isEmpty())) {
-					result=true;
-					break;
-				}
-				if(location.getLatitude().getUom()==null || (location.getLatitude().getUom() != null && location.getLatitude().getUom().toString().isEmpty())) {
-					result=true;
-					break;
-				}
-				if(location.getLongitude().getUom()==null || (location.getLongitude().getUom() != null && location.getLongitude().getUom().toString().isEmpty())) {
-					result=true;
-					break;
-				}
-				if(location.getLocalX().getUom()==null || (location.getLocalX().getUom() != null && location.getLocalX().getUom().toString().isEmpty())) {
-					result=true;
-					break;
-				}
-				if(location.getLocalY().getUom()==null || (location.getLocalY().getUom() != null && location.getLocalY().getUom().toString().isEmpty())) {
-					result=true;
-					break;
-				}
-				
-				com.hashmapinc.tempus.WitsmlObjects.v1411.CsWellCRS wellCRS = (com.hashmapinc.tempus.WitsmlObjects.v1411.CsWellCRS) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject).getWellCRS();
-				if(wellCRS.getGeographic().getXTranslation().getUom()==null || (wellCRS.getGeographic().getXTranslation().getUom() != null && wellCRS.getGeographic().getXTranslation().getUom().toString().isEmpty())) {
-					result=true;
-					break;
-				}
-				if(wellCRS.getGeographic().getYTranslation().getUom()==null || (wellCRS.getGeographic().getYTranslation().getUom() != null && wellCRS.getGeographic().getYTranslation().getUom().toString().isEmpty())) {
-					result=true;
-					break;
-				}
-				if(wellCRS.getGeographic().getZTranslation().getUom()==null || (wellCRS.getGeographic().getZTranslation().getUom() != null && wellCRS.getGeographic().getZTranslation().getUom().toString().isEmpty())) {
-					result=true;
-					break;
-				}
-				if(wellCRS.getGeographic().getXRotation().getUom()==null || (wellCRS.getGeographic().getXRotation().getUom() != null && wellCRS.getGeographic().getXRotation().getUom().toString().isEmpty())) {
-					result=true;
-					break;
-				}
-				if(wellCRS.getGeographic().getYRotation().getUom()==null || (wellCRS.getGeographic().getYRotation().getUom() != null && wellCRS.getGeographic().getYRotation().getUom().toString().isEmpty())) {
-					result=true;
-					break;
-				}
-				if(wellCRS.getGeographic().getZRotation().getUom()==null || (wellCRS.getGeographic().getZRotation().getUom() != null && wellCRS.getGeographic().getZRotation().getUom().toString().isEmpty())) {
-					result=true;
-					break;
-				}
-				if(wellCRS.getGeographic().getEllipsoidSemiMajorAxis().getUom()==null || (wellCRS.getGeographic().getEllipsoidSemiMajorAxis().getUom() != null && wellCRS.getGeographic().getEllipsoidSemiMajorAxis().getUom().toString().isEmpty())) {
-					result=true;
+
+				com.hashmapinc.tempus.WitsmlObjects.v1411.CsWellDatum wellDatum = (com.hashmapinc.tempus.WitsmlObjects.v1411.CsWellDatum) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject)
+						.getWellDatum();
+				if (wellDatum.getElevation().getUom() == null || (wellDatum.getElevation().getUom() != null
+						&& wellDatum.getElevation().getUom().toString().isEmpty())) {
+					result = true;
 					break;
 				}
 
+				com.hashmapinc.tempus.WitsmlObjects.v1411.CsLocation wellLocation = (com.hashmapinc.tempus.WitsmlObjects.v1411.CsLocation) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject)
+						.getWellLocation();
+				if (wellLocation.getEasting().getUom() == null || (wellLocation.getEasting().getUom() != null
+						&& wellLocation.getEasting().getUom().toString().isEmpty())) {
+					result = true;
+					break;
+				}
+				if (wellLocation.getNorthing().getUom() == null || (wellLocation.getNorthing().getUom() != null
+						&& wellLocation.getNorthing().getUom().toString().isEmpty())) {
+					result = true;
+					break;
+				}
+				if (wellLocation.getLatitude().getUom() == null || (wellLocation.getLatitude().getUom() != null
+						&& wellLocation.getLatitude().getUom().toString().isEmpty())) {
+					result = true;
+					break;
+				}
+				if (wellLocation.getLongitude().getUom() == null || (wellLocation.getLongitude().getUom() != null
+						&& wellLocation.getLongitude().getUom().toString().isEmpty())) {
+					result = true;
+					break;
+				}
+				if (wellLocation.getLocalX().getUom() == null || (wellLocation.getLocalX().getUom() != null
+						&& wellLocation.getLocalX().getUom().toString().isEmpty())) {
+					result = true;
+					break;
+				}
+				if (wellLocation.getLocalY().getUom() == null || (wellLocation.getLocalY().getUom() != null
+						&& wellLocation.getLocalY().getUom().toString().isEmpty())) {
+					result = true;
+					break;
+				}
 
+				com.hashmapinc.tempus.WitsmlObjects.v1411.CsReferencePoint refrencePoint = (com.hashmapinc.tempus.WitsmlObjects.v1411.CsReferencePoint) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject)
+						.getReferencePoint();
+				if (refrencePoint.getElevation().getUom() == null || (refrencePoint.getElevation().getUom() != null
+						&& refrencePoint.getElevation().getUom().toString().isEmpty())) {
+					result = true;
+					break;
+				}
+				if (refrencePoint.getMeasuredDepth().getUom() == null
+						|| (refrencePoint.getMeasuredDepth().getUom() != null
+								&& refrencePoint.getMeasuredDepth().getUom().toString().isEmpty())) {
+					result = true;
+					break;
+				}
+				com.hashmapinc.tempus.WitsmlObjects.v1411.CsLocation location = (com.hashmapinc.tempus.WitsmlObjects.v1411.CsLocation) refrencePoint
+						.getLocation();
+				if (location.getEasting().getUom() == null || (location.getEasting().getUom() != null
+						&& location.getEasting().getUom().toString().isEmpty())) {
+					result = true;
+					break;
+				}
+				if (location.getNorthing().getUom() == null || (location.getNorthing().getUom() != null
+						&& location.getNorthing().getUom().toString().isEmpty())) {
+					result = true;
+					break;
+				}
+				if (location.getLatitude().getUom() == null || (location.getLatitude().getUom() != null
+						&& location.getLatitude().getUom().toString().isEmpty())) {
+					result = true;
+					break;
+				}
+				if (location.getLongitude().getUom() == null || (location.getLongitude().getUom() != null
+						&& location.getLongitude().getUom().toString().isEmpty())) {
+					result = true;
+					break;
+				}
+				if (location.getLocalX().getUom() == null || (location.getLocalX().getUom() != null
+						&& location.getLocalX().getUom().toString().isEmpty())) {
+					result = true;
+					break;
+				}
+				if (location.getLocalY().getUom() == null || (location.getLocalY().getUom() != null
+						&& location.getLocalY().getUom().toString().isEmpty())) {
+					result = true;
+					break;
+				}
+
+				com.hashmapinc.tempus.WitsmlObjects.v1411.CsWellCRS wellCRS = (com.hashmapinc.tempus.WitsmlObjects.v1411.CsWellCRS) ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) abstractWitsmlObject)
+						.getWellCRS();
+				if (wellCRS.getGeographic().getXTranslation().getUom() == null
+						|| (wellCRS.getGeographic().getXTranslation().getUom() != null
+								&& wellCRS.getGeographic().getXTranslation().getUom().toString().isEmpty())) {
+					result = true;
+					break;
+				}
+				if (wellCRS.getGeographic().getYTranslation().getUom() == null
+						|| (wellCRS.getGeographic().getYTranslation().getUom() != null
+								&& wellCRS.getGeographic().getYTranslation().getUom().toString().isEmpty())) {
+					result = true;
+					break;
+				}
+				if (wellCRS.getGeographic().getZTranslation().getUom() == null
+						|| (wellCRS.getGeographic().getZTranslation().getUom() != null
+								&& wellCRS.getGeographic().getZTranslation().getUom().toString().isEmpty())) {
+					result = true;
+					break;
+				}
+				if (wellCRS.getGeographic().getXRotation().getUom() == null
+						|| (wellCRS.getGeographic().getXRotation().getUom() != null
+								&& wellCRS.getGeographic().getXRotation().getUom().toString().isEmpty())) {
+					result = true;
+					break;
+				}
+				if (wellCRS.getGeographic().getYRotation().getUom() == null
+						|| (wellCRS.getGeographic().getYRotation().getUom() != null
+								&& wellCRS.getGeographic().getYRotation().getUom().toString().isEmpty())) {
+					result = true;
+					break;
+				}
+				if (wellCRS.getGeographic().getZRotation().getUom() == null
+						|| (wellCRS.getGeographic().getZRotation().getUom() != null
+								&& wellCRS.getGeographic().getZRotation().getUom().toString().isEmpty())) {
+					result = true;
+					break;
+				}
+				if (wellCRS.getGeographic().getEllipsoidSemiMajorAxis().getUom() == null
+						|| (wellCRS.getGeographic().getEllipsoidSemiMajorAxis().getUom() != null
+								&& wellCRS.getGeographic().getEllipsoidSemiMajorAxis().getUom().toString().isEmpty())) {
+					result = true;
+					break;
+				}
 
 			}
 		}
@@ -5034,11 +5134,92 @@ interface Validation extends Function<ValidateParam, ValidationResult> {
 	 * @return true if nested objects are not found
 	 * 
 	 */
-	static boolean checkOptionsInHeader(String OptionsIn) {
+	static boolean checkOptionsInHeader(String OptionsIn, String checkParam) {
 		boolean result = false;
-		String regex = "";
-		if (!OptionsIn.matches(regex)) {
-			result = true;
+		XPath xpath = XPathFactory.newInstance().newXPath();
+		InputSource inputSource = new InputSource(new StringReader(OptionsIn)); // ??? = InputStream or Reader
+		try {
+			if (xpath.evaluate(checkParam, inputSource).isEmpty() || xpath.evaluate(checkParam, inputSource) == null) {
+				result = true;
+			}
+		} catch (XPathExpressionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	static boolean checkOptions(String WMLTypein, String OptionsIn) {
+		boolean result = false;
+
+		try {
+
+			switch (WMLTypein) {
+			case "log":
+				if (OptionsIn.equalsIgnoreCase("returnElements=data-only")) {
+					result = true;
+					break;
+				}
+
+			case "well":
+				if (OptionsIn.equalsIgnoreCase("returnElements=data-only")
+						|| OptionsIn.equalsIgnoreCase("returnElements=header-only")) {
+					result = false;
+					break;
+				}
+			case "wellbore":
+				if (OptionsIn.equalsIgnoreCase("returnElements=data-only")
+						|| OptionsIn.equalsIgnoreCase("returnElements=header-only")) {
+					result = false;
+					
+				}
+			default:
+				throw new WitsmlException("unsupported witsml object type: " + WMLTypein);
+			}
+		} catch (Exception e) {
+			LOG.warning("the error is " + e.getMessage());
+		}
+		return result;
+	}
+
+	// error 475
+	static boolean checkTrajForsubUID(String XMLin, String WMLTypin) {
+		boolean result = false;
+		List<AbstractWitsmlObject> witsmlObjects;
+		String version;
+		try {
+			version = WitsmlUtil.getVersionFromXML(XMLin);
+			LOG.info("the version is: " + version);
+			witsmlObjects = WitsmlObjectParser.parse(WMLTypin, XMLin, version);
+			if (WMLTypin.equalsIgnoreCase("trajectory") && checkTrajUID(witsmlObjects)) {
+				result = true;
+			}
+		} catch (Exception e) {
+			LOG.warning("the error is the " + e.getMessage());
+		}
+		return result;
+	}
+
+	static boolean checkTrajUID(List<AbstractWitsmlObject> witsmlObjects) {
+		boolean result = false;
+
+		for (AbstractWitsmlObject abstractWitsmlObject : witsmlObjects) {
+			if (abstractWitsmlObject instanceof ObjTrajectory) {
+				ObjTrajectory objTraj = (ObjTrajectory) abstractWitsmlObject;
+				if (objTraj.getUidWell().isEmpty() && objTraj.getUidWellbore().isEmpty()
+						|| objTraj.getUidWell() == null && objTraj.getUidWellbore() == null) {
+					result = true;
+					break;
+				}
+
+			} else if (abstractWitsmlObject instanceof com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory) {
+				com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory objTraj = (com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory) abstractWitsmlObject;
+				if (objTraj.getUidWell().isEmpty() && objTraj.getUidWellbore().isEmpty()
+						|| objTraj.getUidWell() == null && objTraj.getUidWellbore() == null) {
+					result = true;
+					break;
+				}
+			}
 		}
 		return result;
 	}
