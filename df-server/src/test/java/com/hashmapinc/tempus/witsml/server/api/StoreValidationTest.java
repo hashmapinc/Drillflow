@@ -56,25 +56,7 @@ public class StoreValidationTest {
 
     @Test
     public void test408ShouldErrorEmptyMultiLine(){
-        short resp = StoreValidator.validateAddToStore("well", "<wells xmlns=\"http://www.witsml.org/schemas/131\" version=\"1.3.1.1\">\n" +
-                "<well  uid=\"uid12333\">\n" +
-                "</well>\n" +
-                "</wells>", null, valve);
-        assertThat(resp).isEqualTo((short)-408);
-    }
-
-    @Test
-    public void test408ShouldErrorEmptySingleLine(){
-        short resp = StoreValidator.validateAddToStore("well", "<wells xmlns=\"http://www.witsml.org/schemas/131\" version=\"1.3.1.1\">\n" +
-                "<well  uid=\"uid12333\"></well>\n" +
-                "</wells>", null, valve);
-        assertThat(resp).isEqualTo((short)-408);
-    }
-    @Test
-    public void test408ShouldErrorEmptyShorthand(){
-        short resp = StoreValidator.validateAddToStore("well", "<wells xmlns=\"http://www.witsml.org/schemas/131\" version=\"1.3.1.1\">\n" +
-                "<well  uid=\"uid12333\" />\n" +
-                "</wells>", null, valve);
+        short resp = StoreValidator.validateAddToStore("well", "", null, valve);
         assertThat(resp).isEqualTo((short)-408);
     }
 

@@ -36,12 +36,12 @@ public class StoreValidator {
     public static short validateAddToStore(String WMLtypeIn, String xmlIn, Map<String,String> optionsIn, IValve valve){
         if (WMLtypeIn.isEmpty())
             return -407;
+        if (xmlIn.isEmpty())
+            return -408;
         if (!isTypeMatch(WMLtypeIn, xmlIn))
             return -486;
         if (!isObjectSupported(WMLtypeIn, valve, "WMLS_AddToStore"))
             return -487;
-        if (isObjectEmpty(WMLtypeIn, xmlIn))
-            return -408;
         if (!containsPluralRoot(WMLtypeIn, xmlIn))
             return -401;
         return 1;
@@ -84,20 +84,6 @@ public class StoreValidator {
      */
     public static short validateDeleteFromStore(String WMLtypeIn, String xmlIn, Map<String,String> optionsIn, IValve valve){
         return 1;
-    }
-
-    /***
-     * Checks to make sure that the XMLIn is not empty as part of the add
-     * @param WMLtypeIn The witsml type in
-     * @param xmlIn The XML input from the client
-     * @return true if empty false if not empty
-     */
-    private static boolean isObjectEmpty(String WMLtypeIn, String xmlIn){
-        // This regex matches (for dataObjectType: well) <well uid="xxx" /> and <well uid="xxx"></well> and is multiline capable
-        Pattern singularPattern =
-                Pattern.compile("(<[" + WMLtypeIn + "][^<]*?/>)|<([" + WMLtypeIn + "][^<]*?>*[\\s\\S]</" + WMLtypeIn + ">)");
-        Matcher m = singularPattern.matcher(xmlIn);
-        return m.find();
     }
 
     /***
