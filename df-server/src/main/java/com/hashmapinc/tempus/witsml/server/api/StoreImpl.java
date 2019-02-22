@@ -126,9 +126,10 @@ public class StoreImpl implements IStore {
         try {
             // build the query context
             Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
-            short validationResult = StoreValidator.validateAddToStore(WMLtypeIn, XMLin, optionsMap);
+            short validationResult = StoreValidator.validateAddToStore(WMLtypeIn, XMLin, optionsMap, valve);
             if (validationResult != 1){
                 response.setResult(validationResult);
+                return response;
             }
             String version = WitsmlUtil.getVersionFromXML(XMLin);
             witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, XMLin, version);
@@ -186,9 +187,10 @@ public class StoreImpl implements IStore {
         try {
             // build the query context
             Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
-            short validationResult = StoreValidator.validateUpdateInStore(WMLtypeIn, XMLin, optionsMap);
+            short validationResult = StoreValidator.validateUpdateInStore(WMLtypeIn, XMLin, optionsMap, valve);
             if (validationResult != 1){
                 response.setResult(validationResult);
+                return response;
             }
             String version = WitsmlUtil.getVersionFromXML(XMLin);
             witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, XMLin, version);
@@ -241,9 +243,10 @@ public class StoreImpl implements IStore {
         resp.setResult((short) -1);
 
         Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
-        short validationResult = StoreValidator.validateDeleteFromStore(WMLtypeIn, QueryIn, optionsMap);
+        short validationResult = StoreValidator.validateDeleteFromStore(WMLtypeIn, QueryIn, optionsMap, valve);
         if (validationResult != 1){
             resp.setResult(validationResult);
+            return resp;
         }
         // try to deserialize
         List<AbstractWitsmlObject> witsmlObjects;
@@ -344,9 +347,10 @@ public class StoreImpl implements IStore {
         WMLS_GetFromStoreResponse resp = new WMLS_GetFromStoreResponse();
         // try to deserialize
         Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
-        short validationResult = StoreValidator.validateGetFromStore(WMLtypeIn, QueryIn, optionsMap);
+        short validationResult = StoreValidator.validateGetFromStore(WMLtypeIn, QueryIn, optionsMap, valve);
         if (validationResult != 1){
             resp.setResult(validationResult);
+            return resp;
         }
         List<AbstractWitsmlObject> witsmlObjects;
         String clientVersion;
