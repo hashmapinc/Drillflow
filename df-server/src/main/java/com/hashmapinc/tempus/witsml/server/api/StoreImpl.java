@@ -36,9 +36,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import javax.jws.WebService;
+import javax.xml.bind.JAXBException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -126,6 +129,11 @@ public class StoreImpl implements IStore {
         try {
             // build the query context
             Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
+            short validationResult = StoreValidator.validateAddToStore(WMLtypeIn, XMLin, optionsMap, valve);
+            if (validationResult != 1){
+                response.setResult(validationResult);
+                return response;
+            }
             String version = WitsmlUtil.getVersionFromXML(XMLin);
             witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, XMLin, version);
             ValveUser user = (ValveUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -182,6 +190,11 @@ public class StoreImpl implements IStore {
         try {
             // build the query context
             Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
+            short validationResult = StoreValidator.validateUpdateInStore(WMLtypeIn, XMLin, optionsMap, valve);
+            if (validationResult != 1){
+                response.setResult(validationResult);
+                return response;
+            }
             String version = WitsmlUtil.getVersionFromXML(XMLin);
             witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, XMLin, version);
             ValveUser user = (ValveUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -232,6 +245,12 @@ public class StoreImpl implements IStore {
         // set initial ERROR state for resp
         resp.setResult((short) -1);
 
+        Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
+        short validationResult = StoreValidator.validateDeleteFromStore(WMLtypeIn, QueryIn, optionsMap, valve);
+        if (validationResult != 1){
+            resp.setResult(validationResult);
+            return resp;
+        }
         // try to deserialize
         List<AbstractWitsmlObject> witsmlObjects;
         try {
@@ -252,7 +271,7 @@ public class StoreImpl implements IStore {
         // try to delete
         try {
             // construct query context
-            Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
+
             ValveUser user = (ValveUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             QueryContext qc = new QueryContext(
                     null, // client version not needed
@@ -285,21 +304,30 @@ public class StoreImpl implements IStore {
     @Override
     public WMLS_GetCapResponse getCap(String OptionsIn) {
         LOG.info("Executing GetCap");
-
-        String requestedVersion = OptionsIn.substring(OptionsIn.lastIndexOf("=") +1);
         WMLS_GetCapResponse resp = new WMLS_GetCapResponse();
+        short validationResult = StoreValidator.validateGetCap(OptionsIn);
+        if (validationResult != 1){
+            resp.setResult(validationResult);
+            return resp;
+        }
+        HashMap<String,String> options = WitsmlUtil.parseOptionsIn(OptionsIn);
+        String requestedVersion = options.get("dataVersion");
+
         resp.setSuppMsgOut("");
         try {
             // get cap string and populate response data
             String data = cap.getWitsmlObject(requestedVersion);
             LOG.info("Returning cap: " + data);
-            LOG.info("Returning cap again: " + cap.getWitsmlObject(requestedVersion));
 
             resp.setCapabilitiesOut(data);
             resp.setResult((short)1);
-        } catch (Exception e) {
+        } catch (UnsupportedOperationException e) {
             resp.setResult((short)-424);
-            LOG.info("Exception in generating GetCap response: " + e.getMessage());
+            LOG.info("Unsupported version requested: " + e.getMessage());
+        } catch (JAXBException e) {
+            resp.setResult((short)-1001);
+            resp.setSuppMsgOut("Unable to generate the capabilities object due to misconfiguration of the server");
+            LOG.log(Level.FINE, "Unable to generate the capabilities object due to misconfiguration of the server: " + e.getMessage());
         }
 
         return resp;
@@ -330,6 +358,12 @@ public class StoreImpl implements IStore {
         LOG.info("Executing GetFromStore");
         WMLS_GetFromStoreResponse resp = new WMLS_GetFromStoreResponse();
         // try to deserialize
+        Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
+        short validationResult = StoreValidator.validateGetFromStore(WMLtypeIn, QueryIn, optionsMap, valve);
+        if (validationResult != 1){
+            resp.setResult(validationResult);
+            return resp;
+        }
         List<AbstractWitsmlObject> witsmlObjects;
         String clientVersion;
         try {
@@ -352,7 +386,7 @@ public class StoreImpl implements IStore {
         // try to query
         try {
             // construct query context
-            Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
+
             ValveUser user = (ValveUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             QueryContext qc = new QueryContext(
                 clientVersion,

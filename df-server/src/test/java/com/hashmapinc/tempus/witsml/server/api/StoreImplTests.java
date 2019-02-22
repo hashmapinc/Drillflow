@@ -40,7 +40,7 @@ public class StoreImplTests {
 	@Test
 	public void addToStoreShouldHandleBadInput() {
 		assertThat(this.witsmlServer.addToStore("WMLtypeIn", "XMLin", "OptionsIn", "CapabilitiesIn").getResult())
-				.isEqualTo((short) -1);
+				.isEqualTo((short) -486);
 	}
 
 	@Test
@@ -60,7 +60,7 @@ public class StoreImplTests {
 
 	@Test
 	public void getCapShouldReturnAnXMLForACorrectVersion(){
-		WMLS_GetCapResponse resp = this.witsmlServer.getCap("dataValue=1.3.1.1");
+		WMLS_GetCapResponse resp = this.witsmlServer.getCap("dataVersion=1.3.1.1");
 		assertThat(resp).isNotNull();
 		assertThat(resp.getCapabilitiesOut()).contains("<name>");
 		assertThat(resp.getResult()).isEqualTo((short)1);

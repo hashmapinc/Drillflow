@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.annotation.Async;
@@ -206,16 +208,45 @@ public class DotValve implements IValve {
 	public CompletableFuture<Boolean> deleteObject(QueryContext qc) throws ValveException {
 		// delete each object with 1 retry for bad token errors
 		boolean result = false;
+		// According to the WITSML Spec you cannot delete more than one object (or sub elements of more than one object)
+		// at a time, so we do this check
+		if (qc.WITSML_OBJECTS.size() > 1)
+			throw new ValveException("Delete cannot have more than one singular object per query");
+		// This is rare but a check must be made
+		if (qc.WITSML_OBJECTS.size() == 0)
+			throw new ValveException("Delete must have exactly one singluar object, but found 0 in the query");
 		try {
-			for (AbstractWitsmlObject witsmlObject : qc.WITSML_OBJECTS) {
-				this.DELEGATOR.deleteObject(witsmlObject, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.CLIENT);
+			// Should be a safe assumption as we check above
+			AbstractWitsmlObject wmlObject = qc.WITSML_OBJECTS.get(0);
+
+			if (!isObjectDelete(wmlObject.getObjectType(), qc.QUERY_XML)){
+				// This is an element delete so re-route to delegator update
+				this.DELEGATOR.performElementDelete(wmlObject, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.CLIENT);
+				result = true;
+			} else {
+				// This is an object delete, so straight delete
+				this.DELEGATOR.deleteObject(wmlObject, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.CLIENT);
+				result = true;
 			}
-			result = true;
 		} catch (Exception e) {
 			LOG.warning("Got exception in DotValve delete object: " + e.getMessage());
 			throw new ValveException(e.getMessage());
 		}
 		return CompletableFuture.completedFuture(result);
+	}
+
+	/**
+	 * Determines if this delete is an element delete or object delete
+	 * @param dataObjectType they type of object to search for
+	 * @param data the WITSML query template document
+	 * @return True if it is an object delete, false if it is an element delete
+	 */
+	private boolean isObjectDelete(String dataObjectType, String data){
+		// This regex matches (for dataObjectType: well) <well uid="xxx" /> and <well uid="xxx"></well> and is multiline capable
+		Pattern singularPattern =
+				Pattern.compile("(<[" + dataObjectType + "][^<]*?/>)|<([" + dataObjectType + "][^<]*?>*[\\s\\S]</" + dataObjectType + ">)");
+		Matcher m = singularPattern.matcher(data);
+		return m.find();
 	}
 
 	/**
