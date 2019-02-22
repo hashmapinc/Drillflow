@@ -126,9 +126,10 @@ public class StoreImpl implements IStore {
         try {
             // build the query context
             Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
-            short validationResult = StoreValidator.validateAddToStore(WMLtypeIn, XMLin, optionsMap);
+            short validationResult = StoreValidator.validateAddToStore(WMLtypeIn, XMLin, optionsMap, valve);
             if (validationResult != 1){
                 response.setResult(validationResult);
+                return response;
             }
             String version = WitsmlUtil.getVersionFromXML(XMLin);
             witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, XMLin, version);
