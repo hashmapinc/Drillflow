@@ -40,9 +40,11 @@ public class StoreValidationTest {
 
 
     @Before
-    public void setUp() {
+    public void Setup() {
         valve = ValveFactory.buildValve("DoT", config.getConfiguration());
     }
+
+    // *****************ADD TO STORE TESTS***************** //
 
     @Test
     public void testSuccess(){
@@ -56,25 +58,7 @@ public class StoreValidationTest {
 
     @Test
     public void test408ShouldErrorEmptyMultiLine(){
-        short resp = StoreValidator.validateAddToStore("well", "<wells xmlns=\"http://www.witsml.org/schemas/131\" version=\"1.3.1.1\">\n" +
-                "<well  uid=\"uid12333\">\n" +
-                "</well>\n" +
-                "</wells>", null, valve);
-        assertThat(resp).isEqualTo((short)-408);
-    }
-
-    @Test
-    public void test408ShouldErrorEmptySingleLine(){
-        short resp = StoreValidator.validateAddToStore("well", "<wells xmlns=\"http://www.witsml.org/schemas/131\" version=\"1.3.1.1\">\n" +
-                "<well  uid=\"uid12333\"></well>\n" +
-                "</wells>", null, valve);
-        assertThat(resp).isEqualTo((short)-408);
-    }
-    @Test
-    public void test408ShouldErrorEmptyShorthand(){
-        short resp = StoreValidator.validateAddToStore("well", "<wells xmlns=\"http://www.witsml.org/schemas/131\" version=\"1.3.1.1\">\n" +
-                "<well  uid=\"uid12333\" />\n" +
-                "</wells>", null, valve);
+        short resp = StoreValidator.validateAddToStore("well", "", null, valve);
         assertThat(resp).isEqualTo((short)-408);
     }
 
@@ -97,7 +81,7 @@ public class StoreValidationTest {
     }
 
     @Test
-    public void test487UnsupportedObjectShouldError(){
+    public void test487UnsupportedObjectShouldError(){ ;
         short resp = StoreValidator.validateAddToStore("iceCream", "<iceCreams xmlns=\"http://www.witsml.org/schemas/131\" version=\"1.3.1.1\">\n" +
                 "<iceCream  uid=\"uid12333\">\n" +
                 "</iceCream>\n" +
@@ -106,8 +90,48 @@ public class StoreValidationTest {
     }
 
     @Test
-    public void test401DoesNotContainPluralRootElementError(){
+    public void test401DoesNotContainPluralRootElementError(){ ;
         short resp = StoreValidator.validateAddToStore("well", "<well uid=\"uid12333\" ><name>test</name></well>", null, valve);
         assertThat(resp).isEqualTo((short)-401);
+    }
+
+    @Test
+    public void test468DoesNotContainVersionElement(){ ;
+        short resp = StoreValidator.validateAddToStore("well", "<wells xmlns=\"http://www.witsml.org/schemas/131\">\n" +
+                "<well  uid=\"uid12333\">\n" +
+                "\t\t<name>Well Test</name>\n" +
+                "</well>\n" +
+                "</wells>", null, valve);
+        assertThat(resp).isEqualTo((short)-468);
+    }
+
+    @Test
+    public void test403DoesNotContainADefaultNamespace(){ ;
+        short resp = StoreValidator.validateAddToStore("well", "<wells version=\"1.3.1.1\">\n" +
+                "<well  uid=\"uid12333\">\n" +
+                "\t\t<name>Well Test</name>\n" +
+                "</well>\n" +
+                "</wells>", null, valve);
+        assertThat(resp).isEqualTo((short)-403);
+    }
+
+    // *****************GET CAP TESTS***************** //
+
+    @Test
+    public void test411InvalidOptionsIn(){
+        short resp = StoreValidator.validateGetCap("dataVersion:123");
+        assertThat(resp).isEqualTo((short)-411);
+    }
+
+    @Test
+    public void test424CheckForDataVersionExist(){
+        short resp = StoreValidator.validateGetCap("hello=123");
+        assertThat(resp).isEqualTo((short)-424);
+    }
+
+    @Test
+    public void getCapShouldSuceed(){
+        short resp = StoreValidator.validateGetCap("dataVersion=1.3.1.1");
+        assertThat(resp).isEqualTo((short)1);
     }
 }

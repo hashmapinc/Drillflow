@@ -16,13 +16,27 @@
 package com.hashmapinc.tempus.witsml.server.api;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.witsml.WitsmlUtil;
 import com.hashmapinc.tempus.witsml.valve.IValve;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class StoreValidator {
+
+    /**
+     * Validate the GetCap Request
+     * @param optionsIn The optionsIn provided by the client
+     * @return 1 if its all good, other if its not.
+     */
+    public static short validateGetCap(String optionsIn){
+        HashMap<String, String> options = WitsmlUtil.parseOptionsIn(optionsIn);
+        if (!optionsIn.isEmpty() && options.size() == 0)
+            return -411;
+        if (!options.containsKey("dataVersion"))
+            return -424;
+        return 1;
+    }
 
     /***
      * Validate the AddToStore query from the client to see if the query flow even needs to continue.
@@ -36,14 +50,18 @@ public class StoreValidator {
     public static short validateAddToStore(String WMLtypeIn, String xmlIn, Map<String,String> optionsIn, IValve valve){
         if (WMLtypeIn.isEmpty())
             return -407;
+        if (xmlIn.isEmpty())
+            return -408;
         if (!isTypeMatch(WMLtypeIn, xmlIn))
             return -486;
         if (!isObjectSupported(WMLtypeIn, valve, "WMLS_AddToStore"))
             return -487;
-        if (isObjectEmpty(WMLtypeIn, xmlIn))
-            return -408;
         if (!containsPluralRoot(WMLtypeIn, xmlIn))
             return -401;
+        if (!containsVersion(xmlIn))
+            return -468;
+        if (!containsDefaultNamespace(xmlIn))
+            return -403;
         return 1;
     }
 
@@ -87,20 +105,6 @@ public class StoreValidator {
     }
 
     /***
-     * Checks to make sure that the XMLIn is not empty as part of the add
-     * @param WMLtypeIn The witsml type in
-     * @param xmlIn The XML input from the client
-     * @return true if empty false if not empty
-     */
-    private static boolean isObjectEmpty(String WMLtypeIn, String xmlIn){
-        // This regex matches (for dataObjectType: well) <well uid="xxx" /> and <well uid="xxx"></well> and is multiline capable
-        Pattern singularPattern =
-                Pattern.compile("(<[" + WMLtypeIn + "][^<]*?/>)|<([" + WMLtypeIn + "][^<]*?>*[\\s\\S]</" + WMLtypeIn + ">)");
-        Matcher m = singularPattern.matcher(xmlIn);
-        return m.find();
-    }
-
-    /***
      * Make sure that the WMLtypeIn matches the XML In
      * @param WMLtypeIn The type of the object that was identified by the client
      * @param xmlIn The actual query that was input
@@ -140,5 +144,28 @@ public class StoreValidator {
      */
     private static boolean containsPluralRoot(String wmlTypeIn, String xmlIn){
         return xmlIn.contains(wmlTypeIn + "s");
+    }
+
+    /**
+     * Determines whether or not the xmlIn contains the default namespace
+     * @param xmlIn The XML In provided by the client
+     * @return true if the default namespace is provided, false if it is not
+     */
+    private static boolean containsDefaultNamespace(String xmlIn){
+        return xmlIn.contains("xmlns=");
+    }
+
+    /***
+     * Determines whether or not the version tag is contained
+     * @param xmlIn The XML query from the client
+     * @return true if it exists, false if it does not
+     */
+    private static boolean containsVersion(String xmlIn) {
+        try {
+            String version = WitsmlUtil.getVersionFromXML(xmlIn);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
