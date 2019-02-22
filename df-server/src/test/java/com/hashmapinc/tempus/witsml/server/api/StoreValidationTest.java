@@ -40,7 +40,7 @@ public class StoreValidationTest {
 
 
     @Before
-    public void Setup() {
+    public void setUp() {
         valve = ValveFactory.buildValve("DoT", config.getConfiguration());
     }
 
@@ -97,7 +97,7 @@ public class StoreValidationTest {
     }
 
     @Test
-    public void test487UnsupportedObjectShouldError(){ ;
+    public void test487UnsupportedObjectShouldError(){
         short resp = StoreValidator.validateAddToStore("iceCream", "<iceCreams xmlns=\"http://www.witsml.org/schemas/131\" version=\"1.3.1.1\">\n" +
                 "<iceCream  uid=\"uid12333\">\n" +
                 "</iceCream>\n" +
@@ -106,7 +106,7 @@ public class StoreValidationTest {
     }
 
     @Test
-    public void test401DoesNotContainPluralRootElementError(){ ;
+    public void test401DoesNotContainPluralRootElementError(){
         short resp = StoreValidator.validateAddToStore("well", "<well uid=\"uid12333\" ><name>test</name></well>", null, valve);
         assertThat(resp).isEqualTo((short)-401);
     }
