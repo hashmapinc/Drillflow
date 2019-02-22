@@ -16,13 +16,27 @@
 package com.hashmapinc.tempus.witsml.server.api;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.witsml.WitsmlUtil;
 import com.hashmapinc.tempus.witsml.valve.IValve;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class StoreValidator {
+
+    /**
+     * Validate the GetCap Request
+     * @param optionsIn The optionsIn provided by the client
+     * @return 1 if its all good, other if its not.
+     */
+    public static short validateGetCap(String optionsIn){
+        HashMap<String, String> options = WitsmlUtil.parseOptionsIn(optionsIn);
+        if (!optionsIn.isEmpty() && options.size() == 0)
+            return -411;
+        if (!options.containsKey("dataVersion"))
+            return -424;
+        return 1;
+    }
 
     /***
      * Validate the AddToStore query from the client to see if the query flow even needs to continue.
@@ -44,6 +58,10 @@ public class StoreValidator {
             return -487;
         if (!containsPluralRoot(WMLtypeIn, xmlIn))
             return -401;
+        if (!containsVersion(xmlIn))
+            return -468;
+        if (!containsDefaultNamespace(xmlIn))
+            return -403;
         return 1;
     }
 
@@ -126,5 +144,23 @@ public class StoreValidator {
      */
     private static boolean containsPluralRoot(String wmlTypeIn, String xmlIn){
         return xmlIn.contains(wmlTypeIn + "s");
+    }
+
+    /**
+     * Determines whether or not the xmlIn contains the default namespace
+     * @param xmlIn The XML In provided by the client
+     * @return true if the default namespace is provided, false if it is not
+     */
+    private static boolean containsDefaultNamespace(String xmlIn){
+        return xmlIn.contains("xmlns=");
+    }
+
+    /***
+     * Determines whether or not the version tag is contained
+     * @param xmlIn The XML query from the client
+     * @return true if it exists, false if it does not
+     */
+    private static boolean containsVersion(String xmlIn) {
+        return xmlIn.contains("version=");
     }
 }

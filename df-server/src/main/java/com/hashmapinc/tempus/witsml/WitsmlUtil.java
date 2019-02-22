@@ -77,12 +77,17 @@ public class WitsmlUtil {
         if (optionsIn.isEmpty())
             return new HashMap<>();
         //parse the string
-        HashMap<String, String> map = new HashMap<>();
-        Arrays.stream(optionsIn.split(";")).forEach(optionString -> {
-            String[] option = optionString.split("=");
-            map.put(option[0], option[1]);
-        });
+        try {
+            HashMap<String, String> map = new HashMap<>();
+            Arrays.stream(optionsIn.split(";")).forEach(optionString -> {
+                String[] option = optionString.split("=");
+                map.put(option[0], option[1]);
+            });
+            return map;
+        }catch (Exception ex){
+            LOG.fine("Error parsing options in.");
+        }
 
-        return map;
+        return new HashMap<>();
     }
 }
