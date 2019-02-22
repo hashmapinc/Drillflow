@@ -61,9 +61,8 @@ public class GraphQLQueryConverterTest {
 
     @Test
     public void generateProperTrajectoryResponseFromGraphQL() throws Exception {
-        String queryResp = TestUtilities.getResourceAsString("GraphQLResponse.json");
-        GraphQLRespConverter converter = new GraphQLRespConverter();
-        List<AbstractWitsmlObject> objs =  converter.convert(queryResp, "trajectory");
+        String queryResp = TestUtilities.getResourceAsString("trajectoryGraphql/trajectoryGraphqlResponse.json");
+        List<AbstractWitsmlObject> objs =  GraphQLRespConverter.convert(queryResp, "trajectory");
         assertNotNull(objs);
     }
 }
