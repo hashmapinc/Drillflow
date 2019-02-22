@@ -161,6 +161,11 @@ public class StoreValidator {
      * @return true if it exists, false if it does not
      */
     private static boolean containsVersion(String xmlIn) {
-        return xmlIn.contains("version=");
+        try {
+            String version = WitsmlUtil.getVersionFromXML(xmlIn);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
