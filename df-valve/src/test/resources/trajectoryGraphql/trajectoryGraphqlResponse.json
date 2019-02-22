@@ -1,0 +1,310 @@
+{
+  "data": {
+    "trajectories": [
+      {
+        "aliases": null,
+        "aziRef": "GRID_NORTH",
+        "aziVertSect": {
+          "uom": "dega",
+          "value": 82.7
+        },
+        "citation": null,
+        "commonData": {
+          "acquisitionTimeZone": [],
+          "comments": "These are the comments associated with the trajectory data object.",
+          "defaultDatum": null,
+          "extensionAny": null,
+          "extensionNameValue": [],
+          "itemState": "PLAN",
+          "privateGroupOnly": null,
+          "serviceCategory": null,
+          "sourceName": null
+        },
+        "creationTimeUtc": "2019-02-07T16:56:53.8901213+00:00",
+        "customData": null,
+        "definitive": true,
+        "dispEwVertSectOrig": {
+          "uom": "ft",
+          "value": 0
+        },
+        "dispNsVertSectOrig": {
+          "uom": "ft",
+          "value": 0
+        },
+        "dTimTrajEnd": "2001-10-21T08:15:00+00:00",
+        "dTimTrajStart": "2001-10-21T08:15:00+00:00",
+        "existenceKind": null,
+        "extensionNameValue": null,
+        "finalTraj": true,
+        "gridConUsed": null,
+        "gridCorUsed": {
+          "uom": "dega",
+          "value": 0.99961
+        },
+        "growingStatus": "INACTIVE",
+        "lastUpdateTimeUtc": "2019-02-07T16:56:53.8901213+00:00",
+        "magDeclUsed": {
+          "uom": "dega",
+          "value": -4.038
+        },
+        "mdMn": {
+          "datum": null,
+          "uom": "FT",
+          "value": 0
+        },
+        "mdMx": {
+          "datum": null,
+          "uom": "FT",
+          "value": 0
+        },
+        "memory": true,
+        "name": "HM_Plan #2",
+        "nameWell": "HM_6507/7-A-42",
+        "nameWellbore": "A-42",
+        "objectVersion": null,
+        "parentTrajectory": null,
+        "schemaVersion": null,
+        "serviceCompany": "Anadrill",
+        "uid": "HM_randyTraj",
+        "uuid": "c62db27f-494c-4b2b-bbea-6ba230c4c331",
+        "uuidWell": "5253f93c-e496-4282-bf63-3e358dfa1018",
+        "uuidWellbore": "af30e261-558d-4aa8-b846-50d6d1640fd6",
+        "wellbore": null,
+        "trajectoryStation": [
+          {
+            "axialMagInterferenceCorUsed": null,
+            "azi": {
+              "uom": "dega",
+              "value": 47.3
+            },
+            "calcAlgorithm": null,
+            "commonData": null,
+            "corUsed": {
+              "dirSensorOffset": {
+                "uom": "ft",
+                "value": 48.3
+              },
+              "gravAxialAccelCor": {
+                "uom": "FT_S_2",
+                "value": 0.11
+              },
+              "gravTran1AccelCor": {
+                "uom": "FT_S_2",
+                "value": 0.14
+              },
+              "gravTran2AccelCor": {
+                "uom": "FT_S_2",
+                "value": 0.13
+              },
+              "magAxialDrlstrCor": {
+                "uom": "N_T",
+                "value": 0.17
+              },
+              "magAxialMSACor": null,
+              "magTran1DrlstrCor": {
+                "uom": "N_T",
+                "value": 0.16
+              },
+              "magTran1MSACor": null,
+              "magTran2DrlstrCor": {
+                "uom": "N_T",
+                "value": 0.24
+              },
+              "magTran2MSACor": null,
+              "sagAziCor": {
+                "uom": "dega",
+                "value": 0
+              },
+              "sagIncCor": {
+                "uom": "dega",
+                "value": 0
+              },
+              "stnGridConUsed": null,
+              "stnGridCorUsed": {
+                "uom": "dega",
+                "value": -0.4917
+              },
+              "stnMagDeclUsed": {
+                "uom": "dega",
+                "value": -4.038
+              }
+            },
+            "cosagCorUsed": null,
+            "creationTimeUtc": "2019-02-07T16:56:53.8901213+00:00",
+            "dipAngleUncert": {
+              "uom": "dega",
+              "value": 0
+            },
+            "dispEw": {
+              "uom": "ft",
+              "value": 0
+            },
+            "dispNs": {
+              "uom": "ft",
+              "value": 0
+            },
+            "dls": {
+              "uom": "DEGA_FT",
+              "value": 0
+            },
+            "dTimStn": "2001-10-21T08:15:00+00:00",
+            "extensionNameValue": [],
+            "geoModelUsed": null,
+            "gravAccelCorUsed": false,
+            "gravTotalFieldReference": null,
+            "gravTotalUncert": {
+              "uom": "M_S_2",
+              "value": 0
+            },
+            "gtf": {
+              "uom": "dega",
+              "value": 0
+            },
+            "incl": {
+              "uom": "dega",
+              "value": 0
+            },
+            "infieldRefCorUsed": null,
+            "inHoleRefCorUsed": null,
+            "interpolatedInfieldRefCorUsed": null,
+            "iscwsaToolErrorModel": null,
+            "lastUpdateTimeUtc": "2019-02-07T16:56:53.8901213+00:00",
+            "location": null,
+            "magDipAngleReference": null,
+            "magDrlstrCorUsed": false,
+            "magModelUsed": null,
+            "magModelValid": null,
+            "magTotalFieldReference": null,
+            "magTotalUncert": {
+              "uom": "N_T",
+              "value": 0
+            },
+            "magXAxialCorUsed": false,
+            "manuallyEntered": null,
+            "matrixCov": {
+              "biasE": {
+                "uom": "ft",
+                "value": 0
+              },
+              "biasN": {
+                "uom": "ft",
+                "value": 0
+              },
+              "biasVert": {
+                "uom": "ft",
+                "value": 0
+              },
+              "varianceEE": {
+                "uom": "FT_2",
+                "value": 0.005236
+              },
+              "varianceEVert": {
+                "uom": "FT_2",
+                "value": 0.005236
+              },
+              "varianceNE": {
+                "uom": "FT_2",
+                "value": 0.005236
+              },
+              "varianceNN": {
+                "uom": "FT_2",
+                "value": 0.005236
+              },
+              "varianceNVert": {
+                "uom": "FT_2",
+                "value": 2.356194
+              },
+              "varianceVertVert": {
+                "uom": "FT_2",
+                "value": 0.785398
+              }
+            },
+            "md": {
+              "datum": null,
+              "uom": "FT",
+              "value": 0
+            },
+            "mdDelta": {
+              "uom": "ft",
+              "value": 0
+            },
+            "modelToolError": "good gyro",
+            "mSACorUsed": null,
+            "mtf": {
+              "uom": "dega",
+              "value": 47.3
+            },
+            "rateBuild": {
+              "uom": "DEGA_FT",
+              "value": 0
+            },
+            "rateTurn": {
+              "uom": "DEGA_FT",
+              "value": 0
+            },
+            "rawData": {
+              "gravAxialRaw": {
+                "uom": "FT_S_2",
+                "value": 0.116
+              },
+              "gravTran1Raw": {
+                "uom": "FT_S_2",
+                "value": -0.168
+              },
+              "gravTran2Raw": {
+                "uom": "FT_S_2",
+                "value": -1654
+              },
+              "magAxialRaw": {
+                "uom": "N_T",
+                "value": 22.77
+              },
+              "magTran1Raw": {
+                "uom": "N_T",
+                "value": 22.5
+              },
+              "magTran2Raw": {
+                "uom": "N_T",
+                "value": 27.05
+              }
+            },
+            "sagCorUsed": false,
+            "sourceStation": null,
+            "statusTrajStation": "POSITION",
+            "target": null,
+            "tvd": {
+              "datum": null,
+              "uom": "FT",
+              "value": 0
+            },
+            "tvdDelta": {
+              "uom": "ft",
+              "value": 0
+            },
+            "typeSurveyTool": null,
+            "typeTrajStation": "TIE_IN_POINT",
+            "uid": "34ht5",
+            "valid": {
+              "gravTotalFieldCalc": {
+                "uom": "FT_S_2",
+                "value": 0.999
+              },
+              "magDipAngleCalc": {
+                "uom": "dega",
+                "value": 41.5
+              },
+              "magTotalFieldCalc": {
+                "uom": "N_T",
+                "value": 51.19
+              }
+            },
+            "vertSect": {
+              "uom": "ft",
+              "value": 0
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

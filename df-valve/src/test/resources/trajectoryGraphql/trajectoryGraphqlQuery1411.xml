@@ -1,0 +1,28 @@
+<trajectorys
+        xmlns="http://www.witsml.org/schemas/1series"
+        version="1.4.1.1">
+    <trajectory>
+        <nameWell/>
+        <nameWellbore/>
+        <name>HM_Plan #2</name>
+        <dTimTrajStart/>
+        <dTimTrajEnd/>
+        <mdMn/>
+        <mdMx/>
+        <serviceCompany/>
+        <magDeclUsed/>
+        <gridCorUsed/>
+        <aziVertSect/>
+        <dispNsVertSectOrig/>
+        <dispEwVertSectOrig/>
+        <definitive/>
+        <memory/>
+        <finalTraj/>
+        <aziRef/>
+        <trajectoryStation uid="34ht5"/>
+        <commonData>
+            <itemState/>
+            <comments/>
+        </commonData>
+    </trajectory>
+</trajectorys>
