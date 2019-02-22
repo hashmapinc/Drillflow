@@ -27,6 +27,7 @@ import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
 import org.json.JSONObject;
 
+import javax.xml.datatype.DatatypeConfigurationException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
@@ -43,6 +44,7 @@ import java.util.regex.Pattern;
     private final String TRAJECTORY_PATH;
     private final String WELL_GQL_PATH;
     private final String WELLBORE_GQL_PATH;
+	private final String TRAJECTORY_GQL_PATH;
 
     /**
      * Map based constructor
@@ -50,12 +52,13 @@ import java.util.regex.Pattern;
      * @param config - map with field values
      */
     public DotDelegator(Map<String, String> config) {
-        this.URL =             	config.get("baseurl");
-        this.WELL_PATH =       	config.get("well.path");
-        this.WB_PATH =         	config.get("wellbore.path");
-        this.TRAJECTORY_PATH = 	config.get("trajectory.path");
-        this.WELL_GQL_PATH =   	config.get("well.gql.path");
-        this.WELLBORE_GQL_PATH =config.get("wellbore.gql.path") 	;
+        this.URL =             		config.get("baseurl");
+        this.WELL_PATH =       		config.get("well.path");
+        this.WB_PATH =         		config.get("wellbore.path");
+        this.TRAJECTORY_PATH = 		config.get("trajectory.path");
+        this.WELL_GQL_PATH =   		config.get("well.gql.path");
+        this.WELLBORE_GQL_PATH = 	config.get("wellbore.gql.path");
+		this.TRAJECTORY_GQL_PATH = 	config.get("trajectory.gql.path");
     }
 
     /**
@@ -70,7 +73,7 @@ import java.util.regex.Pattern;
         // TODO: these should be injected in the DotDelegator constructor and not rely on a shared this.URL
         // get endpoint
         String endpoint;
-        switch (objectType) { // TODO: add support for log and trajectory
+        switch (objectType) {
             case "well":
             	endpoint = this.URL + this.WELL_PATH;
                 break;
@@ -86,6 +89,9 @@ import java.util.regex.Pattern;
             case "trajectory":
                 endpoint = this.URL + this.TRAJECTORY_PATH;
                 break;
+			case "trajectorysearch":
+				endpoint = this.URL + this.TRAJECTORY_GQL_PATH;
+				break;
             default:
                 throw new ValveException("Unsupported object type<" + objectType + ">");
         }
@@ -367,13 +373,13 @@ import java.util.regex.Pattern;
 	 * @return get results AbstractWitsmlObject
 	 */
 	public ArrayList<AbstractWitsmlObject> executeGraphQL(
-			AbstractWitsmlObject witsmlObject,
-			String query,
-			String username,
-			String password,
-			String exchangeID,
-			DotClient client
-	) throws ValveException, ValveAuthException, UnirestException, IOException {
+		AbstractWitsmlObject witsmlObject,
+		String query,
+		String username,
+		String password,
+		String exchangeID,
+		DotClient client
+	) throws ValveException, ValveAuthException, UnirestException, IOException, DatatypeConfigurationException {
 		String objectType = witsmlObject.getObjectType();
 		String endpoint = this.getEndpoint(objectType + "search");
 
@@ -395,8 +401,7 @@ import java.util.regex.Pattern;
 			LOG.info(valveLoggingResponse.toString());
 			// get an abstractWitsmlObject from merging the query and the result
 			// JSON objects
-			GraphQLRespConverter converter = new GraphQLRespConverter();
-			return converter.convert(response.getBody(), objectType);
+			return GraphQLRespConverter.convert(response.getBody(), objectType);
 		} else {
 			ValveLogging valveLoggingResponse = new ValveLogging(witsmlObject.getUid(),
 					logResponse(response, "Unable to execute POST"), witsmlObject);

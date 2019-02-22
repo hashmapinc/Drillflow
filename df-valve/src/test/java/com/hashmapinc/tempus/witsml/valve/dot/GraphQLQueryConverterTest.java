@@ -17,6 +17,8 @@ package com.hashmapinc.tempus.witsml.valve.dot;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbores;
 import org.junit.Test;
@@ -44,6 +46,23 @@ public class GraphQLQueryConverterTest {
         String queryResp = TestUtilities.getResourceAsString("GraphQLResponse.json");
         GraphQLRespConverter converter = new GraphQLRespConverter();
         List<AbstractWitsmlObject> objs =  converter.convert(queryResp, "wellbore");
+        assertNotNull(objs);
+    }
+
+    @Test
+    public void generateProperGraphQLQueryForTrajectory() throws Exception {
+        String queryXML = TestUtilities.getResourceAsString("trajectoryGraphql/trajectoryGraphqlQuery1411.xml");
+        ObjTrajectory obj = ((ObjTrajectorys) WitsmlMarshal.deserialize(queryXML, ObjTrajectorys.class)).getTrajectory().get(0);
+        GraphQLQueryConverter converter = new GraphQLQueryConverter();
+        String graphQLQuery = converter.convertQuery(obj);
+        assertNotNull(graphQLQuery);
+        assertTrue(graphQLQuery.contains("title"));
+    }
+
+    @Test
+    public void generateProperTrajectoryResponseFromGraphQL() throws Exception {
+        String queryResp = TestUtilities.getResourceAsString("trajectoryGraphql/trajectoryGraphqlResponse.json");
+        List<AbstractWitsmlObject> objs =  GraphQLRespConverter.convert(queryResp, "trajectory");
         assertNotNull(objs);
     }
 }
