@@ -153,4 +153,18 @@ public class JsonUtil {
         }
         return src.toString();
     }
+
+    /**
+     * removes every field in the JSONObject that
+     * doesn't have a corresponding key in the XML string
+     * @param src - JSON object to filter
+     * @param xmlFilter - xml string with tag filters
+     * @return
+     */
+    public static JSONObject filterByXML(
+        JSONObject src,
+        String xmlFilter
+    ) {
+        return null;
+    }
 }
