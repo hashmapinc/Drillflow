@@ -16,6 +16,7 @@
 package com.hashmapinc.tempus.witsml.valve.dot;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.json.JSONArray;
@@ -157,14 +158,21 @@ public class JsonUtil {
     /**
      * removes every field in the JSONObject that
      * doesn't have a corresponding key in the XML string
+     *
      * @param src - JSON object to filter
      * @param xmlFilter - xml string with tag filters
-     * @return
+     * @return filtered json object
      */
     public static JSONObject filterByXML(
         JSONObject src,
         String xmlFilter
     ) {
+        // get xmlFilter as set of keys
+        HashSet<String> keysToKeep = new HashSet<>();
+
+        // remove keys not in the hashmap
+
+        // return
         return null;
     }
 }
