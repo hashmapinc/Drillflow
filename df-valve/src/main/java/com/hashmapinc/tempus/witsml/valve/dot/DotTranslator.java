@@ -72,8 +72,11 @@ public class DotTranslator {
         JSONObject queryJson = new JSONObject(wmlObject.getJSONString("1.4.1.1"));
         JSONObject responseJson = new JSONObject(jsonResponseString);
 
-        // Merge the responseJson into the queryJson
-        JSONObject result = JsonUtil.merge(queryJson, responseJson); // WARNING: this method modifies query internally
+        // get the result string
+        String result = JsonUtil.merge(queryJson, responseJson).toString(); // WARNING: this method modifies query internally
+
+        // doctor some commonly-butchered json keys
+        result = result.replaceAll("\"dtimStn\":","\"dTimStn\":");
 
         // convert the queryJSON back to valid xml
         LOG.info("Converting merged query JSON to valid XML string");
@@ -81,13 +84,13 @@ public class DotTranslator {
             switch (wmlObject.getObjectType()) {
                 case "well":
                     return WitsmlMarshal.deserializeFromJSON(
-                        result.toString(), com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell.class);
+                        result, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell.class);
                 case "wellbore":
                     return WitsmlMarshal.deserializeFromJSON(
-                        result.toString(), com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore.class);
+                        result, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore.class);
                 case "trajectory":
                     return WitsmlMarshal.deserializeFromJSON(
-                        result.toString(), com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory.class);
+                        result, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory.class);
                 default:
                     throw new ValveException("unsupported object type");
             }

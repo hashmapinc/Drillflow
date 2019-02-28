@@ -16,7 +16,6 @@
 package com.hashmapinc.tempus.witsml.valve.dot;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.json.JSONArray;
@@ -78,7 +77,8 @@ public class JsonUtil {
         }
 
         // cleanup fields
-        for (String removableKey : keysToRemove) req.remove(removableKey);
+        for (String removableKey : keysToRemove)
+            req.remove(removableKey);
 
         // return the req
         return req;
