@@ -20,7 +20,6 @@ import com.hashmapinc.tempus.WitsmlObjects.Util.TrajectoryConverter;
 import com.hashmapinc.tempus.WitsmlObjects.Util.WellConverter;
 import com.hashmapinc.tempus.WitsmlObjects.Util.WellboreConverter;
 import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
-import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
 import org.json.JSONObject;
 
@@ -29,9 +28,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
-/**
- * ABANDON ALL HOPE, YE WHO ENTER HERE
- */
 public class DotTranslator {
     private static final Logger LOG = Logger.getLogger(DotTranslator.class.getName());
 
@@ -46,7 +42,7 @@ public class DotTranslator {
             switch (wmlObj.getObjectType()) { //TODO: support log and trajectory
                 case "well":
                     if (wmlObj instanceof com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell) return wmlObj;
-                    return WellConverter.convertTo1311((ObjWell) wmlObj);
+                    return WellConverter.convertTo1311((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) wmlObj);
                 case "wellbore":
                     if (wmlObj instanceof com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore) return wmlObj;
                     return WellboreConverter.convertTo1311((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) wmlObj);
@@ -125,8 +121,6 @@ public class DotTranslator {
             } catch (JAXBException jxbe) {
                 throw new ValveException("Could not serialize empty wells object");
             }
-
-
         } else {
             // handle non empty well list
             xml = is1411 ? 
@@ -162,8 +156,6 @@ public class DotTranslator {
             } catch (JAXBException jxbe) {
                 throw new ValveException("Could not serialize empty wellbores object");
             }
-
-
         } else {
             // handle non empty list
             xml = is1411 ?
@@ -194,13 +186,11 @@ public class DotTranslator {
         if (0 == witsmlObjects.size()) {
             try {
                 xml = is1411 ?
-                        WitsmlMarshal.serialize(new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys()):
-                        WitsmlMarshal.serialize(new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectorys());
+                    WitsmlMarshal.serialize(new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys()):
+                    WitsmlMarshal.serialize(new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectorys());
             } catch (JAXBException jxbe) {
                 throw new ValveException("Could not serialize empty trajectories object");
             }
-
-
         } else {
             // handle non empty list
             xml = is1411 ?
@@ -251,8 +241,9 @@ public class DotTranslator {
         return xmlString;
     }
 
-    private static String consolidate1311TrajectoriesToXML(ArrayList<AbstractWitsmlObject> witsmlObjects)
-            throws ValveException {
+    private static String consolidate1311TrajectoriesToXML(
+        ArrayList<AbstractWitsmlObject> witsmlObjects
+    ) throws ValveException {
         try {
             // get parent object from first child
             com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectorys parent =
@@ -261,7 +252,7 @@ public class DotTranslator {
             // consolidate children
             for (AbstractWitsmlObject child : witsmlObjects) {
                 parent.addTrajectory(
-                        (com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory) get1311WitsmlObject(child)
+                    (com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory) get1311WitsmlObject(child)
                 );
             }
 
@@ -272,8 +263,9 @@ public class DotTranslator {
         }
     }
 
-    private static String consolidate1411TrajectoriesToXML(ArrayList<AbstractWitsmlObject> witsmlObjects)
-            throws ValveException {
+    private static String consolidate1411TrajectoriesToXML(
+        ArrayList<AbstractWitsmlObject> witsmlObjects
+    ) throws ValveException {
         try {
             // get parent object from first child
             com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys parent =
@@ -293,9 +285,8 @@ public class DotTranslator {
         }
     }
 
-
     private static String consolidate1311WellsToXML(
-            ArrayList<AbstractWitsmlObject> witsmlObjects
+        ArrayList<AbstractWitsmlObject> witsmlObjects
     ) throws ValveException {
         try {
             // get parent object from first child
@@ -317,17 +308,17 @@ public class DotTranslator {
     }
 
     private static String consolidate1411WellsToXML(
-            ArrayList<AbstractWitsmlObject> witsmlObjects
+        ArrayList<AbstractWitsmlObject> witsmlObjects
     ) throws ValveException {
         try {
             // get parent object from first child
             com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWells parent =
-                    new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWells();
+                new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWells();
 
             // consolidate children
             for (AbstractWitsmlObject child : witsmlObjects) {
                 parent.addWell(
-                        (com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) child
+                    (com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) child
                 );
             }
 
