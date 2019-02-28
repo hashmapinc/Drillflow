@@ -29,7 +29,6 @@ import org.json.JSONObject;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.logging.Logger;
