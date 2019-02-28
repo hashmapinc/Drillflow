@@ -29,6 +29,7 @@ import org.json.JSONObject;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -421,8 +422,24 @@ public class DotDelegator {
 				witsmlObject
 			));
 
-			// get an abstractWitsmlObject from merging the query and the result JSON objects
-			return GraphQLRespConverter.convert(response.getBody(), objectType);
+			// get matching objects from search as list of abstract witsml objects
+			ArrayList<AbstractWitsmlObject> wmlResponses = GraphQLRespConverter.convert(response.getBody(), objectType);
+
+			// translate responses
+			if (wmlResponses.isEmpty())
+				return null; // this is valid. No matches found
+
+			ArrayList<AbstractWitsmlObject> results = new ArrayList<>();
+			for (AbstractWitsmlObject wmlResponse: wmlResponses) {
+				results.add(
+					DotTranslator.translateQueryResponse(
+						witsmlObject,
+						wmlResponse.getJSONString("1.4.1.1")
+					)
+				);
+			}
+
+			return results;
 
 		} else {
 			LOG.warning(ValveLogging.getLogMsg(

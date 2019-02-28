@@ -23,6 +23,32 @@ import org.json.JSONObject;
 
 public class JsonUtil {
 
+
+    public static JSONObject merge(
+        JSONObject req,
+        JSONObject resp
+    ) {
+        // track keys that should be removed before entering recursive merging
+        ArrayList<String> keysToRemove = new ArrayList<>();
+
+        // iterate through keys and remove any null keys
+        Set<String> keyset = req.keySet();
+
+        // collect keys to remove
+        for (String key : keyset) {
+            // filter out null keys and empty arrays (equivalent of null) from request
+            if (isEmptyArray(req.get(key)) || JSONObject.NULL.equals(req.get(key)))
+                keysToRemove.add(key);
+        }
+
+        // remove keys
+        for (String keyToRemove : keysToRemove)
+            req.remove(keyToRemove);
+
+        // enter recursion
+        return mergeRecursive(req, resp);
+    }
+
     /**
      * This function merges the fields from resp that
      * are missing from req. Only fields that exist in req
@@ -32,7 +58,7 @@ public class JsonUtil {
      * @param resp - resp to merge from for blank values in req
      * @return req - fully merged req
      */
-    public static JSONObject merge (
+    public static JSONObject mergeRecursive(
         JSONObject req,
         JSONObject resp
     ) {
@@ -42,11 +68,6 @@ public class JsonUtil {
         // iterate through keys and merge in place
         Set<String> keyset = req.keySet();
         for (String key : keyset) {
-            // filter out empty arrays from the req
-            if (isEmptyArray(req.get(key))) {
-                keysToRemove.add(key);
-                continue;
-            }
             // check that the response has a value for this key.
             if (!resp.has(key)) {
                 if (isEmpty(req.get(key)))
@@ -55,20 +76,20 @@ public class JsonUtil {
             }
 
             // get values in resp and req as objects for this key
-            Object destObj = req.get(key);
-            Object srcObj = resp.get(key);
+            Object reqObj = req.get(key);
+            Object respObj = resp.get(key);
 
             // do merging below for each possible type
-            if (destObj instanceof JSONObject && srcObj instanceof JSONObject ) {
-                merge((JSONObject) destObj, (JSONObject) srcObj); // recursively copy into destObj
-                req.put(key, destObj); // update req with the updated value for this key
+            if (reqObj instanceof JSONObject && respObj instanceof JSONObject ) {
+                mergeRecursive((JSONObject) reqObj, (JSONObject) respObj); // recursively copy into reqObj
+                req.put(key, reqObj); // update req with the updated value for this key
 
-            } else if (destObj instanceof JSONArray && srcObj instanceof JSONArray ) {
-                if (isEmpty(destObj) && !isEmpty(srcObj)) {
-                    req.put(key, srcObj); // TODO: deep merging on sub objects
+            } else if (reqObj instanceof JSONArray && respObj instanceof JSONArray ) {
+                if (isEmpty(reqObj) && !isEmpty(respObj)) {
+                    req.put(key, respObj);
                 }
             } else { // handle all basic values (non array, non nested objects)
-                req.put(key, srcObj);
+                req.put(key, respObj);
             }
 
             // if after all the merging the req value is still empty, add the key to list of removable fields
