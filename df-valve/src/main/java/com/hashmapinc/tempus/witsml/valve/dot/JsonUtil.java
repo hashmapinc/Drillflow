@@ -1,5 +1,5 @@
 /**
- * Copyright © 2018-2018 Hashmap, Inc
+ * Copyright © 2018-2019 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,11 @@ public class JsonUtil {
         // iterate through keys and merge in place
         Set<String> keyset = dest.keySet();
         for (String key : keyset) {
+            // filter out empty arrays from the dest
+            if (isEmptyArray(dest.get(key))) {
+                keysToRemove.add(key);
+                continue;
+            }
             // check that the response has a value for this key.
             if (!src.has(key)) {
                 if (isEmpty(dest.get(key)))
@@ -132,10 +137,10 @@ public class JsonUtil {
     public static boolean isEmptyArray(Object obj){
         // handle JSONArrays
         if (obj instanceof JSONArray) {
-            return isEmpty(obj);
-        } else {
-            return false;
+            JSONArray arrObj = (JSONArray) obj;
+            return arrObj.length() == 0;
         }
+        return false;
     }
 
     /**

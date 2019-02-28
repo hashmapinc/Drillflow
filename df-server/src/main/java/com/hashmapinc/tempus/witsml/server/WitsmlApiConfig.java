@@ -1,5 +1,5 @@
 /**
- * Copyright © 2018-2018 Hashmap, Inc
+ * Copyright © 2018-2019 Hashmap, Inc
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,10 @@ import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBus;
+import org.apache.cxf.feature.transform.XSLTOutInterceptor;
+import org.apache.cxf.interceptor.StaxOutInterceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
+import org.apache.cxf.phase.Phase;
 import org.apache.cxf.transport.common.gzip.GZIPOutInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +34,8 @@ import com.hashmapinc.tempus.witsml.server.api.StoreImpl;
 
 @Configuration
 public class WitsmlApiConfig {
+
+    private final String XSLT_REQUEST_PATH = "interceptor/removeReturn.xsl";
 
     private Bus bus;
     private Environment env;
@@ -58,6 +63,12 @@ public class WitsmlApiConfig {
         EndpointImpl endpoint = new EndpointImpl(bus, storeImpl);
         if (compression)
             endpoint.getOutInterceptors().add(new GZIPOutInterceptor());
+
+        // Removes the <return> element that causes the certification test to fail
+        XSLTOutInterceptor returnRemoval = new XSLTOutInterceptor(Phase.PRE_STREAM, StaxOutInterceptor.class, null,
+                XSLT_REQUEST_PATH);
+        endpoint.getOutInterceptors().add(returnRemoval);
+
         endpoint.publish("/WMLS");
         return endpoint;
     }
