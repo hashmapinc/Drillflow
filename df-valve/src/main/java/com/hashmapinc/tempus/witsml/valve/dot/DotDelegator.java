@@ -32,10 +32,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-	public class DotDelegator {
+public class DotDelegator {
     private static final Logger LOG = Logger.getLogger(DotDelegator.class.getName());
 
     private final String URL;
@@ -372,9 +370,8 @@ import java.util.regex.Pattern;
 	 * @param client - DotClient to execute requests with
 	 * @return get results AbstractWitsmlObject
 	 */
-	public ArrayList<AbstractWitsmlObject> executeGraphQL(
+	public ArrayList<AbstractWitsmlObject> search(
 		AbstractWitsmlObject witsmlObject,
-		String query,
 		String username,
 		String password,
 		String exchangeID,
@@ -383,12 +380,24 @@ import java.util.regex.Pattern;
 		String objectType = witsmlObject.getObjectType();
 		String endpoint = this.getEndpoint(objectType + "search");
 
+		// build query
+		String query;
+		try {
+			query = new GraphQLQueryConverter().getQuery(witsmlObject);
+			LOG.fine(
+				new ValveLogging(exchangeID, System.lineSeparator() + "Graph QL Query: " + query, witsmlObject ).toString()
+			);
+		} catch (IOException ex) {
+			throw new ValveException(ex.getMessage());
+		}
+
 		// build request
 		HttpRequestWithBody request = Unirest.post(endpoint);
 		request.header("Content-Type", "application/json");
 		request.body(query);
 		ValveLogging valveLoggingRequest = new ValveLogging(exchangeID, logRequest(request), witsmlObject);
 		LOG.info(valveLoggingRequest.toString());
+
 		// get response
 		HttpResponse<String> response = client.makeRequest(request, username, password);
 

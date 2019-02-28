@@ -37,7 +37,7 @@ class GraphQLQueryConverter {
      * @return the object
      * @throws IOException Thrown if there is an error in creation of the query
      */
-    public String convertQuery(AbstractWitsmlObject wmlObject) throws IOException {
+    public String getQuery(AbstractWitsmlObject wmlObject) throws IOException {
         switch (wmlObject.getObjectType()){
             case "well":
                 this.createWellQuery(wmlObject.getJSONString("1.4.1.1"));
@@ -46,12 +46,11 @@ class GraphQLQueryConverter {
                 this.createWellboreQuery(wmlObject.getJSONString("1.4.1.1"));
                 break;
             case "trajectory":
-                String json1411 = wmlObject.getJSONString("1.4.1.1"); // needed for some query args. some fields are lost in 2.0
-                String json20 = wmlObject.getJSONString("2.0");
-                return getTrajectoryQuery(json1411, json20);
+                return getTrajectoryQuery(wmlObject);
             default:
                 return null;
         }
+
         return this.builder.GetGraphQLQuery();
     }
 
@@ -59,18 +58,19 @@ class GraphQLQueryConverter {
      * this function converts 2.0 trajectory json
      * into a graphql query "select *"-style query
      *
-     * @param jsonString1411 - json 1411 string of object to query for
-     * @param jsonString20 - json 20 string of object to query for
+     * @param wmlObject - the trajectory awo build a query from
      *
      * @return graphql query string
      */
-    private static String getTrajectoryQuery(String jsonString1411, String jsonString20) {
+    private static String getTrajectoryQuery(AbstractWitsmlObject wmlObject) {
         // payload json object for building full query
         JSONObject payload = new JSONObject();
 
         // parse json strings
-        JSONObject objTrajectoryJson = new JSONObject(jsonString1411); // 1.4.1.1
-        JSONObject trajectoryJson = new JSONObject(jsonString20); // 2.0
+        String jsonString1411 =         wmlObject.getJSONString("1.4.1.1"); // needed for some query args. some fields are lost in 2.0
+        String jsonString20 =           wmlObject.getJSONString("2.0");
+        JSONObject objTrajectoryJson =  new JSONObject(jsonString1411); // 1.4.1.1
+        JSONObject trajectoryJson =     new JSONObject(jsonString20); // 2.0
 
         // ====================================================================
         // get trajectory query fields
