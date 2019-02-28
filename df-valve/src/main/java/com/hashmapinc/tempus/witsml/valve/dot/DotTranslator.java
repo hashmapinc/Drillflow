@@ -36,39 +36,25 @@ public class DotTranslator {
     private static final Logger LOG = Logger.getLogger(DotTranslator.class.getName());
 
     /**
-     * This function serializes the object to a 1.4.1.1 JSON string
-     * @param obj - object to serialize
-     * @return jsonString - String serialization of a JSON version of the 1.4.1.1 witsml object
-     */
-    public static String get1411JSONString(AbstractWitsmlObject obj) {
-        LOG.info("Getting 1.4.1.1 json string for object: " + obj.toString());
-        return obj.getJSONString("1.4.1.1");
-    }
-
-    /**
      * returns a valid 1311 AbstractWitsmlObject
-     * @param obj1411 - 1411 AbstractWitsmlObject to convert
+     * @param wmlObj - AbstractWitsmlObject to convert
      */
-    // TODO: delete this method and use the AbstractWitsmlObject.getXMLString method when WOL fixes the namespace bug.
     public static AbstractWitsmlObject get1311WitsmlObject(
-        AbstractWitsmlObject obj1411
+        AbstractWitsmlObject wmlObj
     ) throws ValveException {
-        LOG.info("converting to 1311 from 1411 object" + obj1411.toString());
-
-        // convert to 1311 object
         try {
-            switch (obj1411.getObjectType()) { //TODO: support log and trajectory
+            switch (wmlObj.getObjectType()) { //TODO: support log and trajectory
                 case "well":
-                    if (obj1411 instanceof com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell) return obj1411;
-                    return WellConverter.convertTo1311((ObjWell)obj1411);
+                    if (wmlObj instanceof com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell) return wmlObj;
+                    return WellConverter.convertTo1311((ObjWell) wmlObj);
                 case "wellbore":
-                    if (obj1411 instanceof com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore) return obj1411;
-                    return WellboreConverter.convertTo1311((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) obj1411);
+                    if (wmlObj instanceof com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore) return wmlObj;
+                    return WellboreConverter.convertTo1311((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) wmlObj);
                 case "trajectory":
-                    if (obj1411 instanceof com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory) return obj1411;
-                    return TrajectoryConverter.convertTo1311((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory) obj1411);
+                    if (wmlObj instanceof com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory) return wmlObj;
+                    return TrajectoryConverter.convertTo1311((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory) wmlObj);
                 default:
-                    throw new ValveException("unsupported object type: " + obj1411.getObjectType());
+                    throw new ValveException("unsupported object type: " + wmlObj.getObjectType());
             }
         } catch (Exception e) {
             throw new ValveException(e.getMessage());
@@ -76,27 +62,30 @@ public class DotTranslator {
     }
 
     /**
-     * merges response into query and returns the parsed 1.4.1.1 object
+     * merges response 1.4.1.1 object
      * 
-     * @param query    - JSON object representing the query
-     * @param response - JSON object representing the response from DoT
+     * @param wmlObject - object queried for
+     * @param jsonResponseString - json string response from request
      * @return obj - parsed abstract object
      */
     public static AbstractWitsmlObject translateQueryResponse(
-        JSONObject query, 
-        JSONObject response,
-        String objectType
+        AbstractWitsmlObject wmlObject,
+        String jsonResponseString
     ) throws ValveException {
-        // Merge the 2 objects
-        JSONObject result = JsonUtil.merge(query,response); // WARNING: this method modifies query internally
+        // get JSON objects
+        JSONObject queryJson = new JSONObject(wmlObject.getJSONString("1.4.1.1"));
+        JSONObject responseJson = new JSONObject(jsonResponseString);
+
+        // Merge the responseJson into the queryJson
+        JSONObject result = JsonUtil.merge(queryJson, responseJson); // WARNING: this method modifies query internally
 
         // convert the queryJSON back to valid xml
         LOG.info("Converting merged query JSON to valid XML string");
         try {
-            switch (objectType) { // TODO: support log and trajectory
+            switch (wmlObject.getObjectType()) {
                 case "well":
-                    ObjWell well =  WitsmlMarshal.deserializeFromJSON(result.toString(), ObjWell.class);
-                    return well;
+                    return WitsmlMarshal.deserializeFromJSON(
+                        result.toString(), com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell.class);
                 case "wellbore":
                     return WitsmlMarshal.deserializeFromJSON(
                         result.toString(), com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore.class);

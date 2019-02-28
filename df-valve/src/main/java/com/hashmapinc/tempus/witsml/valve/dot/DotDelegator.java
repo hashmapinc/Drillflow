@@ -355,12 +355,8 @@ public class DotDelegator {
 				witsmlObject
 			));
 
-			// get an abstractWitsmlObject from merging the query and the result
-			// JSON objects
-			String jsonObj = witsmlObject.getJSONString("1.4.1.1");
-			JSONObject queryJSON = new JSONObject(jsonObj);
-			JSONObject responseJSON = new JsonNode(response.getBody()).getObject();
-			return DotTranslator.translateQueryResponse(queryJSON, responseJSON, objectType);
+			// translate the query response
+			return DotTranslator.translateQueryResponse(witsmlObject, response.getBody());
 		} else if (404 == status) {
 			// handle not found. This is a valid response
 			return null;
