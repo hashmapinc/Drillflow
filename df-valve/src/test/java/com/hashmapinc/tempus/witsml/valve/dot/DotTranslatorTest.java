@@ -21,7 +21,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 
 import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
-import org.json.JSONObject;
 import org.junit.Test;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
