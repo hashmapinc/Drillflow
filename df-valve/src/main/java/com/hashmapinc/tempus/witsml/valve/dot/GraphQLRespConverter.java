@@ -38,8 +38,8 @@ public class GraphQLRespConverter {
      * @throws IOException
      */
     public static ArrayList<AbstractWitsmlObject> convert (
-            String response,
-            String objectType
+        String response,
+        String objectType
     ) throws IOException, DatatypeConfigurationException {
         JSONObject responseJSON = new JSONObject(response);
 
@@ -109,8 +109,12 @@ public class GraphQLRespConverter {
             return null;
 
         for(int i = 0; i < trajectories.length(); i++) {
-            Trajectory trajectory = WitsmlMarshal.deserializeFromJSON(trajectories.get(i).toString(), Trajectory.class);
-            foundObjects.add(TrajectoryConverter.convertTo1411(trajectory));
+            try {
+                Trajectory trajectory = WitsmlMarshal.deserializeFromJSON(trajectories.get(i).toString(), Trajectory.class);
+                foundObjects.add(TrajectoryConverter.convertTo1411(trajectory));
+            } catch (Exception e) {
+
+            }
         }
 
         return foundObjects;

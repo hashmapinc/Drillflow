@@ -173,7 +173,7 @@ public class DotDelegatorTest {
         ObjWells queryObject = WitsmlMarshal.deserialize(query, ObjWells.class);
         AbstractWitsmlObject singleWell = queryObject.getWell().get(0);
         GraphQLQueryConverter converter = new GraphQLQueryConverter();
-        String jsonQuery = converter.convertQuery(singleWell);
+        String jsonQuery = converter.getQuery(singleWell);
         assertNotNull(jsonQuery);
         String endpoint = this.url + this.graphQlWellPath;
         HttpRequestWithBody req = Unirest.post(endpoint);
@@ -190,7 +190,7 @@ public class DotDelegatorTest {
                         someReq.getHeaders().containsKey("Content-Type")
         )), eq("goodUsername"), eq("goodPassword"))).thenReturn(resp);
 
-        ArrayList<AbstractWitsmlObject> foundObjects = this.delegator.executeGraphQL(singleWell, jsonQuery, "goodUsername", "goodPassword", "exchangeID", this.client);
+        ArrayList<AbstractWitsmlObject> foundObjects = this.delegator.search(singleWell, "goodUsername", "goodPassword", "exchangeID", this.client);
         assertEquals(3, foundObjects.size());
     }
 

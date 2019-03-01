@@ -36,7 +36,7 @@ public class GraphQLQueryConverterTest {
         ObjWellbores queryObject = WitsmlMarshal.deserialize(query, ObjWellbores.class);
         ObjWellbore singularObject = queryObject.getWellbore().get(0);
         GraphQLQueryConverter converter = new GraphQLQueryConverter();
-        String graphQLQuery = converter.convertQuery(singularObject);
+        String graphQLQuery = converter.getQuery(singularObject);
         assertNotNull(graphQLQuery);
         assertTrue(graphQLQuery.contains("title"));
     }
@@ -54,7 +54,7 @@ public class GraphQLQueryConverterTest {
         String queryXML = TestUtilities.getResourceAsString("trajectoryGraphql/trajectoryGraphqlQuery1411.xml");
         ObjTrajectory obj = ((ObjTrajectorys) WitsmlMarshal.deserialize(queryXML, ObjTrajectorys.class)).getTrajectory().get(0);
         GraphQLQueryConverter converter = new GraphQLQueryConverter();
-        String graphQLQuery = converter.convertQuery(obj);
+        String graphQLQuery = converter.getQuery(obj);
         assertNotNull(graphQLQuery);
         assertTrue(graphQLQuery.contains("title"));
     }
@@ -62,7 +62,7 @@ public class GraphQLQueryConverterTest {
     @Test
     public void generateProperTrajectoryResponseFromGraphQL() throws Exception {
         String queryResp = TestUtilities.getResourceAsString("trajectoryGraphql/trajectoryGraphqlResponse.json");
-        List<AbstractWitsmlObject> objs =  GraphQLRespConverter.convert(queryResp, "trajectory");
+        List<AbstractWitsmlObject> objs = GraphQLRespConverter.convert(queryResp, "trajectory");
         assertNotNull(objs);
     }
 }

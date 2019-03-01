@@ -32,10 +32,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-	public class DotDelegator {
+public class DotDelegator {
     private static final Logger LOG = Logger.getLogger(DotDelegator.class.getName());
 
     private final String URL;
@@ -122,8 +120,7 @@ import java.util.regex.Pattern;
  
         // create request
 		HttpRequest request = Unirest.delete(endpoint).header("Content-Type", "application/json");
-		ValveLogging valveLoggingRequest = new ValveLogging(exchangeID, logRequest(request), witsmlObj);
-		LOG.info(valveLoggingRequest.toString());
+		LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(request), witsmlObj));
 
 		// add query string params
         if ("wellbore".equals(objectType)) {
@@ -145,13 +142,17 @@ import java.util.regex.Pattern;
         // check response status
         int status = response.getStatus();
         if (201 == status || 200 == status || 204 == status) {
-			ValveLogging valveLoggingResponse = new ValveLogging(exchangeID,
-					logResponse(response, "Successfully Deleted Object with UID :"+uid+"."), witsmlObj);
-			LOG.info(valveLoggingResponse.toString());
+			LOG.info(ValveLogging.getLogMsg(
+				exchangeID,
+				logResponse(response, "Successfully Deleted Object with UID :"+uid+"."),
+				witsmlObj)
+			);
 		} else {
-			ValveLogging valveLoggingResponse = new ValveLogging(exchangeID,
-					logResponse(response, "Unable to delete"), witsmlObj);
-			LOG.warning(valveLoggingResponse.toString());
+			LOG.warning(ValveLogging.getLogMsg(
+				exchangeID,
+				logResponse(response, "Unable to delete"),
+				witsmlObj)
+			);
             throw new ValveException("DELETE DoT REST call failed with status code: " + status);
         }
     }
@@ -202,8 +203,7 @@ import java.util.regex.Pattern;
 			request.queryString("uidWell", uidWell);
 		}
 
-		ValveLogging valveLoggingRequest = new ValveLogging(exchangeID, logRequest(request), witsmlObj);
-		LOG.info(valveLoggingRequest.toString());
+		LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(request), witsmlObj));
 
 		// make the UPDATE call.
 		HttpResponse<String> response = client.makeRequest(request, username, password);
@@ -211,13 +211,17 @@ import java.util.regex.Pattern;
 		// check response status
 		int status = response.getStatus();
 		if (201 == status || 200 == status) {
-			ValveLogging valveLoggingResponse = new ValveLogging(exchangeID,
-					logResponse(response, "UPDATE for " + witsmlObj + " was successful"), witsmlObj);
-			LOG.info(valveLoggingResponse.toString());
+			LOG.info(ValveLogging.getLogMsg(
+				exchangeID,
+				logResponse(response, "UPDATE for " + witsmlObj + " was successful"),
+				witsmlObj
+			));
 		} else {
-			ValveLogging valveLoggingResponse = new ValveLogging(exchangeID,
-					logResponse(response, "Received failure status code from DoT PUT"), witsmlObj);
-			LOG.warning(valveLoggingResponse.toString());
+			LOG.warning(ValveLogging.getLogMsg(
+				exchangeID,
+				logResponse(response, "Received failure status code from DoT PUT"),
+				witsmlObj
+			));
 			throw new ValveException(response.getBody());
 		}
 	}
@@ -275,8 +279,7 @@ import java.util.regex.Pattern;
         request.header("Content-Type", "application/json");
         request.body(payload);
 
-		ValveLogging valveLoggingRequest = new ValveLogging(exchangeID, logRequest(request), witsmlObj);
-		LOG.info(valveLoggingRequest.toString());
+		LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(request), witsmlObj));
 
         // get the request response.
         HttpResponse<String> response = client.makeRequest(request, username, password);
@@ -284,14 +287,18 @@ import java.util.regex.Pattern;
         // check response status
         int status = response.getStatus();
         if (201 == status || 200 == status) {
-			ValveLogging valveLoggingResponse = new ValveLogging(exchangeID,
-					logResponse(response, "Received successful status code from DoT create call"), witsmlObj);
-			LOG.info(valveLoggingResponse.toString());
+			LOG.info(ValveLogging.getLogMsg(
+				exchangeID,
+				logResponse(response, "Received successful status code from DoT create call"),
+				witsmlObj
+			));
             return (null == uid || uid.isEmpty()) ? new JsonNode(response.getBody()).getObject().getString("uid") : uid;
         } else {
-			ValveLogging valveLoggingResponse = new ValveLogging(exchangeID,
-					logResponse(response, "Received " + status + " from DoT POST" + response.getBody()), witsmlObj);
-			LOG.warning(valveLoggingResponse.toString());
+			LOG.warning(ValveLogging.getLogMsg(
+				exchangeID,
+				logResponse(response, "Received " + status + " from DoT POST" + response.getBody()),
+				witsmlObj
+			));
             throw new ValveException(response.getBody());
         }
     }
@@ -333,31 +340,32 @@ import java.util.regex.Pattern;
 			}
 			request.queryString("uidWell", uidWell);
 		}
-		ValveLogging valveLoggingRequest = new ValveLogging(exchangeID, logRequest(request), witsmlObject);
-		LOG.info(valveLoggingRequest.toString());
+
+		LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(request), witsmlObject));
+
 		// get response
 		HttpResponse<String> response = client.makeRequest(request, username, password);
 
 		// check response status
 		int status = response.getStatus();
 		if (201 == status || 200 == status) {
-			ValveLogging valveLoggingResponse = new ValveLogging(exchangeID,
-					logResponse(response, "Successfully executed GET for query object=" + witsmlObject.toString()),
-					witsmlObject);
-			LOG.info(valveLoggingResponse.toString());
-			// get an abstractWitsmlObject from merging the query and the result
-			// JSON objects
-			String jsonObj = witsmlObject.getJSONString("1.4.1.1");
-			JSONObject queryJSON = new JSONObject(jsonObj);
-			JSONObject responseJSON = new JsonNode(response.getBody()).getObject();
-			return DotTranslator.translateQueryResponse(queryJSON, responseJSON, objectType);
+			LOG.info(ValveLogging.getLogMsg(
+				exchangeID,
+				logResponse(response, "Successfully executed GET for query object=" + witsmlObject.toString()),
+				witsmlObject
+			));
+
+			// translate the query response
+			return DotTranslator.translateQueryResponse(witsmlObject, response.getBody());
 		} else if (404 == status) {
 			// handle not found. This is a valid response
 			return null;
 		} else {
-			ValveLogging valveLoggingResponse = new ValveLogging(witsmlObject.getUid(),
-					logResponse(response, "Unable to execute GET"), witsmlObject);
-			LOG.warning(valveLoggingResponse.toString());
+			LOG.warning(ValveLogging.getLogMsg(
+				witsmlObject.getUid(),
+				logResponse(response, "Unable to execute GET"),
+				witsmlObject
+			));
 			throw new ValveException(response.getBody());
 		}
 	}
@@ -372,9 +380,8 @@ import java.util.regex.Pattern;
 	 * @param client - DotClient to execute requests with
 	 * @return get results AbstractWitsmlObject
 	 */
-	public ArrayList<AbstractWitsmlObject> executeGraphQL(
+	public ArrayList<AbstractWitsmlObject> search(
 		AbstractWitsmlObject witsmlObject,
-		String query,
 		String username,
 		String password,
 		String exchangeID,
@@ -383,29 +390,62 @@ import java.util.regex.Pattern;
 		String objectType = witsmlObject.getObjectType();
 		String endpoint = this.getEndpoint(objectType + "search");
 
+		// build query
+		String query;
+		try {
+			query = new GraphQLQueryConverter().getQuery(witsmlObject);
+			LOG.fine(ValveLogging.getLogMsg(
+				exchangeID,
+				System.lineSeparator() + "Graph QL Query: " + query,
+				witsmlObject)
+			);
+		} catch (IOException ex) {
+			throw new ValveException(ex.getMessage());
+		}
+
 		// build request
 		HttpRequestWithBody request = Unirest.post(endpoint);
 		request.header("Content-Type", "application/json");
 		request.body(query);
-		ValveLogging valveLoggingRequest = new ValveLogging(exchangeID, logRequest(request), witsmlObject);
-		LOG.info(valveLoggingRequest.toString());
+		LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(request), witsmlObject));
+
 		// get response
 		HttpResponse<String> response = client.makeRequest(request, username, password);
 
 		// check response status
 		int status = response.getStatus();
 		if (201 == status || 200 == status || 400 == status) {
-			ValveLogging valveLoggingResponse = new ValveLogging(exchangeID,
-					logResponse(response, "Successfully executed POST for query object=" + witsmlObject.toString()),
-					witsmlObject);
-			LOG.info(valveLoggingResponse.toString());
-			// get an abstractWitsmlObject from merging the query and the result
-			// JSON objects
-			return GraphQLRespConverter.convert(response.getBody(), objectType);
+			LOG.info(ValveLogging.getLogMsg(
+				exchangeID,
+				logResponse(response, "Successfully executed POST for query object=" + witsmlObject.toString()),
+				witsmlObject
+			));
+
+			// get matching objects from search as list of abstract witsml objects
+			ArrayList<AbstractWitsmlObject> wmlResponses = GraphQLRespConverter.convert(response.getBody(), objectType);
+
+			// translate responses
+			if (wmlResponses.isEmpty())
+				return null; // this is valid. No matches found
+
+			ArrayList<AbstractWitsmlObject> results = new ArrayList<>();
+			for (AbstractWitsmlObject wmlResponse: wmlResponses) {
+				results.add(
+					DotTranslator.translateQueryResponse(
+						witsmlObject,
+						wmlResponse.getJSONString("1.4.1.1")
+					)
+				);
+			}
+
+			return results;
+
 		} else {
-			ValveLogging valveLoggingResponse = new ValveLogging(witsmlObject.getUid(),
-					logResponse(response, "Unable to execute POST"), witsmlObject);
-			LOG.warning(valveLoggingResponse.toString());
+			LOG.warning(ValveLogging.getLogMsg(
+				witsmlObject.getUid(),
+				logResponse(response, "Unable to execute POST"),
+				witsmlObject
+			));
 			throw new ValveException(response.getBody());
 		}
 	}
