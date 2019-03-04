@@ -26,6 +26,8 @@ import org.json.JSONObject;
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 public class DotTranslator {
@@ -66,14 +68,17 @@ public class DotTranslator {
      */
     public static AbstractWitsmlObject translateQueryResponse(
         AbstractWitsmlObject wmlObject,
-        String jsonResponseString
+        String jsonResponseString,
+        Map<String, String> optionsIn
     ) throws ValveException {
         // get JSON objects
         JSONObject queryJson = new JSONObject(wmlObject.getJSONString("1.4.1.1"));
         JSONObject responseJson = new JSONObject(jsonResponseString);
 
-        // get the result string
-        String result = JsonUtil.merge(queryJson, responseJson).toString(); // WARNING: this method modifies query internally
+        String result = responseJson.toString();
+
+        if (!optionsIn.containsKey("returnElements") || !("all".equals(optionsIn.get("returnElements"))))
+            result = JsonUtil.merge(queryJson, responseJson).toString(); // WARNING: this method modifies query internally
 
         // doctor some commonly-butchered json keys
         result = result.replaceAll("\"dtimStn\":","\"dTimStn\":");
@@ -151,7 +156,7 @@ public class DotTranslator {
         boolean is1411 = "1.4.1.1".equals(version);
 
         // handle empty list
-        if (0 == witsmlObjects.size()) {
+        if (witsmlObjects == null || 0 == witsmlObjects.size()) {
             try {
                 xml = is1411 ?
                     WitsmlMarshal.serialize(new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbores()):

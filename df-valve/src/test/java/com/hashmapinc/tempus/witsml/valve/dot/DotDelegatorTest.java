@@ -190,7 +190,7 @@ public class DotDelegatorTest {
                         someReq.getHeaders().containsKey("Content-Type")
         )), eq("goodUsername"), eq("goodPassword"))).thenReturn(resp);
 
-        ArrayList<AbstractWitsmlObject> foundObjects = this.delegator.search(singleWell, "goodUsername", "goodPassword", "exchangeID", this.client);
+        ArrayList<AbstractWitsmlObject> foundObjects = this.delegator.search(singleWell, "goodUsername", "goodPassword", "exchangeID", this.client, new HashMap<>());
         assertEquals(3, foundObjects.size());
     }
 

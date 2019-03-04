@@ -132,7 +132,8 @@ public class DotValve implements IValve {
 					qc.USERNAME,
 					qc.PASSWORD,
 					qc.EXCHANGE_ID,
-					this.CLIENT
+					this.CLIENT,
+					qc.OPTIONS_IN
 				);
 				if (null != response)
 					queryResponses.add(response);
@@ -166,7 +167,8 @@ public class DotValve implements IValve {
 				qc.USERNAME,
 				qc.PASSWORD,
 				qc.EXCHANGE_ID,
-				this.CLIENT
+				this.CLIENT,
+				qc.OPTIONS_IN
 			);
 		} catch (Exception e) {
 			LOG.warning("Exception in DotValve get object: " + e.getMessage());

@@ -26,6 +26,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import static junit.framework.TestCase.*;
@@ -70,7 +71,7 @@ public class DotValveTest {
 		QueryContext qc = new QueryContext(
 			"1.3.1.1",
 			"well",
-			null,
+			new HashMap<>(),
 			"",
 			witsmlObjects,
 			"goodUsername",
@@ -80,7 +81,7 @@ public class DotValveTest {
 
 		// mock delegator behavior
 		when(
-			this.mockDelegator.getObject(well, qc.USERNAME, qc.PASSWORD,qc.EXCHANGE_ID, this.mockClient)
+			this.mockDelegator.getObject(well, qc.USERNAME, qc.PASSWORD,qc.EXCHANGE_ID, this.mockClient, qc.OPTIONS_IN)
 		).thenReturn(well);
 
 		// test
@@ -113,7 +114,7 @@ public class DotValveTest {
 
 		// mock delegator behavior
 		when(
-			this.mockDelegator.getObject(well, qc.USERNAME, qc.PASSWORD,qc.EXCHANGE_ID, this.mockClient)
+			this.mockDelegator.getObject(well, qc.USERNAME, qc.PASSWORD,qc.EXCHANGE_ID, this.mockClient, qc.OPTIONS_IN)
 		).thenReturn(null);
 
 		// test
@@ -143,7 +144,7 @@ public class DotValveTest {
 		QueryContext qc = new QueryContext(
 			"1.3.1.1",
 			"wellbore",
-			null,
+			new HashMap<>(),
 			"",
 			witsmlObjects,
 			"goodUsername",
@@ -153,8 +154,8 @@ public class DotValveTest {
 
 
 		// mock delegator behavior
-		doReturn(wellboreA).when(this.mockDelegator).getObject(wellboreA, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.mockClient);
-		doReturn(wellboreB).when(this.mockDelegator).getObject(wellboreB, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.mockClient);
+		doReturn(wellboreA).when(this.mockDelegator).getObject(wellboreA, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.mockClient, new HashMap<>());
+		doReturn(wellboreB).when(this.mockDelegator).getObject(wellboreB, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.mockClient, new HashMap<>());
 
 		// test
 		String expected = // expected = merge wellboreA and wellbore B
