@@ -30,6 +30,7 @@ import org.json.JSONObject;
 import javax.xml.datatype.DatatypeConfigurationException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -303,22 +304,23 @@ public class DotDelegator {
         }
     }
 
-    /**
-     * Submits the query to the DoT rest API for object GETing
-     *
-     * @param witsmlObject - AbstractWitsmlObject to get
-     * @param username - auth username
-     * @param password - auth password
+	/**
+	 * Submits the query to the DoT rest API for object GETing
+	 *
+	 * @param witsmlObject - AbstractWitsmlObject to get
+	 * @param username - auth username
+	 * @param password - auth password
 	 * @param exchangeID - unique string for tracking which exchange called this method
-     * @param client - DotClient to execute requests with
-     * @return get results AbstractWitsmlObject
-     */
+	 * @param client - DotClient to execute requests with
+	 * @return get results AbstractWitsmlObject
+	 */
     public AbstractWitsmlObject getObject(
-		AbstractWitsmlObject witsmlObject, 
-		String username, 
-		String password,	
-		String exchangeID, 
-		DotClient client
+		AbstractWitsmlObject witsmlObject,
+		String username,
+		String password,
+	  	String exchangeID,
+	  	DotClient client,
+		Map<String,String> optionsIn
 	) throws ValveException, ValveAuthException, UnirestException {
 		String uid = witsmlObject.getUid();
 		String objectType = witsmlObject.getObjectType();
@@ -350,21 +352,21 @@ public class DotDelegator {
 		int status = response.getStatus();
 		if (201 == status || 200 == status) {
 			LOG.info(ValveLogging.getLogMsg(
-				exchangeID,
-				logResponse(response, "Successfully executed GET for query object=" + witsmlObject.toString()),
-				witsmlObject
+					exchangeID,
+					logResponse(response, "Successfully executed GET for query object=" + witsmlObject.toString()),
+					witsmlObject
 			));
 
 			// translate the query response
-			return DotTranslator.translateQueryResponse(witsmlObject, response.getBody());
+			return DotTranslator.translateQueryResponse(witsmlObject, response.getBody(), optionsIn);
 		} else if (404 == status) {
 			// handle not found. This is a valid response
 			return null;
 		} else {
 			LOG.warning(ValveLogging.getLogMsg(
-				witsmlObject.getUid(),
-				logResponse(response, "Unable to execute GET"),
-				witsmlObject
+					witsmlObject.getUid(),
+					logResponse(response, "Unable to execute GET"),
+					witsmlObject
 			));
 			throw new ValveException(response.getBody());
 		}
@@ -385,7 +387,8 @@ public class DotDelegator {
 		String username,
 		String password,
 		String exchangeID,
-		DotClient client
+		DotClient client,
+		Map<String, String> optionsIn
 	) throws ValveException, ValveAuthException, UnirestException, IOException, DatatypeConfigurationException {
 		String objectType = witsmlObject.getObjectType();
 		String endpoint = this.getEndpoint(objectType + "search");
@@ -433,7 +436,8 @@ public class DotDelegator {
 				results.add(
 					DotTranslator.translateQueryResponse(
 						witsmlObject,
-						wmlResponse.getJSONString("1.4.1.1")
+						wmlResponse.getJSONString("1.4.1.1"),
+						optionsIn
 					)
 				);
 			}

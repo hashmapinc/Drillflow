@@ -19,6 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
 import org.junit.Test;
@@ -168,7 +169,7 @@ public class DotTranslatorTest {
 
 
         // get query response
-        AbstractWitsmlObject abstractWitsmlObject = DotTranslator.translateQueryResponse(wmlObject, responseString);
+        AbstractWitsmlObject abstractWitsmlObject = DotTranslator.translateQueryResponse(wmlObject, responseString, new HashMap<>());
 
         assertTrue(abstractWitsmlObject instanceof com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell);
 
