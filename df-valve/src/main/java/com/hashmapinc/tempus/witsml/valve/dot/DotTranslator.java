@@ -26,7 +26,6 @@ import org.json.JSONObject;
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -77,8 +76,43 @@ public class DotTranslator {
 
         String result = responseJson.toString();
 
+        /*
         if (!optionsIn.containsKey("returnElements") || !("all".equals(optionsIn.get("returnElements"))))
             result = JsonUtil.merge(queryJson, responseJson).toString(); // WARNING: this method modifies query internally
+        */
+        // if options does not contain "returnElements" key OR "all" is not specified in it...
+        if (!optionsIn.containsKey("returnElements") || !("all".equals(optionsIn.get("returnElements"))))
+
+            // Check if the "id-only" case needs to be handled...
+            if ( optionsIn.containsKey("returnElements")  && "id-only".equals(optionsIn.get("returnElements")) ) {
+                // • Parentage uids and names (if any):
+                //   o uidWell and nameWell (if it exists in schema).
+                //   o uidWellbore and nameWellbore (if it exists in schema).
+                // • data-object uid and name.
+                //
+                // So the suggested approach is to leave everything "as is", and just change the
+                // the line with "well" or "wellbore, etc. based on the type (is it type?).
+                //
+                // Sample JSON:
+                //  {
+                //    "well" : [ {
+                //                "name" : "",
+                //                "nameWellbore" : "",
+                //                "nameWell" : "",
+                //                "uid" : "",
+                //                 "uidWell" : ""
+                //    } ],
+                //    "version" : "1.4.1.1"
+                //  }
+                //
+            }
+
+            // Perform the selective merge since "all" was not specified OR the JSON has been manipulated for "id-only"
+            // case OR the "returnElements" was not given in "optionsIn" --
+            result = JsonUtil.merge(queryJson, responseJson).toString(); // WARNING: this method modifies query internally
+
+        // End TMS
+
 
         // doctor some commonly-butchered json keys
         result = result.replaceAll("\"dtimStn\":","\"dTimStn\":");
