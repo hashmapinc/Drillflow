@@ -84,7 +84,7 @@ public class DotTranslator {
         result = result.replaceAll("\"dtimStn\":","\"dTimStn\":");
 
         // convert the queryJSON back to valid xml
-        LOG.info("Converting merged query JSON to valid XML string");
+        LOG.finest("Converting merged query JSON to valid XML string");
         try {
             switch (wmlObject.getObjectType()) {
                 case "well":
