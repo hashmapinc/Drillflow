@@ -27,6 +27,7 @@ import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
 import org.json.JSONObject;
 
+import javax.json.JsonObject;
 import javax.xml.datatype.DatatypeConfigurationException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -166,7 +167,51 @@ public class DotDelegator {
 	) throws ValveException, ValveAuthException, UnirestException {
 		// Throwing valve exception as this is currently not supported by DoT until the Patch API is implemented
 		// We dont want to delete the object because someone thought something was implemented.
-		throw new ValveException("Element delete not currently supported");
+		String uid = witsmlObj.getUid(); // get uid for delete call
+		String objectType = witsmlObj.getObjectType(); // get obj type for exception handling
+
+		// It is an object delete, so re-route there
+		String endpoint = this.getEndpoint(objectType) + uid; // add uid for delete call
+		String payload = witsmlObj.getJSONString("1.4.1.1");
+		// create request
+		HttpRequestWithBody request = Unirest.patch(endpoint).header("Content-Type", "application/json");
+		payload = JsonUtil.removeEmptyArrays(new JSONObject(payload));
+		request.body(payload);
+		LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(request), witsmlObj));
+
+		// add query string params
+		if ("wellbore".equals(objectType)) {
+			request.queryString("uidWell", witsmlObj.getParentUid()); // TODO: ensure parent uid exists?
+		} else if ("trajectory".equals(objectType)){
+			request.queryString("uidWellbore", witsmlObj.getParentUid());
+			String uidWell;
+			if ("1.4.1.1".equals(witsmlObj.getVersion())) {
+				uidWell = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory) witsmlObj).getUidWell();
+			} else {
+				uidWell = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory) witsmlObj).getUidWell();
+			}
+			request.queryString("uidWell", uidWell);
+		}
+
+		// make the DELETE call.
+		HttpResponse<String> response = client.makeRequest(request, username, password);
+
+		// check response status
+		int status = response.getStatus();
+		if (201 == status || 200 == status || 204 == status) {
+			LOG.info(ValveLogging.getLogMsg(
+					exchangeID,
+					logResponse(response, "Successfully Patched Object with UID :"+uid+"."),
+					witsmlObj)
+			);
+		} else {
+			LOG.warning(ValveLogging.getLogMsg(
+					exchangeID,
+					logResponse(response, "Unable to patch"),
+					witsmlObj)
+			);
+			throw new ValveException("PATCH DoT REST call failed with status code: " + status);
+		}
 	}
 
 	public void updateObject(
