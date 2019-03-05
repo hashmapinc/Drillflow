@@ -21,10 +21,13 @@ import com.hashmapinc.tempus.WitsmlObjects.Util.WellConverter;
 import com.hashmapinc.tempus.WitsmlObjects.Util.WellboreConverter;
 import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
+import javax.json.JsonObject;
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -66,6 +69,7 @@ public class DotTranslator {
      * @return obj - parsed abstract object
      */
     public static AbstractWitsmlObject translateQueryResponse(
+            // One of the properties is Object Type.
         AbstractWitsmlObject wmlObject,
         String jsonResponseString,
         Map<String, String> optionsIn
@@ -76,22 +80,19 @@ public class DotTranslator {
 
         String result = responseJson.toString();
 
-        /*
-        if (!optionsIn.containsKey("returnElements") || !("all".equals(optionsIn.get("returnElements"))))
-            result = JsonUtil.merge(queryJson, responseJson).toString(); // WARNING: this method modifies query internally
-        */
+        // TMS
         // if options does not contain "returnElements" key OR "all" is not specified in it...
-        if (!optionsIn.containsKey("returnElements") || !("all".equals(optionsIn.get("returnElements"))))
+        if (!optionsIn.containsKey("returnElements") || !("all".equals(optionsIn.get("returnElements")))) {
 
             // Check if the "id-only" case needs to be handled...
-            if ( optionsIn.containsKey("returnElements")  && "id-only".equals(optionsIn.get("returnElements")) ) {
+            // if ( optionsIn.containsKey("returnElements")  && "id-only".equals(optionsIn.get("returnElements")) ) {
+            if ("id-only".equals(optionsIn.get("returnElements"))) {
                 // • Parentage uids and names (if any):
                 //   o uidWell and nameWell (if it exists in schema).
                 //   o uidWellbore and nameWellbore (if it exists in schema).
                 // • data-object uid and name.
                 //
-                // So the suggested approach is to leave everything "as is", and just change the
-                // the line with "well" or "wellbore, etc. based on the type (is it type?).
+                // So the approach is to populate the type from the AbstractWitsmlObject.
                 //
                 // Sample JSON:
                 //  {
@@ -100,17 +101,33 @@ public class DotTranslator {
                 //                "nameWellbore" : "",
                 //                "nameWell" : "",
                 //                "uid" : "",
-                //                 "uidWell" : ""
-                //    } ],
+                //                "uidWell" : ""
+                //               } ],
                 //    "version" : "1.4.1.1"
                 //  }
-                //
+                // The merge will complete the new query for just the id...
+                JSONArray array = new JSONArray();
+                
+                JSONObject item = new JSONObject();
+                item.put("name","");
+                item.put("nameWellBore","");
+                item.put("nameWell","");
+                item.put("uid","");
+                item.put("uidWell","");
+                array.add(item);
+
+                queryJson.put( wmlObject.getObjectType(), array );
+
+                try ( PrintWriter out = new PrintWriter("queryJson.txt") ) {
+                    out.println(queryJson.toString());
+                } catch ( Exception ex ) {}
+
             }
 
             // Perform the selective merge since "all" was not specified OR the JSON has been manipulated for "id-only"
             // case OR the "returnElements" was not given in "optionsIn" --
             result = JsonUtil.merge(queryJson, responseJson).toString(); // WARNING: this method modifies query internally
-
+        }
         // End TMS
 
 
