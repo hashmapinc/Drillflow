@@ -24,7 +24,6 @@ import com.hashmapinc.tempus.witsml.valve.ValveException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import javax.json.JsonObject;
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -107,14 +106,14 @@ public class DotTranslator {
                 //  }
                 // The merge will complete the new query for just the id...
                 JSONArray array = new JSONArray();
-                
+
                 JSONObject item = new JSONObject();
                 item.put("name","");
                 item.put("nameWellBore","");
                 item.put("nameWell","");
                 item.put("uid","");
                 item.put("uidWell","");
-                array.add(item);
+                array.put(item);
 
                 queryJson.put( wmlObject.getObjectType(), array );
 
