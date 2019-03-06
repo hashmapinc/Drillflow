@@ -54,7 +54,7 @@ public class GraphQLQueryConverterTest {
         String queryXML = TestUtilities.getResourceAsString("trajectoryGraphql/trajectoryGraphqlQuery1411.xml");
         ObjTrajectory obj = ((ObjTrajectorys) WitsmlMarshal.deserialize(queryXML, ObjTrajectorys.class)).getTrajectory().get(0);
         GraphQLQueryConverter converter = new GraphQLQueryConverter();
-        String graphQLQuery = converter.getQuery(obj);
+        String graphQLQuery = converter.getQuery(obj, "test");
         assertNotNull(graphQLQuery);
         assertTrue(graphQLQuery.contains("title"));
     }

@@ -113,10 +113,25 @@ public class GraphQLRespConverter {
                 Trajectory trajectory = WitsmlMarshal.deserializeFromJSON(trajectories.get(i).toString(), Trajectory.class);
                 foundObjects.add(TrajectoryConverter.convertTo1411(trajectory));
             } catch (Exception e) {
-
+                String a = "1";
             }
         }
 
         return foundObjects;
+    }
+
+    public static String getUUid(JSONObject response){
+        if (!response.has("data")){
+            return null;
+        }
+        JSONObject data = (JSONObject)response.get("data");
+        if (!data.has("wellbores")){
+            return null;
+        }
+        if (data.get("wellbores") == null)
+            return null;
+        JSONArray wells = (JSONArray) data.get("wellbores");
+
+        return ((JSONObject)wells.get(0)).getString("uuid");
     }
 }

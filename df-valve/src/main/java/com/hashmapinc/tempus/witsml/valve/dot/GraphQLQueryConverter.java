@@ -44,13 +44,15 @@ class GraphQLQueryConverter {
             case "wellbore":
                 this.createWellboreQuery(wmlObject.getJSONString("1.4.1.1"));
                 break;
-            case "trajectory":
-                return getTrajectoryQuery(wmlObject);
             default:
                 return null;
         }
 
         return this.builder.GetGraphQLQuery();
+    }
+
+    public String getQuery(AbstractWitsmlObject wmlObject, String uuid){
+        return getTrajectoryQuery(wmlObject, uuid);
     }
 
     /**
@@ -61,7 +63,7 @@ class GraphQLQueryConverter {
      *
      * @return graphql query string
      */
-    private static String getTrajectoryQuery(AbstractWitsmlObject wmlObject) {
+    private static String getTrajectoryQuery(AbstractWitsmlObject wmlObject, String wbUuid) {
         // payload json object for building full query
         JSONObject payload = new JSONObject();
 
@@ -75,6 +77,9 @@ class GraphQLQueryConverter {
         // get trajectory query fields
         // ====================================================================
         JSONObject trajQueryFields = new JSONObject();
+        // uuidWellbore
+        trajQueryFields.put("uuidWellbore", wbUuid);
+
         // uuid
         if (trajectoryJson.has("uuid") && !JsonUtil.isEmpty(trajectoryJson.get("uuid")))
             trajQueryFields.put("uuid", trajectoryJson.get("uuid"));
@@ -82,10 +87,6 @@ class GraphQLQueryConverter {
         // uuidWell
         if (trajectoryJson.has("uuidWell") && !JsonUtil.isEmpty(trajectoryJson.get("uuidWell")))
             trajQueryFields.put("uuidWell", trajectoryJson.get("uuidWell"));
-
-        // uuidWellbore
-        if (trajectoryJson.has("uuidWellbore") && !JsonUtil.isEmpty(trajectoryJson.get("uuidWellbore")))
-            trajQueryFields.put("uuidWellbore", trajectoryJson.get("uuidWellbore"));
 
         // name
         if (objTrajectoryJson.has("name") && !JsonUtil.isEmpty(objTrajectoryJson.get("name")))
@@ -121,7 +122,7 @@ class GraphQLQueryConverter {
 
         // support query by uid OR query by filters, not both
         // uid-based station query
-        if (!JsonUtil.isEmpty(stationsJson) && stationsJson.getJSONObject(0).get("uid") != null) {
+        /*if (!JsonUtil.isEmpty(stationsJson) && stationsJson.getJSONObject(0).get("uid") != null) {
             // get list of UIDs
             JSONArray stationUids = new JSONArray();
             for (int i = 0; i < stationsJson.length(); i++) {
@@ -129,7 +130,7 @@ class GraphQLQueryConverter {
             }
             stationQueryFields.put("uids", stationUids);
         // non uid-based station query
-        } else {
+        } else {*/
             // lastUpdateTimeUtc
             if (trajectoryJson.has("lastUpdateTimeUtc") && !JsonUtil.isEmpty(trajectoryJson.get("lastUpdateTimeUtc")))
                 stationQueryFields.put("lastUpdateTimeUtc", trajectoryJson.get("lastUpdateTimeUtc"));
@@ -141,7 +142,7 @@ class GraphQLQueryConverter {
             // mdMx
             if (trajectoryJson.has("mdMx") && !JsonUtil.isEmpty(trajectoryJson.get("mdMx")))
                 stationQueryFields.put("mdMx", trajectoryJson.get("mdMx"));
-        }
+        //}
 
         // ====================================================================
 
@@ -196,6 +197,38 @@ class GraphQLQueryConverter {
 
         // return payload
         return payload.toString(2);
+    }
+
+    public String getUidUUIDMappingQuery(AbstractWitsmlObject wmlObject){
+        JSONObject payload = new JSONObject();
+
+        // parse json strings
+        String jsonString1411 = wmlObject.getJSONString("1.4.1.1");
+        JSONObject wmlObjJson = new JSONObject(jsonString1411);
+
+        // ====================================================================
+        // get trajectory query fields
+        // ====================================================================
+        JSONObject wellQueryFields = new JSONObject();
+        // uidWellbore
+        if (wmlObjJson.has("uidWellbore") && !JsonUtil.isEmpty(wmlObjJson.get("uidWellbore")))
+            wellQueryFields.put("uid", wmlObjJson.get("uidWellbore"));
+
+        // uidWell
+        if (wmlObjJson.has("uidWell") && !JsonUtil.isEmpty(wmlObjJson.get("uidWell")))
+            wellQueryFields.put("uidWell", wmlObjJson.get("uidWell"));
+
+        // build variables section
+        JSONObject variables = new JSONObject();
+        variables.put("arg", wellQueryFields);
+        payload.put("variables", variables);
+
+        // build query section of payload
+        payload.put("query", GraphQLQueryConstants.WELLBORE_UID_MAPPING_QUERY);
+
+        // return payload
+        return payload.toString(2);
+
     }
 
     private void createWellboreQuery(String jsonObj) throws IOException{
