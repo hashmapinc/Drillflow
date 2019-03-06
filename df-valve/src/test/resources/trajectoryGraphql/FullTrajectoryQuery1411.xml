@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<trajectorys xmlns="http://www.witsml.org/schemas/1series"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://www.witsml.org/schemas/1series  ../xsd_schemas/obj_trajectory.xsd"
+             version="1.4.1.1">
+    <trajectory uidWell="uidWell" uidWellbore="uidWellbore" uid="">
+        <nameWell></nameWell>
+        <nameWellbore></nameWellbore>
+        <name></name>
+        <parentTrajectory>
+            <trajectory uidRef=""></trajectory>
+        </parentTrajectory>
+        <dTimTrajStart></dTimTrajStart>
+        <dTimTrajEnd></dTimTrajEnd>
+        <mdMn uom=""></mdMn>
+        <mdMx uom=""></mdMx>
+        <serviceCompany></serviceCompany>
+        <magDeclUsed uom=""></magDeclUsed>
+        <gridCorUsed uom=""></gridCorUsed>
+        <aziVertSect uom=""></aziVertSect>
+        <dispNsVertSectOrig uom=""></dispNsVertSectOrig>
+        <dispEwVertSectOrig uom=""></dispEwVertSectOrig>
+        <definitive></definitive>
+        <memory></memory>
+        <finalTraj></finalTraj>
+        <aziRef></aziRef>
+        <trajectoryStation uid="">
+            <dTimStn></dTimStn>
+            <typeTrajStation></typeTrajStation>
+            <md uom=""></md>
+            <tvd uom=""></tvd>
+            <incl uom=""></incl>
+            <azi uom=""></azi>
+            <mtf uom=""></mtf>
+            <gtf uom=""></gtf>
+            <dispNs uom=""></dispNs>
+            <dispEw uom=""></dispEw>
+            <vertSect uom=""></vertSect>
+            <dls uom=""></dls>
+            <rateTurn uom=""></rateTurn>
+            <rateBuild uom=""></rateBuild>
+            <mdDelta uom=""></mdDelta>
+            <tvdDelta uom=""></tvdDelta>
+            <modelToolError></modelToolError>
+            <gravTotalUncert uom=""></gravTotalUncert>
+            <dipAngleUncert uom=""></dipAngleUncert>
+            <magTotalUncert uom=""></magTotalUncert>
+            <gravAccelCorUsed></gravAccelCorUsed>
+            <magXAxialCorUsed></magXAxialCorUsed>
+            <sagCorUsed></sagCorUsed>
+            <magDrlstrCorUsed></magDrlstrCorUsed>
+            <statusTrajStation></statusTrajStation>
+            <rawData>
+                <gravAxialRaw uom=""></gravAxialRaw>
+                <gravTran1Raw uom=""></gravTran1Raw>
+                <gravTran2Raw uom=""></gravTran2Raw>
+                <magAxialRaw uom=""></magAxialRaw>
+                <magTran1Raw uom=""></magTran1Raw>
+                <magTran2Raw uom=""></magTran2Raw>
+            </rawData>
+            <corUsed>
+                <gravAxialAccelCor uom=""></gravAxialAccelCor>
+                <gravTran1AccelCor uom=""></gravTran1AccelCor>
+                <gravTran2AccelCor uom=""></gravTran2AccelCor>
+                <magAxialDrlstrCor uom=""></magAxialDrlstrCor>
+                <magTran1DrlstrCor uom=""></magTran1DrlstrCor>
+                <magTran2DrlstrCor uom=""></magTran2DrlstrCor>
+                <sagIncCor uom=""></sagIncCor>
+                <sagAziCor uom=""></sagAziCor>
+                <stnMagDeclUsed uom=""></stnMagDeclUsed>
+                <stnGridCorUsed uom=""></stnGridCorUsed>
+                <dirSensorOffset uom=""></dirSensorOffset>
+            </corUsed>
+            <valid>
+                <magTotalFieldCalc uom=""></magTotalFieldCalc>
+                <magDipAngleCalc uom=""></magDipAngleCalc>
+                <gravTotalFieldCalc uom=""></gravTotalFieldCalc>
+            </valid>
+            <matrixCov>
+                <varianceNN uom=""></varianceNN>
+                <varianceNE uom=""></varianceNE>
+                <varianceNVert uom=""></varianceNVert>
+                <varianceEE uom=""></varianceEE>
+                <varianceEVert uom=""></varianceEVert>
+                <varianceVertVert uom=""></varianceVertVert>
+                <biasN uom=""></biasN>
+                <biasE uom=""></biasE>
+                <biasVert uom=""></biasVert>
+            </matrixCov>
+            <location uid="">
+                <wellCRS uidRef=""></wellCRS>
+                <latitude uom=""></latitude>
+                <longitude uom=""></longitude>
+                <easting uom=""></easting>
+                <northing uom=""></northing>
+                <westing uom=""></westing>
+                <southing uom=""></southing>
+                <projectedX uom=""></projectedX>
+                <projectedY uom=""></projectedY>
+                <localX uom=""></localX>
+                <localY uom=""></localY>
+            </location>
+            <commonData>
+                <dTimCreation></dTimCreation>
+                <dTimLastChange></dTimLastChange>
+                <itemState></itemState>
+                <comments></comments>
+            </commonData>
+        </trajectoryStation>
+        <commonData>
+            <dTimCreation></dTimCreation>
+            <dTimLastChange></dTimLastChange>
+            <itemState></itemState>
+            <comments></comments>
+        </commonData>
+    </trajectory>
+</trajectorys>

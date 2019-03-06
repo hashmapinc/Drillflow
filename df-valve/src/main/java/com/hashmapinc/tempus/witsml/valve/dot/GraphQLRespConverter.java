@@ -119,4 +119,19 @@ public class GraphQLRespConverter {
 
         return foundObjects;
     }
+
+    public static String getUUid(JSONObject response){
+        if (!response.has("data")){
+            return null;
+        }
+        JSONObject data = (JSONObject)response.get("data");
+        if (!data.has("wellbores")){
+            return null;
+        }
+        if (data.get("wellbores") == null)
+            return null;
+        JSONArray wells = (JSONArray) data.get("wellbores");
+
+        return ((JSONObject)wells.get(0)).getString("uuid");
+    }
 }

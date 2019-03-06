@@ -1,7 +1,7 @@
 <trajectorys
         xmlns="http://www.witsml.org/schemas/1series"
         version="1.4.1.1">
-    <trajectory>
+    <trajectory uidWell="uidWell" uidWellbore="uidWellbore" uid="">
         <nameWell/>
         <nameWellbore/>
         <name>HM_Plan #2</name>
