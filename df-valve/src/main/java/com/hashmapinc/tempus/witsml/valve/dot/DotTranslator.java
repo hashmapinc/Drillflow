@@ -111,7 +111,7 @@ public class DotTranslator {
         result = result.replaceAll("\"dtimStn\":","\"dTimStn\":");
 
         // convert the queryJSON back to valid xml
-        LOG.info("Converting merged query JSON to valid XML string");
+        LOG.finest("Converting merged query JSON to valid XML string");
         try {
             switch (wmlObject.getObjectType()) {
                 case "well":
@@ -218,7 +218,7 @@ public class DotTranslator {
         boolean is1411 = "1.4.1.1".equals(version);
 
         // handle empty list
-        if (0 == witsmlObjects.size()) {
+        if (witsmlObjects == null || 0 == witsmlObjects.size()) {
             try {
                 xml = is1411 ?
                     WitsmlMarshal.serialize(new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys()):

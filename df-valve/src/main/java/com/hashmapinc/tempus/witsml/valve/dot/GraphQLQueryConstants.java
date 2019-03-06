@@ -566,4 +566,167 @@ public class GraphQLQueryConstants {
             "\t}\n" +
             "}";
     //=========================================================================
+
+    //=========================================================================
+    // WELL QUERY
+    //=========================================================================
+
+    public static final String WELL_QUERY =
+            "query WellQuery($wellArgument: WellArgument) {\n" +
+            "  wells(wellArgument: $wellArgument) {\n" +
+            "    country\n" +
+            "    dTimLicense\n" +
+            "    numLicense\n" +
+            "    county\n" +
+            "    waterDepth {\n" +
+            "      uom\n" +
+            "      value\n" +
+            "    }\n" +
+            "    operator\n" +
+            "    pcInterest {\n" +
+            "      uom\n" +
+            "      value\n" +
+            "    }\n" +
+            "    dTimPa\n" +
+            "    uid\n" +
+            "    nameLegal\n" +
+            "    block\n" +
+            "    state\n" +
+            "    operatorDiv\n" +
+            "    groundElevation {\n" +
+            "      datum\n" +
+            "      uom\n" +
+            "      value\n" +
+            "    }\n" +
+            "    timeZone\n" +
+            "    statusWell\n" +
+            "    purposeWell\n" +
+            "    numAPI\n" +
+            "    referencePoint {\n" +
+            "      elevation {\n" +
+            "        datum\n" +
+            "        uom\n" +
+            "        value\n" +
+            "      }\n" +
+            "      uid\n" +
+            "      measuredDepth {\n" +
+            "        datum\n" +
+            "        uom\n" +
+            "        value\n" +
+            "      }\n" +
+            "      name\n" +
+            "      location {\n" +
+            "        uid\n" +
+            "        easting {\n" +
+            "          uom\n" +
+            "          value\n" +
+            "        }\n" +
+            "        wellCRS {\n" +
+            "          value\n" +
+            "          uidRef\n" +
+            "        }\n" +
+            "        latitude {\n" +
+            "          uom\n" +
+            "          value\n" +
+            "        }\n" +
+            "        localY {\n" +
+            "          uom\n" +
+            "          value\n" +
+            "        }\n" +
+            "        description\n" +
+            "        localX {\n" +
+            "          uom\n" +
+            "          value\n" +
+            "        }\n" +
+            "        northing {\n" +
+            "          uom\n" +
+            "          value\n" +
+            "        }\n" +
+            "        longitude {\n" +
+            "          uom\n" +
+            "          value\n" +
+            "        }\n" +
+            "      }\n" +
+            "      type\n" +
+            "    }\n" +
+            "    wellLocation {\n" +
+            "      uid\n" +
+            "      easting {\n" +
+            "        uom\n" +
+            "        value\n" +
+            "      }\n" +
+            "      wellCRS {\n" +
+            "        value\n" +
+            "        uidRef\n" +
+            "      }\n" +
+            "      description\n" +
+            "      northing {\n" +
+            "        uom\n" +
+            "        value\n" +
+            "      }\n" +
+            "    }\n" +
+            "    wellheadElevation {\n" +
+            "      datum\n" +
+            "      uom\n" +
+            "      value\n" +
+            "    }\n" +
+            "    field\n" +
+            "    wellCRS {\n" +
+            "      uid\n" +
+            "      localCRS {\n" +
+            "        yAxisAzimuth {\n" +
+            "          uom\n" +
+            "          northDirection\n" +
+            "          value\n" +
+            "        }\n" +
+            "      }\n" +
+            "      mapProjectionCRS {\n" +
+            "        value\n" +
+            "        uidRef\n" +
+            "      }\n" +
+            "      geodeticCRS {\n" +
+            "        value\n" +
+            "        uidRef\n" +
+            "      }\n" +
+            "      name\n" +
+            "      description\n" +
+            "    }\n" +
+            "    dTimSpud\n" +
+            "    district\n" +
+            "    name\n" +
+            "    numGovt\n" +
+            "    region\n" +
+            "    wellDatum {\n" +
+            "      elevation {\n" +
+            "        datum\n" +
+            "        uom\n" +
+            "        value\n" +
+            "      }\n" +
+            "      uid\n" +
+            "      code\n" +
+            "      datumName {\n" +
+            "        namingSystem\n" +
+            "        code\n" +
+            "        value\n" +
+            "      }\n" +
+            "      name\n" +
+            "    }\n" +
+            "  }\n" +
+            "}";
+    //=========================================================================
+
+    //=========================================================================
+    // WELLBORE UID UUID MAPPING QUERY
+    //=========================================================================
+
+    public static final String WELLBORE_UID_MAPPING_QUERY =
+            "query WellboreQuery($arg: WellboreArgument) {\n" +
+                    "  wellbores(wellboreArgument: $arg) {\n" +
+                    "    uuid\n" +
+                    "    well {\n" +
+                    "      uuid\n" +
+                    "    }\n" +
+                    "  }\n" +
+                    "}";
+
 }

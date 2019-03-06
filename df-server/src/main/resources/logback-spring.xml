@@ -57,8 +57,6 @@
 
     <!-- LOG "com.hashmapinc*" at TRACE level -->
     <logger name="com.hashmapinc" level="trace" additivity="false">
-        <appender-ref ref="RollingFile" />
-        <appender-ref ref="Console" />
     </logger>
 
     <logger name="org.apache.cxf" level="info" additivity="false">
