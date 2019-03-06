@@ -20,13 +20,15 @@ import com.hashmapinc.tempus.WitsmlObjects.Util.TrajectoryConverter;
 import com.hashmapinc.tempus.WitsmlObjects.Util.WellConverter;
 import com.hashmapinc.tempus.WitsmlObjects.Util.WellboreConverter;
 import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
 import org.json.JSONObject;
 
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -67,6 +69,7 @@ public class DotTranslator {
      * @return obj - parsed abstract object
      */
     public static AbstractWitsmlObject translateQueryResponse(
+            // One of the properties is Object Type.
         AbstractWitsmlObject wmlObject,
         String jsonResponseString,
         Map<String, String> optionsIn
@@ -77,8 +80,30 @@ public class DotTranslator {
 
         String result = responseJson.toString();
 
-        if (!optionsIn.containsKey("returnElements") || !("all".equals(optionsIn.get("returnElements"))))
+        // if options does not contain "returnElements" key OR "all" is not specified within it...
+        if (!optionsIn.containsKey("returnElements") || !("all".equals(optionsIn.get("returnElements")))) {
+
+            // Check if the "id-only" case needs to be handled...
+            if ("id-only".equals(optionsIn.get("returnElements"))) {
+
+                // Clear out the queryJson object...
+                queryJson.keySet().clear();
+                // Construct the queryJson object anew...
+                // We will put all parentage info, and only the parentage that is warrented based on 
+                // the object type will be preserved after the merge. 
+                queryJson.put("name","");
+                queryJson.put("nameWellbore","");
+                queryJson.put("nameWell","");
+                queryJson.put("uid","");
+                queryJson.put("uidWellbore","");
+                queryJson.put("uidWell","");
+            }
+
+            // Perform the selective merge since "all" was not specified
+            //                             OR    the query JSON has been changed for "id-only" case
+            //                             OR    the "returnElements" was not given in "optionsIn" --
             result = JsonUtil.merge(queryJson, responseJson).toString(); // WARNING: this method modifies query internally
+        }
 
         // doctor some commonly-butchered json keys
         result = result.replaceAll("\"dtimStn\":","\"dTimStn\":");
@@ -89,13 +114,13 @@ public class DotTranslator {
             switch (wmlObject.getObjectType()) {
                 case "well":
                     return WitsmlMarshal.deserializeFromJSON(
-                        result, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell.class);
+                        result, ObjWell.class);
                 case "wellbore":
                     return WitsmlMarshal.deserializeFromJSON(
-                        result, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore.class);
+                        result, ObjWellbore.class);
                 case "trajectory":
                     return WitsmlMarshal.deserializeFromJSON(
-                        result, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory.class);
+                        result, ObjTrajectory.class);
                 default:
                     throw new ValveException("unsupported object type");
             }
