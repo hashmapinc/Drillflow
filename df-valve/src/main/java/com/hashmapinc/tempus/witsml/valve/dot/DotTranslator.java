@@ -85,14 +85,12 @@ public class DotTranslator {
 
             // Check if the "id-only" case needs to be handled...
             if ("id-only".equals(optionsIn.get("returnElements"))) {
-                // • Parentage uids and names (if any):
-                //   o uidWell and nameWell (if it exists in schema).
-                //   o uidWellbore and nameWellbore (if it exists in schema).
-                // • data-object uid and name.
 
                 // Clear out the queryJson object...
                 queryJson.keySet().clear();
                 // Construct the queryJson object anew...
+                // We will put all parentage info, and only the parentage that is warrented based on 
+                // the object type will be preserved after the merge. 
                 queryJson.put("name","");
                 queryJson.put("nameWellbore","");
                 queryJson.put("nameWell","");
