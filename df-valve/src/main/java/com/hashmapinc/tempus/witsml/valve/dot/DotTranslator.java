@@ -92,6 +92,7 @@ public class DotTranslator {
 
                 // Clear out the queryJson object...
                 queryJson.keySet().clear();
+                // Construct the queryJson object anew...
                 queryJson.put("name","");
                 queryJson.put("nameWellbore","");
                 queryJson.put("nameWell","");
@@ -101,7 +102,7 @@ public class DotTranslator {
             }
 
             // Perform the selective merge since "all" was not specified
-            //                             OR    the JSON has been manipulated for "id-only" case
+            //                             OR    the query JSON has been changed for "id-only" case
             //                             OR    the "returnElements" was not given in "optionsIn" --
             result = JsonUtil.merge(queryJson, responseJson).toString(); // WARNING: this method modifies query internally
         }
