@@ -20,13 +20,14 @@ import com.hashmapinc.tempus.WitsmlObjects.Util.TrajectoryConverter;
 import com.hashmapinc.tempus.WitsmlObjects.Util.WellConverter;
 import com.hashmapinc.tempus.WitsmlObjects.Util.WellboreConverter;
 import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -91,36 +92,24 @@ public class DotTranslator {
                 //   o uidWellbore and nameWellbore (if it exists in schema).
                 // • data-object uid and name.
                 //
-                // So the approach is to populate the type from the AbstractWitsmlObject.
-                //
-                // Sample JSON:
+                // queryJson --
                 //  {
-                //    "well" : [ {
-                //                "name" : "",
-                //                "nameWellbore" : "",
-                //                "nameWell" : "",
-                //                "uid" : "",
-                //                "uidWell" : ""
-                //               } ],
-                //    "version" : "1.4.1.1"
+                //    "name" : "",
+                //    "nameWellbore" : "",
+                //    "nameWell" : "",
+                //    "uid" : "",
+                //    "uidWell" : ""
                 //  }
-                // The merge will complete the new query for just the id...
-                JSONArray array = new JSONArray();
 
-                JSONObject item = new JSONObject();
-                item.put("name","");
-                item.put("nameWellBore","");
-                item.put("nameWell","");
-                item.put("uid","");
-                item.put("uidWell","");
-                array.put(item);
 
-                queryJson.put( wmlObject.getObjectType(), array );
-
-                try ( PrintWriter out = new PrintWriter("queryJson.txt") ) {
-                    out.println(queryJson.toString());
-                } catch ( Exception ex ) {}
-
+                // Clear out the queryJson object...
+                queryJson.keySet().clear();
+                queryJson.put("name","");
+                queryJson.put("nameWellbore","");
+                queryJson.put("nameWell","");
+                queryJson.put("uid","");
+                queryJson.put("uidWellbore","");
+                queryJson.put("uidWell","");
             }
 
             // Perform the selective merge since "all" was not specified OR the JSON has been manipulated for "id-only"
@@ -139,13 +128,13 @@ public class DotTranslator {
             switch (wmlObject.getObjectType()) {
                 case "well":
                     return WitsmlMarshal.deserializeFromJSON(
-                        result, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell.class);
+                        result, ObjWell.class);
                 case "wellbore":
                     return WitsmlMarshal.deserializeFromJSON(
-                        result, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore.class);
+                        result, ObjWellbore.class);
                 case "trajectory":
                     return WitsmlMarshal.deserializeFromJSON(
-                        result, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory.class);
+                        result, ObjTrajectory.class);
                 default:
                     throw new ValveException("unsupported object type");
             }
