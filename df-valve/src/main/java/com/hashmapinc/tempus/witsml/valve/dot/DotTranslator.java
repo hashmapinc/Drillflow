@@ -80,27 +80,15 @@ public class DotTranslator {
 
         String result = responseJson.toString();
 
-        // TMS
-        // if options does not contain "returnElements" key OR "all" is not specified in it...
+        // if options does not contain "returnElements" key OR "all" is not specified within it...
         if (!optionsIn.containsKey("returnElements") || !("all".equals(optionsIn.get("returnElements")))) {
 
             // Check if the "id-only" case needs to be handled...
-            // if ( optionsIn.containsKey("returnElements")  && "id-only".equals(optionsIn.get("returnElements")) ) {
             if ("id-only".equals(optionsIn.get("returnElements"))) {
                 // • Parentage uids and names (if any):
                 //   o uidWell and nameWell (if it exists in schema).
                 //   o uidWellbore and nameWellbore (if it exists in schema).
                 // • data-object uid and name.
-                //
-                // queryJson --
-                //  {
-                //    "name" : "",
-                //    "nameWellbore" : "",
-                //    "nameWell" : "",
-                //    "uid" : "",
-                //    "uidWell" : ""
-                //  }
-
 
                 // Clear out the queryJson object...
                 queryJson.keySet().clear();
@@ -112,12 +100,11 @@ public class DotTranslator {
                 queryJson.put("uidWell","");
             }
 
-            // Perform the selective merge since "all" was not specified OR the JSON has been manipulated for "id-only"
-            // case OR the "returnElements" was not given in "optionsIn" --
+            // Perform the selective merge since "all" was not specified
+            //                             OR    the JSON has been manipulated for "id-only" case
+            //                             OR    the "returnElements" was not given in "optionsIn" --
             result = JsonUtil.merge(queryJson, responseJson).toString(); // WARNING: this method modifies query internally
         }
-        // End TMS
-
 
         // doctor some commonly-butchered json keys
         result = result.replaceAll("\"dtimStn\":","\"dTimStn\":");
