@@ -40,8 +40,7 @@ class GraphQLQueryConverter {
     public String getQuery(AbstractWitsmlObject wmlObject) throws IOException {
         switch (wmlObject.getObjectType()){
             case "well":
-                this.createWellQuery(wmlObject.getJSONString("1.4.1.1"));
-                break;
+                return getWellQuery(wmlObject);
             case "wellbore":
                 this.createWellboreQuery(wmlObject.getJSONString("1.4.1.1"));
                 break;
@@ -159,31 +158,44 @@ class GraphQLQueryConverter {
         return payload.toString(2);
     }
 
-    private void createWellQuery(String jsonObj) throws IOException{
-        JSONObject obj = new JSONObject(jsonObj);
-        List<String> keysToOmit = new ArrayList<>();
-        Map<String, String> keysToRename = new HashMap<>();
-        keysToOmit.add("customData");
-        keysToOmit.add("commonData");
-        keysToOmit.add("dTimLastChange");
-        keysToOmit.add("dTimCreation");
-        keysToOmit.add("defaultDatum");
-        StringBuilder querybuilder = new StringBuilder();
-        querybuilder.append("query WellQuery($wellArgument: WellArgument) ");
-        this.builder.addVariableGroup("wellArgument");
-        querybuilder.append(delimiter);
-        querybuilder.append("{");
-        querybuilder.append(delimiter);
-        querybuilder.append("wells(wellArgument: $wellArgument)");
-        querybuilder.append("{");
-        querybuilder.append(delimiter);
-        String indentStr = "";
-        querybuilder.append(this.getQuery(obj, indentStr, "well", keysToOmit, "",keysToRename));
-        querybuilder.append(delimiter);
-        querybuilder.append("}");
-        querybuilder.append(delimiter);
-        querybuilder.append("}");
-        this.builder.setQuery(querybuilder.toString());
+    private String getWellQuery(AbstractWitsmlObject wmlObject){
+        // payload json object for building full query
+        JSONObject payload = new JSONObject();
+
+        // parse json strings
+        String jsonString1411 = wmlObject.getJSONString("1.4.1.1");
+        JSONObject wellJson = new JSONObject(jsonString1411);
+
+        // ====================================================================
+        // get trajectory query fields
+        // ====================================================================
+        JSONObject wellQueryFields = new JSONObject();
+        // uid
+        if (wellJson.has("uid") && !JsonUtil.isEmpty(wellJson.get("uid")))
+            wellQueryFields.put("uid", wellJson.get("uid"));
+
+        // name
+        if (wellJson.has("name") && !JsonUtil.isEmpty(wellJson.get("name")))
+            wellQueryFields.put("name", wellJson.get("name"));
+
+        // numGovt
+        if (wellJson.has("numGovt") && !JsonUtil.isEmpty(wellJson.get("numGovt")))
+            wellQueryFields.put("numGovt", wellJson.get("numGovt"));
+
+        // numAPI
+        if (wellJson.has("numAPI") && !JsonUtil.isEmpty(wellJson.get("numAPI")))
+            wellQueryFields.put("numAPI", wellJson.get("numAPI"));
+
+        // build variables section
+        JSONObject variables = new JSONObject();
+        variables.put("wellArgument", wellQueryFields);
+        payload.put("variables", variables);
+
+        // build query section of payload
+        payload.put("query", GraphQLQueryConstants.WELL_QUERY);
+
+        // return payload
+        return payload.toString(2);
     }
 
     private void createWellboreQuery(String jsonObj) throws IOException{
