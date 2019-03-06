@@ -1,0 +1,7 @@
+{
+  "variables": {"arg": {
+    "uid": "2f74b464-c789-4cfb-a508-f31e2fdd31ad",
+    "uidWell": "uid12333"
+  }},
+  "query": "query WellboreQuery($arg: WellboreArgument) {\n  wellbores(wellboreArgument: $arg) {\n    uuid\n    well {\n      uuid\n    }\n  }\n}"
+}

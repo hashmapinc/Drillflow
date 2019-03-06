@@ -511,9 +511,8 @@ public class DotDelegator {
 			DotClient client,
 			String username,
 			String password)
-			throws ValveException, ValveAuthException, UnirestException, IOException, DatatypeConfigurationException {
+			throws ValveException, ValveAuthException, UnirestException {
 
-		String objectType = wmlObject.getObjectType();
 		String endpoint = this.getEndpoint( "wellboresearch");
 
 		// build query

@@ -29,6 +29,8 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys;
+import org.hamcrest.CoreMatchers;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
@@ -49,6 +51,8 @@ public class DotDelegatorTest {
     private String url;
     private String trajectoryPath;
     private String graphQlWellPath;
+    private String graphQlWellborePath;
+    private String graphQlTrajectoryPath;
 
     @Before
     public void init() {
@@ -56,14 +60,19 @@ public class DotDelegatorTest {
         this.url = "test.com";
         this.trajectoryPath = "/trajectory/";
         this.graphQlWellPath = "/well/graphql/";
+        this.graphQlWellborePath = "/wellbore/graphql/";
+        this.graphQlTrajectoryPath = "/trajectory/graphql";
 
         // build config
         HashMap<String, String> config = new HashMap<>();
         config.put("baseurl", this.url);
         config.put("well.path", "/well/");
         config.put("wellbore.path", "/wellbore/");
-        config.put("trajectory.path", this.trajectoryPath);
+        config.put("trajectory.path", "/trajectory/");
         config.put("well.gql.path", "/well/graphql/");
+        config.put("wellbore.gql.path", "/wellbore/graphql/");
+        config.put("trajectory.gql.path", "/trajectory/graphql");
+
 
         // instantiate delegator
         this.delegator = new DotDelegator(config);
@@ -193,7 +202,7 @@ public class DotDelegatorTest {
         ArrayList<AbstractWitsmlObject> foundObjects = this.delegator.search(singleWell, "goodUsername", "goodPassword", "exchangeID", this.client, new HashMap<>());
         assertEquals(3, foundObjects.size());
     }
-
+    
     @Test
     public void shouldDeleteTrajectory() throws Exception {
         // build object
