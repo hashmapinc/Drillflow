@@ -28,11 +28,9 @@ import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
 import org.json.JSONObject;
 
-import javax.json.JsonObject;
 import javax.xml.datatype.DatatypeConfigurationException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -473,7 +471,7 @@ public class DotDelegator {
 			ArrayList<AbstractWitsmlObject> wmlResponses = GraphQLRespConverter.convert(response.getBody(), objectType);
 
 			// translate responses
-			if (wmlResponses.isEmpty())
+			if (wmlResponses == null || wmlResponses.isEmpty())
 				return null; // this is valid. No matches found
 
 			if ("trajectory".equals(objectType)) {
