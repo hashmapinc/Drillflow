@@ -42,13 +42,10 @@ class GraphQLQueryConverter {
             case "well":
                 return getWellQuery(wmlObject);
             case "wellbore":
-                this.createWellboreQuery(wmlObject.getJSONString("1.4.1.1"));
-                break;
+                return createWellboreQuery(wmlObject.getJSONString("1.4.1.1"));
             default:
                 return null;
         }
-
-        return this.builder.GetGraphQLQuery();
     }
 
     public String getQuery(AbstractWitsmlObject wmlObject, String uuid){
@@ -238,33 +235,39 @@ class GraphQLQueryConverter {
 
     }
 
-    private void createWellboreQuery(String jsonObj) throws IOException{
-        JSONObject obj = new JSONObject(jsonObj);
-        List<String> keysToOmit = new ArrayList<>();
-        Map<String, String> keysToRename = new HashMap<>();
-        keysToOmit.add("parentUid");
-        keysToOmit.add("customData");
-        keysToOmit.add("dTimLastChange");
-        keysToOmit.add("dTimCreation");
-        keysToOmit.add("defaultDatum");
-        keysToRename.put("/parentWellbore/value", "title");
-        keysToOmit.add("extensionAny");
-        StringBuilder querybuilder = new StringBuilder();
-        querybuilder.append("query WellboreQuery($wellboreArgument: WellboreArgument) ");
-        this.builder.addVariableGroup("wellboreArgument");
-        querybuilder.append(delimiter);
-        querybuilder.append("{");
-        querybuilder.append(delimiter);
-        querybuilder.append("wellbores(wellboreArgument: $wellboreArgument)");
-        querybuilder.append("{");
-        querybuilder.append(delimiter);
-        String indentStr = "";
-        querybuilder.append(this.getQuery(obj, indentStr, "wellbore", keysToOmit, "", keysToRename));
-        querybuilder.append(delimiter);
-        querybuilder.append("}");
-        querybuilder.append(delimiter);
-        querybuilder.append("}");
-        this.builder.setQuery(querybuilder.toString());
+    private String createWellboreQuery(String jsonObj) {
+
+        // ====================================================================
+        // get wellbore query fields
+        // ====================================================================
+        JSONObject wellboreQueryFields = new JSONObject();
+        JSONObject wellboreJson = new JSONObject(jsonObj);
+        // uid
+        if (wellboreJson.has("uid") && !JsonUtil.isEmpty(wellboreJson.get("uid")))
+            wellboreQueryFields.put("uid", wellboreJson.get("uid"));
+
+        // uidWell
+        if (wellboreJson.has("uidWell") && !JsonUtil.isEmpty(wellboreJson.get("uidWell")))
+            wellboreQueryFields.put("uidWell", wellboreJson.get("uidWell"));
+
+        // name
+        if (wellboreJson.has("name") && !JsonUtil.isEmpty(wellboreJson.get("name")))
+            wellboreQueryFields.put("name", wellboreJson.get("name"));
+
+        // nameWell
+        if (wellboreJson.has("nameWell") && !JsonUtil.isEmpty(wellboreJson.get("nameWell")))
+            wellboreQueryFields.put("nameWell", wellboreJson.get("nameWell"));
+
+        JSONObject payload = new JSONObject();
+        payload.put("query", GraphQLQueryConstants.WELLBORE_QUERY);
+
+        // build variables section
+        JSONObject variables = new JSONObject();
+        variables.put("wellboreArgument",wellboreQueryFields);
+        payload.put("variables", variables);
+
+        // return full open query with no variables
+        return payload.toString(2);
     }
 
     private String getQuery(JSONObject jsonWitsml, String indent, String wmlObjType, List<String> keysToOmit, String currentPath, Map<String, String> keysToRename) {
