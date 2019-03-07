@@ -23,7 +23,6 @@ import com.hashmapinc.tempus.witsml.server.WitsmlApiConfig;
 import com.hashmapinc.tempus.witsml.server.api.model.*;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.DataObject;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.ServerCap;
-import com.hashmapinc.tempus.witsml.server.api.properties.BaseMessagesProperties;
 import com.hashmapinc.tempus.witsml.valve.IValve;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
 import com.hashmapinc.tempus.witsml.valve.ValveFactory;
@@ -33,9 +32,9 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
 import javax.annotation.PostConstruct;
 import javax.jws.WebService;
 import javax.xml.bind.JAXBException;
