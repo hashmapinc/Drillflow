@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name="WMLS_DeleteFromStoreResponse")
 public class WMLS_DeleteFromStoreResponse {
+
     private Short Result;
     private String SuppMsgOut;
 

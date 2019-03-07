@@ -32,6 +32,8 @@ import org.springframework.core.env.Environment;
 
 import com.hashmapinc.tempus.witsml.server.api.StoreImpl;
 
+import java.net.URL;
+
 @Configuration
 public class WitsmlApiConfig {
 
@@ -67,8 +69,9 @@ public class WitsmlApiConfig {
         // Removes the <return> element that causes the certification test to fail
         XSLTOutInterceptor returnRemoval = new XSLTOutInterceptor(Phase.PRE_STREAM, StaxOutInterceptor.class, null,
                 XSLT_REQUEST_PATH);
+        URL wsdl = getClass().getResource("/schema/WMLS.WSDL");
         endpoint.getOutInterceptors().add(returnRemoval);
-
+        endpoint.setWsdlLocation(wsdl.toString());
         endpoint.publish("/WMLS");
         return endpoint;
     }

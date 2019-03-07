@@ -46,7 +46,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Service
-@WebService(serviceName = "StoreSoapBinding", portName = "StoreSoapBindingSoap",
+@WebService(serviceName = "WMLS", portName = "StoreSoapPort",
         targetNamespace = "http://www.witsml.org/wsdl/120",
         endpointInterface = "com.hashmapinc.tempus.witsml.server.api.IStore")
 @Features(features = "org.apache.cxf.ext.logging.LoggingFeature")

@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name="WMLS_AddToStoreResponse")
 public class WMLS_AddToStoreResponse {
+
     private short Result;
     private String SuppMsgOut;
 
