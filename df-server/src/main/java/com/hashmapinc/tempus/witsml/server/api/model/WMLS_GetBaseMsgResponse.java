@@ -23,15 +23,15 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name="WMLS_GetBaseMsgResponse")
 public class WMLS_GetBaseMsgResponse {
-    @XmlElement(name="Result")
-    private String result;
+
+    private String Result;
 
     public String getResult() {
-        return result;
+        return Result;
     }
 
     public void setResult(String result) {
-        this.result = result;
+        this.Result = result;
     }
 
 }

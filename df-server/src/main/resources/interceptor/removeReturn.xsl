@@ -20,14 +20,14 @@
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:ns2="http://www.witsml.org/wsdl/120"
                 exclude-result-prefixes="ns2">
-    <xsl:output indent="yes" method="xml" />\
-    <xsl:template match="*">
-        <xsl:element name="{name()}" namespace="{namespace-uri()}">
-            <xsl:apply-templates/>
-        </xsl:element>
-    </xsl:template>
-
-    <xsl:template match="return">
+<xsl:output indent="yes" method="xml" />\
+<xsl:template match="*">
+    <xsl:element name="{name()}" namespace="{namespace-uri()}">
         <xsl:apply-templates/>
-    </xsl:template>
+    </xsl:element>
+</xsl:template>
+
+<xsl:template match="Result[not ( text() )]">
+    <xsl:apply-templates/>
+</xsl:template>
 </xsl:stylesheet>
