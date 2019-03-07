@@ -27,6 +27,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static junit.framework.TestCase.*;
@@ -167,6 +168,41 @@ public class DotValveTest {
 			);
 		String actual = this.valve.getObject(qc).get();
 		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void shouldSearchWellsWithEmptyUID() throws Exception {
+
+		String query = TestUtilities.getResourceAsString("well1311FullEmptyQueryNoUid.xml");
+		String response = TestUtilities.getResourceAsString("well1311FullEmptyQueryNoUidResponse.xml");
+		String completeResponse = TestUtilities.getResourceAsString("well1311NoUidSearchFullValveResponse.xml");
+		ObjWells wellsResponse= WitsmlMarshal.deserialize(response, ObjWells.class);
+		ObjWells wellsQuery = WitsmlMarshal.deserialize(query, ObjWells.class);
+		ObjWell singularWellQuery = wellsQuery.getWell().get(0);
+		ObjWell singularWellResponse = wellsResponse.getWell().get(0);
+		List<AbstractWitsmlObject> wmlObjectsQuery = new ArrayList<>();
+		wmlObjectsQuery.add(singularWellQuery);
+		List<AbstractWitsmlObject> wmlObjectsResp = new ArrayList<>();
+		wmlObjectsResp.add(singularWellResponse);
+
+		// build query context
+		QueryContext qc = new QueryContext(
+				"1.3.1.1",
+				"well",
+				new HashMap<>(),
+				query,
+				wmlObjectsQuery,
+				"goodUsername",
+				"goodPassword",
+				"shouldGetPluralObject"
+		);
+
+
+		// mock delegator behavior
+		doReturn(wmlObjectsResp).when(this.mockDelegator).search(singularWellQuery, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.mockClient, new HashMap<>());
+
+		String actual = this.valve.getObject(qc).get();
+		assertEquals(completeResponse, actual);
 	}
 
 	@Test

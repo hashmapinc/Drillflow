@@ -54,7 +54,7 @@ public class JsonUtilTest {
         JSONObject merged = JsonUtil.merge(dest, src);
 
         String actual = merged.toString(2);
-        String expected = "{}";
+        String expected = "{\"uid\": \"uid12333\"}";
 
         assertEquals(expected, actual);
     }

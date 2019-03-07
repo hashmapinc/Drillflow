@@ -28,6 +28,8 @@ public class JsonUtil {
         JSONObject req,
         JSONObject resp
     ) {
+        if (!req.has("uid") || JSONObject.NULL.equals(req.get("uid")))
+            req.put("uid", "");
         // track keys that should be removed before entering recursive merging
         ArrayList<String> keysToRemove = new ArrayList<>();
 
