@@ -115,9 +115,9 @@ class GraphQLQueryConverter {
         // ====================================================================
         JSONObject stationQueryFields = new JSONObject();
         JSONArray stationsJson = (
-            trajectoryJson.has("trajectoryStation")
-            ? trajectoryJson.getJSONArray("trajectoryStation")
-            : new JSONArray()
+                trajectoryJson.has("trajectoryStation")
+                        ? trajectoryJson.getJSONArray("trajectoryStation")
+                        : new JSONArray()
         );
 
         // support query by uid OR query by filters, not both
@@ -131,17 +131,17 @@ class GraphQLQueryConverter {
             stationQueryFields.put("uids", stationUids);
         // non uid-based station query
         } else {*/
-            // lastUpdateTimeUtc
-            if (trajectoryJson.has("lastUpdateTimeUtc") && !JsonUtil.isEmpty(trajectoryJson.get("lastUpdateTimeUtc")))
-                stationQueryFields.put("lastUpdateTimeUtc", trajectoryJson.get("lastUpdateTimeUtc"));
+        // lastUpdateTimeUtc
+        if (trajectoryJson.has("lastUpdateTimeUtc") && !JsonUtil.isEmpty(trajectoryJson.get("lastUpdateTimeUtc")))
+            stationQueryFields.put("lastUpdateTimeUtc", trajectoryJson.get("lastUpdateTimeUtc"));
 
-            // mdMn
-            if (trajectoryJson.has("mdMn") && !JsonUtil.isEmpty(trajectoryJson.get("mdMn")))
-                stationQueryFields.put("mdMn", trajectoryJson.get("mdMn"));
+        // mdMn
+        if (trajectoryJson.has("mdMn") && !JsonUtil.isEmpty(trajectoryJson.get("mdMn")))
+            stationQueryFields.put("mdMn", trajectoryJson.get("mdMn"));
 
-            // mdMx
-            if (trajectoryJson.has("mdMx") && !JsonUtil.isEmpty(trajectoryJson.get("mdMx")))
-                stationQueryFields.put("mdMx", trajectoryJson.get("mdMx"));
+        // mdMx
+        if (trajectoryJson.has("mdMx") && !JsonUtil.isEmpty(trajectoryJson.get("mdMx")))
+            stationQueryFields.put("mdMx", trajectoryJson.get("mdMx"));
         //}
 
         // ====================================================================
@@ -168,7 +168,7 @@ class GraphQLQueryConverter {
         JSONObject wellJson = new JSONObject(jsonString1411);
 
         // ====================================================================
-        // get trajectory query fields
+        // get well query fields
         // ====================================================================
         JSONObject wellQueryFields = new JSONObject();
         // uid
@@ -186,6 +186,13 @@ class GraphQLQueryConverter {
         // numAPI
         if (wellJson.has("numAPI") && !JsonUtil.isEmpty(wellJson.get("numAPI")))
             wellQueryFields.put("numAPI", wellJson.get("numAPI"));
+
+        // dTimLastChange
+        if (wellJson.has("commonData")){
+            JSONObject commonData = (JSONObject)wellJson.get("commonData");
+            if (commonData.has("dTimLastChange") && !JsonUtil.isEmpty(commonData.get("dTimLastChange")))
+                wellQueryFields.put("lastUpdateTimeUtc", commonData.get("dTimLastChange"));
+        }
 
         // build variables section
         JSONObject variables = new JSONObject();
