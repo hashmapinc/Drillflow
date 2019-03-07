@@ -19,11 +19,8 @@ import com.hashmapinc.tempus.witsml.server.api.model.*;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
-import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
-import javax.xml.ws.RequestWrapper;
-import javax.xml.ws.ResponseWrapper;
 
 @WebService(targetNamespace = "http://www.witsml.org/wsdl/120", name = "WMLS")
 public interface IStore {

@@ -34,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
 import javax.annotation.PostConstruct;
 import javax.jws.WebService;
 import javax.xml.bind.JAXBException;
@@ -193,6 +194,7 @@ public class StoreImpl implements IStore {
             short validationResult = StoreValidator.validateUpdateInStore(WMLtypeIn, XMLin, optionsMap, valve);
             if (validationResult != 1){
                 response.setResult(validationResult);
+                response.setSuppMsgOut(witsmlApiConfigUtil.getProperty("basemessages." + response.getResult()));
                 return response;
             }
             String version = WitsmlUtil.getVersionFromXML(XMLin);
@@ -230,6 +232,7 @@ public class StoreImpl implements IStore {
 
         LOG.info("Successfully updated object: " + witsmlObjects.toString());
         response.setResult((short)1);
+        response.setSuppMsgOut(witsmlApiConfigUtil.getProperty("basemessages." + response.getResult()));
         return response;
     }
 
@@ -249,6 +252,7 @@ public class StoreImpl implements IStore {
         short validationResult = StoreValidator.validateDeleteFromStore(WMLtypeIn, QueryIn, optionsMap, valve);
         if (validationResult != 1){
             resp.setResult(validationResult);
+            resp.setSuppMsgOut(witsmlApiConfigUtil.getProperty("basemessages." + resp.getResult()));
             return resp;
         }
         // try to deserialize
@@ -289,7 +293,7 @@ public class StoreImpl implements IStore {
             resp.setSuppMsgOut(e.getMessage());
         }
 
-        // return response
+        resp.setSuppMsgOut(witsmlApiConfigUtil.getProperty("basemessages." + resp.getResult()));
         return resp;
     }
 
@@ -308,6 +312,7 @@ public class StoreImpl implements IStore {
         short validationResult = StoreValidator.validateGetCap(OptionsIn);
         if (validationResult != 1){
             resp.setResult(validationResult);
+            resp.setSuppMsgOut(witsmlApiConfigUtil.getProperty("basemessages." + resp.getResult()));
             return resp;
         }
         HashMap<String,String> options = WitsmlUtil.parseOptionsIn(OptionsIn);
@@ -329,7 +334,7 @@ public class StoreImpl implements IStore {
             resp.setSuppMsgOut("Unable to generate the capabilities object due to misconfiguration of the server");
             LOG.log(Level.FINE, "Unable to generate the capabilities object due to misconfiguration of the server: " + e.getMessage());
         }
-
+        resp.setSuppMsgOut(witsmlApiConfigUtil.getProperty("basemessages." + resp.getResult()));
         return resp;
     }
 
@@ -362,6 +367,7 @@ public class StoreImpl implements IStore {
         short validationResult = StoreValidator.validateGetFromStore(WMLtypeIn, QueryIn, optionsMap, valve);
         if (validationResult != 1){
             resp.setResult(validationResult);
+            resp.setSuppMsgOut(witsmlApiConfigUtil.getProperty("basemessages." + resp.getResult()));
             return resp;
         }
         List<AbstractWitsmlObject> witsmlObjects;
@@ -422,6 +428,7 @@ public class StoreImpl implements IStore {
         }
 
         // return response
+        resp.setSuppMsgOut(witsmlApiConfigUtil.getProperty("basemessages." + resp.getResult()));
         return resp;
     }
 
