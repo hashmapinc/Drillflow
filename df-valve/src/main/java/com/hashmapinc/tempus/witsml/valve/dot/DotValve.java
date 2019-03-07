@@ -98,7 +98,7 @@ public class DotValve implements IValve {
 	public CompletableFuture<String> getObject(QueryContext qc) throws ValveException {
 		// get query responses
 		ArrayList<AbstractWitsmlObject> queryResponses;
-		if (qc.WITSML_OBJECTS.size() == 1 && "".equals(qc.WITSML_OBJECTS.get(0).getUid())) {
+		if (qc.WITSML_OBJECTS.size() == 1 && (qc.WITSML_OBJECTS.get(0).getUid() == null|| "".equals(qc.WITSML_OBJECTS.get(0).getUid()))) {
 			// its a search
 			queryResponses = doSearch(qc);
 		} else {

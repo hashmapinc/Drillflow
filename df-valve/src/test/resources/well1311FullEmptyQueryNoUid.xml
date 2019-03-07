@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wells version="1.3.1.1" xmlns="http://www.witsml.org/schemas/131">
+    <documentInfo>
+        <DocumentName></DocumentName>
+        <FileCreationInformation>
+            <FileCreationDate></FileCreationDate>
+            <SoftwareName></SoftwareName>
+            <FileCreator></FileCreator>
+        </FileCreationInformation>
+    </documentInfo>
+    <well>
+        <name></name>
+        <nameLegal></nameLegal>
+        <numLicense></numLicense>
+        <numGovt></numGovt>
+        <dTimLicense></dTimLicense>
+        <field></field>
+        <country></country>
+        <state></state>
+        <county></county>
+        <region></region>
+        <district></district>
+        <block></block>
+        <timeZone></timeZone>
+        <operator></operator>
+        <operatorDiv></operatorDiv>
+        <pcInterest uom=""></pcInterest>
+        <numAPI></numAPI>
+        <statusWell></statusWell>
+        <purposeWell></purposeWell>
+        <fluidWell></fluidWell>
+        <directionWell></directionWell>
+        <dTimSpud></dTimSpud>
+        <dTimPa></dTimPa>
+        <wellheadElevation uom=""></wellheadElevation>
+        <wellDatum uid="" defaultMeasuredDepth="" defaultVerticalDepth="" defaultElevation="">
+            <name></name>
+            <code></code>
+            <datumName></datumName>
+            <kind></kind>
+            <wellbore>
+                <wellboreReference></wellboreReference>
+                <wellParent></wellParent>
+            </wellbore>
+            <rig>
+                <rigReference></rigReference>
+                <wellboreParent></wellboreParent>
+                <wellParent></wellParent>
+            </rig>
+            <elevation uom="" datum=""></elevation>
+            <measuredDepth uom="" datum=""></measuredDepth>
+            <comment></comment>
+        </wellDatum>
+        <groundElevation uom="" datum=""></groundElevation>
+        <waterDepth uom="" datum=""></waterDepth>
+        <wellLocation>
+            <wellCRS uidRef=""></wellCRS>
+            <latitude uom=""></latitude>
+            <longitude uom=""></longitude>
+            <easting uom=""></easting>
+            <northing uom=""></northing>
+            <westing uom=""></westing>
+            <southing uom=""></southing>
+            <projectedX uom=""></projectedX>
+            <projectedY uom=""></projectedY>
+            <localX uom=""></localX>
+            <localY uom=""></localY>
+            <original></original>
+            <description></description>
+        </wellLocation>
+        <referencePoint uid="">
+            <name></name>
+            <type></type>
+            <elevation uom="" datum=""></elevation>
+            <measuredDepth uom="" datum=""></measuredDepth>
+            <location>
+                <wellCRS uidRef=""></wellCRS>
+                <latitude uom=""></latitude>
+                <longitude uom=""></longitude>
+                <easting uom=""></easting>
+                <northing uom=""></northing>
+                <westing uom=""></westing>
+                <southing uom=""></southing>
+                <projectedX uom=""></projectedX>
+                <projectedY uom=""></projectedY>
+                <localX uom=""></localX>
+                <localY uom=""></localY>
+                <original></original>
+                <description></description>
+            </location>
+            <description></description>
+        </referencePoint>
+        <wellCRS uid="">
+            <name></name>
+            <mapProjection>
+                <nameCRS namingSystem="" code=""></nameCRS>
+                <projectionCode></projectionCode>
+                <projectedFrom uidRef=""></projectedFrom>
+                <stdParallel1 uom=""></stdParallel1>
+                <stdParallel2 uom=""></stdParallel2>
+                <centralMeridian uom=""></centralMeridian>
+                <originLatitude uom=""></originLatitude>
+                <originLongitude uom=""></originLongitude>
+                <latitude1 uom=""></latitude1>
+                <longitude1 uom=""></longitude1>
+                <latitude2 uom=""></latitude2>
+                <longitude2 uom=""></longitude2>
+                <latitudeForScale uom=""></latitudeForScale>
+                <longitudeForScale uom=""></longitudeForScale>
+                <trueScaleLatitude uom=""></trueScaleLatitude>
+                <spheroidRadius uom=""></spheroidRadius>
+                <scaleFactor></scaleFactor>
+                <methodVariant></methodVariant>
+                <perspectiveHeight uom=""></perspectiveHeight>
+                <zone></zone>
+                <NADType></NADType>
+                <falseEasting uom=""></falseEasting>
+                <falseNorthing uom=""></falseNorthing>
+                <bearing uom=""></bearing>
+                <hemisphere></hemisphere>
+                <description></description>
+                <parameter index="" name="" uom="" description=""></parameter>
+            </mapProjection>
+            <geographic>
+                <nameCRS namingSystem="" code=""></nameCRS>
+                <geodeticDatumCode></geodeticDatumCode>
+                <xTranslation uom=""></xTranslation>
+                <yTranslation uom=""></yTranslation>
+                <zTranslation uom=""></zTranslation>
+                <xRotation uom=""></xRotation>
+                <yRotation uom=""></yRotation>
+                <zRotation uom=""></zRotation>
+                <scaleFactor></scaleFactor>
+                <ellipsoidCode></ellipsoidCode>
+                <ellipsoidSemiMajorAxis uom=""></ellipsoidSemiMajorAxis>
+                <ellipsoidInverseFlattening></ellipsoidInverseFlattening>
+            </geographic>
+            <localCRS>
+                <usesWellAsOrigin></usesWellAsOrigin>
+                <origin></origin>
+                <originDescription></originDescription>
+                <yAxisAzimuth uom=""></yAxisAzimuth>
+                <yAxisDescription></yAxisDescription>
+                <xRotationCounterClockwise></xRotationCounterClockwise>
+            </localCRS>
+            <description></description>
+        </wellCRS>
+        <commonData>
+            <dTimCreation></dTimCreation>
+            <dTimLastChange></dTimLastChange>
+            <itemState></itemState>
+            <comments></comments>
+        </commonData>
+    </well>
+</wells>
