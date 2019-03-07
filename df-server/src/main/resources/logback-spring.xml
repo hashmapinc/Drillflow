@@ -34,7 +34,7 @@
         <file>${LOGS}/spring-boot-logger.log</file>
         <encoder
                 class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <Pattern>%d %p %C{1.} [%t] %m%n</Pattern>
+            <Pattern>${FILE_LOGGER_PATTERN:-%d %p %C{1.} [%t] %m%n}</Pattern>
         </encoder>
 
         <rollingPolicy
@@ -44,7 +44,7 @@
             </fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy
                     class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>10MB</maxFileSize>
+                <maxFileSize>${FILE_LOGGER_MAX_SIZE:-10MB}</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
     </appender>
