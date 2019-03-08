@@ -446,7 +446,7 @@ public class DotDelegator {
 		try {
 			//TODO: Shift to does not = well || wellbore
 			if ("trajectory".equals(objectType)) {
-				String wellboreUuid = getWellboreUUID(witsmlObject, exchangeID, client, username, password);
+				String wellboreUuid = getParentWellboreUUID(witsmlObject, exchangeID, client, username, password);
 				query = GraphQLQueryConverter.getQuery(witsmlObject, wellboreUuid);
 			} else {
 				query = GraphQLQueryConverter.getQuery(witsmlObject);
@@ -541,11 +541,9 @@ public class DotDelegator {
 
 
 		// wellbore uuid not found in cache. Proceed to fetch it
-
-		// build query
 		String query;
 		try {
-			query = GraphQLQueryConverter.getUidUUIDMappingQuery(wmlObject);
+			query = GraphQLQueryConverter.getWellboreAndWellUuidQuery(wmlObject);
 			LOG.fine(ValveLogging.getLogMsg(
 				exchangeID,
 				System.lineSeparator() + "Graph QL Query: " + query,
@@ -574,8 +572,13 @@ public class DotDelegator {
 				wmlObject
 			));
 
-			// get matching objects from search as list of abstract witsml objects
-			return GraphQLRespConverter.getUUid(new JSONObject(response.getBody()));
+			// get the UUID of the first wellbore in the response
+			String wellboreUUID = GraphQLRespConverter.getWellboreUuidFromGraphqlResponse(new JSONObject(response.getBody()));
+
+			// cache the wellbore uuid/uid
+			UidUuidCache.putInCache(wellboreUUID, wmlObject.getParentUid(), wmlObject.getGrandParentUid());
+
+			return wellboreUUID;
 
 		} else {
 			LOG.warning(ValveLogging.getLogMsg(

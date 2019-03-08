@@ -66,8 +66,7 @@ public class GraphQLQueryConverterTest {
     public void generateProperGraphQLQueryUUIDUidMapping() throws Exception {
         String queryXML = TestUtilities.getResourceAsString("trajectoryGraphql/trajectoryGraphqlQuery1411.xml");
         ObjTrajectory obj = ((ObjTrajectorys) WitsmlMarshal.deserialize(queryXML, ObjTrajectorys.class)).getTrajectory().get(0);
-        GraphQLQueryConverter converter = new GraphQLQueryConverter();
-        String graphQLQuery = converter.getUidUUIDMappingQuery(obj);
+        String graphQLQuery = GraphQLQueryConverter.getWellboreAndWellUuidQuery(obj);
         assertNotNull(graphQLQuery);
         assertTrue(graphQLQuery.contains("\"arg\": {\n" +
                 "    \"uid\": \"uidWellbore\",\n" +
