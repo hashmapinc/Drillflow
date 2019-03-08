@@ -793,7 +793,7 @@ public class GraphQLQueryConstants {
     // WELLBORE UID UUID MAPPING QUERY
     //=========================================================================
 
-    public static final String WELLBORE_UID_MAPPING_QUERY =
+    public static final String WELLBORE_AND_WELL_UUID_QUERY =
             "query WellboreQuery($arg: WellboreArgument) {\n" +
                     "  wellbores(wellboreArgument: $arg) {\n" +
                     "    uuid\n" +

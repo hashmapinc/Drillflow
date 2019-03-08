@@ -40,8 +40,8 @@ public class UidUuidCache {
      * @param uid - string uid used as a cache value
      */
     public static void putInCache(
-            String uuid,
-            String uid
+        String uuid,
+        String uid
     ) {
         // store 2-way mappings in cache
         cache.put(uuid, uid); // uuid->uid mapping

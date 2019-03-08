@@ -120,7 +120,13 @@ public class GraphQLRespConverter {
         return foundObjects;
     }
 
-    public static String getUUid(JSONObject response){
+    /**
+     * This function accepts the JSONObject 2.0 wtsml
+     * representation of either a
+     * @param response
+     * @return
+     */
+    public static String get(JSONObject response){
         if (!response.has("data"))
             return null;
 
