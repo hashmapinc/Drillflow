@@ -146,7 +146,7 @@ public class DotTranslator {
         boolean is1411 = "1.4.1.1".equals(version);
 
         // handle empty well list
-        if (0 == witsmlObjects.size()) {
+        if (witsmlObjects == null || 0 == witsmlObjects.size()) {
             try {
                 xml = is1411 ?
                     WitsmlMarshal.serialize(new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWells()) :

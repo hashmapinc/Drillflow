@@ -69,6 +69,7 @@ class GraphQLQueryConverter {
         // ====================================================================
         JSONObject trajQueryFields = new JSONObject();
         // uuidWellbore
+        // TODO: check for empty wbUuid
         trajQueryFields.put("uuidWellbore", wbUuid);
 
         // uuid

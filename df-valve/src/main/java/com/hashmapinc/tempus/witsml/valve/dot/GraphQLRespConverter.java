@@ -113,7 +113,7 @@ public class GraphQLRespConverter {
                 Trajectory trajectory = WitsmlMarshal.deserializeFromJSON(trajectories.get(i).toString(), Trajectory.class);
                 foundObjects.add(TrajectoryConverter.convertTo1411(trajectory));
             } catch (Exception e) {
-
+                // TODO: Remove
             }
         }
 

@@ -439,6 +439,7 @@ public class DotDelegator {
 
 		String query;
 		try {
+			//TODO: Shift to does not = well || wellbore
 			if ("trajectory".equals(objectType)) {
 				String uuid = getWellboreUUID(witsmlObject, exchangeID, client, username, password);
 				query = GraphQLQueryConverter.getQuery(witsmlObject, uuid);
