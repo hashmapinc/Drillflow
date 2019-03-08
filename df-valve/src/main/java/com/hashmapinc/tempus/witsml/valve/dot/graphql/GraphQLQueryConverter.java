@@ -13,16 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.tempus.witsml.valve.dot;
+package com.hashmapinc.tempus.witsml.valve.dot.graphql;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.witsml.valve.dot.JsonUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
 
 //This class takes a WITSML Query search and converts it to a GraphQL search
-class GraphQLQueryConverter {
+public class GraphQLQueryConverter {
 
     /**
      * Converts a WITSML search query to GraphQL
@@ -227,7 +228,6 @@ class GraphQLQueryConverter {
 
         // return payload
         return payload.toString(2);
-
     }
 
     private static String createWellboreQuery(String jsonObj) {

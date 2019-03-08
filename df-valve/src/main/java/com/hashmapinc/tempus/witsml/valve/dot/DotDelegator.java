@@ -20,6 +20,9 @@ import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory;
 import com.hashmapinc.tempus.witsml.ValveLogging;
 import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
+import com.hashmapinc.tempus.witsml.valve.dot.client.DotClient;
+import com.hashmapinc.tempus.witsml.valve.dot.graphql.GraphQLQueryConverter;
+import com.hashmapinc.tempus.witsml.valve.dot.graphql.GraphQLRespConverter;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -158,11 +161,12 @@ public class DotDelegator {
         }
     }
 
-    public void performElementDelete(AbstractWitsmlObject witsmlObj,
-									 String username,
-									 String password,
-									 String exchangeID,
-									 DotClient client
+    public void performElementDelete(
+		AbstractWitsmlObject witsmlObj,
+		String username,
+		String password,
+		String exchangeID,
+		DotClient client
 	) throws ValveException, ValveAuthException, UnirestException {
 		// Throwing valve exception as this is currently not supported by DoT until the Patch API is implemented
 		// We dont want to delete the object because someone thought something was implemented.
@@ -199,15 +203,15 @@ public class DotDelegator {
 		int status = response.getStatus();
 		if (201 == status || 200 == status || 204 == status) {
 			LOG.info(ValveLogging.getLogMsg(
-					exchangeID,
-					logResponse(response, "Successfully Patched Object with UID :"+uid+"."),
-					witsmlObj)
+				exchangeID,
+				logResponse(response, "Successfully Patched Object with UID :"+uid+"."),
+				witsmlObj)
 			);
 		} else {
 			LOG.warning(ValveLogging.getLogMsg(
-					exchangeID,
-					logResponse(response, "Unable to patch"),
-					witsmlObj)
+				exchangeID,
+				logResponse(response, "Unable to patch"),
+				witsmlObj)
 			);
 			throw new ValveException("PATCH DoT REST call failed with status code: " + status);
 		}
