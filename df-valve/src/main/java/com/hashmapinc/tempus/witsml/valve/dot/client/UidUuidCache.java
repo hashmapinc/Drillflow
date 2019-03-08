@@ -67,8 +67,8 @@ public class UidUuidCache {
         String compositeKey = parentUid + SEPARATOR + uid;
 
         // store 2-way mappings in cache
-        cache.put(uuid, uid);         // uuid->uid
-        cache.put(compositeKey, uid); // uid->uuid
+        cache.put(uuid, uid);          // uuid->uid
+        cache.put(compositeKey, uuid); // uid->uuid
     }
 
     /**
@@ -93,8 +93,8 @@ public class UidUuidCache {
         String compositeKey = grandparentUid + SEPARATOR + parentUid + SEPARATOR + uid;
 
         // store 2-way mappings in cache
-        cache.put(uuid, uid);         // uuid->uid
-        cache.put(compositeKey, uid); // uid->uuid
+        cache.put(uuid, uid);          // uuid->uid
+        cache.put(compositeKey, uuid); // uid->uuid
     }
 
     /**

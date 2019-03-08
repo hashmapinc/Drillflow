@@ -22,8 +22,6 @@ import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbores;
 import com.hashmapinc.tempus.witsml.valve.dot.TestUtilities;
-import com.hashmapinc.tempus.witsml.valve.dot.graphql.GraphQLQueryConverter;
-import com.hashmapinc.tempus.witsml.valve.dot.graphql.GraphQLRespConverter;
 import org.junit.Test;
 
 import java.util.List;
