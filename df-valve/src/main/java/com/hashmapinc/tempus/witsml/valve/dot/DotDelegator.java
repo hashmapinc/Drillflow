@@ -218,13 +218,12 @@ public class DotDelegator {
 	}
 
 	public void updateObject(
-			AbstractWitsmlObject witsmlObj,
-			String username,
-			String password,
-			String exchangeID,
-			DotClient client
+		AbstractWitsmlObject witsmlObj,
+		String username,
+		String password,
+		String exchangeID,
+		DotClient client
 	) throws ValveException, ValveAuthException, UnirestException {
-
 		String uid = witsmlObj.getUid();
 		String objectType = witsmlObj.getObjectType();
 		String endpoint = this.getEndpoint(objectType) + uid;
@@ -245,6 +244,7 @@ public class DotDelegator {
 			request.queryString("uidWellbore", witsmlObj.getParentUid());
 			String uidWell;
 			if ("1.4.1.1".equals(witsmlObj.getVersion())) {
+				// TODO: maybe replace with this -> uidWell = witsmlObj.getGrandParentUid();
 				uidWell = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory) witsmlObj).getUidWell();
 			} else {
 				uidWell = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory) witsmlObj).getUidWell();
@@ -511,12 +511,12 @@ public class DotDelegator {
 	}
 
 	private String getWellboreUUID(
-			AbstractWitsmlObject wmlObject,
-			String exchangeID,
-			DotClient client,
-			String username,
-			String password)
-			throws ValveException, ValveAuthException, UnirestException {
+		AbstractWitsmlObject wmlObject,
+		String exchangeID,
+		DotClient client,
+		String username,
+		String password
+	) throws ValveException, ValveAuthException, UnirestException {
 
 		String endpoint = this.getEndpoint( "wellboresearch");
 

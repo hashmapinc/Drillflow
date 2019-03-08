@@ -58,8 +58,8 @@ public class DotClient {
      * @param password
      */
     private void refreshToken(
-            String username,
-            String password
+        String username,
+        String password
     ) throws ValveAuthException {
         try {
             // build payload for authentication
