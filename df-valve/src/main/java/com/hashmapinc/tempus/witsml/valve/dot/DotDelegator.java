@@ -441,9 +441,9 @@ public class DotDelegator {
 		try {
 			if ("trajectory".equals(objectType)) {
 				String uuid = getWellboreUUID(witsmlObject, exchangeID, client, username, password);
-				query = new GraphQLQueryConverter().getQuery(witsmlObject, uuid);
+				query = GraphQLQueryConverter.getQuery(witsmlObject, uuid);
 			} else {
-				query = new GraphQLQueryConverter().getQuery(witsmlObject);
+				query = GraphQLQueryConverter.getQuery(witsmlObject);
 			}
 		} catch (Exception ex){
 			throw new ValveException(ex.getMessage());
@@ -518,7 +518,7 @@ public class DotDelegator {
 		// build query
 		String query;
 		try {
-			query = new GraphQLQueryConverter().getUidUUIDMappingQuery(wmlObject);
+			query = GraphQLQueryConverter.getUidUUIDMappingQuery(wmlObject);
 			LOG.fine(ValveLogging.getLogMsg(
 					exchangeID,
 					System.lineSeparator() + "Graph QL Query: " + query,

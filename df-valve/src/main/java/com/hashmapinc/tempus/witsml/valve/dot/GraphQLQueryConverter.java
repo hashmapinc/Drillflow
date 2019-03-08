@@ -15,20 +15,14 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.StringWriter;
-import java.util.*;
 
 //This class takes a WITSML Query search and converts it to a GraphQL search
 class GraphQLQueryConverter {
-
-    private final String delimiter = " ";
-    private final QueryBuilder builder = new QueryBuilder();
 
     /**
      * Converts a WITSML search query to GraphQL
@@ -37,21 +31,18 @@ class GraphQLQueryConverter {
      * @return the object
      * @throws IOException Thrown if there is an error in creation of the query
      */
-    public String getQuery(AbstractWitsmlObject wmlObject) throws IOException {
+    public static String getQuery(AbstractWitsmlObject wmlObject) throws IOException {
         switch (wmlObject.getObjectType()){
             case "well":
                 return getWellQuery(wmlObject);
             case "wellbore":
-                this.createWellboreQuery(wmlObject.getJSONString("1.4.1.1"));
-                break;
+                return createWellboreQuery(wmlObject.getJSONString("1.4.1.1"));
             default:
                 return null;
         }
-
-        return this.builder.GetGraphQLQuery();
     }
 
-    public String getQuery(AbstractWitsmlObject wmlObject, String uuid){
+    public static String getQuery(AbstractWitsmlObject wmlObject, String uuid){
         return getTrajectoryQuery(wmlObject, uuid);
     }
 
@@ -159,7 +150,7 @@ class GraphQLQueryConverter {
         return payload.toString(2);
     }
 
-    private String getWellQuery(AbstractWitsmlObject wmlObject){
+    private static String getWellQuery(AbstractWitsmlObject wmlObject){
         // payload json object for building full query
         JSONObject payload = new JSONObject();
 
@@ -206,7 +197,7 @@ class GraphQLQueryConverter {
         return payload.toString(2);
     }
 
-    public String getUidUUIDMappingQuery(AbstractWitsmlObject wmlObject){
+    public static String getUidUUIDMappingQuery(AbstractWitsmlObject wmlObject){
         JSONObject payload = new JSONObject();
 
         // parse json strings
@@ -238,112 +229,38 @@ class GraphQLQueryConverter {
 
     }
 
-    private void createWellboreQuery(String jsonObj) throws IOException{
-        JSONObject obj = new JSONObject(jsonObj);
-        List<String> keysToOmit = new ArrayList<>();
-        Map<String, String> keysToRename = new HashMap<>();
-        keysToOmit.add("parentUid");
-        keysToOmit.add("customData");
-        keysToOmit.add("dTimLastChange");
-        keysToOmit.add("dTimCreation");
-        keysToOmit.add("defaultDatum");
-        keysToRename.put("/parentWellbore/value", "title");
-        keysToOmit.add("extensionAny");
-        StringBuilder querybuilder = new StringBuilder();
-        querybuilder.append("query WellboreQuery($wellboreArgument: WellboreArgument) ");
-        this.builder.addVariableGroup("wellboreArgument");
-        querybuilder.append(delimiter);
-        querybuilder.append("{");
-        querybuilder.append(delimiter);
-        querybuilder.append("wellbores(wellboreArgument: $wellboreArgument)");
-        querybuilder.append("{");
-        querybuilder.append(delimiter);
-        String indentStr = "";
-        querybuilder.append(this.getQuery(obj, indentStr, "wellbore", keysToOmit, "", keysToRename));
-        querybuilder.append(delimiter);
-        querybuilder.append("}");
-        querybuilder.append(delimiter);
-        querybuilder.append("}");
-        this.builder.setQuery(querybuilder.toString());
-    }
+    private static String createWellboreQuery(String jsonObj) {
 
-    private String getQuery(JSONObject jsonWitsml, String indent, String wmlObjType, List<String> keysToOmit, String currentPath, Map<String, String> keysToRename) {
-        Set<String> keyset = jsonWitsml.keySet();
-        ArrayList<String> queryKeys = new ArrayList<>();
-        HashMap variables = new HashMap();
-        for (String key : keyset) {
-            String localPath = currentPath + "/" + key;
-            if (keysToOmit.contains(key)){
-                continue;
-            }
-            Object queryObj = jsonWitsml.get(key);
-            if (queryObj instanceof JSONObject) {
-                JSONObject subObj = (JSONObject)queryObj;
-                queryKeys.add(indent + key);
-                queryKeys.add(indent + "{");
-                queryKeys.add(this.getQuery(subObj, indent, wmlObjType, keysToOmit, localPath, keysToRename));
-                queryKeys.add(indent + "}");
-                continue;
-            }
-            if (queryObj instanceof JSONArray) {
-                JSONArray queryArray = (JSONArray)queryObj;
-                for (int i = 0; i < queryArray.length(); ++i) {
-                    Object arrObj = queryArray.get(i);
-                    if (arrObj instanceof JSONObject) {
-                        queryKeys.add(indent + key);
-                        JSONObject subObj = (JSONObject) arrObj;
-                        queryKeys.add(indent + "{");
-                        queryKeys.add(this.getQuery(subObj, indent, wmlObjType, keysToOmit, localPath, keysToRename));
-                        queryKeys.add(indent + "}");
-                    }
-                }
-                continue;
-            }
-            String value = jsonWitsml.get(key).toString();
-            if (!"".equals(value) && !"null".equals(value) && !keysToOmit.contains(key)) {
-                this.builder.addVariable(wmlObjType + "Argument", key, value);
-            }
-            if (keysToRename.containsKey(localPath)){
-                key = keysToRename.get(localPath);
-            }
-            queryKeys.add(indent + key);
-        }
-        for (String key : keysToOmit){
-            queryKeys.remove(key);
-        }
-        return String.join(this.delimiter, queryKeys);
-    }
+        // ====================================================================
+        // get wellbore query fields
+        // ====================================================================
+        JSONObject wellboreQueryFields = new JSONObject();
+        JSONObject wellboreJson = new JSONObject(jsonObj);
+        // uid
+        if (wellboreJson.has("uid") && !JsonUtil.isEmpty(wellboreJson.get("uid")))
+            wellboreQueryFields.put("uid", wellboreJson.get("uid"));
 
-    // Internal class that handles the structuring and serialization of the GraphQL query
-    class QueryBuilder
-    {
-        private String query;
-        private Map<String, Map<String, String>> variables = new HashMap();
+        // uidWell
+        if (wellboreJson.has("uidWell") && !JsonUtil.isEmpty(wellboreJson.get("uidWell")))
+            wellboreQueryFields.put("uidWell", wellboreJson.get("uidWell"));
 
-        public String getQuery() { return query; }
+        // name
+        if (wellboreJson.has("name") && !JsonUtil.isEmpty(wellboreJson.get("name")))
+            wellboreQueryFields.put("name", wellboreJson.get("name"));
 
-        public void setQuery(String query)
-        {
-            this.query = query;
-        }
+        // nameWell
+        if (wellboreJson.has("nameWell") && !JsonUtil.isEmpty(wellboreJson.get("nameWell")))
+            wellboreQueryFields.put("nameWell", wellboreJson.get("nameWell"));
 
-        public Map<String, Map<String, String>> getVariables() {
-            return variables;
-        }
+        JSONObject payload = new JSONObject();
+        payload.put("query", GraphQLQueryConstants.WELLBORE_QUERY);
 
-        public void addVariableGroup(String group) {
-            variables.put(group, new HashMap());
-        }
+        // build variables section
+        JSONObject variables = new JSONObject();
+        variables.put("wellboreArgument",wellboreQueryFields);
+        payload.put("variables", variables);
 
-        public void addVariable(String group, String key, String value) {
-            ((Map)variables.get(group)).put(key, value);
-        }
-
-        public String GetGraphQLQuery() throws IOException {
-            ObjectMapper objectMapper = new ObjectMapper();
-            StringWriter query = new StringWriter();
-            objectMapper.writeValue(query, this);
-            return query.toString();
-        }
+        // return full open query with no variables
+        return payload.toString(2);
     }
 }

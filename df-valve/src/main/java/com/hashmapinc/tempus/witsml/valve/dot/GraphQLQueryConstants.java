@@ -716,6 +716,80 @@ public class GraphQLQueryConstants {
     //=========================================================================
 
     //=========================================================================
+    // WELLBORE QUERY
+    //=========================================================================
+
+    public static final String WELLBORE_QUERY =
+            "query WellboreQuery($wellboreArgument: WellboreArgument) {\n" +
+                    "  wellbores(wellboreArgument: $wellboreArgument) {\n" +
+                    "    tvd {\n" +
+                    "      datum\n" +
+                    "      uom\n" +
+                    "      value\n" +
+                    "    }\n" +
+                    "    shape\n" +
+                    "    statusWellbore\n" +
+                    "    commonData {\n" +
+                    "      privateGroupOnly\n" +
+                    "      comments\n" +
+                    "      itemState\n" +
+                    "      sourceName\n" +
+                    "      serviceCategory\n" +
+                    "    }\n" +
+                    "    tvdKickoff {\n" +
+                    "      datum\n" +
+                    "      uom\n" +
+                    "      value\n" +
+                    "    }\n" +
+                    "    mdKickoff {\n" +
+                    "      datum\n" +
+                    "      uom\n" +
+                    "      value\n" +
+                    "    }\n" +
+                    "    mdPlanned {\n" +
+                    "      datum\n" +
+                    "      uom\n" +
+                    "      value\n" +
+                    "    }\n" +
+                    "    uidWell\n" +
+                    "    nameWell\n" +
+                    "    mdSubSeaPlanned {\n" +
+                    "      datum\n" +
+                    "      uom\n" +
+                    "      value\n" +
+                    "    }\n" +
+                    "    dayTarget {\n" +
+                    "      uom\n" +
+                    "      value\n" +
+                    "    }\n" +
+                    "    number\n" +
+                    "    uid\n" +
+                    "    tvdPlanned {\n" +
+                    "      datum\n" +
+                    "      uom\n" +
+                    "      value\n" +
+                    "    }\n" +
+                    "    tvdSubSeaPlanned {\n" +
+                    "      datum\n" +
+                    "      uom\n" +
+                    "      value\n" +
+                    "    }\n" +
+                    "    dTimKickoff\n" +
+                    "    purposeWellbore\n" +
+                    "    typeWellbore\n" +
+                    "    md {\n" +
+                    "      datum\n" +
+                    "      uom\n" +
+                    "      value\n" +
+                    "    }\n" +
+                    "    name\n" +
+                    "    suffixAPI\n" +
+                    "    numGovt\n" +
+                    "  }\n" +
+                    "}";
+    //=========================================================================
+
+    //=========================================================================
     // WELLBORE UID UUID MAPPING QUERY
     //=========================================================================
 
