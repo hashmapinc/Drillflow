@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.tempus.witsml.valve.dot;
+package com.hashmapinc.tempus.witsml.valve.dot.graphql;
 
 public class GraphQLQueryConstants {
     //=========================================================================
@@ -793,7 +793,7 @@ public class GraphQLQueryConstants {
     // WELLBORE UID UUID MAPPING QUERY
     //=========================================================================
 
-    public static final String WELLBORE_UID_MAPPING_QUERY =
+    public static final String WELLBORE_AND_WELL_UUID_QUERY =
             "query WellboreQuery($arg: WellboreArgument) {\n" +
                     "  wellbores(wellboreArgument: $arg) {\n" +
                     "    uuid\n" +

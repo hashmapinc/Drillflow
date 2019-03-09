@@ -22,6 +22,7 @@ import com.hashmapinc.tempus.WitsmlObjects.v1311.*;
 import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
+import com.hashmapinc.tempus.witsml.valve.dot.client.DotClient;
 import org.junit.Before;
 import org.junit.Test;
 

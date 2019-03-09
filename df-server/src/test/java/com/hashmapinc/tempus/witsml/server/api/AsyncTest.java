@@ -35,7 +35,7 @@ import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore;
 import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.server.AsyncAppConstants;
 import com.hashmapinc.tempus.witsml.server.WitsmlServerApplication;
-import com.hashmapinc.tempus.witsml.valve.dot.DotClient;
+import com.hashmapinc.tempus.witsml.valve.dot.client.DotClient;
 import com.hashmapinc.tempus.witsml.valve.dot.DotDelegator;
 import com.hashmapinc.tempus.witsml.valve.dot.DotValve;
 

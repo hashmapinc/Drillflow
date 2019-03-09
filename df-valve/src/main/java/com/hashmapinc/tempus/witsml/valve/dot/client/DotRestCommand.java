@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.tempus.witsml.valve.dot;
+package com.hashmapinc.tempus.witsml.valve.dot.client;
 
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.netflix.hystrix.HystrixCommand;
