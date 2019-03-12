@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.tempus.witsml.valve.dot;
+package com.hashmapinc.tempus.witsml.valve.dot.graphql;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
@@ -22,7 +22,9 @@ import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbores;
+import com.hashmapinc.tempus.witsml.valve.dot.JsonUtil;
 import org.json.JSONObject;
+import com.hashmapinc.tempus.witsml.valve.dot.TestUtilities;
 import org.junit.Test;
 
 import java.util.List;
@@ -122,8 +124,7 @@ public class GraphQLQueryConverterTest {
     public void generateProperGraphQLQueryUUIDUidMapping() throws Exception {
         String queryXML = TestUtilities.getResourceAsString("trajectoryGraphql/trajectoryGraphqlQuery1411.xml");
         ObjTrajectory obj = ((ObjTrajectorys) WitsmlMarshal.deserialize(queryXML, ObjTrajectorys.class)).getTrajectory().get(0);
-        GraphQLQueryConverter converter = new GraphQLQueryConverter();
-        String graphQLQuery = converter.getUidUUIDMappingQuery(obj);
+        String graphQLQuery = GraphQLQueryConverter.getWellboreAndWellUuidQuery(obj);
         assertNotNull(graphQLQuery);
         assertTrue(graphQLQuery.contains("\"arg\": {\n" +
                 "    \"uid\": \"uidWellbore\",\n" +

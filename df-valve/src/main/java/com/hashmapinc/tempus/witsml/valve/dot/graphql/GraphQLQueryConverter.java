@@ -13,16 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.tempus.witsml.valve.dot;
+package com.hashmapinc.tempus.witsml.valve.dot.graphql;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.witsml.valve.dot.JsonUtil;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
 
 //This class takes a WITSML Query search and converts it to a GraphQL search
-class GraphQLQueryConverter {
+public class GraphQLQueryConverter {
 
     /**
      * Converts a WITSML search query to GraphQL
@@ -42,8 +43,8 @@ class GraphQLQueryConverter {
         }
     }
 
-    public static String getQuery(AbstractWitsmlObject wmlObject, String uuid){
-        return getTrajectoryQuery(wmlObject, uuid);
+    public static String getQuery(AbstractWitsmlObject wmlObject, String wellboreUuid){
+        return getTrajectoryQuery(wmlObject, wellboreUuid);
     }
 
     /**
@@ -198,36 +199,42 @@ class GraphQLQueryConverter {
         return payload.toString(2);
     }
 
-    public static String getUidUUIDMappingQuery(AbstractWitsmlObject wmlObject){
+    /**
+     * This function accepts any wmlObject that has a
+     * wellbore parent and a well grandparent and builds
+     * a graphql query to get the uuid's of the well/wellbore.
+     *
+     * @param wmlObject - log or trajectory object child to query with
+     * @return - graphQL query string needed to get well/wellbore uuids
+     */
+    public static String getWellboreAndWellUuidQuery(AbstractWitsmlObject wmlObject){
         JSONObject payload = new JSONObject();
 
         // parse json strings
         String jsonString1411 = wmlObject.getJSONString("1.4.1.1");
         JSONObject wmlObjJson = new JSONObject(jsonString1411);
 
-        // ====================================================================
-        // get trajectory query fields
-        // ====================================================================
-        JSONObject wellQueryFields = new JSONObject();
-        // uidWellbore
-        if (wmlObjJson.has("uidWellbore") && !JsonUtil.isEmpty(wmlObjJson.get("uidWellbore")))
-            wellQueryFields.put("uid", wmlObjJson.get("uidWellbore"));
 
-        // uidWell
+        // get query fields from the wmlObjJson
+        JSONObject queryFields = new JSONObject();
+
+        if (wmlObjJson.has("uidWellbore") && !JsonUtil.isEmpty(wmlObjJson.get("uidWellbore")))
+            queryFields.put("uid", wmlObjJson.get("uidWellbore")); // add wellbore uid to query fields
+
         if (wmlObjJson.has("uidWell") && !JsonUtil.isEmpty(wmlObjJson.get("uidWell")))
-            wellQueryFields.put("uidWell", wmlObjJson.get("uidWell"));
+            queryFields.put("uidWell", wmlObjJson.get("uidWell")); // add well uid to query fields
+
 
         // build variables section
         JSONObject variables = new JSONObject();
-        variables.put("arg", wellQueryFields);
+        variables.put("arg", queryFields);
         payload.put("variables", variables);
 
         // build query section of payload
-        payload.put("query", GraphQLQueryConstants.WELLBORE_UID_MAPPING_QUERY);
+        payload.put("query", GraphQLQueryConstants.WELLBORE_AND_WELL_UUID_QUERY);
 
         // return payload
         return payload.toString(2);
-
     }
 
     private static String createWellboreQuery(String jsonObj) {

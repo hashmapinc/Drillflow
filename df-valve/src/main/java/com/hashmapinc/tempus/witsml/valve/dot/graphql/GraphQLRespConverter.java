@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.tempus.witsml.valve.dot;
+package com.hashmapinc.tempus.witsml.valve.dot.graphql;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.WitsmlObjects.Util.TrajectoryConverter;
@@ -120,18 +120,25 @@ public class GraphQLRespConverter {
         return foundObjects;
     }
 
-    public static String getUUid(JSONObject response){
-        if (!response.has("data")){
+    /**
+     * This function accepts the JSONObject wellbore graphql response
+     * representation and extracts the wellbore's UUID
+     * @param response
+     * @return
+     */
+    public static String getWellboreUuidFromGraphqlResponse(JSONObject response){
+        // check that the response has data
+        if (!response.has("data"))
             return null;
-        }
-        JSONObject data = (JSONObject)response.get("data");
-        if (!data.has("wellbores")){
+
+        // check that wellbores exist in the response
+        JSONObject data = response.getJSONObject("data");
+        if (!data.has("wellbores"))
             return null;
-        }
         if (data.get("wellbores") == null)
             return null;
-        JSONArray wells = (JSONArray) data.get("wellbores");
 
-        return ((JSONObject)wells.get(0)).getString("uuid");
+        // return the uuid of the first wellbore in the response.
+        return data.getJSONArray("wellbores").getJSONObject(0).getString("uuid");
     }
 }

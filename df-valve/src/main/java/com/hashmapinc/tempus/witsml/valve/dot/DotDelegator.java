@@ -20,6 +20,10 @@ import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory;
 import com.hashmapinc.tempus.witsml.ValveLogging;
 import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
+import com.hashmapinc.tempus.witsml.valve.dot.client.DotClient;
+import com.hashmapinc.tempus.witsml.valve.dot.client.UidUuidCache;
+import com.hashmapinc.tempus.witsml.valve.dot.graphql.GraphQLQueryConverter;
+import com.hashmapinc.tempus.witsml.valve.dot.graphql.GraphQLRespConverter;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -158,11 +162,12 @@ public class DotDelegator {
         }
     }
 
-    public void performElementDelete(AbstractWitsmlObject witsmlObj,
-									 String username,
-									 String password,
-									 String exchangeID,
-									 DotClient client
+    public void performElementDelete(
+		AbstractWitsmlObject witsmlObj,
+		String username,
+		String password,
+		String exchangeID,
+		DotClient client
 	) throws ValveException, ValveAuthException, UnirestException {
 		// Throwing valve exception as this is currently not supported by DoT until the Patch API is implemented
 		// We dont want to delete the object because someone thought something was implemented.
@@ -199,28 +204,27 @@ public class DotDelegator {
 		int status = response.getStatus();
 		if (201 == status || 200 == status || 204 == status) {
 			LOG.info(ValveLogging.getLogMsg(
-					exchangeID,
-					logResponse(response, "Successfully Patched Object with UID :"+uid+"."),
-					witsmlObj)
+				exchangeID,
+				logResponse(response, "Successfully Patched Object with UID :"+uid+"."),
+				witsmlObj)
 			);
 		} else {
 			LOG.warning(ValveLogging.getLogMsg(
-					exchangeID,
-					logResponse(response, "Unable to patch"),
-					witsmlObj)
+				exchangeID,
+				logResponse(response, "Unable to patch"),
+				witsmlObj)
 			);
 			throw new ValveException("PATCH DoT REST call failed with status code: " + status);
 		}
 	}
 
 	public void updateObject(
-			AbstractWitsmlObject witsmlObj,
-			String username,
-			String password,
-			String exchangeID,
-			DotClient client
+		AbstractWitsmlObject witsmlObj,
+		String username,
+		String password,
+		String exchangeID,
+		DotClient client
 	) throws ValveException, ValveAuthException, UnirestException {
-
 		String uid = witsmlObj.getUid();
 		String objectType = witsmlObj.getObjectType();
 		String endpoint = this.getEndpoint(objectType) + uid;
@@ -241,6 +245,7 @@ public class DotDelegator {
 			request.queryString("uidWellbore", witsmlObj.getParentUid());
 			String uidWell;
 			if ("1.4.1.1".equals(witsmlObj.getVersion())) {
+				// TODO: maybe replace with this -> uidWell = witsmlObj.getGrandParentUid();
 				uidWell = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory) witsmlObj).getUidWell();
 			} else {
 				uidWell = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory) witsmlObj).getUidWell();
@@ -441,8 +446,8 @@ public class DotDelegator {
 		try {
 			//TODO: Shift to does not = well || wellbore
 			if ("trajectory".equals(objectType)) {
-				String uuid = getWellboreUUID(witsmlObject, exchangeID, client, username, password);
-				query = GraphQLQueryConverter.getQuery(witsmlObject, uuid);
+				String wellboreUuid = getParentWellboreUUID(witsmlObject, exchangeID, client, username, password);
+				query = GraphQLQueryConverter.getQuery(witsmlObject, wellboreUuid);
 			} else {
 				query = GraphQLQueryConverter.getQuery(witsmlObject);
 			}
@@ -506,30 +511,50 @@ public class DotDelegator {
 		}
 	}
 
-	private String getWellboreUUID(
-			AbstractWitsmlObject wmlObject,
-			String exchangeID,
-			DotClient client,
-			String username,
-			String password)
-			throws ValveException, ValveAuthException, UnirestException {
+	/**
+	 *
+	 * @param wmlObject - trajectory or log child of the wellbore in question
+	 * @param exchangeID - string ID for logging
+	 * @param client - DotClient instance to use for sending API requests
+	 * @param username - string username for basic client auth
+	 * @param password - string password for basic client auth
+	 * @return - string Uuid of the wellbore parent of wmlObject
+	 * @throws ValveException
+	 * @throws ValveAuthException
+	 * @throws UnirestException
+	 */
+	private String getParentWellboreUUID(
+		AbstractWitsmlObject wmlObject,
+		String exchangeID,
+		DotClient client,
+		String username,
+		String password
+	) throws ValveException, ValveAuthException, UnirestException {
+		// validate wmlObject
+		String objectType = wmlObject.getObjectType();
+		if (!("log".equals(objectType) || "trajectory".equals(objectType)))
+			throw new ValveException("object type <" + objectType + "> does not have a parent wellbore");
 
-		String endpoint = this.getEndpoint( "wellboresearch");
+		// see if the uuid is stored in the uid/uuid cache
+		if (null != UidUuidCache.getUuid(wmlObject.getParentUid(), wmlObject.getGrandParentUid()))
+			return UidUuidCache.getUuid(wmlObject.getParentUid(), wmlObject.getGrandParentUid());
 
-		// build query
+
+		// wellbore uuid not found in cache. Proceed to fetch it
 		String query;
 		try {
-			query = GraphQLQueryConverter.getUidUUIDMappingQuery(wmlObject);
+			query = GraphQLQueryConverter.getWellboreAndWellUuidQuery(wmlObject);
 			LOG.fine(ValveLogging.getLogMsg(
-					exchangeID,
-					System.lineSeparator() + "Graph QL Query: " + query,
-					wmlObject)
+				exchangeID,
+				System.lineSeparator() + "Graph QL Query: " + query,
+				wmlObject)
 			);
 		} catch (Exception ex) {
 			throw new ValveException(ex.getMessage());
 		}
 
 		// build request
+		String endpoint = this.getEndpoint( "wellboresearch");
 		HttpRequestWithBody request = Unirest.post(endpoint);
 		request.header("Content-Type", "application/json");
 		request.body(query);
@@ -542,19 +567,24 @@ public class DotDelegator {
 		int status = response.getStatus();
 		if (201 == status || 200 == status || 400 == status) {
 			LOG.info(ValveLogging.getLogMsg(
-					exchangeID,
-					logResponse(response, "Successfully executed POST for query object=" + wmlObject.toString()),
-					wmlObject
+				exchangeID,
+				logResponse(response, "Successfully executed POST for query object=" + wmlObject.toString()),
+				wmlObject
 			));
 
-			// get matching objects from search as list of abstract witsml objects
-			return GraphQLRespConverter.getUUid(new JSONObject(response.getBody()));
+			// get the UUID of the first wellbore in the response
+			String wellboreUUID = GraphQLRespConverter.getWellboreUuidFromGraphqlResponse(new JSONObject(response.getBody()));
+
+			// cache the wellbore uuid/uid
+			UidUuidCache.putInCache(wellboreUUID, wmlObject.getParentUid(), wmlObject.getGrandParentUid());
+
+			return wellboreUUID;
 
 		} else {
 			LOG.warning(ValveLogging.getLogMsg(
-					wmlObject.getUid(),
-					logResponse(response, "Unable to execute POST"),
-					wmlObject
+				wmlObject.getUid(),
+				logResponse(response, "Unable to execute POST"),
+				wmlObject
 			));
 			throw new ValveException(response.getBody());
 		}

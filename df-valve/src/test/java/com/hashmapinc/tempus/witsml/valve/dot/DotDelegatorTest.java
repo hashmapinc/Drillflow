@@ -29,8 +29,8 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell;
-import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys;
-import org.hamcrest.CoreMatchers;
+import com.hashmapinc.tempus.witsml.valve.dot.client.DotClient;
+import com.hashmapinc.tempus.witsml.valve.dot.graphql.GraphQLQueryConverter;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hashmapinc.tempus.witsml.valve.dot;
+package com.hashmapinc.tempus.witsml.valve.dot.client;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -58,8 +58,8 @@ public class DotClient {
      * @param password
      */
     private void refreshToken(
-            String username,
-            String password
+        String username,
+        String password
     ) throws ValveAuthException {
         try {
             // build payload for authentication
