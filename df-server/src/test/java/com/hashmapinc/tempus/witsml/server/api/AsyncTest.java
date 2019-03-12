@@ -15,13 +15,14 @@
  */
 package com.hashmapinc.tempus.witsml.server.api;
 
-import static junit.framework.TestCase.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-import java.util.concurrent.CompletableFuture;
-
+import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore;
+import com.hashmapinc.tempus.witsml.QueryContext;
+import com.hashmapinc.tempus.witsml.server.AsyncAppConstants;
+import com.hashmapinc.tempus.witsml.server.WitsmlServerApplication;
+import com.hashmapinc.tempus.witsml.valve.dot.DotDelegator;
+import com.hashmapinc.tempus.witsml.valve.dot.DotValve;
+import com.hashmapinc.tempus.witsml.valve.dot.client.DotClient;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.annotation.Bean;
@@ -30,14 +31,12 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
-import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore;
-import com.hashmapinc.tempus.witsml.QueryContext;
-import com.hashmapinc.tempus.witsml.server.AsyncAppConstants;
-import com.hashmapinc.tempus.witsml.server.WitsmlServerApplication;
-import com.hashmapinc.tempus.witsml.valve.dot.client.DotClient;
-import com.hashmapinc.tempus.witsml.valve.dot.DotDelegator;
-import com.hashmapinc.tempus.witsml.valve.dot.DotValve;
+import java.util.ArrayList;
+import java.util.concurrent.CompletableFuture;
+
+import static junit.framework.TestCase.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class AsyncTest {
 
