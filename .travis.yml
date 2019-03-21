@@ -25,6 +25,9 @@ deploy:
     api_key:
       secure: ZeolMWbpUL9SpxZ34uKYvjXzXDRsv5n3vw+p/J8b6TuGGDBoivckn4DRchF63vNmzA1PqCbdFwaE4ZRL/pIzX1TNA+IT2yuM+8HdWEROqg6EJUN6otaPrYlEajK2mxWShRSHCpcFadrDe+2upb1SNYa4sHfObYB+6ZJbluiW0TtFPgf1DtPuK3+IIoiXcfw/sa9TqDtFjnkWk2U6t7mZfiLBVaVb9N+5tp1ug+7GLe98OE87hzRqhJwczchPnb9NHaRCwCCYeEqShyVqheBvXlFHOL+vRpLXh/ZrbdgQp6DbJzb318pnYqmfhiUPeW8xd/vmVSB+tyUKHXEqLnIcgJ6jyoDh1n4uMkDdsHTvOGrMWdRGXYjlQrQFApDZKeoceSFcbHW87t6iTvDLGXxr/X5Ah5JFImHEScX5L+22ekDiPavhCEemil+XBn2pYoAiWQ0aRxVhNMaBSdSDjV31I3xwoxLiLxP1rBJkpyDRR81YXsuSvtvIJbbpVGCI9G3UMQKn+zSQWm5sqlmkACoJ9oBKfR5K9Th9jo/QUy15xsTn1qifdHurJBRXa2+RAjm2Y1RqPpo+1Eg1eVFMaFMPkjlRRM47na1i/urO7dlh3XDE6SH5WCwMaZt7ziQoCNSgdIw92+TtEDejrCzkKs8j2HswgE7KOgLPTZBB9aan/NQ=
     file: "$TRAVIS_BUILD_DIR/out/*.jar"
+    on:
+      all_branches: true
+      condition: $TRAVIS_BRANCH =~ ^dev-rel/.*|master
     draft: true
     overwrite: true
   - provider: s3
@@ -35,12 +38,9 @@ deploy:
     local-dir: "$TRAVIS_BUILD_DIR/out"
     region: us-east-2
     acl: public_read
-  on:
-    repo: hashmapinc/Drillflow
-    branches:
-      only:
-      - master
-      - /^dev-rel.*$/
+    on:
+      all_branches: true
+      condition: $TRAVIS_BRANCH =~ ^dev-rel/.*|master
 after_deploy:
 - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 - export REPO=hashmapinc/drillflow
