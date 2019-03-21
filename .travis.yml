@@ -30,7 +30,7 @@ deploy:
     branches:
       only:
       - master
-      - /([dev\-rel])\w+/g
+      - /^dev-rel.*$/
     draft: true
     overwrite: true
   - provider: s3
@@ -46,7 +46,7 @@ deploy:
     branches:
       only:
       - master
-      - /([dev\-rel])\w+/g
+      - /^dev-rel.*$/
 after_deploy:
 - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 - export REPO=hashmapinc/drillflow
