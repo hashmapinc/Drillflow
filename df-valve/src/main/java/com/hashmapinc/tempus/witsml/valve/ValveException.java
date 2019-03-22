@@ -21,7 +21,29 @@ package com.hashmapinc.tempus.witsml.valve;
  * "Only you can prevent bad exception messages!"
  */
 public class ValveException extends Exception {
+    
+    private Short errorCode;
+
+    /**
+     * @return the errorCode
+     */
+    public Short getErrorCode() {
+        return errorCode;
+    }
+
+    /**
+     * @param errorCode the errorCode to set
+     */
+    public void setErrorCode(Short errorCode) {
+        this.errorCode = errorCode;
+    }
+
     public ValveException(String errorMessage) {
         super(errorMessage);
+    }
+
+    public ValveException(String errorMessage, Short errorCode) {
+        super(errorMessage);
+        this.errorCode = errorCode;
     }
 }
