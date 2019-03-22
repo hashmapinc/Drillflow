@@ -43,7 +43,7 @@ public class DotTranslator {
         AbstractWitsmlObject wmlObj
     ) throws ValveException {
         try {
-            switch (wmlObj.getObjectType()) { //TODO: support log and trajectory
+            switch (wmlObj.getObjectType()) {
                 case "well":
                     if (wmlObj instanceof com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell) return wmlObj;
                     return WellConverter.convertTo1311((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) wmlObj);
@@ -85,18 +85,7 @@ public class DotTranslator {
 
             // Check if the "id-only" case needs to be handled...
             if ("id-only".equals(optionsIn.get("returnElements"))) {
-
-                // Clear out the queryJson object...
-                queryJson.keySet().clear();
-                // Construct the queryJson object anew...
-                // We will put all parentage info, and only the parentage that is warrented based on 
-                // the object type will be preserved after the merge. 
-                queryJson.put("name","");
-                queryJson.put("nameWellbore","");
-                queryJson.put("nameWell","");
-                queryJson.put("uid","");
-                queryJson.put("uidWellbore","");
-                queryJson.put("uidWell","");
+                queryJson = QueryTemplateProvider.getIDOnly(wmlObject.getObjectType());
             }
 
             // Perform the selective merge since "all" was not specified
