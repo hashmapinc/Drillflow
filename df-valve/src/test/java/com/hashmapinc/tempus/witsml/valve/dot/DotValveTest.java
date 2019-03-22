@@ -18,7 +18,12 @@ package com.hashmapinc.tempus.witsml.valve.dot;
 import com.auth0.jwt.JWT;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
-import com.hashmapinc.tempus.WitsmlObjects.v1311.*;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys;
 import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
@@ -38,6 +43,8 @@ public class DotValveTest {
 	private DotClient mockClient;
     private DotDelegator mockDelegator;
     private DotValve valve;
+    // TMS
+    public static DotValve dotValve;
 
 	@Before
 	public void doSetup() {
@@ -491,6 +498,105 @@ public class DotValveTest {
 	}
 
 	@Test
+	public void shouldSearchTrajectory() throws Exception {
+
+		// ==========================================================================
+		// Creation of search objects...
+		// ==========================================================================
+		ObjTrajectory traj = new ObjTrajectory();
+		traj.setUid("traj-search");
+		// =============================================================================
+		// Query logic test steps -- tests just for the case where the object type is
+		// trajectory, UID is provided, and one of the following query args exist:
+		//		(1) lastUpdateTimeUtc
+		//		(2) mdMn
+		//		(3) mdMx
+		// (Note: All three query args may be present, but it only takes one to be
+		//        present to query using a search; any combination of query args
+		//        also is possible))
+		// Case A -- mdMn = 500,  mdMx = null, lastUpdateTimeUtc does not have this key
+		//                                                       but dtimTrajEnd is null
+		// Case B -- mdMn = null, mdMx = 500,  lastUpdateTimeUtc as above
+		// Case C -- mdMn = 100,  mdMx = 500,  lastUpdateTimeUtc as above
+		// Case D -- Case A with lastUpdateTimeUtc not null <-- NOT IMPLEMENTED
+		// Case E -- Case B with lastUpdateTimeUtc not null <-- NOT IMPLEMENTED
+		// Case F -- Case C with lastUpdateTimeUtc not null <-- NOT IMPLEMENTED
+		// =============================================================================
+		String query = traj.getXMLString("1.4.1.1");
+		ObjTrajectorys trajectorysQuery = WitsmlMarshal.deserialize(
+											query,
+											ObjTrajectorys.class);
+		ObjTrajectory singularTrajectoryQuery = trajectorysQuery
+												.getTrajectory()
+												.get(0);
+		singularTrajectoryQuery.setName("traj-search");
+		// Case A:
+		performTestCase(
+				query,
+				500.0,
+				null,
+				singularTrajectoryQuery,
+				"shouldSearchTrajectoryCaseA");
+		// Case B:
+		performTestCase(
+				query,
+				null,
+				500.0,
+				singularTrajectoryQuery,
+				"shouldSearchTrajectoryCaseB");
+
+		// Case C:
+		performTestCase(
+				query,
+				100.0,
+				500.0,
+				singularTrajectoryQuery,
+				"shouldSearchTrajectoryCaseC");
+
+	}
+
+	public void performTestCase(
+			String query,
+			Double mdMn,
+			Double mdMx,
+			ObjTrajectory singularTrajectoryQuery,
+			String caseName) {
+
+		// Requires separate MeasuredDepthCoord objects to work correctly...
+		com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord mDMnMeasuredDepth =
+				new com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord();
+		com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord mDMxmeasuredDepth =
+				new com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord();
+
+		mDMnMeasuredDepth.setValue(mdMn);
+		singularTrajectoryQuery.setMdMn(mDMnMeasuredDepth);
+		mDMxmeasuredDepth.setValue(mdMx);
+		singularTrajectoryQuery.setMdMx(mDMxmeasuredDepth);
+		// OK will this test it right...cases a-c this is empty,
+		// but cases d-f this is a value
+		List<AbstractWitsmlObject> wmlObjectsQuery = new ArrayList<>();
+
+		wmlObjectsQuery.add(singularTrajectoryQuery);
+
+		// build query context
+		QueryContext qc
+				= new QueryContext(
+				"1.4.1.1",
+				"trajectory",
+				null,
+				query,
+				wmlObjectsQuery,
+				"goodUsername",
+				"goodPassword",
+				caseName
+		);
+
+		// let the software-under-test do its thing...
+		assertEquals(true, this.valve.trajHasSearchQueryArgs(qc));
+
+	}
+
+	@Test
 	public void shouldUpdateTrajectory() throws Exception {
 		// build witsmlObjects lists
 		ArrayList<AbstractWitsmlObject> trajs1311 = new ArrayList<>();
@@ -510,24 +616,24 @@ public class DotValveTest {
 
 		// build query contexts
 		QueryContext qc1311 = new QueryContext(
-			"1.3.1.1",
-			"trajectory",
-			null,
-			"",
-			trajs1311,
-			"goodUsername",
-			"goodPassword",
-			"shouldUpdateTrajectory-1311" // exchange ID
+				"1.3.1.1",
+				"trajectory",
+				null,
+				"",
+				trajs1311,
+				"goodUsername",
+				"goodPassword",
+				"shouldUpdateTrajectory-1311" // exchange ID
 		);
 		QueryContext qc1411 = new QueryContext(
-			"1.4.1.1",
-			"trajectory",
-			null,
-			"",
-			trajs1411,
-			"goodUsername",
-			"goodPassword",
-			"shouldUpdateTrajectory-1411" // exchange ID
+				"1.4.1.1",
+				"trajectory",
+				null,
+				"",
+				trajs1411,
+				"goodUsername",
+				"goodPassword",
+				"shouldUpdateTrajectory-1411" // exchange ID
 		);
 
 		// test update
