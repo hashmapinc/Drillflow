@@ -23,6 +23,7 @@ import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore;
 import com.hashmapinc.tempus.WitsmlObjects.v20.Trajectory;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import java.util.HashMap;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import java.io.IOException;
@@ -62,6 +63,7 @@ public class GraphQLRespConverter {
 
     private static ArrayList<AbstractWitsmlObject> getWells(JSONObject data) throws IOException {
         ArrayList<AbstractWitsmlObject> foundObjects = new ArrayList<>();
+        JSONObject commonData = new JSONObject();
         if (!data.has("wells")){
             return null;
         }
@@ -70,7 +72,11 @@ public class GraphQLRespConverter {
         JSONArray wells = (JSONArray) data.get("wells");
 
         for(int i = 0; i < wells.length(); i++){
-            ObjWell foundWell = WitsmlMarshal.deserializeFromJSON(wells.get(i).toString(), ObjWell.class);
+            // Added code to build commonData and map lastUpdateTimeUtc to dTimLastChange
+            JSONObject xformedWell = (JSONObject)wells.get(i);
+            commonData.put("dTimLastChange", xformedWell.get("lastUpdateTimeUtc"));
+            xformedWell.put("commonData",commonData);
+            ObjWell foundWell = WitsmlMarshal.deserializeFromJSON(xformedWell.toString(), ObjWell.class);
             if (foundWell.getUid() != null) {
                 foundObjects.add(foundWell);
             }
