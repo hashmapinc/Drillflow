@@ -129,7 +129,7 @@ public class DotDelegator {
 
 		// add query string params
         if ("wellbore".equals(objectType)) {
-			request.queryString("uidWell", witsmlObj.getParentUid()); // TODO: ensure parent uid exists?
+			request.queryString("uidWell", witsmlObj.getParentUid());
 		} else if ("trajectory".equals(objectType)){
 			request.queryString("uidWellbore", witsmlObj.getParentUid());
 			String uidWell;
@@ -185,7 +185,7 @@ public class DotDelegator {
 
 		// add query string params
 		if ("wellbore".equals(objectType)) {
-			request.queryString("uidWell", witsmlObj.getParentUid()); // TODO: ensure parent uid exists?
+			request.queryString("uidWell", witsmlObj.getParentUid());
 		} else if ("trajectory".equals(objectType)){
 			request.queryString("uidWellbore", witsmlObj.getParentUid());
 			String uidWell;
@@ -197,7 +197,7 @@ public class DotDelegator {
 			request.queryString("uidWell", uidWell);
 		}
 
-		// make the DELETE call.
+		// make the PATCH call.
 		HttpResponse<String> response = client.makeRequest(request, username, password);
 
 		// check response status
