@@ -23,7 +23,6 @@ import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore;
 import com.hashmapinc.tempus.WitsmlObjects.v20.Trajectory;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import java.util.HashMap;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import java.io.IOException;
