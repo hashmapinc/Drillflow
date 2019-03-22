@@ -575,6 +575,7 @@ public class GraphQLQueryConstants {
             "query WellQuery($wellArgument: WellArgument) {\n" +
             "  wells(wellArgument: $wellArgument) {\n" +
             "    country\n" +
+            "    lastUpdateTimeUtc\n" +
             "    dTimLicense\n" +
             "    numLicense\n" +
             "    county\n" +
