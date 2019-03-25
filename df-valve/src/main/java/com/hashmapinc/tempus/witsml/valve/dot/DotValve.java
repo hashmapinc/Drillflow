@@ -15,6 +15,16 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
+import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.witsml.QueryContext;
+import com.hashmapinc.tempus.witsml.valve.IValve;
+import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
+import com.hashmapinc.tempus.witsml.valve.ValveException;
+import com.hashmapinc.tempus.witsml.valve.dot.client.DotClient;
+import org.apache.commons.lang3.StringUtils;
+import org.json.JSONObject;
+import org.springframework.scheduling.annotation.Async;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,16 +32,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.hashmapinc.tempus.witsml.valve.dot.client.DotClient;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.scheduling.annotation.Async;
-
-import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
-import com.hashmapinc.tempus.witsml.QueryContext;
-import com.hashmapinc.tempus.witsml.valve.IValve;
-import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
-import com.hashmapinc.tempus.witsml.valve.ValveException;
 
 public class DotValve implements IValve {
 	private static final Logger LOG = Logger.getLogger(DotValve.class.getName());
@@ -59,7 +59,7 @@ public class DotValve implements IValve {
 	 * Constructor for directly injecting a client and delegator
 	 *
 	 * @param client - dotClient for auth and request execution
-	 * @pararm delegator - dotDelegator for executing valve methods
+	 * @param delegator - dotDelegator for executing valve methods
 	 */
 	public DotValve(DotClient client, DotDelegator delegator) {
 		this.CLIENT = client;
@@ -99,12 +99,20 @@ public class DotValve implements IValve {
 	public CompletableFuture<String> getObject(QueryContext qc) throws ValveException {
 		// get query responses
 		ArrayList<AbstractWitsmlObject> queryResponses;
-		if (qc.WITSML_OBJECTS.size() == 1 && (qc.WITSML_OBJECTS.get(0).getUid() == null|| "".equals(qc.WITSML_OBJECTS.get(0).getUid()))) {
-			// its a search
+
+		// IF  this is a singular object AND a UID is NOT provided ...
+		if (qc.WITSML_OBJECTS.size() == 1 &&
+				(qc.WITSML_OBJECTS.get(0).getUid() == null || "".equals(qc.WITSML_OBJECTS.get(0).getUid()))) {
+			// ... query using a search
 			queryResponses = doSearch(qc);
 		} else {
-			// its a get
-			queryResponses = getSingularObject(qc);
+			if ( "trajectory".equals(qc.OBJECT_TYPE) && trajHasSearchQueryArgs(qc) ) {
+				// ... query using a search
+				queryResponses = doSearch(qc);
+			} else {
+				// ... query using REST get
+				queryResponses = getSingularObject(qc);
+			}
 		}
 
 		// build xml response from query response
@@ -112,6 +120,44 @@ public class DotValve implements IValve {
 
 		// return xml
 		return CompletableFuture.completedFuture(xmlResponse);
+	}
+
+	/*
+		A trajectory object type that has a UID will query using a search if one of the following query args exist:
+		(1) lastUpdateTimeUtc
+		(2) mdMn
+		(3) mdMx
+		All three may be present, but it only takes one to be present to query using a search.
+	 */
+	// TODO If private, need a reflection solution (see http://saturnboy.com/2010/11/testing-private-methods-in-java/)
+	//private static boolean trajHasSearchQueryArgs( QueryContext qc ) {
+	public static boolean trajHasSearchQueryArgs( QueryContext qc ) {
+		// Trajectory object must have a UID.
+		if (qc.WITSML_OBJECTS.get(0).getUid() == null || "".equals(qc.WITSML_OBJECTS.get(0).getUid()))
+			return false;
+
+
+		// Get AbstractWitsmlObject to get at trajectory query args...
+		AbstractWitsmlObject wmlObject = qc.WITSML_OBJECTS.get(0);
+
+		// Needed for some query args since some fields are lost in 2.0
+		String jsonString1411 = wmlObject.getJSONString("1.4.1.1");
+		String jsonString20 =   wmlObject.getJSONString("2.0");
+		JSONObject trajectoryJson =     new JSONObject(jsonString20);  // 2.0
+		JSONObject objTrajectoryJson = new JSONObject(jsonString1411);
+
+		// Just need any one of these to be present to change the trajectory query from REST to search...
+		if (trajectoryJson.has("lastUpdateTimeUtc") &&
+				!JsonUtil.isEmpty(trajectoryJson.get("lastUpdateTimeUtc")))
+			return true;
+		if (objTrajectoryJson.has("mdMn") &&
+				!JsonUtil.isEmpty(objTrajectoryJson.get("mdMn")))
+			return true;
+		if (objTrajectoryJson.has("mdMx") &&
+				!JsonUtil.isEmpty(objTrajectoryJson.get("mdMx")))
+			return true;
+
+		return false;
 	}
 
 	/**
