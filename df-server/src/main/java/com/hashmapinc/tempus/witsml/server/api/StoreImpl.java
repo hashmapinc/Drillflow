@@ -289,8 +289,16 @@ public class StoreImpl implements IStore {
             );
             this.valve.deleteObject(qc).get();
             resp.setResult((short) 1);
-        } catch (Exception e) {
+        } catch (ValveException e) {
             resp.setSuppMsgOut(e.getMessage());
+            if (e.getErrorCode() != null){
+                resp.setResult(e.getErrorCode());
+            }
+            return resp;
+        } catch (Exception ex){
+            resp.setSuppMsgOut(ex.getMessage());
+            resp.setResult((short)-1);
+            return resp;
         }
 
         resp.setSuppMsgOut(witsmlApiConfigUtil.getProperty("basemessages." + resp.getResult()));
