@@ -286,13 +286,17 @@ public class DotValve implements IValve {
 		// According to the WITSML Spec you cannot delete more than one object (or sub elements of more than one object)
 		// at a time, so we do this check
 		if (qc.WITSML_OBJECTS.size() > 1)
-			throw new ValveException("Delete cannot have more than one singular object per query");
+			throw new ValveException("Delete cannot have more than one singular object per query", (short)-444);
 		// This is rare but a check must be made
 		if (qc.WITSML_OBJECTS.size() == 0)
 			throw new ValveException("Delete must have exactly one singluar object, but found 0 in the query");
 		try {
 			// Should be a safe assumption as we check above
 			AbstractWitsmlObject wmlObject = qc.WITSML_OBJECTS.get(0);
+
+			if (wmlObject.getUid() == null || "".equals(wmlObject.getUid())){
+				throw new ValveException("Delete cannot have more than one singular object per query", (short)-415);
+			}
 
 			if (!isObjectDelete(wmlObject.getObjectType(), qc.QUERY_XML)){
 				// This is an element delete so re-route to delegator update

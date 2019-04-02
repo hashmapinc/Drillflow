@@ -26,9 +26,11 @@ hs_err_pid*
 .idea/
 target/
 docs/build/
+docs/source/_build/*
 
 # Things Randy ignored
 .java-version
+*.code-workspace
 .classpath
 .factorypath
 .project

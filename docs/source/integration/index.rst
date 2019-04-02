@@ -13,3 +13,4 @@ These guides will help you integrate the WITSML Server API with your API impleme
    capabilities
    returnmsg
    logging
+   dot/index

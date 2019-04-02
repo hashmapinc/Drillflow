@@ -16,8 +16,7 @@
 package com.hashmapinc.tempus.witsml.valve.dot.client;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import com.auth0.jwt.JWT;
@@ -36,7 +35,8 @@ public class DotClient {
     private final String URL;
     private final String TOKEN_PATH;
     private final String API_KEY;
-    private Map<String, DecodedJWT> cache;
+    // changed to ConcurrentHashMap to make thread safe
+    private ConcurrentHashMap<String, DecodedJWT> cache;
 
     /**
      * DotClient constructor
@@ -48,7 +48,8 @@ public class DotClient {
         this.URL = URL;
         this.API_KEY = API_KEY;
         this.TOKEN_PATH = tokenPath;
-        this.cache = new HashMap<String, DecodedJWT>();
+        // changed to ConcurrentHashMap to make thread safe
+        this.cache = new ConcurrentHashMap<String, DecodedJWT>();
     }
 
     /**
