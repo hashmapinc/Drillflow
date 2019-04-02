@@ -24,6 +24,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
@@ -32,6 +35,12 @@ public class StoreValidationTest {
 
     private IValve valve;
     private ValveConfig config;
+
+    private String minWellQueryTemplate =
+            "<wells xmlns=\"http://www.witsml.org/schemas/1series\" " +
+                    "version=\"1.4.1.1\">" +
+                    "<well/>" +
+                    "</wells>";
 
     @Autowired
     private void setValveConfig(ValveConfig config){
@@ -48,11 +57,15 @@ public class StoreValidationTest {
 
     @Test
     public void testSuccess(){
-        short resp = StoreValidator.validateAddToStore("well", "<wells xmlns=\"http://www.witsml.org/schemas/131\" version=\"1.3.1.1\">\n" +
-                "<well  uid=\"uid12333\">\n" +
-                "\t\t<name>Well Test</name>\n" +
-                "</well>\n" +
-                "</wells>", null, valve);
+        short resp = StoreValidator.validateAddToStore(
+                "well",
+                "<wells xmlns=\"http://www.witsml.org/schemas/131\" version=\"1.3.1.1\">\n" +
+                        "<well  uid=\"uid12333\">\n" +
+                        "\t\t<name>Well Test</name>\n" +
+                        "</well>\n" +
+                        "</wells>",
+                null,
+                valve);
         assertThat(resp).isEqualTo((short)1);
     }
 
@@ -134,4 +147,140 @@ public class StoreValidationTest {
         short resp = StoreValidator.validateGetCap("dataVersion=1.3.1.1");
         assertThat(resp).isEqualTo((short)1);
     }
+
+    // *****************GET FROM STORE TESTS***************** //
+
+    @Test
+    public void getFromStoreGoodKeyGoodValueShouldSuceed() throws Exception {
+        Map<String, String> testMap = new HashMap<>() {{
+            put("requestObjectSelectionCapability", "true");
+        }};
+        short resp = StoreValidator.validateGetFromStore(
+                "well",
+                minWellQueryTemplate,
+                testMap,
+                this.valve);
+        assertThat(resp).isEqualTo((short)1);
+    }
+
+    @Test
+    public void getFromStoreNoKeyNoValueShouldSuceed() throws Exception {
+        Map<String, String> testMap = new HashMap<>() {{
+        }};
+        short resp = StoreValidator.validateGetFromStore(
+                "well",
+                minWellQueryTemplate,
+                testMap,
+                this.valve);
+        assertThat(resp).isEqualTo((short)1);
+    }
+
+    @Test
+    public void getFromStoreAnyOtherKeyAnyOtherValueShouldSucceed() throws Exception {
+        Map<String, String> testMap = new HashMap<>() {{
+            put("anyOtherKey", "anyOtherValue");
+        }};
+        short resp = StoreValidator.validateGetFromStore(
+                "well",
+                minWellQueryTemplate,
+                testMap,
+                this.valve);
+        assertThat(resp).isEqualTo((short)1);
+    }
+
+    @Test
+    public void getFromStoreAnyOtherKeyGoodValueShouldSucceed() throws Exception {
+        //String WMLtypeIn, String xmlIn, Map<String,String> optionsIn, IValve valve;
+        Map<String, String> testMap = new HashMap<String, String>() {{
+            put("anyOtherKey", "true");
+        }};
+        short resp = StoreValidator.validateGetFromStore(
+                "well",
+                "<wells xmlns=\"http://www.witsml.org/schemas/1series\" version=\"1.4.1.1\"><well/></wells>",
+                testMap,
+                this.valve);
+        assertThat(resp).isEqualTo((short)1);
+    }
+
+    @Test
+    public void getFromStoreGoodKeyAnyOtherValueExceptWhitespaceOrEmptyShouldSucceed() throws Exception {
+        Map<String, String> testMap = new HashMap<String, String>() {{
+            put("requestObjectSelectionCapability", "anyOtherValue");
+        }};
+        short resp = StoreValidator.validateGetFromStore(
+                "well",
+                minWellQueryTemplate,
+                testMap,
+                this.valve);
+        assertThat(resp).isEqualTo((short)1);
+    }
+
+    @Test
+    public void getFromStoreGoodKeyEmptyValueShouldFail() throws Exception {
+        Map<String, String> testMap = new HashMap<String, String>() {{
+            put("requestObjectSelectionCapability", "");
+        }};
+        short resp = StoreValidator.validateGetFromStore(
+                "well",
+                minWellQueryTemplate,
+                testMap,
+                this.valve);
+        assertThat(resp).isEqualTo((short)-1001);
+    }
+
+    @Test
+    public void getFromStoreGoodKeyNullValueShouldFail() throws Exception {
+        Map<String, String> testMap = new HashMap<>() {{
+            // Will this get caught by invalid XML (can there be a null key value?)
+            put("requestObjectSelectionCapability", null);
+        }};
+        short resp = StoreValidator.validateGetFromStore(
+                "well",
+                minWellQueryTemplate,
+                testMap,
+                this.valve);
+        assertThat(resp).isEqualTo((short)-1001);
+    }
+
+    @Test
+    public void getFromStoreNullKeyNullValueShouldSucceed() throws Exception {
+        Map<String, String> testMap = new HashMap<>() {{
+            put(null, null);
+        }};
+        short resp = StoreValidator.validateGetFromStore(
+                "well",
+                minWellQueryTemplate,
+                testMap,
+                this.valve);
+        assertThat(resp).isEqualTo((short)1);
+    }
+
+    @Test
+    public void getFromStoreGoodKeyGoodValueMoreEntriesShouldFail() throws Exception {
+        Map<String, String> testMap = new HashMap<>() {{
+            put("requestObjectSelectionCapability", "true");
+            put("anotherKey", "anotherValue");
+        }};
+        short resp = StoreValidator.validateGetFromStore(
+                "well",
+                minWellQueryTemplate,
+                testMap,
+                this.valve);
+        assertThat(resp).isEqualTo((short)-427);
+    }
+
+    @Test
+    public void getFromStoreGoodKeyGoodValueButXMLInHasUIDShouldFail() throws Exception {
+        Map<String, String> testMap = new HashMap<>() {{
+            put("requestObjectSelectionCapability", "true");
+        }};
+        short resp = StoreValidator.validateGetFromStore(
+                "well",
+                "<wells xmlns=\"http://www.witsml.org/schemas/1series\" version=\"1.4.1.1\">" +
+                      "<well uid=\"uid12333\"></well></wells>",
+                testMap,
+                this.valve);
+        assertThat(resp).isEqualTo((short)-428);
+    }
+
 }

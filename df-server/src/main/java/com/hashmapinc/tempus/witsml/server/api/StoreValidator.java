@@ -66,15 +66,55 @@ public class StoreValidator {
     }
 
     /***
-     * Validate the AddToStore query from the client to see if the query flow even needs to continue.
+     * Validate the GetFromStore query from the client to see if the query flow even needs to continue.
      *
      * @param WMLtypeIn The WITSML type in from the API query
      * @param xmlIn The XML Query template sent in
-     * @param optionsIn The options sent in as part of the query
+     * @param optionsMap The options sent in as part of the query, parsed by WitsmlUtil into Map format
      * @param valve The valve that is currently configured for use with DrillFlow
      * @return The return code, 1 if its all good and can proceed, not one if there is an issue that should be reported
+     *         (refer to basemessages.properties for available error codes)
      */
-    public static short validateGetFromStore(String WMLtypeIn, String xmlIn, Map<String,String> optionsIn, IValve valve){
+    public static short validateGetFromStore(String WMLtypeIn, String xmlIn, Map<String,String> optionsMap, IValve valve){
+
+        // perform standard validations for any GetFromStore query
+        short validation = standardValidations(WMLtypeIn, xmlIn, valve);
+        if (validation<0) {
+            // failed standard validations...no need to continue
+            return validation;
+        }
+
+        if ( optionsMap.containsKey("requestObjectSelectionCapability") ) {
+            String keyValue = optionsMap.get("requestObjectSelectionCapability");
+            if (keyValue == null || keyValue.isBlank()) {
+                return -1001;
+            }
+            if (keyValue.equals("true")) {
+                if (xmlIn.contains("uid")) {
+                    return -428;
+                }
+                // there must not be another optionIn present
+                if (optionsMap.size() > 1) {
+                    return -427;
+                }
+            }
+            return 1;
+        }
+        return 1;
+
+    }
+
+    private static short standardValidations(String WMLtypeIn, String xmlIn, IValve valve) {
+        // The WITSML type in from the API query is EMPTY
+        // or contains ONLY WHITESPACE (NOT equivalent to "none").
+        if ( WMLtypeIn.isBlank() )
+            return -407;
+        if ( !isObjectSupported(WMLtypeIn, valve, "WMLS_GetFromStore") )
+            return -487;
+        if ( xmlIn.isEmpty() )
+            return -408;
+        if ( !containsVersion(xmlIn) )
+            return -468;
         return 1;
     }
 

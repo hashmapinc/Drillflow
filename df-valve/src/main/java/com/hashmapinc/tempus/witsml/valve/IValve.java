@@ -15,11 +15,11 @@
  */
 package com.hashmapinc.tempus.witsml.valve;
 
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.QueryContext;
+
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public interface IValve {
     /**
@@ -40,6 +40,13 @@ public interface IValve {
      * @return The resultant object from the query in XML string format
      */
     public CompletableFuture<String> getObject(QueryContext qc) throws ValveException;
+
+    /**
+     * Gets an XML string with the corresponding type specified
+     * @param WMLtypeIn - The WITSML type in from the API query
+     * @return An XML string with the corresponding type
+     */
+    public String getObjectSelectionCapability(String WMLtypeIn);
 
     /**
      * Gets a collection of objects based on the WITSML Query
