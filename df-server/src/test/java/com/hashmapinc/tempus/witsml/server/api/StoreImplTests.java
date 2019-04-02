@@ -15,15 +15,16 @@
  */
 package com.hashmapinc.tempus.witsml.server.api;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse;
+import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetFromStoreResponse;
+import com.hashmapinc.tempus.witsml.valve.ObjectSelectionConstants;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.hashmapinc.tempus.witsml.server.api.model.WMLS_GetCapResponse;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -31,6 +32,12 @@ public class StoreImplTests {
 
 	@Autowired
 	private StoreImpl witsmlServer;
+
+	private String minWellQueryTemplate =
+			"<wells xmlns=\"http://www.witsml.org/schemas/1series\" " +
+			"version=\"1.4.1.1\">" +
+			"<well/>" +
+			"</wells>";
 
 	@Test
 	public void contextLoads() {
@@ -81,4 +88,194 @@ public class StoreImplTests {
 		assertThat(resp.getResult()).isEqualTo((short)-424);
 		assertThat(resp.getCapabilitiesOut()).isNull();
 	}
+
+	// ***************** GET FROM STORE TESTS ***************** //
+	@Test
+	public void getFrStoreRespWellTrueSucceed(){
+		WMLS_GetFromStoreResponse resp = this.witsmlServer.getFromStore(
+				"well",
+				minWellQueryTemplate,
+				"requestObjectSelectionCapability=true",
+				""
+		);
+
+		assertThat(resp).isNotNull();
+		assertThat(resp.getResult()).isEqualTo((short)1);
+		assertThat(resp.getXMLout()).isEqualTo(ObjectSelectionConstants.WELL_OBJ_SELECTION);
+	}
+
+	@Test
+	public void getFrStoreRespWellboreTrueSucceed(){
+		WMLS_GetFromStoreResponse resp = this.witsmlServer.getFromStore(
+				"wellbore",
+				minWellQueryTemplate,
+				"requestObjectSelectionCapability=true",
+				""
+		);
+
+		assertThat(resp).isNotNull();
+		assertThat(resp.getResult()).isEqualTo((short)1);
+		assertThat(resp.getXMLout()).isEqualTo(ObjectSelectionConstants.WELLBORE_OBJ_SELECTION);
+	}
+
+	@Test
+	public void getFrStoreRespTrajTrueSucceed(){
+		WMLS_GetFromStoreResponse resp = this.witsmlServer.getFromStore(
+				"trajectory",
+				minWellQueryTemplate,
+				"requestObjectSelectionCapability=true",
+				""
+		);
+
+		assertThat(resp).isNotNull();
+		assertThat(resp.getResult()).isEqualTo((short)1);
+		assertThat(resp.getXMLout()).isEqualTo(ObjectSelectionConstants.TRAJECTORY_OBJ_SELECTION);
+	}
+
+	@Test
+	public void getFrStoreRespInvalidTypeFail(){
+		WMLS_GetFromStoreResponse resp = this.witsmlServer.getFromStore(
+				"trapezoid",
+				minWellQueryTemplate,
+				"requestObjectSelectionCapability=true",
+				""
+		);
+		assertThat(resp).isNotNull();
+		assertThat(resp.getResult()).isEqualTo((short)-487);
+	}
+
+	@Test
+	public void getFrStoreRespTrajValueOtherThanTrueOrNoneFail(){
+		WMLS_GetFromStoreResponse resp = this.witsmlServer.getFromStore(
+				"trajectory",
+				minWellQueryTemplate,
+				"requestObjectSelectionCapability=notTrue",
+				""
+		);
+		assertThat(resp).isNotNull();
+		assertThat(resp.getResult()).isEqualTo((short)-427);
+	}
+
+	@Test
+	public void getFrStoreRespNoMinQueryTemplateFail(){
+		WMLS_GetFromStoreResponse resp = this.witsmlServer.getFromStore(
+				"trajectory",
+				"",
+				"requestObjectSelectionCapability=true",
+				""
+		);
+		assertThat(resp).isNotNull();
+		assertThat(resp.getResult()).isEqualTo((short)-408);
+	}
+
+	@Test
+	public void getFrStoreRespNoTypeInFail(){
+		WMLS_GetFromStoreResponse resp = this.witsmlServer.getFromStore(
+				"",
+				minWellQueryTemplate,
+				"requestObjectSelectionCapability=true",
+				""
+		);
+		assertThat(resp).isNotNull();
+		assertThat(resp.getResult()).isEqualTo((short)-407);
+	}
+
+	@Test
+	public void getFrStoreRespNoVersionFail(){
+		WMLS_GetFromStoreResponse resp = this.witsmlServer.getFromStore(
+				"well",
+				// Modified minimum Well query template to have no version
+				"<wells xmlns=\"http://www.witsml.org/schemas/1series\" " +
+						"version=\"\">" +
+						"<well/>" +
+						"</wells>",
+				"requestObjectSelectionCapability=true",
+				""
+		);
+		assertThat(resp).isNotNull();
+		assertThat(resp.getResult()).isEqualTo((short)-468);
+	}
+
+	@Test
+	public void getFrStoreRespNullKeyFail(){
+		// This test will succeed for any valid type; just alternating value of
+		// requestObjectSelectionCapability.
+		WMLS_GetFromStoreResponse resp = this.witsmlServer.getFromStore(
+				"well",
+				minWellQueryTemplate,
+				"requestObjectSelectionCapability=",
+				""
+		);
+
+		assertThat(resp).isNotNull();
+		// Since object selection capability is null, the code returns NULL
+		assertThat(resp.getResult()).isEqualTo((short)-411);
+	}
+
+	@Test
+	public void getFrStoreRespWhitespaceKeyFail(){
+		// This test will succeed for any valid type; just alternating value of
+		// requestObjectSelectionCapability.
+		WMLS_GetFromStoreResponse resp = this.witsmlServer.getFromStore(
+				"well",
+				minWellQueryTemplate,
+				"requestObjectSelectionCapability=  ",
+				""
+		);
+		assertThat(resp).isNotNull();
+		// Since object selection capability is null, the code returns NULL
+		assertThat(resp.getResult()).isEqualTo((short)-1001);
+	}
+
+	@Test
+	public void getFrStoreRespXMLHasUIDFail() {
+		WMLS_GetFromStoreResponse resp = this.witsmlServer.getFromStore(
+				"trajectory",
+				"<trajectorys" +
+						"        xmlns=\"http://www.witsml.org/schemas/1series\"" +
+						"        version=\"1.4.1.1\">" +
+						"    <trajectory uidWell=\"uidWell\" uidWellbore=\"uidWellbore\" uid=\"\">" +
+						"        <nameWell/>" +
+						"        <nameWellbore/>" +
+						"        <name>HM_Plan #2</name>" +
+						"        <dTimTrajStart/>" +
+						"        <dTimTrajEnd/>" +
+						"        <mdMn/>" +
+						"        <mdMx/>" +
+						"        <serviceCompany/>" +
+						"        <magDeclUsed/>" +
+						"        <gridCorUsed/>" +
+						"        <aziVertSect/>" +
+						"        <dispNsVertSectOrig/>" +
+						"        <dispEwVertSectOrig/>" +
+						"        <definitive/>" +
+						"        <memory/>" +
+						"        <finalTraj/>" +
+						"        <aziRef/>" +
+						"        <trajectoryStation uid=\"34ht5\"/>" +
+						"        <commonData>" +
+						"            <itemState/>" +
+						"            <comments/>" +
+						"        </commonData>" +
+						"    </trajectory>" +
+						"</trajectorys>",
+				"requestObjectSelectionCapability=true",
+				""
+		);
+		assertThat(resp).isNotNull();
+		assertThat(resp.getResult()).isEqualTo((short)-428);
+	}
+
+	@Test
+	public void getFrStoreRespMoreThanOneOptionsInFail() {
+		WMLS_GetFromStoreResponse resp = this.witsmlServer.getFromStore(
+				"well",
+				minWellQueryTemplate,
+				"requestObjectSelectionCapability=true;dataVersion=1.4.1.1",
+				""
+		);
+		assertThat(resp).isNotNull();
+		assertThat(resp.getResult()).isEqualTo((short)-427);
+	}
+
 }
