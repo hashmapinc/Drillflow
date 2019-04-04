@@ -372,67 +372,94 @@ public class StoreImpl implements IStore {
         WMLS_GetFromStoreResponse resp = new WMLS_GetFromStoreResponse();
         // try to deserialize
         Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
+        // validates to make sure conditions are met
         short validationResult = StoreValidator.validateGetFromStore(WMLtypeIn, QueryIn, optionsMap, valve);
         if (validationResult != 1){
             resp.setResult(validationResult);
             resp.setSuppMsgOut(witsmlApiConfigUtil.getProperty("basemessages." + resp.getResult()));
             return resp;
         }
-        List<AbstractWitsmlObject> witsmlObjects;
-        String clientVersion;
-        try {
-            clientVersion = WitsmlUtil.getVersionFromXML(QueryIn);
-            witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, QueryIn, clientVersion);
-        } catch (Exception e) {
-            // TODO: handle exception
-            LOG.warning("could not deserialize witsml object: \n" + 
-                        "WMLtypeIn: " + WMLtypeIn + " \n" + 
-                        "QueryIn: " + QueryIn + " \n" + 
-                        "OptionsIn: " + OptionsIn + " \n" + 
-                        "CapabilitiesIn: " + CapabilitiesIn
-            );
 
-            resp.setSuppMsgOut("Error parsing input: " + e.getMessage());
-            resp.setResult((short) -1);
-            return resp;
+        String xmlOut=null;
+        // check for the presence of the requestObjectSelectionCapability option --
+        // it is not necessary to retrieve data for a query since the query is a
+        // predefined constant that returns the capabilities of the server due to type
+        if ( optionsMap.containsKey("requestObjectSelectionCapability") &&
+                optionsMap.get("requestObjectSelectionCapability").equals("true") ) {
+            xmlOut = valve.getObjectSelectionCapability(WMLtypeIn);
+        } else {
+            if ( optionsMap.containsKey("requestObjectSelectionCapability") &&
+                    !optionsMap.get("requestObjectSelectionCapability").equals("none") ) {
+                resp.setResult((short)-427);
+                resp.setSuppMsgOut(witsmlApiConfigUtil.getProperty("basemessages." + resp.getResult()));
+                return resp;
+            }
+            if ( OptionsIn.contains("requestObjectSelectionCapability") &&
+                    !optionsMap.containsKey("requestObjectSelectionCapability") ) {
+                // value of the key must have been null since the parse never placed the key/value pair
+                // into the map
+                resp.setResult((short)-411);
+                resp.setSuppMsgOut(witsmlApiConfigUtil.getProperty("basemessages." + resp.getResult()));
+                return resp;
+            }
+            List<AbstractWitsmlObject> witsmlObjects;
+            String clientVersion;
+            try {
+                clientVersion = WitsmlUtil.getVersionFromXML(QueryIn);
+                witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, QueryIn, clientVersion);
+            } catch (Exception e) {
+                // TODO: handle exception
+                LOG.warning("could not deserialize witsml object: \n" +
+                        "WMLtypeIn: " + WMLtypeIn + " \n" +
+                        "QueryIn: " + QueryIn + " \n" +
+                        "OptionsIn: " + OptionsIn + " \n" +
+                        "CapabilitiesIn: " + CapabilitiesIn
+                );
+
+                resp.setSuppMsgOut("Error parsing input: " + e.getMessage());
+                resp.setResult((short) -1);
+                return resp;
+            }
+
+            // try to query
+            try {
+                // construct query context
+                ValveUser user = (ValveUser) SecurityContextHolder
+                        .getContext()
+                        .getAuthentication()
+                        .getPrincipal();
+                QueryContext qc = new QueryContext(
+                        clientVersion,
+                        WMLtypeIn,
+                        optionsMap,
+                        QueryIn,
+                        witsmlObjects,
+                        user.getUserName(),
+                        user.getPassword(),
+                        getExchangeId()
+                );
+
+                xmlOut = this.valve.getObject(qc).get();
+            } catch (ValveException ve) {
+                resp.setResult((short) -425);
+                LOG.warning("Valve Exception in GetFromStore: " + ve.getMessage());
+                resp.setSuppMsgOut(ve.getMessage());
+                ve.printStackTrace();
+            } catch (Exception e) {
+                resp.setResult((short) -425);
+                LOG.warning("Exception in generating GetFromStore response: " + e.getMessage());
+                e.printStackTrace();
+            }
         }
 
-        // try to query
-        try {
-            // construct query context
-
-            ValveUser user = (ValveUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            QueryContext qc = new QueryContext(
-                clientVersion,
-                WMLtypeIn,
-                optionsMap,
-                QueryIn,
-                witsmlObjects,
-                user.getUserName(),
-                user.getPassword(),
-                getExchangeId()
-            );
-
-            String xmlOut = this.valve.getObject(qc).get();
-
-            // populate response
-            if (null != xmlOut) {
-                resp.setSuppMsgOut("");
-                resp.setResult((short) 1);
-                resp.setXMLout(xmlOut);
-            } else {
-                resp.setSuppMsgOut("Unhandled error from REST backend.");
-                resp.setResult((short) -1);
-            }
-        } catch (ValveException ve) {
-            resp.setResult((short)-425);
-            LOG.warning("Valve Exception in GetFromStore: " + ve.getMessage());
-            resp.setSuppMsgOut(ve.getMessage());
-            ve.printStackTrace();
-        } catch (Exception e) {
-            resp.setResult((short)-425);
-            LOG.warning("Exception in generating GetFromStore response: " + e.getMessage());
-            e.printStackTrace();
+        // populate response
+        if (null != xmlOut) {
+            resp.setSuppMsgOut("");
+            resp.setResult((short) 1);
+            resp.setXMLout(xmlOut);
+        } else {
+            resp.setSuppMsgOut("Unhandled error from REST backend.");
+            resp.setResult((short) -1);
         }
 
         // return response
