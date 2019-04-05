@@ -19,7 +19,7 @@ import java.util.Map;
 
 public class ValveFactory {
 
-    public static IValve buildValve(String valveType, Map<String,String> config) {
+    public static IValve buildValve(String valveType, Map<String,String> config) throws ValveAuthException {
         switch (valveType) {
             case "DoT":
                 return new com.hashmapinc.tempus.witsml.valve.dot.DotValve(config);
