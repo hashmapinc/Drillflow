@@ -43,6 +43,7 @@
 		<java.version>11</java.version>
         <main.dir>${basedir}</main.dir>
 		<skipITs>true</skipITs>
+		<owasp.skip>true</owasp.skip>
 	</properties>
 
 	<build>
@@ -130,6 +131,21 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <version>5.0.0-M2</version>
+				<configuration>
+        			<skip>${owasp.skip}</skip>
+    			</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+            </plugin>
 
 		</plugins>
 	</build>

@@ -18,6 +18,7 @@ package com.hashmapinc.tempus.witsml.valve.dot;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.valve.IValve;
+import com.hashmapinc.tempus.witsml.valve.ObjectSelectionConstants;
 import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
 import com.hashmapinc.tempus.witsml.valve.dot.client.DotClient;
@@ -43,8 +44,9 @@ public class DotValve implements IValve {
 	 * fields
 	 * 
 	 * @param config
+	 * @throws ValveAuthException
 	 */
-	public DotValve(Map<String, String> config) {
+	public DotValve(Map<String, String> config) throws ValveAuthException {
 		String url = config.get("baseurl");
 		String apikey = config.get("apikey");
 		String tokenPath = config.get("token.path");
@@ -90,6 +92,27 @@ public class DotValve implements IValve {
 
 	/**
 	 * Gets the object based on the query from the WITSML STORE API
+	 *
+	 * @param WMLtypeIn - The WITSML type in from the API query
+	 * @return The resultant object from the query in xml string format
+	 * 		   NULL if invalid (unsupported) WITSML type
+	 */
+	@Override
+	public String getObjectSelectionCapability(String WMLtypeIn) {
+		switch (WMLtypeIn){
+			case "well":
+					return ObjectSelectionConstants.WELL_OBJ_SELECTION;
+    		case "wellbore":
+					return ObjectSelectionConstants.WELLBORE_OBJ_SELECTION;
+    		case "trajectory":
+					return ObjectSelectionConstants.TRAJECTORY_OBJ_SELECTION;
+			default:
+					return null;
+		}
+	}
+
+	/**
+	 * Gets the object based on the query from the WITSML STORE API
 	 * 
 	 * @param qc - QueryContext needed to execute the getObject querying
 	 * @return The resultant object from the query in xml string format
@@ -122,15 +145,13 @@ public class DotValve implements IValve {
 		return CompletableFuture.completedFuture(xmlResponse);
 	}
 
-	/*
+	/**
 		A trajectory object type that has a UID will query using a search if one of the following query args exist:
 		(1) lastUpdateTimeUtc
 		(2) mdMn
 		(3) mdMx
 		All three may be present, but it only takes one to be present to query using a search.
 	 */
-	// TODO If private, need a reflection solution (see http://saturnboy.com/2010/11/testing-private-methods-in-java/)
-	//private static boolean trajHasSearchQueryArgs( QueryContext qc ) {
 	public static boolean trajHasSearchQueryArgs( QueryContext qc ) {
 		// Trajectory object must have a UID.
 		if (qc.WITSML_OBJECTS.get(0).getUid() == null || "".equals(qc.WITSML_OBJECTS.get(0).getUid()))
