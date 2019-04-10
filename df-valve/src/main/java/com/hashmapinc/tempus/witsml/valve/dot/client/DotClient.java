@@ -45,7 +45,7 @@ import org.apache.http.ssl.SSLContexts;
 
 public class DotClient {
     private static final Logger LOG = Logger.getLogger(DotClient.class.getName());
-    private final String URL;
+    //private final String URL;
     private final String TOKEN_PATH;
     private final String API_KEY;
     // changed to ConcurrentHashMap to make thread safe
@@ -58,8 +58,7 @@ public class DotClient {
      * @param API_KEY
      * @throws ValveAuthException
      */
-    public DotClient(String URL, String API_KEY, String tokenPath) throws ValveAuthException {
-        this.URL = URL;
+    public DotClient(String API_KEY, String tokenPath)  throws ValveAuthException{
         this.API_KEY = API_KEY;
         this.TOKEN_PATH = tokenPath;
         // changed to ConcurrentHashMap to make thread safe
@@ -82,8 +81,10 @@ public class DotClient {
             // build payload for authentication
             String payload = "{\"account\":\"" + username + "\", \"password\":\"" + password + "\"}";
             // build request
-            HttpRequestWithBody req = Unirest.post(URL + this.TOKEN_PATH);
-            req.header("accept", "application/json").header("Ocp-Apim-Subscription-Key", this.API_KEY).body(payload);
+            HttpRequestWithBody req = Unirest.post(this.TOKEN_PATH);
+            req.header("Content-Type", "application/json")
+                .header("X-Api-Key", this.API_KEY)
+                .body(payload);
 
             // send request
             HttpResponse<String> response = new DotRestCommand(req).run();

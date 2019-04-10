@@ -46,15 +46,14 @@ public class DotValve implements IValve {
 	 * @param config
 	 * @throws ValveAuthException
 	 */
-	public DotValve(Map<String, String> config) throws ValveAuthException {
-		String url = config.get("baseurl");
+	public DotValve(Map<String, String> config) throws ValveAuthException  {
 		String apikey = config.get("apikey");
 		String tokenPath = config.get("token.path");
 
-		this.CLIENT = new DotClient(url, apikey, tokenPath);
+		this.CLIENT = new DotClient(apikey, tokenPath);
 		this.DELEGATOR = new DotDelegator(config);
 
-		LOG.info("Creating valve pointing to url: " + url);
+		LOG.info("Creating valve pointing to url: " + tokenPath);
 	}
 
 	/**
