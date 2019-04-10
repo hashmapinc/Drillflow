@@ -32,7 +32,7 @@ import com.mashape.unirest.request.HttpRequestWithBody;
 
 public class DotClient {
     private static final Logger LOG = Logger.getLogger(DotClient.class.getName());
-    private final String URL;
+    //private final String URL;
     private final String TOKEN_PATH;
     private final String API_KEY;
     // changed to ConcurrentHashMap to make thread safe
@@ -44,8 +44,7 @@ public class DotClient {
      * @param URL
      * @param API_KEY
      */
-    public DotClient(String URL, String API_KEY, String tokenPath) {
-        this.URL = URL;
+    public DotClient(String API_KEY, String tokenPath) {
         this.API_KEY = API_KEY;
         this.TOKEN_PATH = tokenPath;
         // changed to ConcurrentHashMap to make thread safe
@@ -67,9 +66,9 @@ public class DotClient {
             String payload = "{\"account\":\"" + username + "\", \"password\":\"" + password + "\"}";
 
             // build request
-            HttpRequestWithBody req = Unirest.post(URL + this.TOKEN_PATH);
-            req.header("accept", "application/json")
-                .header("Ocp-Apim-Subscription-Key", this.API_KEY)
+            HttpRequestWithBody req = Unirest.post(this.TOKEN_PATH);
+            req.header("Content-Type", "application/json")
+                .header("X-Api-Key", this.API_KEY)
                 .body(payload);
 
             // send request
