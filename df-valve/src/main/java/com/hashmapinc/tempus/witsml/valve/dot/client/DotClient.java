@@ -15,9 +15,16 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot.client;
 
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
@@ -29,6 +36,12 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
+
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContexts;
 
 public class DotClient {
     private static final Logger LOG = Logger.getLogger(DotClient.class.getName());
@@ -43,12 +56,18 @@ public class DotClient {
      *
      * @param URL
      * @param API_KEY
+     * @throws ValveAuthException
      */
     public DotClient(String API_KEY, String tokenPath) {
         this.API_KEY = API_KEY;
         this.TOKEN_PATH = tokenPath;
         // changed to ConcurrentHashMap to make thread safe
         this.cache = new ConcurrentHashMap<String, DecodedJWT>();
+        try {
+            buildHttpClient();
+        } catch (KeyManagementException | NoSuchAlgorithmException | KeyStoreException e) {
+            throw new ValveAuthException("Error creating http client: " + e.getMessage(), e);
+        }
     }
 
     /**
@@ -57,14 +76,10 @@ public class DotClient {
      * @param username
      * @param password
      */
-    private void refreshToken(
-        String username,
-        String password
-    ) throws ValveAuthException {
+    private void refreshToken(String username, String password) throws ValveAuthException {
         try {
             // build payload for authentication
             String payload = "{\"account\":\"" + username + "\", \"password\":\"" + password + "\"}";
-
             // build request
             HttpRequestWithBody req = Unirest.post(this.TOKEN_PATH);
             req.header("Content-Type", "application/json")
@@ -76,7 +91,9 @@ public class DotClient {
 
             // validate response
             int status = response.getStatus();
-            LOG.fine("refreshToken call for " + username + "returned REST status: " + status); // fine = debug I guess. Stupid JDK 11
+
+            LOG.fine("refreshToken call for " + username + "returned REST status: " + status); // fine = debug I guess.
+                                                                                               // Stupid JDK 11
             if (201 == status || 200 == status) {
                 // get JWT from response
                 String tokenString = new JsonNode(response.getBody()).getObject().getString("jwt");
@@ -98,17 +115,14 @@ public class DotClient {
      * @return JWT from auth endpoint
      * @throws ValveAuthException
      */
-    public DecodedJWT getJWT(
-        String username,
-        String password
-    ) throws ValveAuthException {
+    public DecodedJWT getJWT(String username, String password) throws ValveAuthException {
         // refresh token if necessary
         if (!cache.containsKey(username) || isTokenExpired(username))
             refreshToken(username, password);
 
         return cache.get(username);
     }
-    
+
     /**
      * Check if JWT Token will expire in the next BUFFER milliseconds
      *
@@ -131,13 +145,29 @@ public class DotClient {
      *
      * @param username - key to remove in the cache
      */
-    private void removeFromCache(
-        String username
-    ) {
+    private void removeFromCache(String username) {
         if (this.cache.containsKey(username))
             this.cache.remove(username); // TODO: maybe make this thread safe?
     }
 
+    private void buildHttpClient() throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException {
+        SSLContext sslcontext = SSLContexts.custom()
+            .loadTrustMaterial(null, new TrustSelfSignedStrategy())
+            .build();
+            
+        HostnameVerifier verifier = new HostnameVerifier(){
+            @Override
+            public boolean verify(String hostname, SSLSession session) {
+                return true;
+            }
+        };
+
+        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext,verifier);
+        CloseableHttpClient httpClient = HttpClients.custom()
+            .setSSLSocketFactory(sslsf)
+            .build();
+        Unirest.setHttpClient(httpClient);
+    }
     /**
      * retry wrapper for private makeRequest
      *

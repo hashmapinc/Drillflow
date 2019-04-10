@@ -31,6 +31,7 @@ import org.springframework.stereotype.Component;
 
 import com.hashmapinc.tempus.witsml.valve.IValve;
 import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
+import com.hashmapinc.tempus.witsml.valve.ValveException;
 import com.hashmapinc.tempus.witsml.valve.ValveFactory;
 
 @Component
@@ -49,7 +50,7 @@ public class ValveAuthenticationProvider implements AuthenticationProvider {
     }
 
     @PostConstruct
-    private void setValve(){
+    private void setValve() throws ValveException, ValveAuthException {
         valve = ValveFactory.buildValve(valveName,config.getConfiguration());
     }
     

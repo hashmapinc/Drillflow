@@ -50,7 +50,11 @@ public class StoreValidationTest {
 
     @Before
     public void Setup() {
-        valve = ValveFactory.buildValve("DoT", config.getConfiguration());
+        try{
+            valve = ValveFactory.buildValve("DoT", config.getConfiguration());
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     // *****************ADD TO STORE TESTS***************** //

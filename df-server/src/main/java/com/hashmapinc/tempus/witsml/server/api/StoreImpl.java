@@ -24,6 +24,7 @@ import com.hashmapinc.tempus.witsml.server.api.model.*;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.DataObject;
 import com.hashmapinc.tempus.witsml.server.api.model.cap.ServerCap;
 import com.hashmapinc.tempus.witsml.valve.IValve;
+import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
 import com.hashmapinc.tempus.witsml.valve.ValveFactory;
 import org.apache.cxf.ext.logging.event.LogEvent;
@@ -47,9 +48,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Service
-@WebService(serviceName = "WMLS", portName = "StoreSoapPort",
-        targetNamespace = "http://www.witsml.org/wsdl/120",
-        endpointInterface = "com.hashmapinc.tempus.witsml.server.api.IStore")
+@WebService(serviceName = "WMLS", portName = "StoreSoapPort", targetNamespace = "http://www.witsml.org/wsdl/120", endpointInterface = "com.hashmapinc.tempus.witsml.server.api.IStore")
 @Features(features = "org.apache.cxf.ext.logging.LoggingFeature")
 public class StoreImpl implements IStore {
     private static final Logger LOG = Logger.getLogger(StoreImpl.class.getName());
@@ -65,24 +64,28 @@ public class StoreImpl implements IStore {
     private String valveName;
 
     @Autowired
-    private void setServerCap(ServerCap cap){
+    private void setServerCap(ServerCap cap) {
         this.cap = cap;
     }
 
     @Autowired
-    private void setWitsmlApiConfig(WitsmlApiConfig witsmlApiConfigUtil){
+    private void setWitsmlApiConfig(WitsmlApiConfig witsmlApiConfigUtil) {
         this.witsmlApiConfigUtil = witsmlApiConfigUtil;
     }
 
     @Autowired
-    private void setValveConfig(ValveConfig config){
+    private void setValveConfig(ValveConfig config) {
         this.config = config;
     }
 
     @PostConstruct
-    private void setValve(){
+    private void setValve() {
         // get the valve
-        valve = ValveFactory.buildValve(valveName, config.getConfiguration());
+        try {
+            valve = ValveFactory.buildValve(valveName, config.getConfiguration());
+        } catch (ValveAuthException e) {
+            LOG.info("Error creating the valve: " + e.getMessage());
+        }
 
         //=====================================================================
         // update the cap with this valve's capabililies
