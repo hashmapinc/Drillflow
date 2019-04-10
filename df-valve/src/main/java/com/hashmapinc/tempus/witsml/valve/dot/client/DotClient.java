@@ -58,7 +58,7 @@ public class DotClient {
      * @param API_KEY
      * @throws ValveAuthException
      */
-    public DotClient(String API_KEY, String tokenPath) {
+    public DotClient(String API_KEY, String tokenPath)  throws ValveAuthException{
         this.API_KEY = API_KEY;
         this.TOKEN_PATH = tokenPath;
         // changed to ConcurrentHashMap to make thread safe

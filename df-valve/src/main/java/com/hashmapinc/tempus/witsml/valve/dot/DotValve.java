@@ -46,7 +46,7 @@ public class DotValve implements IValve {
 	 * @param config
 	 * @throws ValveAuthException
 	 */
-	public DotValve(Map<String, String> config) {
+	public DotValve(Map<String, String> config) throws ValveAuthException  {
 		String apikey = config.get("apikey");
 		String tokenPath = config.get("token.path");
 
