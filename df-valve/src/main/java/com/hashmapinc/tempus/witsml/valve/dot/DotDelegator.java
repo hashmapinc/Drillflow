@@ -41,7 +41,7 @@ import java.util.logging.Logger;
 public class DotDelegator {
     private static final Logger LOG = Logger.getLogger(DotDelegator.class.getName());
 
-    private final String URL;
+    //private final String URL;
     private final String WELL_PATH;
     private final String WB_PATH;
     private final String TRAJECTORY_PATH;
@@ -55,7 +55,6 @@ public class DotDelegator {
      * @param config - map with field values
      */
     public DotDelegator(Map<String, String> config) {
-        this.URL =             		config.get("baseurl");
         this.WELL_PATH =       		config.get("well.path");
         this.WB_PATH =         		config.get("wellbore.path");
         this.TRAJECTORY_PATH = 		config.get("trajectory.path");
@@ -73,27 +72,26 @@ public class DotDelegator {
     private String getEndpoint(
         String objectType
     ) throws ValveException {
-        // TODO: these should be injected in the DotDelegator constructor and not rely on a shared this.URL
         // get endpoint
         String endpoint;
         switch (objectType) {
             case "well":
-            	endpoint = this.URL + this.WELL_PATH;
+            	endpoint = this.WELL_PATH;
                 break;
 			case "wellsearch":
-				endpoint = this.URL + this.WELL_GQL_PATH;
+				endpoint = this.WELL_GQL_PATH;
 				break;
             case "wellbore":
-                endpoint = this.URL + this.WB_PATH;
+                endpoint = this.WB_PATH;
                 break;
 			case "wellboresearch":
-				endpoint = this.URL + this.WELLBORE_GQL_PATH;
+				endpoint = this.WELLBORE_GQL_PATH;
 				break;
             case "trajectory":
-                endpoint = this.URL + this.TRAJECTORY_PATH;
+                endpoint = this.TRAJECTORY_PATH;
                 break;
 			case "trajectorysearch":
-				endpoint = this.URL + this.TRAJECTORY_GQL_PATH;
+				endpoint = this.TRAJECTORY_GQL_PATH;
 				break;
             default:
                 throw new ValveException("Unsupported object type<" + objectType + ">");

@@ -65,13 +65,13 @@ public class DotDelegatorTest {
 
         // build config
         HashMap<String, String> config = new HashMap<>();
-        config.put("baseurl", this.url);
-        config.put("well.path", "/well/");
-        config.put("wellbore.path", "/wellbore/");
-        config.put("trajectory.path", "/trajectory/");
-        config.put("well.gql.path", "/well/graphql/");
-        config.put("wellbore.gql.path", "/wellbore/graphql/");
-        config.put("trajectory.gql.path", "/trajectory/graphql");
+        //config.put("baseurl", this.url);
+        config.put("well.path", this.url + "/well/");
+        config.put("wellbore.path", this.url + "/wellbore/");
+        config.put("trajectory.path", this.url + "/trajectory/");
+        config.put("well.gql.path", this.url + "/well/graphql/");
+        config.put("wellbore.gql.path", this.url + "/wellbore/graphql/");
+        config.put("trajectory.gql.path", this.url + "/trajectory/graphql");
 
 
         // instantiate delegator
