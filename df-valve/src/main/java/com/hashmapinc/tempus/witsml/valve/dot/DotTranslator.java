@@ -23,6 +23,7 @@ import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
 import org.json.JSONObject;
 
@@ -110,6 +111,9 @@ public class DotTranslator {
                 case "trajectory":
                     return WitsmlMarshal.deserializeFromJSON(
                         result, ObjTrajectory.class);
+                case "log":
+                    return WitsmlMarshal.deserializeFromJSON(
+                            result, ObjLog.class);
                 default:
                     throw new ValveException("unsupported object type");
             }

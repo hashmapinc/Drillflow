@@ -128,6 +128,8 @@ public class DotValve implements IValve {
 				(qc.WITSML_OBJECTS.get(0).getUid() == null || "".equals(qc.WITSML_OBJECTS.get(0).getUid()))) {
 			// ... query using a search
 			queryResponses = doSearch(qc);
+		}if ( "log".equals(qc.OBJECT_TYPE) ) {
+			queryResponses = getSingularObject(qc);
 		} else {
 			if ( "trajectory".equals(qc.OBJECT_TYPE) && trajHasSearchQueryArgs(qc) ) {
 				// ... query using a search
@@ -381,10 +383,13 @@ public class DotValve implements IValve {
 																										// arbitrary
 		AbstractWitsmlObject trajectory = new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory(); // 1311 is
 																											// arbitrary
+		AbstractWitsmlObject log = new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog(); // 1311 is arbitrary
+
 		AbstractWitsmlObject[][] supportedObjects = { { well, wellbore, trajectory }, // ADD TO STORE OBJECTS
-				{ well, wellbore, trajectory }, // GET FROM STORE OBJECTS
-				{ well, wellbore, trajectory }, // DELETE FROM STORE OBJECTS
-				{ well, wellbore, trajectory }, // UPDATE IN STORE OBJECTS
+				{ well, wellbore, trajectory, log }, // ADD TO STORE OBJECTS
+				{ well, wellbore, trajectory, log }, // GET FROM STORE OBJECTS
+				{ well, wellbore, trajectory, log }, // DELETE FROM STORE OBJECTS
+				{ well, wellbore, trajectory, log }, // UPDATE IN STORE OBJECTS
 		};
 
 		// populate cap

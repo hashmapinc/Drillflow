@@ -48,7 +48,10 @@ public class DotDelegator {
     private final String WELL_GQL_PATH;
     private final String WELLBORE_GQL_PATH;
 	private final String TRAJECTORY_GQL_PATH;
-
+	private final String LOG_PATH;
+	private final String LOG_CHANNELSET_METADATA;
+	private final String LOG_CHANNELSET_UUID;
+	private final String LOG_CHANNELS;
     /**
      * Map based constructor
      *
@@ -62,6 +65,10 @@ public class DotDelegator {
         this.WELL_GQL_PATH =   		config.get("well.gql.path");
         this.WELLBORE_GQL_PATH = 	config.get("wellbore.gql.path");
 		this.TRAJECTORY_GQL_PATH = 	config.get("trajectory.gql.path");
+		this.LOG_PATH =						config.get("log.channelset.path");
+		this.LOG_CHANNELSET_METADATA =		config.get("log.channelset.metadata.path");
+		this.LOG_CHANNELSET_UUID =			config.get("log.channelset.uuid.path");
+		this.LOG_CHANNELS =					config.get("log.channels.path");
     }
 
     /**
@@ -94,6 +101,18 @@ public class DotDelegator {
                 break;
 			case "trajectorysearch":
 				endpoint = this.URL + this.TRAJECTORY_GQL_PATH;
+				break;
+			case "log":
+				endpoint = this.URL + this.LOG_PATH;
+				break;
+			case "channelsetmetadata":
+				endpoint = this.URL + this.LOG_CHANNELSET_METADATA;
+				break;
+			case "channelsetuuid":
+				endpoint = this.URL + this.LOG_CHANNELSET_UUID;
+				break;
+			case "channels":
+				endpoint = this.URL + this.LOG_CHANNELS;
 				break;
             default:
                 throw new ValveException("Unsupported object type<" + objectType + ">");
@@ -372,8 +391,17 @@ public class DotDelegator {
 		Map<String,String> optionsIn
 	) throws ValveException, ValveAuthException, UnirestException {
 		String uid = witsmlObject.getUid();
+		String uidWellbore ;
+		String uidWellLog ;
 		String objectType = witsmlObject.getObjectType();
-		String endpoint = this.getEndpoint(objectType) + uid; // add uid for rest call
+		String endpoint="";
+		String uuid="";
+	    if ("log".equals(objectType)){
+			 endpoint = this.getEndpoint("channelsetuuid");
+		}else{
+			 endpoint = this.getEndpoint(objectType) + uid; // add uid for rest call
+		}
+
 		String version = witsmlObject.getVersion();
 
 		// build request
@@ -381,6 +409,12 @@ public class DotDelegator {
 		request.header("accept", "application/json");
 		if ("wellbore".equals(objectType)) {
 			request.queryString("uidWell", witsmlObject.getParentUid()); // TODO: check the parent uid exists?
+		} if ("log".equals(objectType)) { // code added to handle log object
+		uidWellbore = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObject).getUidWellbore();
+		uidWellLog = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObject).getUidWell();
+		request.queryString("uid", uid);
+		request.queryString("uidWellbore", uidWellbore);
+		request.queryString("uidWell", uidWellLog);
 		} else if ("trajectory".equals(objectType)) {
 			request.queryString("uidWellbore", witsmlObject.getParentUid());
 			String uidWell;
@@ -397,9 +431,44 @@ public class DotDelegator {
 		// get response
 		HttpResponse<String> response = client.makeRequest(request, username, password);
 
+		if ("log".equals(objectType)) {
+			JSONObject responseJson = new JSONObject(response.getBody());
+			uuid = responseJson.getString("uuid");
+		}
+
 		// check response status
 		int status = response.getStatus();
 		if (201 == status || 200 == status) {
+            // Code logic added to handle log ChannelSet Metadata/Get Channels/get All Channels
+			if ("log".equals(objectType)) {
+				//Build Request for Get ChannelSet Metadata
+				String channelsetmetadataEndpoint = this.getEndpoint("channelsetmetadata");
+				HttpRequest channelsetmetadataRequest = Unirest.get(channelsetmetadataEndpoint);
+				request.header("accept", "application/json");
+				request.queryString("uid", uuid);
+				// get response
+				HttpResponse<String> channelsetmetadataResponse = client.makeRequest(request, username, password);
+
+				//Build Request for Get All ChannelSet
+				String channelsetuuidEndpoint = this.getEndpoint("log");
+				HttpRequest channelsetuuidRequest = Unirest.get(channelsetuuidEndpoint);
+				uidWellbore = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObject).getUidWellbore();
+				uidWellLog = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObject).getUidWell();
+				request.header("accept", "application/json");
+				request.queryString("containerId", uuid);
+				// get response
+				HttpResponse<String> allChannelSet = client.makeRequest(request, username, password);
+
+				//Build Request for Get Channels
+				String channels = this.getEndpoint("channels");
+				uidWellbore = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObject).getUidWellbore();
+				uidWellLog = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObject).getUidWell();
+				HttpRequest channelsRequest = Unirest.get("channels");
+				request.header("accept", "application/json");
+				request.queryString("channelSetUuid", uuid);
+				// get response
+				HttpResponse<String> channelsResponse = client.makeRequest(request, username, password);
+			}
 			LOG.info(ValveLogging.getLogMsg(
 					exchangeID,
 					logResponse(response, "Successfully executed GET for query object=" + witsmlObject.toString()),
