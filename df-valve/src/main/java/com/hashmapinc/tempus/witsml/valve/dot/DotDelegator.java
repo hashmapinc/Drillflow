@@ -396,6 +396,16 @@ public class DotDelegator {
 		String objectType = witsmlObject.getObjectType();
 		String endpoint="";
 		String uuid="";
+		String channelsetmetadataEndpoint;
+		HttpResponse<String> channelsetmetadataResponse;
+		HttpRequest channelsetmetadataRequest;
+		String channelsetuuidEndpoint;
+		HttpRequest channelsetuuidRequest;
+		HttpResponse<String> allChannelSet;
+		String channels;
+		HttpRequest channelsRequest;
+		HttpResponse<String> channelsResponse;
+
 	    if ("log".equals(objectType)){
 			 endpoint = this.getEndpoint("channelsetuuid");
 		}else{
@@ -442,32 +452,32 @@ public class DotDelegator {
             // Code logic added to handle log ChannelSet Metadata/Get Channels/get All Channels
 			if ("log".equals(objectType)) {
 				//Build Request for Get ChannelSet Metadata
-				String channelsetmetadataEndpoint = this.getEndpoint("channelsetmetadata");
-				HttpRequest channelsetmetadataRequest = Unirest.get(channelsetmetadataEndpoint);
+				channelsetmetadataEndpoint = this.getEndpoint("channelsetmetadata");
+				channelsetmetadataRequest = Unirest.get(channelsetmetadataEndpoint);
 				request.header("accept", "application/json");
 				request.queryString("uid", uuid);
 				// get response
-				HttpResponse<String> channelsetmetadataResponse = client.makeRequest(request, username, password);
+				channelsetmetadataResponse = client.makeRequest(request, username, password);
 
 				//Build Request for Get All ChannelSet
-				String channelsetuuidEndpoint = this.getEndpoint("log");
-				HttpRequest channelsetuuidRequest = Unirest.get(channelsetuuidEndpoint);
+				channelsetuuidEndpoint = this.getEndpoint("log");
+				channelsetuuidRequest = Unirest.get(channelsetuuidEndpoint);
 				uidWellbore = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObject).getUidWellbore();
 				uidWellLog = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObject).getUidWell();
 				request.header("accept", "application/json");
 				request.queryString("containerId", uuid);
 				// get response
-				HttpResponse<String> allChannelSet = client.makeRequest(request, username, password);
+				allChannelSet = client.makeRequest(request, username, password);
 
 				//Build Request for Get Channels
-				String channels = this.getEndpoint("channels");
+				channels = this.getEndpoint("channels");
 				uidWellbore = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObject).getUidWellbore();
 				uidWellLog = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObject).getUidWell();
-				HttpRequest channelsRequest = Unirest.get("channels");
+				channelsRequest = Unirest.get("channels");
 				request.header("accept", "application/json");
 				request.queryString("channelSetUuid", uuid);
 				// get response
-				HttpResponse<String> channelsResponse = client.makeRequest(request, username, password);
+				channelsResponse = client.makeRequest(request, username, password);
 			}
 			LOG.info(ValveLogging.getLogMsg(
 					exchangeID,
