@@ -62,9 +62,9 @@ public class LogConverter extends com.hashmapinc.tempus.WitsmlObjects.Util.LogCo
         objLogJO = new JSONObject( witsmlObj.getJSONString("1.4.1.1") );
         String removedEmpties = JsonUtil.removeEmpties(objLogJO);
 
-        renameString("pass", "passNumber");
-        renameString("indexType", "timeDepth");
-        renameString("serviceCompany", "loggingCompanyName");
+        renameString("pass", "passNumber", objLogJO);
+        renameString("indexType", "timeDepth", objLogJO);
+        renameString("serviceCompany", "loggingCompanyName", objLogJO);
 
         // ****************************** citation created JSON object ********************************
         boolean createdAnObject = false;
@@ -123,11 +123,11 @@ public class LogConverter extends com.hashmapinc.tempus.WitsmlObjects.Util.LogCo
     return objLogJO;
 }
 
-    private static void renameString(String oldName, String newName) {
-        if (objLogJO.has(oldName)) {
-            String passValue = objLogJO.getString(oldName);
-            objLogJO.remove(oldName);
-            objLogJO.put(newName, passValue);
+    protected static void renameString(String oldName, String newName, JSONObject objForRename) {
+        if (objForRename.has(oldName)) {
+            String passValue = objForRename.getString(oldName);
+            objForRename.remove(oldName);
+            objForRename.put(newName, passValue);
         }
     }
     // ********************************************************************************************

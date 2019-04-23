@@ -1,0 +1,47 @@
+{
+  "uid":"HM9000",
+  "startIndex":{
+    "uom":"ft","value":0,
+  },
+  "endIndex":{
+    "uom":"ft","value":8201.77,
+  },
+  "logCurveInfo":[
+    {
+      "minDateTimeIndex":null,
+      "classIndex":null,
+      "curveDescription":"Torque",
+      "alternateIndex":null,
+      "densData":null,
+      "maxDateTimeIndex":null,
+      "mnemAlias":null,
+      "classWitsml":null,
+      "extensionNameValue":[],
+      "nullValue":"-999.25",
+      "traceState":null,
+      "uid":"LCI-1",
+      "unit":"m",
+      "maxIndex":null,
+      "sensorOffset":null,
+      "traceOrigin":null,
+      "mnemonic":{
+        "namingSystem":null,
+        "value":"TQA_mnemonic",
+      },
+      "typeLogData":"string",
+      "minIndex":null,
+      "axisDefinition":[],
+      "dataSource":null,
+      "wellDatum":null,
+    }
+  ],
+  "uidWellbore":"WBDD600",
+  "parentUid":"WBDD600",
+  "pass":"2",
+  "grandParentUid":"U2",
+  "serviceCompany":"Schlumberger",
+  "uidWell":"U2",
+  "indexType":"time",
+  "name":"my channel set3",
+  "runNumber":"2",
+}

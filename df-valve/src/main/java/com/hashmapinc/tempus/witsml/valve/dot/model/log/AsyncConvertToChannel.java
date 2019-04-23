@@ -139,7 +139,6 @@ public class AsyncConvertToChannel {
 
         channelItem.put("mnemonic", mnemonicToUse);
         return CompletableFuture.completedFuture(channelItem);
-
     }
 
     private static void renameString(String oldName, String newName, JSONObject jsonItem) {
