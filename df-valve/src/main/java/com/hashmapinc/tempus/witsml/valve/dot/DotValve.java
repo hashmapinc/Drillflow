@@ -128,8 +128,6 @@ public class DotValve implements IValve {
 				(qc.WITSML_OBJECTS.get(0).getUid() == null || "".equals(qc.WITSML_OBJECTS.get(0).getUid()))) {
 			// ... query using a search
 			queryResponses = doSearch(qc);
-		}if ( "log".equals(qc.OBJECT_TYPE) ) {
-			queryResponses = getSingularObject(qc);
 		} else {
 			if ( "trajectory".equals(qc.OBJECT_TYPE) && trajHasSearchQueryArgs(qc) ) {
 				// ... query using a search
