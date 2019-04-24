@@ -393,15 +393,6 @@ public class DotDelegator {
 		String objectType = witsmlObject.getObjectType();
 		String endpoint="";
 		String uuid="";
-		String channelsetmetadataEndpoint;
-		HttpResponse<String> channelsetmetadataResponse;
-		HttpRequest channelsetmetadataRequest;
-		String channelsetuuidEndpoint;
-		HttpRequest channelsetuuidRequest;
-		HttpResponse<String> allChannelSet;
-		String channelsEndPoint;
-		HttpRequest channelsRequest;
-		HttpResponse<String> channelsResponse;
 
 		if ("log".equals(objectType)){
 			endpoint = this.getEndpoint("channelsetuuid");
@@ -442,44 +433,8 @@ public class DotDelegator {
 		if (201 == status || 200 == status) {
 			// Code logic added to handle log ChannelSet Metadata/Get Channels/get All Channels
 			if ("log".equals(objectType)) {
-				//Build Request for Get ChannelSet Metadata
-				channelsetmetadataEndpoint = this.getEndpoint("channelsetmetadata");
-				channelsetmetadataRequest = Unirest.get(channelsetmetadataEndpoint);
-				channelsetmetadataRequest.header("accept", "application/json");
-				channelsetmetadataRequest.queryString("uuid", uuid);
-				// get response
-				channelsetmetadataResponse = client.makeRequest(channelsetmetadataRequest, username, password);
-				//Build Request for Get All ChannelSet
-				channelsetuuidEndpoint = this.getEndpoint("log");
-				channelsetuuidRequest = Unirest.get(channelsetuuidEndpoint);
-				channelsetuuidRequest.header("accept", "application/json");
-				channelsetuuidRequest.queryString("containerId", uuid);
-				// get response
-				allChannelSet = client.makeRequest(channelsetuuidRequest, username, password);
-				//Build Request for Get Channels
-				channelsEndPoint = this.getEndpoint("channels");
-				channelsRequest = Unirest.get(channelsEndPoint);
-				channelsRequest.header("accept", "application/json");
-				channelsRequest.queryString("channelSetUuid", uuid);
-				// get response
-				channelsResponse = client.makeRequest(channelsRequest, username, password);
-				if (201 == channelsetmetadataResponse.getStatus() || 200 == channelsetmetadataResponse.getStatus() || 201 == allChannelSet.getStatus() || 201 == allChannelSet.getStatus() || 201 == channelsResponse.getStatus() || 201 == channelsResponse.getStatus()) {
-					LOG.info(ValveLogging.getLogMsg(
-							exchangeID,
-							logResponse(response, "Successfully executed GET for query object=" + witsmlObject.toString()),
-							witsmlObject
-					));
-				}else if (404 == status) {
-					// handle not found. This is a valid response
-					return null;
-				} else {
-					LOG.warning(ValveLogging.getLogMsg(
-							witsmlObject.getUid(),
-							logResponse(response, "Unable to execute GET"),
-							witsmlObject
-					));
-					throw new ValveException(response.getBody());
-				}
+				getRestCalls(witsmlObject,client,uuid,username,password,exchangeID);
+
 			}
 			LOG.info(ValveLogging.getLogMsg(
 					exchangeID,
@@ -500,6 +455,66 @@ public class DotDelegator {
 			throw new ValveException(response.getBody());
 		}
 	}
+
+	/**
+	 * All other rest calls to verify channelSetMetadata,ChannelSet,Channels
+	 *
+	 * @param witsmlObject - AbstractWitsmlObject to get
+	 * @param username - auth username
+	 * @param password - auth password
+	 * @param exchangeID - unique string for tracking which exchange called this method
+	 * @param client - DotClient to execute requests with
+	 */
+
+	void getRestCalls(AbstractWitsmlObject witsmlObject,DotClient client,String uuid,String username, String password, String exchangeID) throws ValveException, ValveAuthException, UnirestException {
+
+		String channelsetmetadataEndpoint;
+		HttpResponse<String> channelsetmetadataResponse;
+		HttpRequest channelsetmetadataRequest;
+		String channelsetuuidEndpoint;
+		HttpRequest channelsetuuidRequest;
+		HttpResponse<String> allChannelSet;
+		String channelsEndPoint;
+		HttpRequest channelsRequest;
+		HttpResponse<String> channelsResponse;
+
+		//Build Request for Get ChannelSet Metadata
+		channelsetmetadataEndpoint = this.getEndpoint("channelsetmetadata");
+		channelsetmetadataRequest = Unirest.get(channelsetmetadataEndpoint);
+		channelsetmetadataRequest.header("accept", "application/json");
+		channelsetmetadataRequest.queryString("uuid", uuid);
+		// get response
+		channelsetmetadataResponse = client.makeRequest(channelsetmetadataRequest, username, password);
+		//Build Request for Get All ChannelSet
+		channelsetuuidEndpoint = this.getEndpoint("log");
+		channelsetuuidRequest = Unirest.get(channelsetuuidEndpoint);
+		channelsetuuidRequest.header("accept", "application/json");
+		channelsetuuidRequest.queryString("containerId", uuid);
+		// get response
+		allChannelSet = client.makeRequest(channelsetuuidRequest, username, password);
+		//Build Request for Get Channels
+		channelsEndPoint = this.getEndpoint("channels");
+		channelsRequest = Unirest.get(channelsEndPoint);
+		channelsRequest.header("accept", "application/json");
+		channelsRequest.queryString("channelSetUuid", uuid);
+		// get response
+		channelsResponse = client.makeRequest(channelsRequest, username, password);
+		if (201 == channelsetmetadataResponse.getStatus() || 200 == channelsetmetadataResponse.getStatus() || 201 == allChannelSet.getStatus() || 201 == allChannelSet.getStatus() || 201 == channelsResponse.getStatus() || 201 == channelsResponse.getStatus()) {
+			LOG.info(ValveLogging.getLogMsg(
+					exchangeID,
+					logResponse(channelsResponse, "Successfully executed GET for query object=" + witsmlObject.toString()),
+					witsmlObject
+			));
+		} else {
+			LOG.warning(ValveLogging.getLogMsg(
+					witsmlObject.getUid(),
+					logResponse(channelsResponse, "Unable to execute GET"),
+					witsmlObject
+			));
+			throw new ValveException(channelsResponse.getBody());
+		}
+	}
+
 	/**
 	 * Submits a search query to the DoT rest API for object GETing
 	 *
