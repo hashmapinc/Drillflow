@@ -86,7 +86,7 @@ Drillflow includes the [OWASP Dependancy checker](https://github.com/jeremylong/
 To check if any dependencies are subject to any current CVE's run
 
 ```bash
-mvn verify
+mvn clean install -Dowasp.skip=false
 ```
 
 ### Building the Docker image
