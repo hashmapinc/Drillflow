@@ -458,6 +458,23 @@ public class DotDelegator {
 				request.queryString("uid", uuid);
 				// get response
 				channelsetmetadataResponse = client.makeRequest(request, username, password);
+				if (201 == channelsetmetadataResponse.getStatus() || 200 == channelsetmetadataResponse.getStatus()) {
+					LOG.info(ValveLogging.getLogMsg(
+							exchangeID,
+							logResponse(response, "Successfully executed GET for query object=" + witsmlObject.toString()),
+							witsmlObject
+					));
+				}else if (404 == status) {
+					// handle not found. This is a valid response
+					return null;
+				} else {
+					LOG.warning(ValveLogging.getLogMsg(
+							witsmlObject.getUid(),
+							logResponse(response, "Unable to execute GET"),
+							witsmlObject
+					));
+					throw new ValveException(response.getBody());
+				}
 
 				//Build Request for Get All ChannelSet
 				channelsetuuidEndpoint = this.getEndpoint("log");
@@ -469,6 +486,24 @@ public class DotDelegator {
 				// get response
 				allChannelSet = client.makeRequest(request, username, password);
 
+				if (201 == allChannelSet.getStatus() || 200 == allChannelSet.getStatus()) {
+					LOG.info(ValveLogging.getLogMsg(
+							exchangeID,
+							logResponse(response, "Successfully executed GET for query object=" + witsmlObject.toString()),
+							witsmlObject
+					));
+				}else if (404 == status) {
+					// handle not found. This is a valid response
+					return null;
+				} else {
+					LOG.warning(ValveLogging.getLogMsg(
+							witsmlObject.getUid(),
+							logResponse(response, "Unable to execute GET"),
+							witsmlObject
+					));
+					throw new ValveException(response.getBody());
+				}
+
 				//Build Request for Get Channels
 				channels = this.getEndpoint("channels");
 				uidWellbore = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObject).getUidWellbore();
@@ -478,6 +513,24 @@ public class DotDelegator {
 				request.queryString("channelSetUuid", uuid);
 				// get response
 				channelsResponse = client.makeRequest(request, username, password);
+
+				if (201 == channelsResponse.getStatus() || 200 == channelsResponse.getStatus()) {
+					LOG.info(ValveLogging.getLogMsg(
+							exchangeID,
+							logResponse(response, "Successfully executed GET for query object=" + witsmlObject.toString()),
+							witsmlObject
+					));
+				}else if (404 == status) {
+					// handle not found. This is a valid response
+					return null;
+				} else {
+					LOG.warning(ValveLogging.getLogMsg(
+							witsmlObject.getUid(),
+							logResponse(response, "Unable to execute GET"),
+							witsmlObject
+					));
+					throw new ValveException(response.getBody());
+				}
 			}
 			LOG.info(ValveLogging.getLogMsg(
 					exchangeID,
