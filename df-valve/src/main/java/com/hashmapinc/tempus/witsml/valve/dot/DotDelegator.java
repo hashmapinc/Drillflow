@@ -41,8 +41,6 @@ import java.util.logging.Logger;
 public class DotDelegator {
 	private static final Logger LOG = Logger.getLogger(DotDelegator.class.getName());
 
-	//private final String URL;
-	private final String URL;
 	private final String WELL_PATH;
 	private final String WB_PATH;
 	private final String TRAJECTORY_PATH;
@@ -59,7 +57,6 @@ public class DotDelegator {
 	 * @param config - map with field values
 	 */
 	public DotDelegator(Map<String, String> config) {
-		this.URL =             				config.get("baseurl");
 		this.WELL_PATH =       				config.get("well.path");
 		this.WB_PATH =         				config.get("wellbore.path");
 		this.TRAJECTORY_PATH = 				config.get("trajectory.path");
@@ -103,16 +100,16 @@ public class DotDelegator {
 				endpoint = this.TRAJECTORY_GQL_PATH;
 				break;
 			case "log":
-				endpoint = this.URL + this.LOG_PATH;
+				endpoint = this.LOG_PATH;
 				break;
 			case "channelsetmetadata":
-				endpoint = this.URL + this.LOG_CHANNELSET_METADATA;
+				endpoint = this.LOG_CHANNELSET_METADATA;
 				break;
 			case "channelsetuuid":
-				endpoint = this.URL + this.LOG_CHANNELSET_UUID;
+				endpoint = this.LOG_CHANNELSET_UUID;
 				break;
 			case "channels":
-				endpoint = this.URL + this.LOG_CHANNELS;
+				endpoint = this.LOG_CHANNELS;
 				break;
 			default:
 				throw new ValveException("Unsupported object type<" + objectType + ">");
