@@ -433,7 +433,7 @@ public class DotDelegator {
 		if (201 == status || 200 == status) {
 			// Code logic added to handle log ChannelSet Metadata/Get Channels/get All Channels
 			if ("log".equals(objectType)) {
-				getRestCalls(witsmlObject,client,uuid,username,password,exchangeID);
+				 getRestCalls(witsmlObject,client,uuid,username,password,exchangeID);
 
 			}
 			LOG.info(ValveLogging.getLogMsg(
@@ -466,7 +466,7 @@ public class DotDelegator {
 	 * @param client - DotClient to execute requests with
 	 */
 
-	void getRestCalls(AbstractWitsmlObject witsmlObject,DotClient client,String uuid,String username, String password, String exchangeID) throws ValveException, ValveAuthException, UnirestException {
+	private void getRestCalls(AbstractWitsmlObject witsmlObject,DotClient client,String uuid,String username, String password, String exchangeID) throws ValveException, ValveAuthException, UnirestException {
 
 		String channelsetmetadataEndpoint;
 		HttpResponse<String> channelsetmetadataResponse;
