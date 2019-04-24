@@ -18,10 +18,9 @@ cxf:
     path: /Service
 server:
     port: 7070
-valve :
+valve : 
     name: DoT
     configuration :
-        baseurl: ${VALVE_BASE_URL}
         apikey: ${VALVE_API_KEY}
         token.path: ${TOKEN_PATH:/token/jwt/v1/}
         well.path: ${WELL_PATH:democore/well/v2/witsml/wells/}
