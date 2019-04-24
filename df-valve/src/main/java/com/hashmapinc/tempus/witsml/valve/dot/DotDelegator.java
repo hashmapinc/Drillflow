@@ -58,13 +58,13 @@ public class DotDelegator {
      * @param config - map with field values
      */
     public DotDelegator(Map<String, String> config) {
-        this.URL =             		config.get("baseurl");
-        this.WELL_PATH =       		config.get("well.path");
-        this.WB_PATH =         		config.get("wellbore.path");
-        this.TRAJECTORY_PATH = 		config.get("trajectory.path");
-        this.WELL_GQL_PATH =   		config.get("well.gql.path");
-        this.WELLBORE_GQL_PATH = 	config.get("wellbore.gql.path");
-		this.TRAJECTORY_GQL_PATH = 	config.get("trajectory.gql.path");
+        this.URL =             				config.get("baseurl");
+        this.WELL_PATH =       				config.get("well.path");
+        this.WB_PATH =         				config.get("wellbore.path");
+        this.TRAJECTORY_PATH = 				config.get("trajectory.path");
+        this.WELL_GQL_PATH =   				config.get("well.gql.path");
+        this.WELLBORE_GQL_PATH = 			config.get("wellbore.gql.path");
+		this.TRAJECTORY_GQL_PATH = 			config.get("trajectory.gql.path");
 		this.LOG_PATH =						config.get("log.channelset.path");
 		this.LOG_CHANNELSET_METADATA =		config.get("log.channelset.metadata.path");
 		this.LOG_CHANNELSET_UUID =			config.get("log.channelset.uuid.path");
@@ -402,7 +402,7 @@ public class DotDelegator {
 		String channelsetuuidEndpoint;
 		HttpRequest channelsetuuidRequest;
 		HttpResponse<String> allChannelSet;
-		String channels;
+		String channelsEndPoint;
 		HttpRequest channelsRequest;
 		HttpResponse<String> channelsResponse;
 
@@ -454,10 +454,10 @@ public class DotDelegator {
 				//Build Request for Get ChannelSet Metadata
 				channelsetmetadataEndpoint = this.getEndpoint("channelsetmetadata");
 				channelsetmetadataRequest = Unirest.get(channelsetmetadataEndpoint);
-				request.header("accept", "application/json");
-				request.queryString("uid", uuid);
+				channelsetmetadataRequest.header("accept", "application/json");
+				channelsetmetadataRequest.queryString("uuid", uuid);
 				// get response
-				channelsetmetadataResponse = client.makeRequest(request, username, password);
+				channelsetmetadataResponse = client.makeRequest(channelsetmetadataRequest, username, password);
 				if (201 == channelsetmetadataResponse.getStatus() || 200 == channelsetmetadataResponse.getStatus()) {
 					LOG.info(ValveLogging.getLogMsg(
 							exchangeID,
@@ -479,12 +479,10 @@ public class DotDelegator {
 				//Build Request for Get All ChannelSet
 				channelsetuuidEndpoint = this.getEndpoint("log");
 				channelsetuuidRequest = Unirest.get(channelsetuuidEndpoint);
-				uidWellbore = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObject).getUidWellbore();
-				uidWellLog = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObject).getUidWell();
-				request.header("accept", "application/json");
-				request.queryString("containerId", uuid);
+				channelsetuuidRequest.header("accept", "application/json");
+				channelsetuuidRequest.queryString("containerId", uuid);
 				// get response
-				allChannelSet = client.makeRequest(request, username, password);
+				allChannelSet = client.makeRequest(channelsetuuidRequest, username, password);
 
 				if (201 == allChannelSet.getStatus() || 200 == allChannelSet.getStatus()) {
 					LOG.info(ValveLogging.getLogMsg(
@@ -505,14 +503,12 @@ public class DotDelegator {
 				}
 
 				//Build Request for Get Channels
-				channels = this.getEndpoint("channels");
-				uidWellbore = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObject).getUidWellbore();
-				uidWellLog = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObject).getUidWell();
-				channelsRequest = Unirest.get("channels");
-				request.header("accept", "application/json");
-				request.queryString("channelSetUuid", uuid);
+				channelsEndPoint = this.getEndpoint("channels");
+				channelsRequest = Unirest.get(channelsEndPoint);
+				channelsRequest.header("accept", "application/json");
+				channelsRequest.queryString("channelSetUuid", uuid);
 				// get response
-				channelsResponse = client.makeRequest(request, username, password);
+				channelsResponse = client.makeRequest(channelsRequest, username, password);
 
 				if (201 == channelsResponse.getStatus() || 200 == channelsResponse.getStatus()) {
 					LOG.info(ValveLogging.getLogMsg(

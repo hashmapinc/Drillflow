@@ -51,9 +51,6 @@ public class DotTranslator {
                 case "trajectory":
                     if (wmlObj instanceof com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory) return wmlObj;
                     return TrajectoryConverter.convertTo1311((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory) wmlObj);
-                case "log":
-                    if (wmlObj instanceof com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) return wmlObj;
-                    return LogConverter.convertTo1311((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) wmlObj);
                 default:
                     throw new ValveException("unsupported object type: " + wmlObj.getObjectType());
             }
