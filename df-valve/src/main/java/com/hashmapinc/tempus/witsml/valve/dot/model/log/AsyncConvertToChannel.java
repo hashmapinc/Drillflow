@@ -25,6 +25,9 @@ import java.util.concurrent.CompletableFuture;
 @Component
 public class AsyncConvertToChannel {
 
+    private JSONObject channelItemGlobal;
+    private JSONObject objLogJOGlobal;
+
     @Async
     public CompletableFuture<JSONObject> convertToChannel1411(JSONObject channelItem, JSONObject objLogJO) {
 
@@ -54,9 +57,13 @@ public class AsyncConvertToChannel {
         if (channelItem.has("mnemonic")
                 && !channelItem.get("mnemonic").equals(null)) {
             JSONObject workJO = channelItem.getJSONObject("mnemonic");
-            // allows "null" to be picked up
-            Object namingSys = workJO.get("namingSystem");
-            channelItem.getJSONObject("mnemonic").put("namingSystem", namingSys);
+            if (workJO.has("namingSystem")
+                && !workJO.get("namingSystem").equals(null)) {
+                Object namingSys = workJO.get("namingSystem");
+                channelItem.getJSONObject("mnemonic").put("namingSystem", namingSys);
+            } else {
+                channelItem.getJSONObject("mnemonic").put("namingSystem", "");
+            }
             channelItem.put("mnemAlias", channelItem.getJSONObject("mnemonic"));
             JSONObject temp = channelItem.getJSONObject("mnemAlias");
             mnemonicToUse = temp.getString("value");
@@ -64,47 +71,94 @@ public class AsyncConvertToChannel {
         }
 
         // ********************* index created JSON array ***********************
+        channelItemGlobal = channelItem;
+        objLogJOGlobal = objLogJO;
+        createJSONArray();
+        createJSONObject();
+
+        // ********************* citation created JSON object ***********************
+        /*
+        JSONObject workObj;
+        if (channelItem.has("name")
+                && !(channelItem.getString("name").equals(null))) {
+            workObj = new JSONObject();
+            workObj.put("title", channelItem.get("name"));
+            channelItem.remove("name");
+            channelItem.put("citation", workObj);
+        } else {
+            // kludge for now since the witsml object coming in already has no name
+            // for logCurveInfo
+            workObj = new JSONObject();
+            workObj.put("title", "TQA");
+            channelItem.put("citation", workObj);
+        }
+        */
+
+        channelItemGlobal.put("mnemonic", mnemonicToUse);
+        return CompletableFuture.completedFuture(channelItemGlobal);
+    }
+
+    private void createJSONObject() {
+        JSONObject workObj;
+        if (channelItemGlobal.has("name")
+                && !(channelItemGlobal.getString("name").equals(null))) {
+            workObj = new JSONObject();
+            workObj.put("title", channelItemGlobal.get("name"));
+            channelItemGlobal.remove("name");
+            channelItemGlobal.put("citation", workObj);
+        } else {
+            // kludge for now since the incoming witsml object has no name
+            // for logCurveInfo
+            workObj = new JSONObject();
+            workObj.put("title", "TQA");
+            channelItemGlobal.put("citation", workObj);
+        }
+    }
+
+    private void createJSONArray() {
+
+        // ********************* index created JSON array ***********************
         boolean createdAnArray = false;
         JSONArray workArray = null;
         JSONObject workObj = null;
         // typeLogData was converted to dataType by marshal operation;
         // however, still need it within index as uom
-        if (channelItem.has("dataType")
-                && !channelItem.get("dataType").equals(null)) {
+        if (channelItemGlobal.has("dataType")
+                && !channelItemGlobal.get("dataType").equals(null)) {
             workObj = new JSONObject();
             workArray = new JSONArray();
-            workObj.put("uom", channelItem.get("dataType"));
+            workObj.put("uom", channelItemGlobal.get("dataType"));
             //workArray.put(workObj);
             createdAnArray = true;
         }
-        if (objLogJO.has("timeDepth")
-                && !objLogJO.get("timeDepth").equals(null)) {
+        if (objLogJOGlobal.has("timeDepth")
+                && !objLogJOGlobal.get("timeDepth").equals(null)) {
             if (!createdAnArray) {
                 workArray = new JSONArray();
                 workObj = new JSONObject();
                 createdAnArray = true;
             }
-            workObj.put("indexType", objLogJO.getString("timeDepth"));
+            workObj.put("indexType", objLogJOGlobal.getString("timeDepth"));
             //workArray.put(workObj);
         }
-        if (objLogJO.has("direction")
-                && !objLogJO.get("direction").equals(null)) {
+        if (objLogJOGlobal.has("direction")
+                && !objLogJOGlobal.get("direction").equals(null)) {
             if (!createdAnArray) {
                 workArray = new JSONArray();
                 workObj = new JSONObject();
                 createdAnArray = true;
             }
-            workObj.put("direction", objLogJO.getString("direction"));
+            workObj.put("direction", objLogJOGlobal.getString("direction"));
             //workArray.put(workObj);
         }
-        if (objLogJO.has("indexCurve")
-                && !objLogJO.get("indexCurve").equals(null)) {
+        if (objLogJOGlobal.has("indexCurve")
+                && !objLogJOGlobal.get("indexCurve").equals(null)) {
             if (!createdAnArray) {
                 workArray = new JSONArray();
                 workObj = new JSONObject();
                 createdAnArray = true;
             }
-            workObj.put("mnemonic", objLogJO.getString("indexCurve"));
+            workObj.put("mnemonic", objLogJOGlobal.getString("indexCurve"));
             //workArray.put(workObj);
         } else {
             if (!createdAnArray) {
@@ -119,26 +173,8 @@ public class AsyncConvertToChannel {
         workObj.put("direction","increasing");
         if (createdAnArray) {
             workArray.put(workObj);
-            channelItem.put("index", workArray);
+            channelItemGlobal.put("index", workArray);
         }
-
-        // ********************* citation created JSON object ***********************
-        if (channelItem.has("name")
-                && !(channelItem.getString("name").equals(null))) {
-            workObj = new JSONObject();
-            workObj.put("title", channelItem.get("name"));
-            channelItem.remove("name");
-            channelItem.put("citation", workObj);
-        } else {
-            // kludge for now since the witsml object coming in already has no name
-            // for logCurveInfo
-            workObj = new JSONObject();
-            workObj.put("title", "TQA");
-            channelItem.put("citation", workObj);
-        }
-
-        channelItem.put("mnemonic", mnemonicToUse);
-        return CompletableFuture.completedFuture(channelItem);
     }
 
     private static void renameString(String oldName, String newName, JSONObject jsonItem) {

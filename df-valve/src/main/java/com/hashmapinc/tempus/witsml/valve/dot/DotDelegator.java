@@ -359,8 +359,12 @@ public class DotDelegator {
 			// create the payload for create ChannelSet
 			LogConverter logConverter = new LogConverter();
 			if ("1.4.1.1".equals(version)) {
-				objLog = logConverter.convertToChannelSet1411(
+				// TODO Fix this
+				objLog = null;
+				try {
+					objLog = logConverter.convertToChannelSet1411(
 							(com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj);
+				} catch (IOException ex) {System.exit(1);}
 				if (objLog.has("logCurveInfo")) {
 					channelPayload = objLog.getJSONArray("logCurveInfo").toString();
 					objLog.remove("logCurveInfo");
