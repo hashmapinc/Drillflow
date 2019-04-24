@@ -408,9 +408,7 @@ public class DotDelegator {
 		}else{
 			endpoint = this.getEndpoint(objectType) + uid; // add uid for rest call
 		}
-
 		String version = witsmlObject.getVersion();
-
 		// build request
 		HttpRequest request = Unirest.get(endpoint);
 		request.header("accept", "application/json");
@@ -432,17 +430,13 @@ public class DotDelegator {
 			}
 			request.queryString("uidWell", uidWell);
 		}
-
 		LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(request), witsmlObject));
-
 		// get response
 		HttpResponse<String> response = client.makeRequest(request, username, password);
-
 		if ("log".equals(objectType)) {
 			JSONObject responseJson = new JSONObject(response.getBody());
 			uuid = responseJson.getString("uuid");
 		}
-
 		// check response status
 		int status = response.getStatus();
 		if (201 == status || 200 == status) {
@@ -455,24 +449,6 @@ public class DotDelegator {
 				channelsetmetadataRequest.queryString("uuid", uuid);
 				// get response
 				channelsetmetadataResponse = client.makeRequest(channelsetmetadataRequest, username, password);
-				if (201 == channelsetmetadataResponse.getStatus() || 200 == channelsetmetadataResponse.getStatus()) {
-					LOG.info(ValveLogging.getLogMsg(
-							exchangeID,
-							logResponse(response, "Successfully executed GET for query object=" + witsmlObject.toString()),
-							witsmlObject
-					));
-				}else if (404 == status) {
-					// handle not found. This is a valid response
-					return null;
-				} else {
-					LOG.warning(ValveLogging.getLogMsg(
-							witsmlObject.getUid(),
-							logResponse(response, "Unable to execute GET"),
-							witsmlObject
-					));
-					throw new ValveException(response.getBody());
-				}
-
 				//Build Request for Get All ChannelSet
 				channelsetuuidEndpoint = this.getEndpoint("log");
 				channelsetuuidRequest = Unirest.get(channelsetuuidEndpoint);
@@ -480,25 +456,6 @@ public class DotDelegator {
 				channelsetuuidRequest.queryString("containerId", uuid);
 				// get response
 				allChannelSet = client.makeRequest(channelsetuuidRequest, username, password);
-
-				if (201 == allChannelSet.getStatus() || 200 == allChannelSet.getStatus()) {
-					LOG.info(ValveLogging.getLogMsg(
-							exchangeID,
-							logResponse(response, "Successfully executed GET for query object=" + witsmlObject.toString()),
-							witsmlObject
-					));
-				}else if (404 == status) {
-					// handle not found. This is a valid response
-					return null;
-				} else {
-					LOG.warning(ValveLogging.getLogMsg(
-							witsmlObject.getUid(),
-							logResponse(response, "Unable to execute GET"),
-							witsmlObject
-					));
-					throw new ValveException(response.getBody());
-				}
-
 				//Build Request for Get Channels
 				channelsEndPoint = this.getEndpoint("channels");
 				channelsRequest = Unirest.get(channelsEndPoint);
@@ -506,8 +463,7 @@ public class DotDelegator {
 				channelsRequest.queryString("channelSetUuid", uuid);
 				// get response
 				channelsResponse = client.makeRequest(channelsRequest, username, password);
-
-				if (201 == channelsResponse.getStatus() || 200 == channelsResponse.getStatus()) {
+				if (201 == channelsetmetadataResponse.getStatus() || 200 == channelsetmetadataResponse.getStatus() || 201 == allChannelSet.getStatus() || 201 == allChannelSet.getStatus() || 201 == channelsResponse.getStatus() || 201 == channelsResponse.getStatus()) {
 					LOG.info(ValveLogging.getLogMsg(
 							exchangeID,
 							logResponse(response, "Successfully executed GET for query object=" + witsmlObject.toString()),
@@ -530,7 +486,6 @@ public class DotDelegator {
 					logResponse(response, "Successfully executed GET for query object=" + witsmlObject.toString()),
 					witsmlObject
 			));
-
 			// translate the query response
 			return DotTranslator.translateQueryResponse(witsmlObject, response.getBody(), optionsIn);
 		} else if (404 == status) {
@@ -545,7 +500,6 @@ public class DotDelegator {
 			throw new ValveException(response.getBody());
 		}
 	}
-
 	/**
 	 * Submits a search query to the DoT rest API for object GETing
 	 *
