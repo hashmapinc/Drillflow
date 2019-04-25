@@ -29,6 +29,9 @@ valve :
         wellbore.gql.path: ${WB_GQL_PATH:https://api-demo.nam.drillops.slb.com/democore/wellbore/v1/graphql/}
         trajectory.path: ${TRAJ_PATH:https://api-demo.nam.drillops.slb.com/democore/trajectoryreader/v1/witsml/trajectories/}
         trajectory.gql.path: ${TRAJ_GQL_PATH:https://api-demo.nam.drillops.slb.com/democore/trajectoryreader/v1/graphql/}
+        log.channelset.path: ${LOG_PATH:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/witsml/channelSets}
+        log.channel.path: ${LOG_PATH:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/witsml/channels}
+
 wmls:
     version: 1.3.1.1,1.4.1.1
     compression: true
