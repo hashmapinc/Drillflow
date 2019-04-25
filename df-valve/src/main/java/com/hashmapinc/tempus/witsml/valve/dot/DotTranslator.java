@@ -385,7 +385,7 @@ public class DotTranslator {
             // consolidate children
             for (AbstractWitsmlObject child : witsmlObjects) {
                 parent.addLog(
-                        (com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) child
+                        (ObjLog) child
                 );
             }
 
