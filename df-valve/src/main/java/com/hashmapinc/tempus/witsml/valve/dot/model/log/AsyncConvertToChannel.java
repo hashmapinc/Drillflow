@@ -29,7 +29,8 @@ public class AsyncConvertToChannel {
     private JSONObject objLogJOGlobal;
 
     @Async
-    public CompletableFuture<JSONObject> convertToChannel1411(JSONObject channelItem, JSONObject objLogJO) {
+    public CompletableFuture<JSONObject> convertToChannel1411(
+            JSONObject channelItem, JSONObject objLogJO) {
 
         // TODO I do not find "mnemonic_value", "minIndex", "maxIndex" nor "columnIndex"
         //      within channel/View.data. If I change "mnemonic" to "mnemonic_value",
@@ -44,21 +45,18 @@ public class AsyncConvertToChannel {
 
         // JAXB transform of WITSML XML "indexType" to "timeDepth" was performed;
         // ************** so put this value into the channel item per DoT API
-        if (objLogJO.has("timeDepth")
-                && !objLogJO.get("timeDepth").equals(null)) {
+        if (objLogJO.has("timeDepth")) {
             channelItem.put("timeDepth", objLogJO.getString("timeDepth"));
         }
 
         // JAXB transform of WITSML XML "mnemonic" was performed & an object containing
         // ************** "naming system" and "value" resulted; this is a mandatory
         //                DoT object & eventually, "mnemonic" needs to be created with
-        //                just the "value" as it is a mandatory DoT object, also
+        //                just the "value" as it is a mandatory DoT object, also.
         String mnemonicToUse = "";
-        if (channelItem.has("mnemonic")
-                && !channelItem.get("mnemonic").equals(null)) {
+        if (channelItem.has("mnemonic")) {
             JSONObject workJO = channelItem.getJSONObject("mnemonic");
-            if (workJO.has("namingSystem")
-                && !workJO.get("namingSystem").equals(null)) {
+            if (workJO.has("namingSystem")) {
                 Object namingSys = workJO.get("namingSystem");
                 channelItem.getJSONObject("mnemonic").put("namingSystem", namingSys);
             } else {
@@ -70,124 +68,69 @@ public class AsyncConvertToChannel {
             channelItem.remove("mnemonic");
         }
 
-        // ********************* index created JSON array ***********************
+        // ************ index created JSON array ************
         channelItemGlobal = channelItem;
         objLogJOGlobal = objLogJO;
         createJSONArray();
+        // ********** citation created JSON object **********
         createJSONObject();
-
-        // ********************* citation created JSON object ***********************
-        /*
-        JSONObject workObj;
-        if (channelItem.has("name")
-                && !(channelItem.getString("name").equals(null))) {
-            workObj = new JSONObject();
-            workObj.put("title", channelItem.get("name"));
-            channelItem.remove("name");
-            channelItem.put("citation", workObj);
-        } else {
-            // kludge for now since the witsml object coming in already has no name
-            // for logCurveInfo
-            workObj = new JSONObject();
-            workObj.put("title", "TQA");
-            channelItem.put("citation", workObj);
-        }
-        */
 
         channelItemGlobal.put("mnemonic", mnemonicToUse);
         return CompletableFuture.completedFuture(channelItemGlobal);
     }
 
+    // ********** citation created JSON object **********
     private void createJSONObject() {
         JSONObject workObj;
-        if (channelItemGlobal.has("name")
-                && !(channelItemGlobal.getString("name").equals(null))) {
+        if (channelItemGlobal.has("name")) {
             workObj = new JSONObject();
             workObj.put("title", channelItemGlobal.get("name"));
             channelItemGlobal.remove("name");
             channelItemGlobal.put("citation", workObj);
         } else {
-            // kludge for now since the incoming witsml object has no name
-            // for logCurveInfo
+            // kludge for now since the incoming WITSML
+            // object has no name for logCurveInfo
             workObj = new JSONObject();
             workObj.put("title", "TQA");
             channelItemGlobal.put("citation", workObj);
         }
     }
 
+    // ************** index created JSON array **************
     private void createJSONArray() {
-
-        // ********************* index created JSON array ***********************
-        boolean createdAnArray = false;
-        JSONArray workArray = null;
-        JSONObject workObj = null;
-        // typeLogData was converted to dataType by marshal operation;
+        JSONArray workArray = new JSONArray();
+        JSONObject workObj = new JSONObject();
+        // typeLogData was converted to dataType by marshal;
         // however, still need it within index as uom
-        if (channelItemGlobal.has("dataType")
-                && !channelItemGlobal.get("dataType").equals(null)) {
-            workObj = new JSONObject();
-            workArray = new JSONArray();
-            workObj.put("uom", channelItemGlobal.get("dataType"));
-            //workArray.put(workObj);
-            createdAnArray = true;
+        if (channelItemGlobal.has("dataType")) {
+            workObj.put("uom",
+                    channelItemGlobal.get("dataType"));
         }
-        if (objLogJOGlobal.has("timeDepth")
-                && !objLogJOGlobal.get("timeDepth").equals(null)) {
-            if (!createdAnArray) {
-                workArray = new JSONArray();
-                workObj = new JSONObject();
-                createdAnArray = true;
-            }
-            workObj.put("indexType", objLogJOGlobal.getString("timeDepth"));
-            //workArray.put(workObj);
+        if (objLogJOGlobal.has("timeDepth")) {
+            workObj.put("indexType",
+                    objLogJOGlobal.getString("timeDepth"));
         }
-        if (objLogJOGlobal.has("direction")
-                && !objLogJOGlobal.get("direction").equals(null)) {
-            if (!createdAnArray) {
-                workArray = new JSONArray();
-                workObj = new JSONObject();
-                createdAnArray = true;
-            }
-            workObj.put("direction", objLogJOGlobal.getString("direction"));
-            //workArray.put(workObj);
+        if (objLogJOGlobal.has("direction")) {
+            workObj.put("direction",
+                    objLogJOGlobal.getString("direction"));
         }
-        if (objLogJOGlobal.has("indexCurve")
-                && !objLogJOGlobal.get("indexCurve").equals(null)) {
-            if (!createdAnArray) {
-                workArray = new JSONArray();
-                workObj = new JSONObject();
-                createdAnArray = true;
-            }
-            workObj.put("mnemonic", objLogJOGlobal.getString("indexCurve"));
-            //workArray.put(workObj);
+        if (objLogJOGlobal.has("indexCurve")) {
+            workObj.put("mnemonic",
+                    objLogJOGlobal.getString("indexCurve"));
         } else {
-            if (!createdAnArray) {
-                workArray = new JSONArray();
-                workObj = new JSONObject();
-                createdAnArray = true;
-            }
             workObj.put("mnemonic", "index");
-            //workArray.put(workObj);
         }
         // Kludges
         workObj.put("direction","increasing");
-        if (createdAnArray) {
             workArray.put(workObj);
             channelItemGlobal.put("index", workArray);
-        }
     }
 
-    private static void renameString(String oldName, String newName, JSONObject jsonItem) {
+    private static void renameString(String oldName,
+                                     String newName,
+                                     JSONObject jsonItem) {
         if (jsonItem.has(oldName)) {
             String passValue = jsonItem.getString(oldName);
-            jsonItem.remove(oldName);
-            jsonItem.put(newName, passValue);
-        }
-    }
-
-    private static void renameObject(String oldName, String newName, JSONObject jsonItem) {
-        if (jsonItem.has(oldName)) {
-            JSONObject passValue = jsonItem.getJSONObject(oldName);
             jsonItem.remove(oldName);
             jsonItem.put(newName, passValue);
         }

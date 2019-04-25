@@ -1,10 +1,10 @@
 {
-  "uid":"HM9000",
+  "uid":"HM-99999999",
   "startIndex":{
-    "uom":"ft","value":0,
+    "uom":"ft","value":0
   },
   "endIndex":{
-    "uom":"ft","value":8201.77,
+    "uom":"ft","value":8201.77
   },
   "logCurveInfo":[
     {
@@ -26,13 +26,13 @@
       "traceOrigin":null,
       "mnemonic":{
         "namingSystem":null,
-        "value":"TQA_mnemonic",
+        "value":"TQA_mnemonic"
       },
       "typeLogData":"string",
       "minIndex":null,
       "axisDefinition":[],
       "dataSource":null,
-      "wellDatum":null,
+      "wellDatum":null
     }
   ],
   "uidWellbore":"WBDD600",
@@ -43,5 +43,5 @@
   "uidWell":"U2",
   "indexType":"time",
   "name":"my channel set3",
-  "runNumber":"2",
+  "runNumber":"2"
 }

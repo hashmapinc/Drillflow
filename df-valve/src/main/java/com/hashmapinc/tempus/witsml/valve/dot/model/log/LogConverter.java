@@ -15,33 +15,18 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot.model.log;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.hashmapinc.tempus.witsml.valve.dot.JsonUtil;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonWriter;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 public class LogConverter extends com.hashmapinc.tempus.WitsmlObjects.Util.LogConverter {
+
     protected static JSONObject objLogJO;
-    protected static JSONObject ObjLogJOTrimmed = new JSONObject();
-    protected static JSONObject payloadJOchannelSet = new JSONObject();
     protected static JSONObject workObj;
-    protected static JSONArray  payloadJOchannels = new JSONArray();
 
     /**
      * convertToChannelSet1311 takes in a v1.3.1.1 JSON strong
@@ -69,38 +54,76 @@ public class LogConverter extends com.hashmapinc.tempus.WitsmlObjects.Util.LogCo
      *                  This object has been marshalled by JAXB from the raw XML sent by the client.
      * @return JSON String representing the conversion
      */
-    //public static String convertToChannelSet1411( String jsonString ) {
-    public static JSONObject convertToChannelSet1411( com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog witsmlObj )
-                                throws IOException {
-        List<JSONObject> jsonItems;
-/*
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode actualObj = mapper.readTree(witsmlObj.getJSONString("1.4.1.1"));
-        ObjectNode objectNode = removeEmptyFields((ObjectNode) actualObj);
-*/
-        objLogJO = new JSONObject( witsmlObj.getJSONString("1.4.1.1") );
+    public static JSONObject convertToChannelSet1411(
+            com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog witsmlObj ) {
 
+        objLogJO = new JSONObject(
+                witsmlObj.getJSONString("1.4.1.1") );
+
+        // groom the data
         removeNullsFrom(objLogJO);
-
-        String removedEmpties = JsonUtil.removeEmpties(objLogJO);
-        //removeEmptyFields((ObjectNode)objLogJO);
+        JsonUtil.removeEmpties(objLogJO);
 
 
-        renameString("pass", "passNumber", objLogJO);
-        renameString("indexType", "timeDepth", objLogJO);
-        renameString("serviceCompany", "loggingCompanyName", objLogJO);
+        // transform names per DoT API/mapping documentation
+        // *********
+        renameString("pass",
+                "passNumber",
+                objLogJO);
+        renameString("indexType",
+                "timeDepth",
+                objLogJO);
+        renameString("serviceCompany",
+                "loggingCompanyName",
+                objLogJO);
 
-        // ****************************** citation created JSON object ********************************
-        boolean createdAnObject = false;
-        if ( objLogJO.has("name") && !objLogJO.get("name").equals(null) ) {
-            if (!createdAnObject) {
-                workObj = new JSONObject();
-                createdAnObject = true;
+        // ************** citation created JSON object ****************
+        createJO();
+        // ********************* hardcoded logParam *********************
+        // Biz Rule: When logParam is present, the "index" field is required;
+        //           otherwise, API fails
+        // TODO Still debugging why logParam comes in garbled with tab + 2 newlines
+        //           TEMPORARY WORKAROUND
+        if (objLogJO.has("logParam")) {
+            objLogJO.remove("logParam");
+        }
+
+        // =============================== channels ===============================
+        if ( objLogJO.has("logCurveInfo")
+                && objLogJO.getJSONArray("logCurveInfo").length() > 0 ) {
+
+            // move all "logCurveInfo" into a JSON array for async processing
+            JSONArray workArray = objLogJO.getJSONArray("logCurveInfo");
+            objLogJO.remove("logCurveInfo");
+
+            AsyncConvertToChannel asyncConvertToChannel = new AsyncConvertToChannel();
+            for (int i=0; i<workArray.length(); ++i) {
+                JsonUtil.removeEmpties(workArray.getJSONObject(i));
+                asyncConvertToChannel.convertToChannel1411(workArray.getJSONObject(i), objLogJO);
             }
+            // put the converted logCurveInfo back
+            objLogJO.put("logCurveInfo", workArray);
+        } // End of logCurveInfo
+
+        // Now the JSON should be mapped according to DoT's API expectations
+        // Those expectations match the POJOs generated from DoT's API
+        // TODO Create the POJOs using Jackson
+
+        // return the payloads for creating a 1.4.1.1 ChannelSet & updating the Channel Set
+        // with 1.4.1.1 Channel data
+        return objLogJO;
+    }
+
+    protected static void createJO() {
+
+        boolean createdAnObject = false;
+        if (objLogJO.has("name")) {
+            workObj = new JSONObject();
+            createdAnObject = true;
             workObj.put("title", objLogJO.getString("name"));
             objLogJO.remove("name");
         }
-        if ( objLogJO.has("description") && !objLogJO.get("description").equals(null) ) {
+        if (objLogJO.has("description")) {
             if (!createdAnObject) {
                 workObj = new JSONObject();
                 createdAnObject = true;
@@ -110,52 +133,21 @@ public class LogConverter extends com.hashmapinc.tempus.WitsmlObjects.Util.LogCo
         }
         if ( createdAnObject ) {
             objLogJO.put("citation", workObj);
-            createdAnObject = false;
         }
-        // ********************************** hardcoded logParam ************************************
-        // Biz Rule: When logParam is present, the "index" field is required; otherwise, API fails
-        //           Still debugging why logParam comes in garbled with tab + 2 newlines
-        //           TEMPORARY WORKAROUND
-        if (objLogJO.has("logParam")) {
-            objLogJO.remove("logParam");
-        }
-        // ========================================= channels =========================================
-        // NOTE: Since ChannelSet will be created first, all data shown in the channels API that was
-        // ***** created through the ChannelSet does not need to be added/updated again.
-        if ( objLogJO.has("logCurveInfo")
-                && objLogJO.getJSONArray("logCurveInfo").length() > 0 ) {
+    }
 
-        // move all "logCurveInfo" into a JSON array for asynchronous processing
-        JSONArray workArray = objLogJO.getJSONArray("logCurveInfo");
-        objLogJO.remove("logCurveInfo");
-
-        AsyncConvertToChannel asyncConvertToChannel = new AsyncConvertToChannel();
-        for (int i=0; i<workArray.length(); ++i) {
-            JsonUtil.removeEmpties(workArray.getJSONObject(i));
-            asyncConvertToChannel.convertToChannel1411(workArray.getJSONObject(i), objLogJO);
-        }
-        // put the converted logCurveInfo back
-        objLogJO.put("logCurveInfo", workArray);
-    } // End of logCurveInfo
-
-    // Now the JSON should be mapped according to DoT's API expectations
-    // Those expectations match the POJOs generated from DoT's API
-    // TODO Create the POJOs using Jackson
-
-    // return the payloads for creating a 1.4.1.1 ChannelSet & updating the Channel Set
-    // with 1.4.1.1 Channel data
-    return objLogJO;
-}
-
-    protected static void renameString(String oldName, String newName, JSONObject objForRename) {
+    protected static void renameString(String oldName,
+                                       String newName,
+                                       JSONObject objForRename) {
         if (objForRename.has(oldName)) {
             String passValue = objForRename.getString(oldName);
             objForRename.remove(oldName);
             objForRename.put(newName, passValue);
         }
     }
-    // ********************************************************************************************
-    public static void removeNullsFrom(@Nullable JSONObject object) throws JSONException {
+
+    public static void removeNullsFrom(@Nullable JSONObject object)
+    {
         if (object != null) {
             Iterator<String> iterator = object.keys();
             while (iterator.hasNext()) {
@@ -170,7 +162,8 @@ public class LogConverter extends com.hashmapinc.tempus.WitsmlObjects.Util.LogCo
         }
     }
 
-    public static void removeNullsFrom(@Nullable JSONArray array) throws JSONException {
+    public static void removeNullsFrom(@Nullable JSONArray array)
+    {
         if (array != null) {
             for (int i = 0; i < array.length(); i++) {
                 Object o = array.get(i);
@@ -184,7 +177,7 @@ public class LogConverter extends com.hashmapinc.tempus.WitsmlObjects.Util.LogCo
     }
 
     public static void removeNullsFrom(@NonNull Object o)
-                                    throws JSONException {
+    {
         if (o instanceof JSONObject) {
             removeNullsFrom((JSONObject) o);
         } else if (o instanceof JSONArray) {
@@ -192,76 +185,4 @@ public class LogConverter extends com.hashmapinc.tempus.WitsmlObjects.Util.LogCo
         }
     }
 
-    public static JsonNode toJsonNode(JsonObject jsonObject)
-                                    throws IOException {
-
-        // Parse a JsonObject into a JSON string
-        StringWriter stringWriter = new StringWriter();
-        try (JsonWriter jsonWriter = Json.createWriter(stringWriter)) {
-            jsonWriter.writeObject(jsonObject);
-        }
-        String json = stringWriter.toString();
-
-        // Parse a JSON string into a JsonNode
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = objectMapper.readTree(json);
-
-        return jsonNode;
-    }
-
-    /**
-     * Removes empty fields from the given JSON object node.
-     * @param jsonNode an object node
-     * @return the object node with empty fields removed
-     */
-    public static ObjectNode removeEmptyFields(final ObjectNode jsonNode) {
-        ObjectNode ret = new ObjectMapper().createObjectNode();
-        Iterator<Map.Entry<String, JsonNode>> iter = jsonNode.fields();
-
-        while (iter.hasNext()) {
-            Map.Entry<String, JsonNode> entry = iter.next();
-            String key = entry.getKey();
-            JsonNode value = entry.getValue();
-
-            if (value instanceof ObjectNode) {
-                Map<String, ObjectNode> map = new HashMap<String, ObjectNode>();
-                map.put(key, removeEmptyFields((ObjectNode)value));
-                ret.setAll(map);
-            }
-            else if (value instanceof ArrayNode) {
-                ret.set(key, removeEmptyFields((ArrayNode)value));
-            }
-            else if (value.asText() != null && !value.asText().isEmpty()) {
-                ret.set(key, value);
-            }
-        }
-
-        return ret;
-    }
-
-    /**
-     * Removes empty fields from the given JSON array node.
-     * @param array an array node
-     * @return the array node with empty fields removed
-     */
-    public static ArrayNode removeEmptyFields(ArrayNode array) {
-        ArrayNode ret = new ObjectMapper().createArrayNode();
-        Iterator<JsonNode> iter = array.elements();
-
-        while (iter.hasNext()) {
-            JsonNode value = iter.next();
-
-            if (value instanceof ArrayNode) {
-                ret.add(removeEmptyFields((ArrayNode)(value)));
-            }
-            else if (value instanceof ObjectNode) {
-                ret.add(removeEmptyFields((ObjectNode)(value)));
-            }
-            else if (value != null && !value.textValue().isEmpty()){
-                ret.add(value);
-            }
-        }
-
-        return ret;
-    }
 }

@@ -318,8 +318,7 @@ public class DotDelegator {
         // build the requests (log requires two HttpRequests
         HttpRequestWithBody request;
 		HttpRequestWithBody channelsRequest;
-        if (null == uid || uid.isEmpty() || "log".equals(objectType)
-		   ){
+        if (null == uid || uid.isEmpty() || "log".equals(objectType)){
             // create with POST and generate uid
             request = Unirest.post(endpoint);
 		} else {
@@ -361,10 +360,8 @@ public class DotDelegator {
 			if ("1.4.1.1".equals(version)) {
 				// TODO Fix this
 				objLog = null;
-				try {
 					objLog = logConverter.convertToChannelSet1411(
 							(com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj);
-				} catch (IOException ex) {System.exit(1);}
 				if (objLog.has("logCurveInfo")) {
 					channelPayload = objLog.getJSONArray("logCurveInfo").toString();
 					objLog.remove("logCurveInfo");
