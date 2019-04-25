@@ -15,13 +15,12 @@
  */
 package com.hashmapinc.tempus.witsml;
 
-import java.util.logging.Logger;
-import java.util.List;
-import java.util.ArrayList;
-
-import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
-import com.hashmapinc.tempus.witsml.WitsmlException;
+import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
 
 /** 
  * WitsmlObjectParser is a class that provides
@@ -44,6 +43,8 @@ public class WitsmlObjectParser {
         String rawXML,
         String version
     ) throws Exception {
+
+        // TODO Where is aliases? Why is logParam messed up (value = "\n\t\t\t  " & all other fields are null)?
         List<AbstractWitsmlObject> witsmlObjects = new ArrayList<AbstractWitsmlObject>();
         
         // handle version 1.3.1.1

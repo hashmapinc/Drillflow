@@ -70,19 +70,21 @@ public class View {
     private Integer bhaRunNumber;
     @JsonProperty("aliases")
     private List<Alias> aliases = null;
+            // new ArrayList<Alias>;
     @JsonProperty("citation")
     private Citation citation;
     @JsonProperty("customData")
     private String customData;
     @JsonProperty("extensionNameValue")
     private List<ExtensionNameValue> extensionNameValue = null;
+            //new ArrayList<ExtensionNameValue>;
     @JsonProperty("objectVersion")
     private String objectVersion;
     @JsonProperty("existenceKind")
     private String existenceKind;
     @JsonProperty("index")
     private List<Index> index = null;
-    @JsonProperty("objectGrowing")
+            // new ArrayList<Index>;
     private Boolean objectGrowing;
     @JsonProperty("dataUpateRate")
     private Integer dataUpateRate;

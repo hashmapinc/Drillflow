@@ -33,6 +33,7 @@ valve :
         log.channelset.metadata.path: ${LOG_CHANNELSET_METADATA:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/witsml/channelSets/:uuid}
         log.channelset.uuid.path: ${LOG_CHANNELSET_UUID:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/identities}
         log.channels.path: ${LOG_CHANNELS:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/witsml/channels/metadata/}
+        log.channel.path: ${LOG_PATH:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/witsml/channels}
 wmls:
     version: 1.3.1.1,1.4.1.1
     compression: true
