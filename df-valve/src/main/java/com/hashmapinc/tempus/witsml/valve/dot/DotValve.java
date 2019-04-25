@@ -375,8 +375,7 @@ public class DotValve implements IValve {
 		String[] funcs = { "WMLS_AddToStore", "WMLS_GetFromStore", "WMLS_DeleteFromStore", "WMLS_UpdateInStore" };
 
 		// supported objects for each function
-
-		// choice of 1311 is arbitrary
+    // choice of 1311 is arbitrary
 		AbstractWitsmlObject well = new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell();
 		// choice of 1311 is arbitrary
 		AbstractWitsmlObject wellbore = new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore();

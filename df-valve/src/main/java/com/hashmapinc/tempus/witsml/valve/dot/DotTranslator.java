@@ -16,13 +16,11 @@
 package com.hashmapinc.tempus.witsml.valve.dot;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
-import com.hashmapinc.tempus.WitsmlObjects.Util.TrajectoryConverter;
-import com.hashmapinc.tempus.WitsmlObjects.Util.WellConverter;
-import com.hashmapinc.tempus.WitsmlObjects.Util.WellboreConverter;
-import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
+import com.hashmapinc.tempus.WitsmlObjects.Util.*;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
 import org.json.JSONObject;
 
@@ -110,6 +108,9 @@ public class DotTranslator {
                 case "trajectory":
                     return WitsmlMarshal.deserializeFromJSON(
                         result, ObjTrajectory.class);
+                case "log":
+                    return WitsmlMarshal.deserializeFromJSON(
+                            result, ObjLog.class);
                 default:
                     throw new ValveException("unsupported object type");
             }
@@ -223,6 +224,43 @@ public class DotTranslator {
         return xml;
     }
 
+    // for consolidateLogsToXML
+
+    /**
+     * converts witsmlObjects list of logs to valid
+     * witsml XML string based on version and whether
+     * the list is empty or not
+     * @param witsmlObjects - list of objects to serialize
+     * @param version - witsml version to serialize to
+     * @return STRING xml serialization result
+     * @throws ValveException
+     */
+    private static String consolidateLogsToXML(
+            ArrayList<AbstractWitsmlObject> witsmlObjects,
+            String version
+    ) throws ValveException {
+        String xml;
+        boolean is1411 = "1.4.1.1".equals(version);
+
+        // handle empty list
+        if (witsmlObjects == null || 0 == witsmlObjects.size()) {
+            try {
+                xml = is1411 ?
+                        WitsmlMarshal.serialize(new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLogs()):
+                        WitsmlMarshal.serialize(new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLogs());
+            } catch (JAXBException jxbe) {
+                throw new ValveException("Could not serialize empty trajectories object");
+            }
+        } else {
+            // handle non empty list
+            xml = is1411 ?
+                    consolidate1411LogsToXML(witsmlObjects) :
+                    consolidate1311LogsToXML(witsmlObjects);
+        }
+
+        return xml;
+    }
+
     /**
      * Consolidates each object under 1 parent and serializes
      * the consolidated object into an XML string in the proper
@@ -256,6 +294,9 @@ public class DotTranslator {
             case "trajectory":
                 xmlString = consolidateTrajectoriesToXML(witsmlObjects, version);
                 break;
+            case "log":
+                xmlString = consolidateLogsToXML(witsmlObjects, version);
+                break;
             default:
                 throw new ValveException("Unsupported object type: " + witsmlObjects.get(0).getObjectType());
         }
@@ -285,6 +326,30 @@ public class DotTranslator {
         }
     }
 
+    // code for consolidate1311LogsToXML
+
+    private static String consolidate1311LogsToXML(
+            ArrayList<AbstractWitsmlObject> witsmlObjects
+    ) throws ValveException {
+        try {
+            // get parent object from first child
+            com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLogs parent =
+                    new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLogs();
+
+            // consolidate children
+            for (AbstractWitsmlObject child : witsmlObjects) {
+                parent.addLog(
+                        (com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) get1311WitsmlObject(child)
+                );
+            }
+
+            // return xml
+            return WitsmlMarshal.serialize(parent);
+        } catch (Exception e ) {
+            throw new ValveException(e.getMessage());
+        }
+    }
+
     private static String consolidate1411TrajectoriesToXML(
         ArrayList<AbstractWitsmlObject> witsmlObjects
     ) throws ValveException {
@@ -297,6 +362,30 @@ public class DotTranslator {
             for (AbstractWitsmlObject child : witsmlObjects) {
                 parent.addTrajectory(
                         (com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory) child
+                );
+            }
+
+            // return xml
+            return WitsmlMarshal.serialize(parent);
+        } catch (Exception e ) {
+            throw new ValveException(e.getMessage());
+        }
+    }
+
+    //code for consolidate1411LogsToXML
+
+    private static String consolidate1411LogsToXML(
+            ArrayList<AbstractWitsmlObject> witsmlObjects
+    ) throws ValveException {
+        try {
+            // get parent object from first child
+            com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLogs parent =
+                    new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLogs();
+
+            // consolidate children
+            for (AbstractWitsmlObject child : witsmlObjects) {
+                parent.addLog(
+                        (ObjLog) child
                 );
             }
 
