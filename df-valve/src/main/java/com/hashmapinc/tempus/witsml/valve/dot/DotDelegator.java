@@ -331,7 +331,7 @@ public class DotDelegator {
     
 		// build the requests (log requires two HttpRequests
 		HttpRequestWithBody request;
-    HttpRequestWithBody channelsRequest;
+    	HttpRequestWithBody channelsRequest;
 		if (null == uid || uid.isEmpty() || "log".equals(objectType)){
 			// create with POST and generate uid
 			request = Unirest.post(endpoint);
@@ -353,48 +353,47 @@ public class DotDelegator {
 			}
 			request.queryString("uidWell", uidWell);
 		} else if ( "log".equals(objectType) ) {
-         request.queryString("uid", uid);
-         request.queryString("uidWellbore", witsmlObj.getParentUid());
-         String uidWell;
-         if ("1.4.1.1".equals(version)) {
-            uidWell = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj).getUidWell();
-         } else {
-            // TODO work with v1.3.1.1
-            uidWell = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj).getUidWell();
-         }
-         request.queryString("uidWell", uidWell);
-    }
+			 request.queryString("uid", uid);
+			 request.queryString("uidWellbore", witsmlObj.getParentUid());
+			 String uidWell;
+			 if ("1.4.1.1".equals(version)) {
+				uidWell = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj).getUidWell();
+			 } else {
+				// TODO work with v1.3.1.1
+				uidWell = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj).getUidWell();
+			 }
+			 request.queryString("uidWell", uidWell);
+		}
     
 		// add the header and payload
 		request.header("Content-Type", "application/json");
     
 		if ("log".equals(objectType)) {
-         // create the payload for create ChannelSet
-         LogConverter logConverter = new LogConverter();
-         if ("1.4.1.1".equals(version)) {
-            // TODO Fix this
-            objLog = null;
-               objLog = logConverter.convertToChannelSet1411(
-                     (com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj);
-            if (objLog.has("logCurveInfo")) {
-               channelPayload = objLog.getJSONArray("logCurveInfo").toString();
-               objLog.remove("logCurveInfo");
-            }
-            channelSetPayload = objLog.toString();
+			// create the payload for create ChannelSet
+			LogConverter logConverter = new LogConverter();
+			if ("1.4.1.1".equals(version)) {
+			    // TODO Fix this
+				objLog = null;
+				   objLog = logConverter.convertToChannelSet1411(
+						 (com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj);
+				if (objLog.has("logCurveInfo")) {
+				   channelPayload = objLog.getJSONArray("logCurveInfo").toString();
+				   objLog.remove("logCurveInfo");
+				}
+				channelSetPayload = objLog.toString();
 
-         } else {
-            channelSetPayload =
-                  logConverter.convertToChannelSet1311(witsmlObj.getJSONString("1.3.1.1"));
-         }
-         request.body(channelSetPayload);
-      } else {
-
-         request.body(payload);
-      }
+			} else {
+				channelSetPayload =
+					  logConverter.convertToChannelSet1311(witsmlObj.getJSONString("1.3.1.1"));
+			}
+			request.body(channelSetPayload);
+		} else {
+			request.body(payload);
+		}
 
 		LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(request), witsmlObj));
 
-		// get the request response.
+		// get the request response
 		HttpResponse<String> response = client.makeRequest(request, username, password);
 
 		// check response status
@@ -403,60 +402,54 @@ public class DotDelegator {
 			LOG.info(ValveLogging.getLogMsg(
 					exchangeID,
 					logResponse(response, "Received successful status code from DoT create call"),
-					witsmlObj
-			));
-      
-      // add channels to an existing ChannelSet
-    if ("log".equals(objectType) && !(channelPayload.isEmpty())) {
+					witsmlObj));
+			// add channels to an existing ChannelSet
+			if ("log".equals(objectType) && !(channelPayload.isEmpty())) {
 
-      // build the request...
-      endpoint = this.getEndpoint(objectType+"Channel");
-      endpoint = endpoint + "/metadata";
-      // get the uuid for the channelSet just created from the response
-      int startIndexUUID = response.getBody().indexOf("uuid")
-            + "uuid".length() + 3;
-      String sub = response.getBody().substring(startIndexUUID);
-      int lengthOfUUID = sub.indexOf('"');
-      String uuid4CS = response.getBody().substring(
-            startIndexUUID,
-            startIndexUUID+lengthOfUUID
-      );
+				// build the request...
+				endpoint = this.getEndpoint(objectType+"Channel");
+				endpoint = endpoint + "/metadata";
+				// get the uuid for the channelSet just created from the response
+				int startIndexUUID = response.getBody().indexOf("uuid")
+						+ "uuid".length() + 3;
+				String sub = response.getBody().substring(startIndexUUID);
+				int lengthOfUUID = sub.indexOf('"');
+				String uuid4CS = response.getBody().substring(
+													startIndexUUID,
+													startIndexUUID+lengthOfUUID);
+				// create with POST
+				channelsRequest = Unirest.post(endpoint);
+				// provide the ChannelSet's UUID as a query parameter
+				channelsRequest.queryString("channelSetUuid", uuid4CS);
+				// add the header and payload
+				channelsRequest.header("Content-Type", "application/json");
+				// TODO Figure out if I need to add more data to channelPayload? such as - citation?
+				channelsRequest.body(channelPayload);
 
-      // create with POST
-      channelsRequest = Unirest.post(endpoint);
-      // provide the ChannelSet's UUID as a query parameter
-      channelsRequest.queryString("channelSetUuid", uuid4CS);
-      // add the header and payload
-      channelsRequest.header("Content-Type", "application/json");
-      // TODO Figure out if I need to add more data to channelPayload? such as - citation?
-      channelsRequest.body(channelPayload);
+				LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(channelsRequest), witsmlObj));
 
-      LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(channelsRequest), witsmlObj));
+				// get the channels request response
+				HttpResponse<String> channelsResponse = client.makeRequest(channelsRequest, username, password);
+				status = channelsResponse.getStatus();
+				if (201 == status || 200 == status) {
+					LOG.info(ValveLogging.getLogMsg(
+									exchangeID,
+									logResponse(channelsResponse,
+												"Received successful status code from DoT create call"),
+												witsmlObj));
+				}
 
-      // get the request response.
-      response = client.makeRequest(channelsRequest, username, password);
-      // check response status
-      status = response.getStatus();
-      if (201 == status || 200 == status) {
-         LOG.info(ValveLogging.getLogMsg(
-               exchangeID,
-               logResponse(response, "Received successful status code from DoT create call"),
-               witsmlObj
-         ));
-      }
+			}
 
-   }
-
-         // TODO I should probably return something else? yes....this needs to concatenate responses for BOTH REST calls
-         //      And what if there are no channels -- still create the channelSet (I think "yes")
-         //      But what if there is a failure creating channels -- should I delete the channelSet (I think "yes")
+			// TODO I should probably return something else? yes....this needs to concatenate responses for BOTH REST calls
+			//      And what if there are no channels -- still create the channelSet (I think "yes")
+			//      But what if there is a failure creating channels -- should I delete the channelSet (I think "yes")
 			return (null == uid || uid.isEmpty()) ? new JsonNode(response.getBody()).getObject().getString("uid") : uid;
 		} else {
 			LOG.warning(ValveLogging.getLogMsg(
 					exchangeID,
 					logResponse(response, "Received " + status + " from DoT POST" + response.getBody()),
-					witsmlObj
-			));
+					witsmlObj));
 			throw new ValveException(response.getBody());
 		}
 	}

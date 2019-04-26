@@ -21,6 +21,8 @@ import org.json.JSONObject;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import java.util.Iterator;
 
 public class LogConverter extends com.hashmapinc.tempus.WitsmlObjects.Util.LogConverter {
@@ -46,13 +48,16 @@ public class LogConverter extends com.hashmapinc.tempus.WitsmlObjects.Util.LogCo
      * convertToChannelSet1411 takes in a v1.4.1.1 WITSML object
      *          that was produced client-side from SOAP WITSML XML
      *          & translates as necessary to adhere to DoT's
-     *          "Create a new ChannelSet" API.
+     *          "Create a new ChannelSet" & "Post channels to existing ChannelSet" API.
      *
-     * Conversion at this stage exists to handle data business rules.
+     * Conversion at this stage exists to handle data business rules
+     * as documented by the DoT API.
      *
-     * @param witsmlObj Represents the client's WITSML object (complete).
-     *                  This object has been marshalled by JAXB from the raw XML sent by the client.
-     * @return JSON String representing the conversion
+     * @param witsmlObj     Represents the client's WITSML object v1.4.1.1.
+     *                      This object has been marshalled by JAXB from the raw XML
+     *                          sent by the client.
+     * @return JSONObject Represents the conversion of both the ChannelSet
+     *                      and the Channels.
      */
     public static JSONObject convertToChannelSet1411(
             com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog witsmlObj ) {
@@ -136,6 +141,41 @@ public class LogConverter extends com.hashmapinc.tempus.WitsmlObjects.Util.LogCo
         }
     }
 
+    /**
+     * convertTo1411 takes in a JSONObject that represents a ChannelSet &
+     *          Channels returned by DoT & translates as necessary to
+     *          adhere to the standard for a v1.4.1.1 WITSML object.
+     *
+     * Conversion at this stage exists to handle the WITSML standard.
+     *
+     * @param csPlusCfromDoT Represents both the ChannelSet & Channels
+     *                         returned by DoT.
+     * @return witsmlObj Represents the client's WITSML object v1.4.1.1.
+     *                     This object has been marshalled by JAXB from the raw XML
+     *      *                          sent by the client.
+     */
+    public static com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog convertTo1411(
+            JSONObject csPlusCfromDoT ) throws JAXBException {
+        // unmarshal JSON into a POJO
+        JAXBContext jcCS = JAXBContext.newInstance(
+                com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.View.class);
+        JAXBContext jcCs = JAXBContext.newInstance(
+                com.hashmapinc.tempus.witsml.valve.dot.model.log.channel.View.class);
+
+
+        return null;
+    }
+
+
+    // TODO Move to the correct location
+    // ************** Utility Methods ****************
+    /**
+     * renameString
+     *
+     * @param oldName
+     *        newName
+     *        objForRename
+     */
     protected static void renameString(String oldName,
                                        String newName,
                                        JSONObject objForRename) {
@@ -145,7 +185,11 @@ public class LogConverter extends com.hashmapinc.tempus.WitsmlObjects.Util.LogCo
             objForRename.put(newName, passValue);
         }
     }
-
+    /**
+     * removeNullsFrom
+     *
+     * @param object
+     */
     public static void removeNullsFrom(@Nullable JSONObject object)
     {
         if (object != null) {
@@ -162,6 +206,11 @@ public class LogConverter extends com.hashmapinc.tempus.WitsmlObjects.Util.LogCo
         }
     }
 
+    /**
+     * removeNullsFrom
+     *
+     * @param array
+     */
     public static void removeNullsFrom(@Nullable JSONArray array)
     {
         if (array != null) {
@@ -176,6 +225,11 @@ public class LogConverter extends com.hashmapinc.tempus.WitsmlObjects.Util.LogCo
         }
     }
 
+    /**
+     * removeNullsFrom
+     *
+     * @param o
+     */
     public static void removeNullsFrom(@NonNull Object o)
     {
         if (o instanceof JSONObject) {
