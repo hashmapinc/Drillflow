@@ -22,6 +22,7 @@ import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys;
 import com.hashmapinc.tempus.witsml.QueryContext;
@@ -95,6 +96,44 @@ public class DotValveTest {
 
 		// test
 		String expected = well.getXMLString("1.3.1.1");
+		String actual = this.valve.getObject(qc).get();
+		assertEquals(expected, actual);
+	}
+
+	// code to test getFromStore for Log
+	@Test
+	public void shouldGetLogSingleObject() throws Exception {
+		// build well list
+		ArrayList<AbstractWitsmlObject> witsmlObjects;
+		witsmlObjects = new ArrayList<>();
+		ObjLog log = new ObjLog();
+
+		//well.setName("well-1");
+		//well.setUid("well-1");
+		log.setUid("HM_700009");
+		log.setUidWell("U2");
+		log.setUidWellbore("WBDD600");
+		witsmlObjects.add(log);
+
+		// build query context
+		QueryContext qc = new QueryContext(
+				"1.4.1.1",
+				"log",
+				new HashMap<>(),
+				"",
+				witsmlObjects,
+				"goodUsername",
+				"goodPassword",
+				"shouldGetSingleObject" // exchange ID
+		);
+
+		// mock delegator behavior
+		when(
+				this.mockDelegator.getObject(log, qc.USERNAME, qc.PASSWORD,qc.EXCHANGE_ID, this.mockClient, qc.OPTIONS_IN)
+		).thenReturn(log);
+
+		// test
+		String expected = log.getXMLString("1.4.1.1");
 		String actual = this.valve.getObject(qc).get();
 		assertEquals(expected, actual);
 	}
@@ -796,13 +835,16 @@ public class DotValveTest {
 		assertEquals("well", 	   actualAddObjects[0].getObjectType());
 		assertEquals("wellbore",   actualAddObjects[1].getObjectType());
 		assertEquals("trajectory", actualAddObjects[2].getObjectType());
+		assertEquals("log", actualAddObjects[3].getObjectType());
 		assertEquals("well", 	   actualGetObjects[0].getObjectType());
 		assertEquals("wellbore",   actualGetObjects[1].getObjectType());
 		assertEquals("well", 	   actualDeleteObjects[0].getObjectType());
 		assertEquals("wellbore",   actualDeleteObjects[1].getObjectType());
 		assertEquals("trajectory",   actualDeleteObjects[2].getObjectType());
+		assertEquals("log", actualAddObjects[3].getObjectType());
 		assertEquals("well", 	   actualUpdateObjects[0].getObjectType());
 		assertEquals("wellbore",   actualUpdateObjects[1].getObjectType());
 		assertEquals("trajectory",   actualUpdateObjects[2].getObjectType());
+		assertEquals("log", actualAddObjects[3].getObjectType());
 	}
 }
