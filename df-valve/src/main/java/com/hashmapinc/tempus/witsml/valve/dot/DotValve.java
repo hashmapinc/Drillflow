@@ -269,6 +269,7 @@ public class DotValve implements IValve {
 			LOG.warning("Exception in DotValve create object: " + e.getMessage());
 			throw new ValveException(e.getMessage());
 		}
+		// return the uids created
 		return CompletableFuture.completedFuture(StringUtils.join(uids, ','));
 	}
 

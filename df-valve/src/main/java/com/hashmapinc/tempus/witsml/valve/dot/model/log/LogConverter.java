@@ -84,6 +84,7 @@ public class LogConverter extends com.hashmapinc.tempus.WitsmlObjects.Util.LogCo
 
         // ************** citation created JSON object ****************
         createJO();
+
         // ********************* hardcoded logParam *********************
         // Biz Rule: When logParam is present, the "index" field is required;
         //           otherwise, API fails

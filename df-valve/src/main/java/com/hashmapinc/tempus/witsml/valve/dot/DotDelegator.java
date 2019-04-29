@@ -323,11 +323,11 @@ public class DotDelegator {
 		// get object as payload string
 		String payload = witsmlObj.getJSONString("1.4.1.1");
     
-    // a log will derive its payload for creating a ChannelSet from "payload"
-    // & then use "payload" again to update the ChannelSet with Log Curve information (Channel)
-    JSONObject objLog;
-    String channelSetPayload="";
-    String channelPayload="";
+		// a log will derive its payload for creating a ChannelSet from "payload"
+		// & then use "payload" again to update the ChannelSet with Log Curve information (Channel)
+		JSONObject objLog;
+		String channelSetPayload="";
+		String channelPayload="";
     
 		// build the requests (log requires two HttpRequests
 		HttpRequestWithBody request;
@@ -372,9 +372,7 @@ public class DotDelegator {
 			// create the payload for create ChannelSet
 			LogConverter logConverter = new LogConverter();
 			if ("1.4.1.1".equals(version)) {
-			    // TODO Fix this
-				objLog = null;
-				   objLog = logConverter.convertToChannelSet1411(
+				objLog = logConverter.convertToChannelSet1411(
 						 (com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj);
 				if (objLog.has("logCurveInfo")) {
 				   channelPayload = objLog.getJSONArray("logCurveInfo").toString();
@@ -403,6 +401,7 @@ public class DotDelegator {
 					exchangeID,
 					logResponse(response, "Received successful status code from DoT create call"),
 					witsmlObj));
+System.out.println("create ChannelSet response: " + response.getBody());
 			// add channels to an existing ChannelSet
 			if ("log".equals(objectType) && !(channelPayload.isEmpty())) {
 
@@ -436,7 +435,8 @@ public class DotDelegator {
 									exchangeID,
 									logResponse(channelsResponse,
 												"Received successful status code from DoT create call"),
-												witsmlObj));
+									witsmlObj));
+System.out.println("create ChannelSet response: " + response.getBody());
 				}
 
 			}
