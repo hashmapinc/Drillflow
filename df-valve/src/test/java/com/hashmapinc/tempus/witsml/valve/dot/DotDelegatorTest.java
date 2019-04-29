@@ -15,35 +15,35 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNotNull;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.ShortNameStruct;
 import com.hashmapinc.tempus.witsml.valve.dot.client.DotClient;
 import com.hashmapinc.tempus.witsml.valve.dot.graphql.GraphQLQueryConverter;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.request.HttpRequest;
+import com.mashape.unirest.request.HttpRequestWithBody;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
-import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
-import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory;
-import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.request.HttpRequest;
-import com.mashape.unirest.request.HttpRequestWithBody;
+import java.security.SecureRandom;
+import java.util.*;
+
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertNotNull;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 public class DotDelegatorTest {
     private DotDelegator delegator;
@@ -53,6 +53,21 @@ public class DotDelegatorTest {
     private String graphQlWellPath;
     private String graphQlWellborePath;
     private String graphQlTrajectoryPath;
+    private String logChannelsetPath;
+    private String logChannelPath;
+    // private GenericMeasure testGM = new GenericMeasure();
+    private CsLogData csLogData = new CsLogData();
+    private CsLogCurveInfo csLogCurveInfo;
+    private List<CsLogCurveInfo> logCurveInfoList;
+    private List<CsLogData> dataList;
+
+    public DotDelegatorTest(CsLogCurveInfo csLogCurveInfo,
+                            List<CsLogCurveInfo> logCurveInfoList,
+                            List<CsLogData> dataList) {
+        this.csLogCurveInfo = csLogCurveInfo;
+        this.logCurveInfoList = logCurveInfoList;
+        this.dataList = dataList;
+    }
 
     @Before
     public void init() {
@@ -62,6 +77,8 @@ public class DotDelegatorTest {
         this.graphQlWellPath = "/well/graphql/";
         this.graphQlWellborePath = "/wellbore/graphql/";
         this.graphQlTrajectoryPath = "/trajectory/graphql";
+        this.logChannelsetPath = "/channelSets/";
+        this.logChannelPath = "/channels/";
 
         // build config
         HashMap<String, String> config = new HashMap<>();
@@ -72,7 +89,8 @@ public class DotDelegatorTest {
         config.put("well.gql.path", this.url + "/well/graphql/");
         config.put("wellbore.gql.path", this.url + "/wellbore/graphql/");
         config.put("trajectory.gql.path", this.url + "/trajectory/graphql");
-
+        config.put("log.channelset.path", this.url + logChannelsetPath);
+        config.put("log.channel.path", this.url + logChannelPath);
 
         // instantiate delegator
         this.delegator = new DotDelegator(config);
@@ -134,6 +152,95 @@ public class DotDelegatorTest {
         String actualUid = this.delegator.createObject(traj, "goodUsername", "goodPassword", "exchangeID", this.client);
         String expectedUid = traj.getUid();
         assertEquals(expectedUid, actualUid);
+    }
+
+    @Test
+    public void shouldCreateLog() {
+
+        /* ***************** create channelSet log object ***************** */
+        ObjLog log = new ObjLog();
+        log.setUid("HM_Test" + randomString(10));
+        log.setUidWell("U2");
+        log.setUidWellbore("WBDD600");
+
+        log.setNameWell("Awing");
+        log.setNameWellbore("AwingWB1");
+        log.setName("Baker Logs Section1 - MD Log");
+        log.setServiceCompany("Schlumberger");
+        // TODO why does any other value, such as "measured depth",
+        //      fail the API call?
+        log.setIndexType("time");
+        log.setDirection("increasing");
+        log.setIndexCurve("Mdepth");
+        /*
+           Using example from the WITSML API Guide, p. 122, item 7
+           only changed "measured depth" to "time" for indexType.
+         */
+        // TODO: try it with StartIndex & EndIndex
+        // StartIndex & EndIndex was not available in the example.
+        // testGM.setUom("ft");
+        // testGM.setValue(0.0);
+        // log.setStartIndex(testGM);
+        // testGM.setValue(8201.77);
+        // log.setEndIndex(testGM);
+        // TODO if it becomes important to create "creationDate", then
+        // an XMLGregorianCalendar object can be created for testing
+        // log.setObjectGrowing(true);
+        csLogData.setMnemonicList("Mdepth,TQ on btm");
+        csLogData.setUnitList("m,kft.lbf");
+        List<String> data = Arrays.asList("498,-0.33,0.1");
+        csLogData.setData(data);
+        dataList.add(csLogData);
+        log.setLogData(dataList);
+        String channelSetPayload = ((AbstractWitsmlObject) log)
+                                        .getJSONString("1.4.1.1");
+
+        /* ******************* create channel log object ****************** */
+        log = new ObjLog();
+        csLogCurveInfo.setUid("Mdepth");
+        ShortNameStruct shortNameStruct = new ShortNameStruct;
+        shortNameStruct.setNamingSystem("naming system");
+        shortNameStruct.setValue("Mdepth");
+        csLogCurveInfo.setMnemonic(shortNameStruct);
+        csLogCurveInfo.setClassWitsml("measured depth of hole");
+        csLogCurveInfo.setUnit("m");
+        csLogCurveInfo.setTypeLogData("double");
+        logCurveInfoList.add(csLogCurveInfo);
+        log.setLogCurveInfo(logCurveInfoList);
+        String channelPayload = ((AbstractWitsmlObject) log)
+                                     .getJSONString("1.4.1.1");
+
+        // build first http request that creates a channelSet
+        String endpoint = this.url + this.logChannelsetPath;
+
+        HttpRequestWithBody req = Unirest.put(endpoint);
+        req.header("Content-Type", "application/json");
+        req.body(channelSetPayload);
+        req.queryString("uid", log.getUid());
+        req.queryString("uidWellbore", log.getUidWellbore());
+        req.queryString("uidWell", log.getUidWell());
+
+        // build second http request to create channels for
+        // the channelSet
+        endpoint = this.url + this.logChannelPath;
+        req = Unirest.put(endpoint);
+        req.body(channelPayload);
+
+        // TODO Pick up from here...not necessary to perform 2 calls, correct?
+
+    }
+
+    static final String AB =
+            "0123456789"
+            + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            + "abcdefghijklmnopqrstuvwxyz";
+    static SecureRandom rnd = new SecureRandom();
+
+    String randomString( int len ){
+        StringBuilder sb = new StringBuilder( len );
+        for( int i = 0; i < len; i++ )
+            sb.append( AB.charAt( rnd.nextInt(AB.length()) ) );
+        return sb.toString();
     }
 
     @Test
