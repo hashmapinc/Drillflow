@@ -16,6 +16,8 @@
 package com.hashmapinc.tempus.witsml.valve.dot.model.log;
 
 import com.hashmapinc.tempus.witsml.valve.dot.JsonUtil;
+import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.View;
+import org.eclipse.persistence.jaxb.UnmarshallerProperties;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.lang.NonNull;
@@ -23,6 +25,8 @@ import org.springframework.lang.Nullable;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.stream.StreamSource;
 import java.util.Iterator;
 
 public class LogConverter extends com.hashmapinc.tempus.WitsmlObjects.Util.LogConverter {
@@ -68,7 +72,6 @@ public class LogConverter extends com.hashmapinc.tempus.WitsmlObjects.Util.LogCo
         // groom the data
         removeNullsFrom(objLogJO);
         JsonUtil.removeEmpties(objLogJO);
-
 
         // transform names per DoT API/mapping documentation
         // *********
@@ -155,15 +158,44 @@ public class LogConverter extends com.hashmapinc.tempus.WitsmlObjects.Util.LogCo
      *                     This object has been marshalled by JAXB from the raw XML
      *      *                          sent by the client.
      */
-    public static com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog convertTo1411(
-            JSONObject csPlusCfromDoT ) throws JAXBException {
-        // unmarshal JSON into a POJO
+    public com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog convertTo1411(
+                                        String csPlusCHfromDoT)
+                                                throws JAXBException {
+
+        // create JaxBContexts to unmarshal JSON into the two POJOs
+        // https://examples.javacodegeeks.com/core-java/xml/bind/jaxb-json-example/
         JAXBContext jcCS = JAXBContext.newInstance(
                 com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.View.class);
-        JAXBContext jcCs = JAXBContext.newInstance(
-                com.hashmapinc.tempus.witsml.valve.dot.model.log.channel.View.class);
+        JAXBContext jcCH = JAXBContext.newInstance(
+                     com.hashmapinc.tempus.witsml.valve.dot.model.log.channel.View.class);
 
+        // create the Unmarshaller Objects using the JaxB Contexts
+        Unmarshaller unmarshallerCS = jcCS.createUnmarshaller();
+        Unmarshaller unmarshallerCH = jcCH.createUnmarshaller();
 
+        // set the Unmarshaller Objects' media type to JSON
+        unmarshallerCS.setProperty(UnmarshallerProperties.MEDIA_TYPE,
+                "application/json");
+        unmarshallerCH.setProperty(UnmarshallerProperties.MEDIA_TYPE,
+                "application/json");
+
+        // Set it to true if you need to include the JSON root element in the
+        // JSON input
+        unmarshallerCS
+                .setProperty(UnmarshallerProperties.JSON_INCLUDE_ROOT, true);
+        unmarshallerCH
+                .setProperty(UnmarshallerProperties.JSON_INCLUDE_ROOT, true);
+
+        // create the StreamSource from the JSON String input
+        StreamSource json = new StreamSource(
+                getClass().getResourceAsStream(csPlusCHfromDoT));
+
+        // create the channel set View from the json
+        View viewCS = unmarshallerCS.unmarshal(json, View.class)
+                .getValue();
+
+        // Print the employee data to console
+        System.out.println("ChannelSet View : " + viewCS.getBhaRunNumber());
         return null;
     }
 

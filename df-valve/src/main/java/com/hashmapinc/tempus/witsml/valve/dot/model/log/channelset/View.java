@@ -17,6 +17,7 @@ package com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset;
 
 import com.fasterxml.jackson.annotation.*;
 
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,6 +63,7 @@ import java.util.Map;
     "wellId",
     "wellboreId"
 })
+@XmlRootElement
 public class View {
 
     @JsonProperty("uuid")

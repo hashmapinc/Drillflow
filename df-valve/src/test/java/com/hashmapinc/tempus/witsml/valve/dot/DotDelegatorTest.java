@@ -57,18 +57,21 @@ public class DotDelegatorTest {
     private String logChannelPath;
     // private GenericMeasure testGM = new GenericMeasure();
     private CsLogData csLogData = new CsLogData();
-    private CsLogCurveInfo csLogCurveInfo;
-    private List<CsLogCurveInfo> logCurveInfoList;
-    private List<CsLogData> dataList;
+    private CsLogCurveInfo csLogCurveInfo = new CsLogCurveInfo();
+    private List<CsLogCurveInfo> logCurveInfoList = new ArrayList<>();
+    private List<CsLogData> dataList = new ArrayList<>();
+/*
+    public DotDelegatorTest () {}
 
-    public DotDelegatorTest(CsLogCurveInfo csLogCurveInfo,
+    private DotDelegatorTest(CsLogCurveInfo csLogCurveInfo,
                             List<CsLogCurveInfo> logCurveInfoList,
                             List<CsLogData> dataList) {
+        // TODO: Why do I need this if it is just null?
         this.csLogCurveInfo = csLogCurveInfo;
         this.logCurveInfoList = logCurveInfoList;
         this.dataList = dataList;
     }
-
+*/
     @Before
     public void init() {
         // instantiate strings
@@ -154,12 +157,17 @@ public class DotDelegatorTest {
         assertEquals(expectedUid, actualUid);
     }
 
+    /*
+       Version 1.4.1.1
+     */
     @Test
-    public void shouldCreateLog() {
+    public void shouldCreateLog() throws Exception {
 
         /* ***************** create channelSet log object ***************** */
         ObjLog log = new ObjLog();
-        log.setUid("HM_Test" + randomString(10));
+        String randomUID = randomString(10);
+        String prefixUID = "HM_Test";
+        log.setUid(prefixUID + randomUID);
         log.setUidWell("U2");
         log.setUidWellbore("WBDD600");
 
@@ -192,13 +200,11 @@ public class DotDelegatorTest {
         csLogData.setData(data);
         dataList.add(csLogData);
         log.setLogData(dataList);
-        String channelSetPayload = ((AbstractWitsmlObject) log)
-                                        .getJSONString("1.4.1.1");
 
         /* ******************* create channel log object ****************** */
-        log = new ObjLog();
+        // log = new ObjLog();
         csLogCurveInfo.setUid("Mdepth");
-        ShortNameStruct shortNameStruct = new ShortNameStruct;
+        ShortNameStruct shortNameStruct = new ShortNameStruct();
         shortNameStruct.setNamingSystem("naming system");
         shortNameStruct.setValue("Mdepth");
         csLogCurveInfo.setMnemonic(shortNameStruct);
@@ -207,27 +213,52 @@ public class DotDelegatorTest {
         csLogCurveInfo.setTypeLogData("double");
         logCurveInfoList.add(csLogCurveInfo);
         log.setLogCurveInfo(logCurveInfoList);
+
+        String channelSetPayload = ((AbstractWitsmlObject) log)
+                .getJSONString("1.4.1.1");
         String channelPayload = ((AbstractWitsmlObject) log)
                                      .getJSONString("1.4.1.1");
 
         // build first http request that creates a channelSet
         String endpoint = this.url + this.logChannelsetPath;
+        HttpRequestWithBody reqCS = Unirest.put(endpoint);
+        reqCS.header("Content-Type", "application/json");
 
-        HttpRequestWithBody req = Unirest.put(endpoint);
-        req.header("Content-Type", "application/json");
-        req.body(channelSetPayload);
-        req.queryString("uid", log.getUid());
-        req.queryString("uidWellbore", log.getUidWellbore());
-        req.queryString("uidWell", log.getUidWell());
+        // create the payload for create ChannelSet
+        reqCS.body(channelSetPayload);
+        reqCS.queryString("uid", log.getUid());
+        reqCS.queryString("uidWellbore", log.getUidWellbore());
+        reqCS.queryString("uidWell", log.getUidWell());
+
+        // build first http response mock
+        HttpResponse<String> respCS = mock(HttpResponse.class);
+        //when(resp.getBody()).thenReturn("{\"uid\": \"traj-a\"}");
+        String logUid = prefixUID + randomUID;
+        when(respCS.getBody()).thenReturn("{\"uid\": \"" + logUid + "\"}" );
+        when(respCS.getStatus()).thenReturn(200);
 
         // build second http request to create channels for
         // the channelSet
-        endpoint = this.url + this.logChannelPath;
-        req = Unirest.put(endpoint);
-        req.body(channelPayload);
+ //       endpoint = this.url + this.logChannelPath;
+ //       HttpRequestWithBody reqCH = Unirest.put(endpoint);
+ //       reqCH.body(channelPayload);
 
-        // TODO Pick up from here...not necessary to perform 2 calls, correct?
+        // mock client behavior
+        when(this.client.makeRequest(argThat(someReq -> (
+                someReq.getHttpMethod().name().equals(reqCS.getHttpMethod().name()) &&
+                someReq.getUrl().equals(reqCS.getUrl()) &&
+                someReq.getHeaders().containsKey("Content-Type")
+        )), eq("goodUsername"), eq("goodPassword"))).thenReturn(respCS);
 
+        // test
+        String actualUid = this.delegator.createObject(
+                log,
+                "goodUsername",
+                "goodPassword",
+                "exchangeID",
+                this.client);
+        String expectedUid = logUid;
+        assertEquals(expectedUid, actualUid);
     }
 
     static final String AB =

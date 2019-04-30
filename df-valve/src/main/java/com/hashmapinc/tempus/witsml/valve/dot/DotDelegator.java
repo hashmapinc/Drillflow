@@ -49,7 +49,7 @@ public class DotDelegator {
 	private final String WELLBORE_GQL_PATH;
 	private final String TRAJECTORY_GQL_PATH;
 	private final String LOG_PATH;
-  private final String LOG_CHANNEL_PATH;
+    private final String LOG_CHANNEL_PATH;
 	private final String LOG_CHANNELSET_METADATA;
 	private final String LOG_CHANNELSET_UUID;
 	private final String LOG_CHANNELS;
@@ -66,7 +66,7 @@ public class DotDelegator {
 		this.WELLBORE_GQL_PATH = 			config.get("wellbore.gql.path");
 		this.TRAJECTORY_GQL_PATH = 			config.get("trajectory.gql.path");
 		this.LOG_PATH =						config.get("log.channelset.path");
-    this.LOG_CHANNEL_PATH =       config.get("log.channel.path");
+        this.LOG_CHANNEL_PATH =       		config.get("log.channel.path");
 		this.LOG_CHANNELSET_METADATA =		config.get("log.channelset.metadata.path");
 		this.LOG_CHANNELSET_UUID =			config.get("log.channelset.uuid.path");
 		this.LOG_CHANNELS =					config.get("log.channels.path");
@@ -105,9 +105,9 @@ public class DotDelegator {
 			case "log":
 				endpoint = this.LOG_PATH;
 				break;
-      case "logChannel":
-        endpoint = this.LOG_CHANNEL_PATH;
-        break;
+      		case "logChannel":
+        		endpoint = this.LOG_CHANNEL_PATH;
+        		break;
 			case "channelsetmetadata":
 				endpoint = this.LOG_CHANNELSET_METADATA;
 				break;
@@ -401,8 +401,7 @@ public class DotDelegator {
 					exchangeID,
 					logResponse(response, "Received successful status code from DoT create call"),
 					witsmlObj));
-System.out.println("create ChannelSet response: " + response.getBody());
-			// add channels to an existing ChannelSet
+			// add channels to an existing channelSet
 			if ("log".equals(objectType) && !(channelPayload.isEmpty())) {
 
 				// build the request...
@@ -436,19 +435,31 @@ System.out.println("create ChannelSet response: " + response.getBody());
 									logResponse(channelsResponse,
 												"Received successful status code from DoT create call"),
 									witsmlObj));
-System.out.println("create ChannelSet response: " + response.getBody());
+				} else {
+					LOG.warning(ValveLogging.getLogMsg(
+							exchangeID,
+							logResponse(response,
+									"Received " +
+											status +
+											" from DoT POST to add channels to an existing channelSet" +
+											channelsResponse.getBody()),
+							witsmlObj));
+					// TODO Will this be the way to convey that channelSet was created but channels were not?
+					//      		throw new ValveException(channelsResponse.getBody());
+					//      OR modification of success response below?
 				}
-
 			}
-
-			// TODO I should probably return something else? yes....this needs to concatenate responses for BOTH REST calls
-			//      And what if there are no channels -- still create the channelSet (I think "yes")
-			//      But what if there is a failure creating channels -- should I delete the channelSet (I think "yes")
+			// LOG: success is based upon the "create a channelSet" REST call's response because even a failed
+			//      "add channels to an existing channelSet" REST call will not cause a rollback of the channelSet
+			// TODO Verify that the client checks that channels were added to the channelSet OR that a status needs to
+			//      indicate "channelSet created but channels were not" (check WITSML API Guide)
 			return (null == uid || uid.isEmpty()) ? new JsonNode(response.getBody()).getObject().getString("uid") : uid;
 		} else {
+			// LOG: channelSet creation failed
 			LOG.warning(ValveLogging.getLogMsg(
 					exchangeID,
-					logResponse(response, "Received " + status + " from DoT POST" + response.getBody()),
+					logResponse(response,
+							"Received " + status + " from DoT POST" + response.getBody()),
 					witsmlObj));
 			throw new ValveException(response.getBody());
 		}
