@@ -23,8 +23,6 @@ import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData;
-import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog;
-import com.hashmapinc.tempus.WitsmlObjects.v1411.ShortNameStruct;
 import com.hashmapinc.tempus.witsml.valve.dot.client.DotClient;
 import com.hashmapinc.tempus.witsml.valve.dot.graphql.GraphQLQueryConverter;
 import com.mashape.unirest.http.HttpResponse;
@@ -37,7 +35,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.security.SecureRandom;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
@@ -60,6 +61,19 @@ public class DotDelegatorTest {
     private CsLogCurveInfo csLogCurveInfo = new CsLogCurveInfo();
     private List<CsLogCurveInfo> logCurveInfoList = new ArrayList<>();
     private List<CsLogData> dataList = new ArrayList<>();
+
+    private static final String AB =
+            "0123456789"
+                    + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                    + "abcdefghijklmnopqrstuvwxyz";
+    private static SecureRandom rnd = new SecureRandom();
+
+    String randomString( int len ){
+        StringBuilder sb = new StringBuilder( len );
+        for( int i = 0; i < len; i++ )
+            sb.append( AB.charAt( rnd.nextInt(AB.length()) ) );
+        return sb.toString();
+    }
 
     @Before
     public void init() {
@@ -149,10 +163,11 @@ public class DotDelegatorTest {
     /*
        Version 1.4.1.1
      */
-    @Test
+
+    /*@Test
     public void shouldCreateLog() throws Exception {
 
-        /* ***************** create channelSet log object ***************** */
+        *//* ***************** create channelSet log object ***************** *//*
         ObjLog log = new ObjLog();
         String randomUID = randomString(10);
         String prefixUID = "HM_Test";
@@ -169,10 +184,10 @@ public class DotDelegatorTest {
         log.setIndexType("time");
         log.setDirection("increasing");
         log.setIndexCurve("Mdepth");
-        /*
+        *//*
            Using example from the WITSML API Guide, p. 122, item 7
            only changed "measured depth" to "time" for indexType.
-         */
+         *//*
         // TODO: try it with StartIndex & EndIndex
         // StartIndex & EndIndex was not available in the example.
         // testGM.setUom("ft");
@@ -190,7 +205,7 @@ public class DotDelegatorTest {
         dataList.add(csLogData);
         log.setLogData(dataList);
 
-        /* ******************* create channel log object ****************** */
+        *//* ******************* create channel log object ****************** *//*
         // log = new ObjLog();
         csLogCurveInfo.setUid("Mdepth");
         ShortNameStruct shortNameStruct = new ShortNameStruct();
@@ -240,7 +255,7 @@ public class DotDelegatorTest {
         )), eq("goodUsername"), eq("goodPassword"))).thenReturn(respCS);
 
         // test
-        /*
+        *//*
         String actualUid = this.delegator.createObject(
                 log,
                 "goodUsername",
@@ -249,21 +264,8 @@ public class DotDelegatorTest {
                 this.client);
         String expectedUid = logUid;
         assertEquals(expectedUid, actualUid);
-        */
-    }
-
-    static final String AB =
-            "0123456789"
-            + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            + "abcdefghijklmnopqrstuvwxyz";
-    static SecureRandom rnd = new SecureRandom();
-
-    String randomString( int len ){
-        StringBuilder sb = new StringBuilder( len );
-        for( int i = 0; i < len; i++ )
-            sb.append( AB.charAt( rnd.nextInt(AB.length()) ) );
-        return sb.toString();
-    }
+        *//*
+    }*/
 
     @Test
     public void shouldCreateTrajectoryWithoutUid() throws Exception {

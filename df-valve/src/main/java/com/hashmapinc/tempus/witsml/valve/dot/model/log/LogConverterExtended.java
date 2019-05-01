@@ -126,6 +126,11 @@ public class LogConverterExtended
         return objLogJO;
     }
 
+    /**
+     * createJO converts the following JSONObject from the old name
+     *          to the new name, and puts them (one or both) into
+     *          a JSONObject
+     */
     protected static void createJO() {
 
         boolean createdAnObject = false;

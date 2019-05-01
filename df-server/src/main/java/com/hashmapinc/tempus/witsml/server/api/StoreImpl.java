@@ -27,7 +27,6 @@ import com.hashmapinc.tempus.witsml.valve.IValve;
 import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
 import com.hashmapinc.tempus.witsml.valve.ValveFactory;
-import com.hashmapinc.tempus.witsml.valve.dot.model.log.LogConverterExtended;
 import org.apache.cxf.ext.logging.event.LogEvent;
 import org.apache.cxf.feature.Features;
 import org.apache.cxf.message.Message;
@@ -451,7 +450,7 @@ public class StoreImpl implements IStore {
 
                 xmlOut = this.valve.getObject(qc).get();
                 // convert to WITSML XML
-                LogConverterExtended logConverter = new LogConverterExtended();
+                //LogConverterExtended logConverter = new LogConverterExtended();
                 /*
                 try {
                     com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog witsmlXmlOut =
