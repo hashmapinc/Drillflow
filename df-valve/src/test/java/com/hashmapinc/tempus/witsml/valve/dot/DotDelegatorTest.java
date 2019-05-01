@@ -32,7 +32,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -60,13 +59,13 @@ public class DotDelegatorTest {
     //private CsLogCurveInfo csLogCurveInfo = new CsLogCurveInfo();
     // private List<CsLogCurveInfo> logCurveInfoList = new ArrayList<>();
     // private List<CsLogData> dataList = new ArrayList<>();
-
+/*
     private static final String AB =
             "0123456789"
                     + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                     + "abcdefghijklmnopqrstuvwxyz";
     private static SecureRandom rnd = new SecureRandom();
-
+*/
     /*
     private String randomString( int len ){
         StringBuilder sb = new StringBuilder( len );
