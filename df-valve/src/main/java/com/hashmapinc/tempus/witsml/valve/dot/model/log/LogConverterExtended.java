@@ -37,9 +37,9 @@ public class LogConverterExtended
     protected static JSONObject workObj;
 
     /**
-     * convertToChannelSet1311 takes in a v1.3.1.1 JSON strong
+     * convertToChannelSet1311 takes in a v1.3.1.1 JSON string
      *          that was produced client-side from SOAP WITSML XML
-     *          & translates as nedessary to adhere to DoT's
+     *          & translates as necessary to adhere to DoT's
      *          "Create a new ChannelSet" API.
      * @param jsonString Represents the client's WITSML object (complete)
      *                   It is a JSON String created from the ObjLog1311
@@ -54,16 +54,17 @@ public class LogConverterExtended
      * convertToChannelSet1411 takes in a v1.4.1.1 WITSML object
      *          that was produced client-side from SOAP WITSML XML
      *          & translates as necessary to adhere to DoT's
-     *          "Create a new ChannelSet" & "Post channels to existing ChannelSet" API.
+     *          "Create a new ChannelSet" &
+     *          "Post channels to existing ChannelSet" API.
      *
      * Conversion at this stage exists to handle data business rules
      * as documented by the DoT API.
      *
-     * @param witsmlObj     Represents the client's WITSML object v1.4.1.1.
-     *                      This object has been marshalled by JAXB from the raw XML
-     *                          sent by the client.
-     * @return JSONObject Represents the conversion of both the ChannelSet
-     *                      and the Channels.
+     * @param witsmlObj   Represents the client's WITSML object v1.4.1.1.
+     *                    This object has been marshaled by JAXB
+     *                         from the faw XML sent by the client.
+     * @return JSONObject Represents the conversion of both the
+     *                         channel set and the channels.
      */
     public static JSONObject convertToChannelSet1411(
             com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog witsmlObj ) {
@@ -215,9 +216,14 @@ public class LogConverterExtended
         // construct the String return value
         JSONObject returnObj = new JSONObject();
         // If I use an array, i can move the whole view at once
-        returnObj.put("timeDepth",viewCS.getTimeDepth());
+        // Rename transformation
+        returnObj.put("indexType",viewCS.getTimeDepth());
+        returnObj.put("pass",viewCS.getPassNumber());
+        returnObj.put("serviceCompany",viewCS.getLoggingCompanyName());
         // TODO Why are nulls not getting removed?
+        // groom the response
         removeNullsFrom(returnObj);
+        JsonUtil.removeEmpties(returnObj);
         return returnObj.toString();
     }
 

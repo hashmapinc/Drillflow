@@ -19,6 +19,7 @@ import org.json.JSONArray;
 import org.junit.Test;
 
 import javax.xml.bind.JAXBException;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class LogConverterTest {
     @Test
@@ -51,8 +52,11 @@ public class LogConverterTest {
               + "\"citation\":{\"title\":\"TQA\"},"
               + "\"customData\":\"{}\"}]"
         );
+        String currentString = "{\"timeDepth\":\"time\"";
         //JSONObject responseFromDoT = new JSONObject(jsonRespCS);
         LogConverterExtended logConverterExtended = new LogConverterExtended();
-        logConverterExtended.convertTo1411(jsonRespCS, jsonRespCH);
+        String convertedResponse = logConverterExtended.convertTo1411(jsonRespCS, jsonRespCH);
+        System.out.println(convertedResponse);
+        assertThat(convertedResponse.equalsIgnoreCase(currentString));
     }
 }
