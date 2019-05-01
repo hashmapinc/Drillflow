@@ -153,7 +153,7 @@ public class View {
     @JsonProperty("customData")
     private String customData;
     @JsonProperty("extensionNameValue")
-    private List<ExtensionNameValue_> extensionNameValue = null;
+    private List<ExtensionNameValue> extensionNameValue = null;
     @JsonProperty("objectVersion")
     private String objectVersion;
     @JsonProperty("existenceKind")
@@ -562,12 +562,12 @@ public class View {
     }
 
     @JsonProperty("extensionNameValue")
-    public List<ExtensionNameValue_> getExtensionNameValue() {
+    public List<ExtensionNameValue> getExtensionNameValue() {
         return extensionNameValue;
     }
 
     @JsonProperty("extensionNameValue")
-    public void setExtensionNameValue(List<ExtensionNameValue_> extensionNameValue) {
+    public void setExtensionNameValue(List<ExtensionNameValue> extensionNameValue) {
         this.extensionNameValue = extensionNameValue;
     }
 

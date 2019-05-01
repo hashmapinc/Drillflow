@@ -16,7 +16,7 @@
 package com.hashmapinc.tempus.witsml.valve.dot.model.log;
 
 import com.hashmapinc.tempus.witsml.valve.dot.JsonUtil;
-import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.View;
+import org.eclipse.persistence.jaxb.JAXBContextFactory;
 import org.eclipse.persistence.jaxb.UnmarshallerProperties;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -27,9 +27,11 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
+import java.io.StringReader;
 import java.util.Iterator;
 
-public class LogConverter extends com.hashmapinc.tempus.WitsmlObjects.Util.LogConverter {
+public class LogConverterExtended
+        extends com.hashmapinc.tempus.WitsmlObjects.Util.LogConverter {
 
     protected static JSONObject objLogJO;
     protected static JSONObject workObj;
@@ -152,51 +154,71 @@ public class LogConverter extends com.hashmapinc.tempus.WitsmlObjects.Util.LogCo
      *
      * Conversion at this stage exists to handle the WITSML standard.
      *
-     * @param csPlusCfromDoT Represents both the ChannelSet & Channels
-     *                         returned by DoT.
+     * @param jsonRespChannels Channels returned by DoT
+     *
      * @return witsmlObj Represents the client's WITSML object v1.4.1.1.
      *                     This object has been marshalled by JAXB from the raw XML
      *      *                          sent by the client.
      */
-    public com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog convertTo1411(
-                                        String csPlusCHfromDoT)
+    public String convertTo1411(JSONArray jsonResponseCS, JSONArray jsonRespChannels)
                                                 throws JAXBException {
 
-        // create JaxBContexts to unmarshal JSON into the two POJOs
-        // https://examples.javacodegeeks.com/core-java/xml/bind/jaxb-json-example/
-        JAXBContext jcCS = JAXBContext.newInstance(
-                com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.View.class);
-        JAXBContext jcCH = JAXBContext.newInstance(
-                     com.hashmapinc.tempus.witsml.valve.dot.model.log.channel.View.class);
-
-        // create the Unmarshaller Objects using the JaxB Contexts
+        // create JaxBContext to unmarshal channel set JSON into the channel set POJO
+        JSONObject joCS = jsonResponseCS.getJSONObject(0); // 1 channel set per log
+        JAXBContext jcCS = JAXBContextFactory.createContext(
+                new Class[] {com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.View.class},
+                null);
+        // create the Unmarshaller Object for channel set using the JaxB Context
         Unmarshaller unmarshallerCS = jcCS.createUnmarshaller();
-        Unmarshaller unmarshallerCH = jcCH.createUnmarshaller();
-
-        // set the Unmarshaller Objects' media type to JSON
         unmarshallerCS.setProperty(UnmarshallerProperties.MEDIA_TYPE,
                 "application/json");
+        unmarshallerCS
+                .setProperty(UnmarshallerProperties.JSON_INCLUDE_ROOT, false);
+        // create the StreamSource from the channel set JSON response Object...
+        StreamSource streamSrcCS = new StreamSource(
+                new StringReader(joCS.toString()));
+        // create the channel set View from the JSON response Object for
+        // channel set
+        com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.View viewCS =
+                unmarshallerCS
+                        .unmarshal(streamSrcCS, com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.View.class)
+                        .getValue();
+        // Print some channel set data to console
+        System.out.println("ChannelSet View timeDepth: " + viewCS.getTimeDepth());
+        System.out.println("ChannelSet View objectGrowing : " + viewCS.getObjectGrowing());
+
+        // create JaxBContext to unmarshal channel JSON into the channel POJO
+        // TODO Do ALL channels next
+        JSONObject joCH = jsonRespChannels.getJSONObject(0);
+        JAXBContext jcCH = JAXBContextFactory.createContext(
+                new Class[] {com.hashmapinc.tempus.witsml.valve.dot.model.log.channel.View.class},
+                null);
+        // create the Unmarshaller Object for channels using the JaxB Context
+        Unmarshaller unmarshallerCH = jcCH.createUnmarshaller();
+        // set the Unmarshaller Objects' media type to JSON
         unmarshallerCH.setProperty(UnmarshallerProperties.MEDIA_TYPE,
                 "application/json");
-
-        // Set it to true if you need to include the JSON root element in the
-        // JSON input
-        unmarshallerCS
-                .setProperty(UnmarshallerProperties.JSON_INCLUDE_ROOT, true);
         unmarshallerCH
-                .setProperty(UnmarshallerProperties.JSON_INCLUDE_ROOT, true);
-
-        // create the StreamSource from the JSON String input
-        StreamSource json = new StreamSource(
-                getClass().getResourceAsStream(csPlusCHfromDoT));
-
-        // create the channel set View from the json
-        View viewCS = unmarshallerCS.unmarshal(json, View.class)
-                .getValue();
-
-        // Print the employee data to console
-        System.out.println("ChannelSet View : " + viewCS.getBhaRunNumber());
-        return null;
+                .setProperty(UnmarshallerProperties.JSON_INCLUDE_ROOT, false);
+        // create the StreamSource from the channel JSON response Objects...
+        StreamSource streamSrcCH = new StreamSource(
+                new StringReader(joCH.toString()));
+        // create the channel View from the JSON response Object for a
+        // channel
+        com.hashmapinc.tempus.witsml.valve.dot.model.log.channel.View viewCH =
+                unmarshallerCH
+                        .unmarshal(streamSrcCH, com.hashmapinc.tempus.witsml.valve.dot.model.log.channel.View.class)
+                        .getValue();
+        // Print some channel data to console
+        System.out.println("ChannelSet View timeDepth: " + viewCH.getGrowingStatus());
+        System.out.println("ChannelSet View objectGrowing : " + viewCH.getTimeDepth());
+        // construct the String return value
+        JSONObject returnObj = new JSONObject();
+        // If I use an array, i can move the whole view at once
+        returnObj.put("timeDepth",viewCS.getTimeDepth());
+        // TODO Why are nulls not getting removed?
+        removeNullsFrom(returnObj);
+        return returnObj.toString();
     }
 
 

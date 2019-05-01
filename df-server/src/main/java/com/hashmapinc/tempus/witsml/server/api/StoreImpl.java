@@ -27,7 +27,7 @@ import com.hashmapinc.tempus.witsml.valve.IValve;
 import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
 import com.hashmapinc.tempus.witsml.valve.ValveFactory;
-import com.hashmapinc.tempus.witsml.valve.dot.model.log.LogConverter;
+import com.hashmapinc.tempus.witsml.valve.dot.model.log.LogConverterExtended;
 import org.apache.cxf.ext.logging.event.LogEvent;
 import org.apache.cxf.feature.Features;
 import org.apache.cxf.message.Message;
@@ -451,7 +451,8 @@ public class StoreImpl implements IStore {
 
                 xmlOut = this.valve.getObject(qc).get();
                 // convert to WITSML XML
-                LogConverter logConverter = new LogConverter();
+                LogConverterExtended logConverter = new LogConverterExtended();
+                /*
                 try {
                     com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog witsmlXmlOut =
                             logConverter.convertTo1411(xmlOut);
@@ -459,6 +460,7 @@ public class StoreImpl implements IStore {
                     throw new Exception("JAXB failure trying to generate GetFromStore response: " +
                             jaxBEx.getMessage());
                 }
+                */
                 // TODO xmlOut is a String; need to go from an ObjLog v1411 to a String & put it into xmlOut
 
             } catch (ValveException ve) {

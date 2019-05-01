@@ -52,7 +52,7 @@ public class CommonData {
     @JsonProperty("extensionAny")
     private String extensionAny;
     @JsonProperty("extensionNameValue")
-    private List<ExtensionNameValue_> extensionNameValue = null;
+    private List<ExtensionNameValue> extensionNameValue = null;
     @JsonProperty("sourceName")
     private String sourceName;
     @JsonProperty("dTimCreation")
@@ -133,12 +133,12 @@ public class CommonData {
     }
 
     @JsonProperty("extensionNameValue")
-    public List<ExtensionNameValue_> getExtensionNameValue() {
+    public List<ExtensionNameValue> getExtensionNameValue() {
         return extensionNameValue;
     }
 
     @JsonProperty("extensionNameValue")
-    public void setExtensionNameValue(List<ExtensionNameValue_> extensionNameValue) {
+    public void setExtensionNameValue(List<ExtensionNameValue> extensionNameValue) {
         this.extensionNameValue = extensionNameValue;
     }
 
