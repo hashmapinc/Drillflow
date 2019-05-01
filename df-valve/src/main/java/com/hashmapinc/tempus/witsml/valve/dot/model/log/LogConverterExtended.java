@@ -153,6 +153,9 @@ public class LogConverterExtended
         }
     }
 
+    protected static void reverseCreateJO(JSONObject returnObj) {
+    }
+
     /**
      * convertTo1411 takes in a JSONObject that represents a ChannelSet &
      *          Channels returned by DoT & translates as necessary to
@@ -225,6 +228,9 @@ public class LogConverterExtended
         returnObj.put("indexType",viewCS.getTimeDepth());
         returnObj.put("pass",viewCS.getPassNumber());
         returnObj.put("serviceCompany",viewCS.getLoggingCompanyName());
+
+        reverseCreateJO(returnObj);
+
         // TODO Why are nulls not getting removed?
         // groom the response
         removeNullsFrom(returnObj);

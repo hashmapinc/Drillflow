@@ -21,8 +21,6 @@ import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells;
-import com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo;
-import com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData;
 import com.hashmapinc.tempus.witsml.valve.dot.client.DotClient;
 import com.hashmapinc.tempus.witsml.valve.dot.graphql.GraphQLQueryConverter;
 import com.mashape.unirest.http.HttpResponse;
@@ -37,7 +35,6 @@ import org.junit.Test;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
@@ -57,10 +54,10 @@ public class DotDelegatorTest {
     private String logChannelsetPath;
     private String logChannelPath;
     // private GenericMeasure testGM = new GenericMeasure();
-    private CsLogData csLogData = new CsLogData();
-    private CsLogCurveInfo csLogCurveInfo = new CsLogCurveInfo();
-    private List<CsLogCurveInfo> logCurveInfoList = new ArrayList<>();
-    private List<CsLogData> dataList = new ArrayList<>();
+    // private CsLogData csLogData = new CsLogData();
+    //private CsLogCurveInfo csLogCurveInfo = new CsLogCurveInfo();
+    // private List<CsLogCurveInfo> logCurveInfoList = new ArrayList<>();
+    // private List<CsLogData> dataList = new ArrayList<>();
 
     private static final String AB =
             "0123456789"
@@ -68,7 +65,7 @@ public class DotDelegatorTest {
                     + "abcdefghijklmnopqrstuvwxyz";
     private static SecureRandom rnd = new SecureRandom();
 
-    String randomString( int len ){
+    private String randomString( int len ){
         StringBuilder sb = new StringBuilder( len );
         for( int i = 0; i < len; i++ )
             sb.append( AB.charAt( rnd.nextInt(AB.length()) ) );
