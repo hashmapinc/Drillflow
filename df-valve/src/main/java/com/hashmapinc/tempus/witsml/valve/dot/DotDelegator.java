@@ -143,17 +143,42 @@ public class DotDelegator {
 	) throws ValveException, UnirestException, ValveAuthException {
 		String uid = witsmlObj.getUid(); // get uid for delete call
 		String objectType = witsmlObj.getObjectType(); // get obj type for exception handling
+		String uidWellbore ;
+		String uidWellLog ;
+		String uuid="";
+		String endpoint="";
+		HttpRequest request=null;
+		HttpRequest logRequest=null;
 
 		// It is an object delete, so re-route there
-		String endpoint = this.getEndpoint(objectType) + uid; // add uid for delete call
-
+		//added code to take care log delete
+		if ("log".equals(objectType)){
+			endpoint = this.getEndpoint("channelsetuuid");
+		}else{
+			endpoint = this.getEndpoint(objectType) + uid; // add uid for rest call
+		}
 		// create request
-		HttpRequest request = Unirest.delete(endpoint).header("Content-Type", "application/json");
-		LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(request), witsmlObj));
+		if ("log".equals(objectType)) {
+			logRequest = Unirest.get(endpoint);
+			logRequest.header("accept", "application/json");
 
+			request = Unirest.delete(endpoint).header("Content-Type", "application/json");
+			LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(request), witsmlObj));
+		}else {
+			request = Unirest.delete(endpoint).header("Content-Type", "application/json");
+			LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(request), witsmlObj));
+		}
 		// add query string params
 		if ("wellbore".equals(objectType)) {
 			request.queryString("uidWell", witsmlObj.getParentUid());
+		}if ("log".equals(objectType)) { // code added to handle log object
+			logRequest = Unirest.get(endpoint);
+			logRequest.header("accept", "application/json");
+			uidWellbore = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj).getUidWellbore();
+			uidWellLog = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj).getUidWell();
+			logRequest.queryString("uid", uid);
+			logRequest.queryString("uidWellbore", uidWellbore);
+			logRequest.queryString("uidWell", uidWellLog);
 		} else if ("trajectory".equals(objectType)){
 			request.queryString("uidWellbore", witsmlObj.getParentUid());
 			String uidWell;
@@ -164,13 +189,42 @@ public class DotDelegator {
 			}
 			request.queryString("uidWell", uidWell);
 		}
-
 		// make the DELETE call.
-		HttpResponse<String> response = client.makeRequest(request, username, password);
+		HttpResponse<String> response;
+		if ("log".equals(objectType)) {
+			response = client.makeRequest(logRequest, username, password);
+		}else{
+			response = client.makeRequest(request, username, password);
+		}
 
+		if ("log".equals(objectType)) {
+			JSONObject responseJson = new JSONObject(response.getBody());
+			uuid = responseJson.getString("uuid");
+		}
 		// check response status
 		int status = response.getStatus();
 		if (201 == status || 200 == status || 204 == status) {
+			if ("log".equals(objectType)) {
+				String logDeletEndpoint = this.getEndpoint("channelsetmetadata");
+				HttpRequest logDeleteRequest = Unirest.delete(logDeletEndpoint).header("Content-Type", "application/json");
+				logDeleteRequest.queryString("uuid", uuid);
+				HttpResponse<String> logDeleteResponse = client.makeRequest(logDeleteRequest, username, password);
+				int deleteStatus = logDeleteResponse.getStatus();
+				if ( 204 == deleteStatus) {
+					LOG.info(ValveLogging.getLogMsg(
+							exchangeID,
+							logResponse(response, "Successfully Deleted Object with UID :"+uid+"."),
+							witsmlObj)
+					);
+				} else {
+					LOG.warning(ValveLogging.getLogMsg(
+							exchangeID,
+							logResponse(response, "Unable to delete"),
+							witsmlObj)
+					);
+					throw new ValveException("DELETE DoT REST call failed with status code: " + status);
+				}
+			}
 			LOG.info(ValveLogging.getLogMsg(
 					exchangeID,
 					logResponse(response, "Successfully Deleted Object with UID :"+uid+"."),
