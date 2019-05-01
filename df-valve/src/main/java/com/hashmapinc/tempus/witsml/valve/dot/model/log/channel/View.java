@@ -17,6 +17,7 @@ package com.hashmapinc.tempus.witsml.valve.dot.model.log.channel;
 
 import com.fasterxml.jackson.annotation.*;
 
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +68,8 @@ import java.util.Map;
     "objectVersion",
     "existenceKind"
 })
+// TODO Is this change necessary? TMS
+@XmlRootElement
 public class View {
 
     @JsonProperty("uuid")
@@ -150,7 +153,7 @@ public class View {
     @JsonProperty("customData")
     private String customData;
     @JsonProperty("extensionNameValue")
-    private List<ExtensionNameValue_> extensionNameValue = null;
+    private List<ExtensionNameValue> extensionNameValue = null;
     @JsonProperty("objectVersion")
     private String objectVersion;
     @JsonProperty("existenceKind")
@@ -559,12 +562,12 @@ public class View {
     }
 
     @JsonProperty("extensionNameValue")
-    public List<ExtensionNameValue_> getExtensionNameValue() {
+    public List<ExtensionNameValue> getExtensionNameValue() {
         return extensionNameValue;
     }
 
     @JsonProperty("extensionNameValue")
-    public void setExtensionNameValue(List<ExtensionNameValue_> extensionNameValue) {
+    public void setExtensionNameValue(List<ExtensionNameValue> extensionNameValue) {
         this.extensionNameValue = extensionNameValue;
     }
 

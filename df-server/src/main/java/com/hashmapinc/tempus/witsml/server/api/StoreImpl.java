@@ -178,6 +178,8 @@ public class StoreImpl implements IStore {
             return response;
         }
 
+        // TODO This is just passing back what was already there from the client &
+        //      not the API response.
         LOG.info("Successfully added object: " + witsmlObjects.get(0).toString());
         response.setSuppMsgOut(uid);
         response.setResult((short)1);
@@ -447,6 +449,19 @@ public class StoreImpl implements IStore {
                 );
 
                 xmlOut = this.valve.getObject(qc).get();
+                // convert to WITSML XML
+                //LogConverterExtended logConverter = new LogConverterExtended();
+                /*
+                try {
+                    com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog witsmlXmlOut =
+                            logConverter.convertTo1411(xmlOut);
+                } catch (JAXBException jaxBEx) {
+                    throw new Exception("JAXB failure trying to generate GetFromStore response: " +
+                            jaxBEx.getMessage());
+                }
+                */
+                // TODO xmlOut is a String; need to go from an ObjLog v1411 to a String & put it into xmlOut
+
             } catch (ValveException ve) {
                 resp.setResult((short) -425);
                 LOG.warning("Valve Exception in GetFromStore: " + ve.getMessage());
