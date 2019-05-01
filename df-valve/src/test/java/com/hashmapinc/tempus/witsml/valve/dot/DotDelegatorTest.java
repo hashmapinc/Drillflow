@@ -51,12 +51,12 @@ public class DotDelegatorTest {
     private String graphQlWellborePath;
     private String graphQlTrajectoryPath;
 
-    private String logChannelsetPath;
-    private String logChannelPath;
+    //private String logChannelsetPath;
+    //private String logChannelPath;
 
     // private GenericMeasure testGM = new GenericMeasure();
     // private CsLogData csLogData = new CsLogData();
-    //private CsLogCurveInfo csLogCurveInfo = new CsLogCurveInfo();
+    // private CsLogCurveInfo csLogCurveInfo = new CsLogCurveInfo();
     // private List<CsLogCurveInfo> logCurveInfoList = new ArrayList<>();
     // private List<CsLogData> dataList = new ArrayList<>();
 /*
@@ -83,8 +83,8 @@ public class DotDelegatorTest {
         this.graphQlWellPath = "/well/graphql/";
         this.graphQlWellborePath = "/wellbore/graphql/";
         this.graphQlTrajectoryPath = "/trajectory/graphql";
-        this.logChannelsetPath = "/channelSets/";
-        this.logChannelPath = "/channels/";
+        //this.logChannelsetPath = "/channelSets/";
+        //this.logChannelPath = "/channels/";
 
         // build config
         HashMap<String, String> config = new HashMap<>();
@@ -95,8 +95,8 @@ public class DotDelegatorTest {
         config.put("well.gql.path", this.url + "/well/graphql/");
         config.put("wellbore.gql.path", this.url + "/wellbore/graphql/");
         config.put("trajectory.gql.path", this.url + "/trajectory/graphql");
-        config.put("log.channelset.path", this.url + logChannelsetPath);
-        config.put("log.channel.path", this.url + logChannelPath);
+        //config.put("log.channelset.path", this.url + logChannelsetPath);
+        //config.put("log.channel.path", this.url + logChannelPath);
 
         // instantiate delegator
         this.delegator = new DotDelegator(config);
