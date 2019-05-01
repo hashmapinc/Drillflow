@@ -51,8 +51,10 @@ public class DotDelegatorTest {
     private String graphQlWellPath;
     private String graphQlWellborePath;
     private String graphQlTrajectoryPath;
+
     private String logChannelsetPath;
     private String logChannelPath;
+
     // private GenericMeasure testGM = new GenericMeasure();
     // private CsLogData csLogData = new CsLogData();
     //private CsLogCurveInfo csLogCurveInfo = new CsLogCurveInfo();
@@ -65,12 +67,14 @@ public class DotDelegatorTest {
                     + "abcdefghijklmnopqrstuvwxyz";
     private static SecureRandom rnd = new SecureRandom();
 
+    /*
     private String randomString( int len ){
         StringBuilder sb = new StringBuilder( len );
         for( int i = 0; i < len; i++ )
             sb.append( AB.charAt( rnd.nextInt(AB.length()) ) );
         return sb.toString();
     }
+    */
 
     @Before
     public void init() {
