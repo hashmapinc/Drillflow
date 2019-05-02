@@ -244,6 +244,10 @@ public class LogConverterExtended
         // ***************** channel set POJO transformation ***************** //
         JSONObject returnObj = new JSONObject();
 
+        returnObj.put("uid", viewCS.getUid());
+        returnObj.put("uidWellbore", viewCS.getWellboreId());
+        returnObj.put("uidWell", viewCS.getWellId());
+
         // TODO If I use an array, i can move the whole view at once
         // Rename transformations on channelSet
         returnObj.put("indexType",viewCS.getTimeDepth());
@@ -284,9 +288,6 @@ public class LogConverterExtended
         // returnObj.put("", viewCS.getChannelState());
         // returnObj.put("", viewCS.getCurveSensorsAligned());
         // returnObj.put("", viewCS.getDataContext());
-        // returnObj.put("uid", viewCS.getUid());
-        // returnObj.put("uidWellbore", viewCS.getWellboreId());
-        // returnObj.put("uidWell", viewCS.getWellId());
 
         // ******************* channels POJO transformation ******************* //
         // TODO Why are nulls not getting removed?
