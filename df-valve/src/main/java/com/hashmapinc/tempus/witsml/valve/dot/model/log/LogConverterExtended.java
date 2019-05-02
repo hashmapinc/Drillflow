@@ -272,7 +272,7 @@ public class LogConverterExtended
         returnObj.put("Index", viewCS.getIndex());
         returnObj.put("LogParam", viewCS.getLogParam());
         returnObj.put("NominalHoleSize", viewCS.getNominalHoleSize());
-        returnObj.put("StepIncrement", viewCS.getStepIncrement();
+        returnObj.put("StepIncrement", viewCS.getStepIncrement());
         // TODO Do I have to put in more values or does this complete a full
         //      channelSet object? Will it be completely transformed once the
         //      transformation is called by Sukhe?
