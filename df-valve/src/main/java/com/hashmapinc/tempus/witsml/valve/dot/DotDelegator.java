@@ -448,10 +448,6 @@ public class DotDelegator {
 				}
 
 			}
-
-			// TODO I should probably return something else? yes....this needs to concatenate responses for BOTH REST calls
-			//      And what if there are no channels -- still create the channelSet (I think "yes")
-			//      But what if there is a failure creating channels -- should I delete the channelSet (I think "yes")
 			return (null == uid || uid.isEmpty()) ? new JsonNode(response.getBody()).getObject().getString("uid") : uid;
 		} else {
 			LOG.warning(ValveLogging.getLogMsg(
@@ -618,9 +614,6 @@ public class DotDelegator {
 			));
 			throw new ValveException(channelsResponse.getBody());
 		}
-		// Create a JSON String that contains the ChannelSet + Channels data
-		// First, create a JSONObject that encompasses the CahnnelSet & the
-		// Channels JSONArray.
 		return finalResponse;
 	}
 

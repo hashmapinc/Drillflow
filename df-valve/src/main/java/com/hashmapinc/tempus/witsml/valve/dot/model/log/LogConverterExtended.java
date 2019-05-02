@@ -164,10 +164,10 @@ public class LogConverterExtended
     protected static void reverseCreateJO(
             JSONObject returnObj, Citation citation) {
 
-        if (!citation.getTitle().isEmpty()) {
+        if (citation.getTitle()!=null && !citation.getTitle().isEmpty()) {
             returnObj.put("name", citation.getTitle());
         }
-        if (!citation.getDescription().isEmpty()) {
+        if (citation.getDescription()!=null && !citation.getDescription().isEmpty()) {
             returnObj.put("description", citation.getDescription());
         }
     }
@@ -251,31 +251,42 @@ public class LogConverterExtended
         returnObj.put("serviceCompany",viewCS.getLoggingCompanyName());
         // Break apart the citation JSON object into its respective elements
         Citation citation = viewCS.getCitation();
-        // Quick verification: these two ways of accessing data should return
-        // identical results.
-        System.out.println(citation.getTitle());
-        System.out.println(viewCS.getCitation().getTitle());
         reverseCreateJO(returnObj, viewCS.getCitation());
         // I should see the correct data after using the class in reverseCreateJO
         // to create the two breakout pieces of data
         // TODO Do I have to map other pieces of data from Citation?
-        System.out.println("Is Title now name? " + returnObj.getString("name"));
-        System.out.println("Is description now within returnObj as a key-value pair? " +
-                returnObj.getString("description"));
+        // System.out.println("Is Title " + citation.getTitle() + " now name " + returnObj.getString("name") + "?");
         // TODO Does this populate the rest of returnObj correctly?
         // TODO Does Transformation that Sukhe calls perform the final
         //      transformation to WITSML XML correctly?
         // Finally build out the rest of the channelSet into returnObj:
         returnObj.put("Alias", viewCS.getAliases());
         returnObj.put("CommonData", viewCS.getCommonData());
-        returnObj.put("ExtensionNameValue", viewCS.getExtensionNameValue());
-        returnObj.put("Index", viewCS.getIndex());
-        returnObj.put("LogParam", viewCS.getLogParam());
-        returnObj.put("NominalHoleSize", viewCS.getNominalHoleSize());
-        returnObj.put("StepIncrement", viewCS.getStepIncrement());
-        // TODO Do I have to put in more values or does this complete a full
-        //      channelSet object? Will it be completely transformed once the
-        //      transformation is called by Sukhe?
+        returnObj.put("LogParam", viewCS.getLogParam());;
+        returnObj.put("stepIncrement", viewCS.getStepIncrement());
+        returnObj.put("nullValue", viewCS.getNullValue());
+        returnObj.put("bhaRunNumber", viewCS.getBhaRunNumber());
+        returnObj.put("customData", viewCS.getCustomData());
+        returnObj.put("startIndex", viewCS.getStartIndex());
+        returnObj.put("endIndex", viewCS.getEndIndex());
+        returnObj.put("objectGrowing", viewCS.getObjectGrowing());
+        returnObj.put("dataGroup", viewCS.getDataGroup());
+        returnObj.put("runNumber", viewCS.getRunNumber());
+        returnObj.put("dataDelimiter", viewCS.getDataDelimiter());
+
+
+
+        // returnObj.put("ExtensionNameValue", viewCS.getExtensionNameValue());
+        // returnObj.put("Index", viewCS.getIndex());
+        // returnObj.put("NominalHoleSize", viewCS.getNominalHoleSize());
+        // returnObj.put("", viewCS.getAdditionalProperties());
+        // returnObj.put("", viewCS.getChannelClass());
+        // returnObj.put("", viewCS.getChannelState());
+        // returnObj.put("", viewCS.getCurveSensorsAligned());
+        // returnObj.put("", viewCS.getDataContext());
+        // returnObj.put("uid", viewCS.getUid());
+        // returnObj.put("uidWellbore", viewCS.getWellboreId());
+        // returnObj.put("uidWell", viewCS.getWellId());
 
         // ******************* channels POJO transformation ******************* //
         // TODO Why are nulls not getting removed?
