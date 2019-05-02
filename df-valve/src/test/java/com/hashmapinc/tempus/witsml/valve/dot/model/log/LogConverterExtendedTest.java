@@ -19,9 +19,10 @@ import org.json.JSONArray;
 import org.junit.Test;
 
 import javax.xml.bind.JAXBException;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class LogConverterTest {
+public class LogConverterExtendedTest {
     @Test
     public void shouldConvertTo1411() throws JAXBException {
         JSONArray jsonRespCS = new JSONArray(

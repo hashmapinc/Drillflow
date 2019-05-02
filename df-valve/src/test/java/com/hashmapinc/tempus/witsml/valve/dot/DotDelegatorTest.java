@@ -28,7 +28,6 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
 import org.json.JSONObject;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -54,19 +53,17 @@ public class DotDelegatorTest {
     //private String logChannelsetPath;
     //private String logChannelPath;
 
-    // private GenericMeasure testGM = new GenericMeasure();
-    // private CsLogData csLogData = new CsLogData();
-    // private CsLogCurveInfo csLogCurveInfo = new CsLogCurveInfo();
-    // private List<CsLogCurveInfo> logCurveInfoList = new ArrayList<>();
-    // private List<CsLogData> dataList = new ArrayList<>();
-/*
+    //private GenericMeasure testGM = new GenericMeasure();
+    //private CsLogData csLogData = new CsLogData();
+    //private CsLogCurveInfo csLogCurveInfo = new CsLogCurveInfo();
+    //private List<CsLogCurveInfo> logCurveInfoList = new ArrayList<>();
+    //private List<CsLogData> dataList = new ArrayList<>();
+    /*
     private static final String AB =
             "0123456789"
                     + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                     + "abcdefghijklmnopqrstuvwxyz";
     private static SecureRandom rnd = new SecureRandom();
-*/
-    /*
     private String randomString( int len ){
         StringBuilder sb = new StringBuilder( len );
         for( int i = 0; i < len; i++ )
@@ -119,7 +116,7 @@ public class DotDelegatorTest {
         ObjectMapper om = new ObjectMapper();
         Map<String, Object> map1311 = (Map<String, Object>) (om.readValue(payload, Map.class));
         Map<String, Object> expectedMap = (Map<String, Object>) (om.readValue(expectedJson, Map.class));
-        Assert.assertEquals(expectedMap, map1311);
+        assertEquals(expectedMap, map1311);
     }
 
     @Test
@@ -162,12 +159,12 @@ public class DotDelegatorTest {
 
     /*
        Version 1.4.1.1
-     */
-
-    /*@Test
+   */
+    /*
+    @Test
     public void shouldCreateLog() throws Exception {
 
-        *//* ***************** create channelSet log object ***************** *//*
+        // ***************** create channelSet log object ***************** //
         ObjLog log = new ObjLog();
         String randomUID = randomString(10);
         String prefixUID = "HM_Test";
@@ -184,10 +181,8 @@ public class DotDelegatorTest {
         log.setIndexType("time");
         log.setDirection("increasing");
         log.setIndexCurve("Mdepth");
-        *//*
-           Using example from the WITSML API Guide, p. 122, item 7
-           only changed "measured depth" to "time" for indexType.
-         *//*
+           // Using example from the WITSML API Guide, p. 122, item 7
+           // only changed "measured depth" to "time" for indexType.
         // TODO: try it with StartIndex & EndIndex
         // StartIndex & EndIndex was not available in the example.
         // testGM.setUom("ft");
@@ -205,7 +200,7 @@ public class DotDelegatorTest {
         dataList.add(csLogData);
         log.setLogData(dataList);
 
-        *//* ******************* create channel log object ****************** *//*
+        // ******************* create channel log object ****************** //
         // log = new ObjLog();
         csLogCurveInfo.setUid("Mdepth");
         ShortNameStruct shortNameStruct = new ShortNameStruct();
@@ -243,9 +238,9 @@ public class DotDelegatorTest {
 
         // build second http request to create channels for
         // the channelSet
- //       endpoint = this.url + this.logChannelPath;
- //       HttpRequestWithBody reqCH = Unirest.put(endpoint);
- //       reqCH.body(channelPayload);
+        endpoint = this.url + this.logChannelPath;
+        HttpRequestWithBody reqCH = Unirest.put(endpoint);
+        reqCH.body(channelPayload);
 
         // mock client behavior
         when(this.client.makeRequest(argThat(someReq -> (
@@ -255,17 +250,19 @@ public class DotDelegatorTest {
         )), eq("goodUsername"), eq("goodPassword"))).thenReturn(respCS);
 
         // test
-        *//*
         String actualUid = this.delegator.createObject(
                 log,
                 "goodUsername",
                 "goodPassword",
                 "exchangeID",
                 this.client);
+
+        String actualUid = "0";
         String expectedUid = logUid;
         assertEquals(expectedUid, actualUid);
-        *//*
-    }*/
+
+    }
+    */
 
     @Test
     public void shouldCreateTrajectoryWithoutUid() throws Exception {
