@@ -18,10 +18,7 @@ package com.hashmapinc.tempus.witsml.valve.dot;
 import com.auth0.jwt.JWT;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
-import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell;
-import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore;
-import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores;
-import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.*;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog;
@@ -400,6 +397,45 @@ public class DotValveTest {
 
 		// verify
 		verify(this.mockDelegator).deleteObject(wellboreA, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.mockClient);
+		verifyNoMoreInteractions(this.mockDelegator);
+	}
+
+	//Test Case For Delete Log
+
+	@Test
+	public void shouldDeleteLogObject() throws Exception {
+		// build witsmlObjects list
+		ArrayList<AbstractWitsmlObject> witsmlObjects;
+		witsmlObjects = new ArrayList<>();
+		ObjLogs wmlObjLogs = new ObjLogs();
+
+		ObjLog logA = new ObjLog();
+		logA.setUid("HM_800008");
+		logA.setUidWell("U2");
+		logA.setUidWellbore("WBDD600");
+		witsmlObjects.add(logA);
+		wmlObjLogs.addLog(logA);
+
+
+		// build query context
+		QueryContext qc = new QueryContext(
+				"1.4.1.1",
+				"wellbore",
+				null,
+				WitsmlMarshal.serialize(wmlObjLogs),
+				witsmlObjects,
+				"goodUsername",
+				"goodPassword",
+				"shouldDeleteSingleObject" // exchange ID
+		);
+
+
+		// test getObject
+		this.valve.deleteObject(qc);
+
+
+		// verify
+		verify(this.mockDelegator).deleteObject(logA, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.mockClient);
 		verifyNoMoreInteractions(this.mockDelegator);
 	}
 
