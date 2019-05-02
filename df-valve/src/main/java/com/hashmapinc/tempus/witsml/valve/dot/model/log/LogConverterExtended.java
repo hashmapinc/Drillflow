@@ -16,6 +16,7 @@
 package com.hashmapinc.tempus.witsml.valve.dot.model.log;
 
 import com.hashmapinc.tempus.witsml.valve.dot.JsonUtil;
+import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.Citation;
 import org.eclipse.persistence.jaxb.JAXBContextFactory;
 import org.eclipse.persistence.jaxb.UnmarshallerProperties;
 import org.json.JSONArray;
@@ -153,8 +154,23 @@ public class LogConverterExtended
         }
     }
 
-    //protected static void reverseCreateJO(JSONObject returnObj) {
-    //}
+    /**
+     *  reverseCreateJO does the reverse of createJO above,
+     *      only this time, I unmarshalled into a POJO
+     */
+    // TODO Better understand citation for channelSet & channels
+    //      If needed for channels, this method will need to be overloaded
+    //      with the Citation class for channelSet
+    protected static void reverseCreateJO(
+            JSONObject returnObj, Citation citation) {
+
+        if (!citation.getTitle().isEmpty()) {
+            returnObj.put("name", citation.getTitle());
+        }
+        if (!citation.getDescription().isEmpty()) {
+            returnObj.put("description", citation.getDescription());
+        }
+    }
 
     /**
      * convertTo1411 takes in a JSONObject that represents a ChannelSet &
@@ -172,7 +188,9 @@ public class LogConverterExtended
     public String convertTo1411(JSONArray jsonResponseCS, JSONArray jsonRespChannels)
                                                 throws JAXBException {
 
+        // ***************** unmarshall responses into their respective POJOs ***************** //
         // create JaxBContext to unmarshal channel set JSON into the channel set POJO
+        // TODO make a separate method
         JSONObject joCS = jsonResponseCS.getJSONObject(0); // 1 channel set per log
         JAXBContext jcCS = JAXBContextFactory.createContext(
                 new Class[] {com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.View.class},
@@ -193,8 +211,8 @@ public class LogConverterExtended
                         .unmarshal(streamSrcCS, com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.View.class)
                         .getValue();
         // Print some channel set data to console
-        System.out.println("ChannelSet View timeDepth: " + viewCS.getTimeDepth());
-        System.out.println("ChannelSet View objectGrowing : " + viewCS.getObjectGrowing());
+        // System.out.println("ChannelSet View timeDepth: " + viewCS.getTimeDepth());
+        // System.out.println("ChannelSet View objectGrowing : " + viewCS.getObjectGrowing());
 
         // create JaxBContext to unmarshal channel JSON into the channel POJO
         // TODO Do ALL channels next
@@ -218,20 +236,51 @@ public class LogConverterExtended
                 unmarshallerCH
                         .unmarshal(streamSrcCH, com.hashmapinc.tempus.witsml.valve.dot.model.log.channel.View.class)
                         .getValue();
-        // Print some channel data to console
-        System.out.println("ChannelSet View timeDepth: " + viewCH.getGrowingStatus());
-        System.out.println("ChannelSet View objectGrowing : " + viewCH.getTimeDepth());
+        // Print some channel data to console to prove it worked
+        // System.out.println("ChannelSet View timeDepth: " + viewCH.getGrowingStatus());
+        // System.out.println("ChannelSet View objectGrowing : " + viewCH.getTimeDepth());
         // construct the String return value
+
+        // ***************** channel set POJO transformation ***************** //
         JSONObject returnObj = new JSONObject();
-        // If I use an array, i can move the whole view at once
-        // Rename transformation
+
+        // TODO If I use an array, i can move the whole view at once
+        // Rename transformations on channelSet
         returnObj.put("indexType",viewCS.getTimeDepth());
         returnObj.put("pass",viewCS.getPassNumber());
         returnObj.put("serviceCompany",viewCS.getLoggingCompanyName());
+        // Break apart the citation JSON object into its respective elements
+        Citation citation = viewCS.getCitation();
+        // Quick verification: these two ways of accessing data should return
+        // identical results.
+        System.out.println(citation.getTitle());
+        System.out.println(viewCS.getCitation().getTitle());
+        reverseCreateJO(returnObj, viewCS.getCitation());
+        // I should see the correct data after using the class in reverseCreateJO
+        // to create the two breakout pieces of data
+        // TODO Do I have to map other pieces of data from Citation?
+        System.out.println("Is Title now name? " + returnObj.getString("name"));
+        System.out.println("Is description now within returnObj as a key-value pair? " +
+                returnObj.getString("description"));
+        // TODO Does this populate the rest of returnObj correctly?
+        // TODO Does Transformation that Sukhe calls perform the final
+        //      transformation to WITSML XML correctly?
+        // Finally build out the rest of the channelSet into returnObj:
+        returnObj.put("Alias", viewCS.getAliases());
+        returnObj.put("CommonData", viewCS.getCommonData());
+        returnObj.put("ExtensionNameValue", viewCS.getExtensionNameValue());
+        returnObj.put("Index", viewCS.getIndex());
+        returnObj.put("LogParam", viewCS.getLogParam());
+        returnObj.put("NominalHoleSize", viewCS.getNominalHoleSize());
+        returnObj.put("StepIncrement", viewCS.getStepIncrement();
+        // TODO Do I have to put in more values or does this complete a full
+        //      channelSet object? Will it be completely transformed once the
+        //      transformation is called by Sukhe?
 
-        //reverseCreateJO(returnObj);
-
+        // ******************* channels POJO transformation ******************* //
         // TODO Why are nulls not getting removed?
+
+        // *********** groom & return JSONObject in String format ************ //
         // groom the response
         removeNullsFrom(returnObj);
         JsonUtil.removeEmpties(returnObj);
