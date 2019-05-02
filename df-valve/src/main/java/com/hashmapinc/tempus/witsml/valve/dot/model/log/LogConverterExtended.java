@@ -245,14 +245,16 @@ public class LogConverterExtended
         JSONObject returnObj = new JSONObject();
 
         returnObj.put("uid", viewCS.getUid());
-        returnObj.put("uidWellbore", viewCS.getWellboreId());
-        returnObj.put("uidWell", viewCS.getWellId());
+        returnObj.put("uidWellbore", viewCS.getUidWellbore());
+        returnObj.put("uidWell", viewCS.getUidWell());
 
         // TODO If I use an array, i can move the whole view at once
         // Rename transformations on channelSet
-        returnObj.put("indexType",viewCS.getTimeDepth());
-        returnObj.put("pass",viewCS.getPassNumber());
-        returnObj.put("serviceCompany",viewCS.getLoggingCompanyName());
+        returnObj.put("indexType", viewCS.getTimeDepth());
+        // returnObj.put("indexType", viewCH.getIndex().get(0).getIndexType());
+
+        returnObj.put("pass", viewCS.getPassNumber());
+        returnObj.put("serviceCompany", viewCS.getLoggingCompanyName());
         // Break apart the citation JSON object into its respective elements
         // Citation citation = viewCS.getCitation();
         reverseCreateJO(returnObj, viewCS.getCitation());
@@ -265,7 +267,9 @@ public class LogConverterExtended
         //      transformation to WITSML XML correctly?
         // Finally build out the rest of the channelSet into returnObj:
         returnObj.put("Alias", viewCS.getAliases());
+
         returnObj.put("CommonData", viewCS.getCommonData());
+
         returnObj.put("LogParam", viewCS.getLogParam());
         returnObj.put("stepIncrement", viewCS.getStepIncrement());
         returnObj.put("nullValue", viewCS.getNullValue());
@@ -277,6 +281,18 @@ public class LogConverterExtended
         returnObj.put("dataGroup", viewCS.getDataGroup());
         returnObj.put("runNumber", viewCS.getRunNumber());
         returnObj.put("dataDelimiter", viewCS.getDataDelimiter());
+        // Information from the channels that are now returned to the channel set
+        // **********************************************************************
+        returnObj.put("startIndex", viewCH.getStartIndex());
+        returnObj.put("endIndex", viewCH.getEndIndex());
+        /*
+          "index":[
+            {
+            "uom":"double",
+            }
+          ]
+        */
+        returnObj.put("direction", viewCH.getIndex().get(0).getDirection());
 
         // What about these?
         // returnObj.put("ExtensionNameValue", viewCS.getExtensionNameValue());
@@ -289,10 +305,68 @@ public class LogConverterExtended
         // returnObj.put("", viewCS.getDataContext());
 
         // ******************* channels POJO transformation ******************* //
+        // TODO I do not find "mnemonic_value", "minIndex", "maxIndex" nor "columnIndex"
+        //      within channel/View.data. If I change "mnemonic" to "mnemonic_value",
+        //      I get a fail response from DoT.
+        //renameObject("mnemonic_value", "mnemonic", channelItem);
+
+        JSONObject logCurveObj = new JSONObject();
+            // renames
+            // *******
+            logCurveObj.put("unit", viewCH.getUom());
+            logCurveObj.put("typeLogData", viewCH.getDataType());
+            logCurveObj.put("curveDescription", viewCH.getDescription());
+            logCurveObj.put("indexType", viewCH.getTimeDepth());
+
+            // object decomposition
+            // ********************
+            logCurveObj.put("namingSystem", viewCH.getMnemAlias().getNamingSystem());
+
+            // straight creation
+            // *****************
+            logCurveObj.put("uid",viewCH.getUid());
+            logCurveObj.put("growingStatus", viewCH.getGrowingStatus());
+            logCurveObj.put("classIndex", viewCH.getClassIndex());
+            logCurveObj.put("mnemonic", viewCH.getMnemonic());
+            logCurveObj.put("dataType", viewCH.getUom());
+            logCurveObj.put("name", viewCH.getCitation().getTitle());
+            // logCurveObj.put("minIndex", )
 
 
+/*
 
+    // ************** index created JSON array **************
+    private void createJSONArray() {
+        JSONArray workArray = new JSONArray();
+        JSONObject workObj = new JSONObject();
+        // typeLogData was converted to dataType by marshal;
+        // however, still need it within index as uom
+        if (channelItemGlobal.has("dataType")) {
+            workObj.put("uom",
+                    channelItemGlobal.get("dataType"));
+        }
+        if (objLogJOGlobal.has("timeDepth")) {
+            workObj.put("indexType",
+                    objLogJOGlobal.getString("timeDepth"));
+        }
+        if (objLogJOGlobal.has("direction")) {
+            workObj.put("direction",
+                    objLogJOGlobal.getString("direction"));
+        }
+        if (objLogJOGlobal.has("indexCurve")) {
+            workObj.put("mnemonic",
+                    objLogJOGlobal.getString("indexCurve"));
+        } else {
+            workObj.put("mnemonic", "index");
+        }
+        // Kludges
+        workObj.put("direction","increasing");
+        workArray.put(workObj);
+        channelItemGlobal.put("index", workArray);
+*/
 
+        returnObj.put("logCurveInfo",logCurveObj);
+        // ******************* channels POJO transformation END ******************* //
 
         // TODO Why are nulls not getting removed?
 
