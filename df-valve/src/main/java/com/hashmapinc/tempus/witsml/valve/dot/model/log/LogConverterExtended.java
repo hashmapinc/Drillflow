@@ -120,7 +120,7 @@ public class LogConverterExtended
 
         // Now the JSON should be mapped according to DoT's API expectations
         // Those expectations match the POJOs generated from DoT's API
-        // TODO Create the POJOs using Jackson
+        // TODO Create the POJOs using Jackson?
 
         // return the payloads for creating a 1.4.1.1 ChannelSet & updating the Channel Set
         // with 1.4.1.1 Channel data
@@ -254,7 +254,7 @@ public class LogConverterExtended
         returnObj.put("pass",viewCS.getPassNumber());
         returnObj.put("serviceCompany",viewCS.getLoggingCompanyName());
         // Break apart the citation JSON object into its respective elements
-        Citation citation = viewCS.getCitation();
+        // Citation citation = viewCS.getCitation();
         reverseCreateJO(returnObj, viewCS.getCitation());
         // I should see the correct data after using the class in reverseCreateJO
         // to create the two breakout pieces of data
@@ -266,7 +266,7 @@ public class LogConverterExtended
         // Finally build out the rest of the channelSet into returnObj:
         returnObj.put("Alias", viewCS.getAliases());
         returnObj.put("CommonData", viewCS.getCommonData());
-        returnObj.put("LogParam", viewCS.getLogParam());;
+        returnObj.put("LogParam", viewCS.getLogParam());
         returnObj.put("stepIncrement", viewCS.getStepIncrement());
         returnObj.put("nullValue", viewCS.getNullValue());
         returnObj.put("bhaRunNumber", viewCS.getBhaRunNumber());
@@ -278,8 +278,7 @@ public class LogConverterExtended
         returnObj.put("runNumber", viewCS.getRunNumber());
         returnObj.put("dataDelimiter", viewCS.getDataDelimiter());
 
-
-
+        // What about these?
         // returnObj.put("ExtensionNameValue", viewCS.getExtensionNameValue());
         // returnObj.put("Index", viewCS.getIndex());
         // returnObj.put("NominalHoleSize", viewCS.getNominalHoleSize());
@@ -290,6 +289,11 @@ public class LogConverterExtended
         // returnObj.put("", viewCS.getDataContext());
 
         // ******************* channels POJO transformation ******************* //
+
+
+
+
+
         // TODO Why are nulls not getting removed?
 
         // *********** groom & return JSONObject in String format ************ //
