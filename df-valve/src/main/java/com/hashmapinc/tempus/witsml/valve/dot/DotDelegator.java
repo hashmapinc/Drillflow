@@ -573,6 +573,7 @@ public class DotDelegator {
 			JSONObject responseJson = new JSONObject(response.getBody());
 			uuid = responseJson.getString("uuid");
 		}
+		finalResponse = response.getBody();
 		// check response status
 		int status = response.getStatus();
 		//HttpResponse<String> finalResponse = client.makeRequest(request, username, password);

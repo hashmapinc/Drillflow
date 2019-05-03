@@ -485,7 +485,9 @@ public class StoreImpl implements IStore {
         }
 
         // return response
-        resp.setSuppMsgOut(witsmlApiConfigUtil.getProperty("basemessages." + resp.getResult()));
+        if (resp.getSuppMsgOut().isEmpty())
+            resp.setSuppMsgOut(witsmlApiConfigUtil.getProperty("basemessages." + resp.getResult()));
+
         return resp;
     }
 
