@@ -32,7 +32,7 @@ import java.util.Map;
 public class LogParam {
 
     @JsonProperty("index")
-    private Integer index;
+    private String index;
     @JsonProperty("name")
     private String name;
     @JsonProperty("uom")
@@ -47,12 +47,12 @@ public class LogParam {
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("index")
-    public Integer getIndex() {
+    public String getIndex() {
         return index;
     }
 
     @JsonProperty("index")
-    public void setIndex(Integer index) {
+    public void setIndex(String index) {
         this.index = index;
     }
 

@@ -43,7 +43,7 @@ public class ExtensionNameValue {
     @JsonProperty("dTim")
     private String dTim;
     @JsonProperty("index")
-    private Integer index;
+    private Long index;
     @JsonProperty("description")
     private String description;
     @JsonProperty("dataType")
@@ -96,12 +96,12 @@ public class ExtensionNameValue {
     }
 
     @JsonProperty("index")
-    public Integer getIndex() {
+    public Long getIndex() {
         return index;
     }
 
     @JsonProperty("index")
-    public void setIndex(Integer index) {
+    public void setIndex(Long index) {
         this.index = index;
     }
 

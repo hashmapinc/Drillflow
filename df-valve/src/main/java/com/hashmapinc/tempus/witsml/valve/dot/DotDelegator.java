@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory;
 import com.hashmapinc.tempus.witsml.ValveLogging;
@@ -25,6 +26,7 @@ import com.hashmapinc.tempus.witsml.valve.dot.client.UidUuidCache;
 import com.hashmapinc.tempus.witsml.valve.dot.graphql.GraphQLQueryConverter;
 import com.hashmapinc.tempus.witsml.valve.dot.graphql.GraphQLRespConverter;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.LogConverterExtended;
+import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.ChannelSet;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -433,25 +435,14 @@ public class DotDelegator {
 		request.header("Content-Type", "application/json");
 
 		if ("log".equals(objectType)) {
-			// create the payload for create ChannelSet
-			LogConverterExtended logConverter = new LogConverterExtended();
-			if ("1.4.1.1".equals(version)) {
-				// TODO Fix this
-				objLog = null;
-				objLog = logConverter.convertToChannelSet1411(
-						(com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj);
-				if (objLog.has("logCurveInfo")) {
-					channelPayload = objLog.getJSONArray("logCurveInfo").toString();
-					objLog.remove("logCurveInfo");
+			try{
+				if ("1.4.1.1".equals(version)) {
+					channelSetPayload = LogConverterExtended.getChannelSet((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj).toJson();
+				} else {
+					channelSetPayload = LogConverterExtended.getChannelSet((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj).toJson();
 				}
-				if (objLog.has("logData")){
-					objLog.remove("logData");
-				}
-				channelSetPayload = objLog.toString();
-
-			} else {
-				channelSetPayload =
-						logConverter.convertToChannelSet1311(witsmlObj.getJSONString("1.3.1.1"));
+			} catch (JsonProcessingException e){
+				throw new ValveException("Error converting Log to ChannelSet");
 			}
 			request.body(channelSetPayload);
 		} else {
@@ -480,14 +471,8 @@ public class DotDelegator {
 				endpoint = this.getEndpoint(objectType+"Channel");
 				endpoint = endpoint + "/metadata";
 				// get the uuid for the channelSet just created from the response
-				int startIndexUUID = response.getBody().indexOf("uuid")
-						+ "uuid".length() + 3;
-				String sub = response.getBody().substring(startIndexUUID);
-				int lengthOfUUID = sub.indexOf('"');
-				String uuid4CS = response.getBody().substring(
-						startIndexUUID,
-						startIndexUUID+lengthOfUUID
-				);
+
+				String uuid4CS = new JsonNode(response.getBody()).getObject().getString("uuid");
 
 				// create with POST
 				channelsRequest = Unirest.post(endpoint);
@@ -523,7 +508,7 @@ public class DotDelegator {
 			throw new ValveException(response.getBody());
 		}
 	}
-
+	
 	/**
 	 * Submits the query to the DoT rest API for object GETing
 	 *
@@ -561,13 +546,15 @@ public class DotDelegator {
 		request.header("accept", "application/json");
 		if ("wellbore".equals(objectType)) {
 			request.queryString("uidWell", witsmlObject.getParentUid()); // TODO: check the parent uid exists?
-		} if ("log".equals(objectType)) { // code added to handle log object
+		} 
+		/*if ("log".equals(objectType)) { // code added to handle log object
 			uidWellbore = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObject).getUidWellbore();
 			uidWellLog = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObject).getUidWell();
 			request.queryString("uid", uid);
 			request.queryString("uidWellbore", uidWellbore);
 			request.queryString("uidWell", uidWellLog);
-		} else if ("trajectory".equals(objectType)) {
+		}*/ 
+		else if ("trajectory".equals(objectType)) {
 			request.queryString("uidWellbore", witsmlObject.getParentUid());
 			String uidWell;
 			if ("1.4.1.1".equals(version)) {
@@ -590,11 +577,11 @@ public class DotDelegator {
 		//HttpResponse<String> finalResponse = client.makeRequest(request, username, password);
 		if (201 == status || 200 == status) {
 			// Code logic added to handle log ChannelSet Metadata/Get Channels/get All Channels
-			if ("log".equals(objectType)) {
+			//if ("log".equals(objectType)) {
 				// TODO Are we to only return channels OR channel set + channels data?
-				finalResponse = getRestCalls(witsmlObject,client,uuid,username,password,exchangeID);
+				//finalResponse = getRestCalls(witsmlObject,client,uuid,username,password,exchangeID);
 				// log requires transformation of the response
-			}
+			//}
 			LOG.info(ValveLogging.getLogMsg(
 					exchangeID,
 					logResponse(response, "Successfully executed GET for query object=" + witsmlObject.toString()),
@@ -625,7 +612,7 @@ public class DotDelegator {
 	 * @param client - DotClient to execute requests with
 	 */
 
-	private String getRestCalls(AbstractWitsmlObject witsmlObject,DotClient client,String uuid,String username, String password, String exchangeID) throws ValveException, ValveAuthException, UnirestException, JAXBException {
+	/*private String getRestCalls(AbstractWitsmlObject witsmlObject,DotClient client,String uuid,String username, String password, String exchangeID) throws ValveException, ValveAuthException, UnirestException, JAXBException {
 
 		String channelsetmetadataEndpoint;
 		HttpResponse<String> channelsetmetadataResponse;
@@ -681,7 +668,7 @@ public class DotDelegator {
 			throw new ValveException(channelsResponse.getBody());
 		}
 		return finalResponse;
-	}
+	}*/
 
 	/**
 	 * Submits a search query to the DoT rest API for object GETing

@@ -1,68 +1,27 @@
-/**
- * Copyright © 2018-2019 Hashmap, Inc
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset;
 
-import com.fasterxml.jackson.annotation.*;
+package com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.StdDateFormat;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-    "uuid",
-    "bhaRunNumber",
-    "aliases",
-    "citation",
-    "customData",
-    "extensionNameValue",
-    "objectVersion",
-    "existenceKind",
-    "index",
-    "objectGrowing",
-    "dataUpateRate",
-    "curveSensorsAligned",
-    "dataGroup",
-    "stepIncrement",
-    "logParam",
-    "dataDelimiter",
-    "nullValue",
-    "channelState",
-    "timeDepth",
-    "channelClass",
-    "runNumber",
-    "passNumber",
-    "startIndex",
-    "endIndex",
-    "loggingCompanyName",
-    "loggingCompanyCode",
-    "toolName",
-    "toolClass",
-    "derivation",
-    "loggingMethod",
-    "nominalHoleSize",
-    "dataContext",
-    "commonData",
-    "uid",
-    "uidWell",
-    "uidWellbore",
-    "wellId",
-    "wellboreId"
-})
-public class View {
+@JsonPropertyOrder({ "uuid", "bhaRunNumber", "aliases", "citation", "customData", "extensionNameValue", "objectVersion",
+        "existenceKind", "index", "objectGrowing", "dataUpateRate", "curveSensorsAligned", "dataGroup", "stepIncrement",
+        "logParam", "dataDelimiter", "nullValue", "channelState", "timeDepth", "channelClass", "runNumber",
+        "passNumber", "startIndex", "endIndex", "loggingCompanyName", "loggingCompanyCode", "toolName", "toolClass",
+        "derivation", "loggingMethod", "nominalHoleSize", "dataContext", "commonData", "uid", "uidWell", "uidWellbore",
+        "wellId", "wellboreId" })
+public class ChannelSet {
 
     @JsonProperty("uuid")
     private String uuid;
@@ -70,21 +29,19 @@ public class View {
     private Integer bhaRunNumber;
     @JsonProperty("aliases")
     private List<Alias> aliases = null;
-            // new ArrayList<Alias>;
     @JsonProperty("citation")
     private Citation citation;
     @JsonProperty("customData")
     private String customData;
     @JsonProperty("extensionNameValue")
     private List<ExtensionNameValue> extensionNameValue = null;
-            //new ArrayList<ExtensionNameValue>;
     @JsonProperty("objectVersion")
     private String objectVersion;
     @JsonProperty("existenceKind")
     private String existenceKind;
     @JsonProperty("index")
     private List<Index> index = null;
-            // new ArrayList<Index>;
+    @JsonProperty("objectGrowing")
     private Boolean objectGrowing;
     @JsonProperty("dataUpateRate")
     private Integer dataUpateRate;
@@ -533,6 +490,12 @@ public class View {
     @JsonAnySetter
     public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
+    }
+
+    public String toJson() throws JsonProcessingException {
+        ObjectMapper om = new ObjectMapper();
+        om.setDateFormat(new StdDateFormat());
+        return om.writerWithDefaultPrettyPrinter().writeValueAsString(this);
     }
 
 }

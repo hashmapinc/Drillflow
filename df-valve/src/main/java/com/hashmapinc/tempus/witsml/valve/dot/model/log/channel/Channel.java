@@ -16,6 +16,9 @@
 package com.hashmapinc.tempus.witsml.valve.dot.model.log.channel;
 
 import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.StdDateFormat;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.HashMap;
@@ -70,7 +73,7 @@ import java.util.Map;
 })
 // TODO Is this change necessary? TMS
 @XmlRootElement
-public class View {
+public class Channel {
 
     @JsonProperty("uuid")
     private String uuid;
@@ -599,6 +602,12 @@ public class View {
     @JsonAnySetter
     public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
+    }
+
+    public String toJson() throws JsonProcessingException {
+        ObjectMapper om = new ObjectMapper();
+        om.setDateFormat(new StdDateFormat());
+        return om.writerWithDefaultPrettyPrinter().writeValueAsString(this);
     }
 
 }
