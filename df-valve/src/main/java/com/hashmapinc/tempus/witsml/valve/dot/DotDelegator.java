@@ -174,8 +174,13 @@ public class DotDelegator {
 		}if ("log".equals(objectType)) { // code added to handle log object
 			logRequest = Unirest.get(endpoint);
 			logRequest.header("accept", "application/json");
-			uidWellbore = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj).getUidWellbore();
-			uidWellLog = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj).getUidWell();
+			if ("1.4.1.1".equals(witsmlObj.getVersion())) {
+				uidWellbore = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj).getUidWellbore();
+				uidWellLog = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj).getUidWell();
+			} else {
+				uidWellbore = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj).getUidWellbore();
+				uidWellLog = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj).getUidWell();
+			}
 			logRequest.queryString("uid", uid);
 			logRequest.queryString("uidWellbore", uidWellbore);
 			logRequest.queryString("uidWell", uidWellLog);
@@ -198,6 +203,9 @@ public class DotDelegator {
 		}
 
 		if ("log".equals(objectType)) {
+			if (response.getBody().isEmpty()){
+				throw new ValveException("No log found for delete.");
+			}
 			JSONObject responseJson = new JSONObject(response.getBody());
 			uuid = responseJson.getString("uuid");
 		}
@@ -435,6 +443,9 @@ public class DotDelegator {
 				if (objLog.has("logCurveInfo")) {
 					channelPayload = objLog.getJSONArray("logCurveInfo").toString();
 					objLog.remove("logCurveInfo");
+				}
+				if (objLog.has("logData")){
+					objLog.remove("logData");
 				}
 				channelSetPayload = objLog.toString();
 
