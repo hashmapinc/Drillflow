@@ -462,6 +462,11 @@ public class DotDelegator {
 
 		// check response status
 		int status = response.getStatus();
+		if (409 == status){
+			LOG.info(ValveLogging.getLogMsg(exchangeID, logResponse(response, "Log alreday in store"), witsmlObj));
+			throw new ValveException("Log already in store", (short)-405);
+		}
+		
 		if (201 == status || 200 == status) {
 			LOG.info(ValveLogging.getLogMsg(
 					exchangeID,
@@ -481,11 +486,8 @@ public class DotDelegator {
 
 				// create with POST
 				channelsRequest = Unirest.post(endpoint);
-				// provide the ChannelSet's UUID as a query parameter
 				channelsRequest.queryString("channelSetUuid", uuid4CS);
-				// add the header and payload
 				channelsRequest.header("Content-Type", "application/json");
-				// TODO Figure out if I need to add more data to channelPayload? such as - citation?
 				channelsRequest.body(channelPayload);
 
 				LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(channelsRequest), witsmlObj));
@@ -501,7 +503,6 @@ public class DotDelegator {
 							witsmlObj
 					));
 				}
-
 			}
 			return (null == uid || uid.isEmpty()) ? new JsonNode(response.getBody()).getObject().getString("uid") : uid;
 		} else {

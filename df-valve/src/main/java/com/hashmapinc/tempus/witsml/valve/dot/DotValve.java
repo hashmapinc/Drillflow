@@ -265,7 +265,10 @@ public class DotValve implements IValve {
 						this.CLIENT));
 			}
 
-		} catch (Exception e) {
+		} catch (ValveException e) {
+			LOG.warning("Exception in DotValve create object: " + e.getMessage());
+			throw new ValveException(e.getMessage(), e.getErrorCode());
+		} catch (Exception e){
 			LOG.warning("Exception in DotValve create object: " + e.getMessage());
 			throw new ValveException(e.getMessage());
 		}

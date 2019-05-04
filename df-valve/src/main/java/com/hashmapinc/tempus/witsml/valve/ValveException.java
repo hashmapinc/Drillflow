@@ -22,7 +22,7 @@ package com.hashmapinc.tempus.witsml.valve;
  */
 public class ValveException extends Exception {
     
-    private Short errorCode;
+    private Short errorCode = -1;
 
     /**
      * @return the errorCode

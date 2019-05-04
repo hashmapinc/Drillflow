@@ -160,7 +160,7 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
         index.setDirection(witsmlObj.getDirection());
         index.setMnemonic(witsmlObj.getIndexCurve());
         index.setIndexType(indexType);
-        witsmlObj.getLogCurveInfo();
+
         Optional<CsLogCurveInfo> matchingObject = witsmlObj.getLogCurveInfo().stream()
                 .filter(p -> p.getMnemonic().getValue().equals(witsmlObj.getIndexCurve())).findFirst();
         index.setUom(matchingObject.get().getUnit());
@@ -217,18 +217,52 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
 
         List<Channel> channels = new ArrayList<Channel>();
 
+        // Get the index type once for each channel
+        String indexType;
+        if (witsmlObj.getIndexType().toLowerCase().contains("depth"))
+            indexType = "depth";
+        else
+            indexType = "time";
+
+        // Create the index once for each channel
+        Index index = new Index();
+        index.setIndexType(indexType);
+        index.setMnemonic(witsmlObj.getIndexCurve());
+        Optional<CsLogCurveInfo> matchingObject = witsmlObj.getLogCurveInfo().stream()
+            .filter(p -> p.getMnemonic().getValue().equals(witsmlObj.getIndexCurve())).findFirst();
+        index.setUom(matchingObject.get().getUnit());
+        index.setDirection(witsmlObj.getDirection());
+
+        List<Index> indicies = new ArrayList<>();
+        indicies.add(index);
+
         for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo lci : witsmlObj.getLogCurveInfo()) {
             try{
                 Channel channel = new Channel();
+
+                Citation c = new Citation();
+                c.setTitle(lci.getMnemonic().getValue());
+                
+                channel.setCitation(c);
                 channel.setUid(lci.getUid());
                 channel.setNamingSystem(lci.getMnemonic().getNamingSystem());
                 channel.setMnemonic(lci.getMnemonic().getValue());
+                if (witsmlObj.getIndexType().toLowerCase().contains("depth"))
+                    channel.setTimeDepth("depth");
+                else
+                    channel.setTimeDepth("time");
                 channel.setClassWitsml(lci.getClassWitsml());
 
                 if (lci.getClassIndex() != null)
                     channel.setClassIndex((int) lci.getClassIndex());
 
-                channel.setUom(lci.getUnit());
+                if (lci.getUnit() == null){
+                    channel.setUom("unitless");
+                } else {
+                    channel.setUom(lci.getUnit());
+                }
+                
+                channel.setIndex(indicies);
 
                 if (lci.getMnemAlias() != null) {
                     MnemAlias alias = new MnemAlias();

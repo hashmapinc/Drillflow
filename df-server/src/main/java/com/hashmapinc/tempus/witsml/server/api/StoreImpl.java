@@ -164,8 +164,13 @@ public class StoreImpl implements IStore {
         } catch (ValveException ve) {
             //TODO: handle exception
             LOG.warning("ValveException in addToStore: " + ve.getMessage());
-            response.setSuppMsgOut(ve.getMessage());
-            response.setResult((short)-1);
+            if (ve.getErrorCode() != -1){
+                response.setSuppMsgOut(witsmlApiConfigUtil.getProperty("basemessages." + ve.getErrorCode()));
+                response.setResult(ve.getErrorCode());
+            } else {
+                response.setSuppMsgOut(ve.getMessage());
+                response.setResult(ve.getErrorCode());
+            }
             return response;
         } catch (Exception e) {
             //TODO: handle exception

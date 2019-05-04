@@ -19,6 +19,8 @@ import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
+import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.Citation;
+import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.Index;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.HashMap;
