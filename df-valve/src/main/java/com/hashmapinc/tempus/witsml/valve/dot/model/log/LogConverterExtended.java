@@ -19,22 +19,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import com.hashmapinc.tempus.WitsmlObjects.v1311.RefNameString;
-import com.hashmapinc.tempus.WitsmlObjects.v1311.WitsmlObj;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.CsAxisDefinition;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.CsExtensionNameValue;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.TimestampedTimeZone;
-import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.DefaultDatum;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channel.AxisDefinition;
+import com.hashmapinc.tempus.witsml.valve.dot.model.log.channel.Channel;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channel.DensData;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channel.MnemAlias;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channel.SensorOffset;
-import com.hashmapinc.tempus.witsml.valve.dot.model.log.channel.Channel;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.AcquisitionTimeZone;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.ChannelSet;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.Citation;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.CommonData;
+import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.DefaultDatum;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.ExtensionNameValue;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.Index;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.LogParam;
@@ -53,7 +54,10 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
      */
     public static ChannelSet getChannelSet(com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog witsmlObj) {
         ChannelSet cs = new ChannelSet();
-        cs.setBhaRunNumber((int) witsmlObj.getBhaRunNumber());
+
+        if (witsmlObj.getBhaRunNumber() != null)
+            cs.setBhaRunNumber((int) witsmlObj.getBhaRunNumber());
+
         cs.setRunNumber(witsmlObj.getRunNumber());
         cs.setPassNumber(witsmlObj.getPass());
         cs.setCustomData(witsmlObj.getCustomData());
@@ -85,9 +89,8 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
         index.setIndexType(indexType);
         index.setDirection(witsmlObj.getDirection());
         index.setMnemonic(witsmlObj.getIndexCurve().getValue());
-        Optional<com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogCurveInfo> matchingObject = witsmlObj.getLogCurveInfo().stream().
-        filter(p -> p.getMnemonic().equals(witsmlObj.getIndexCurve().getValue())).
-        findFirst();
+        Optional<com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogCurveInfo> matchingObject = witsmlObj.getLogCurveInfo()
+                .stream().filter(p -> p.getMnemonic().equals(witsmlObj.getIndexCurve().getValue())).findFirst();
         index.setUom(matchingObject.get().getUnit());
         List<Index> indices = new ArrayList<Index>();
         indices.add(index);
@@ -104,7 +107,7 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
             }
         }
 
-        if (witsmlObj.getCommonData() != null){
+        if (witsmlObj.getCommonData() != null) {
             CommonData cd = new CommonData();
             cd.setItemState(witsmlObj.getCommonData().getItemState());
             cd.setComments(witsmlObj.getCommonData().getComments());
@@ -158,9 +161,8 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
         index.setMnemonic(witsmlObj.getIndexCurve());
         index.setIndexType(indexType);
         witsmlObj.getLogCurveInfo();
-        Optional<CsLogCurveInfo> matchingObject = witsmlObj.getLogCurveInfo().stream().
-            filter(p -> p.getMnemonic().getValue().equals(witsmlObj.getIndexCurve())).
-            findFirst();
+        Optional<CsLogCurveInfo> matchingObject = witsmlObj.getLogCurveInfo().stream()
+                .filter(p -> p.getMnemonic().getValue().equals(witsmlObj.getIndexCurve())).findFirst();
         index.setUom(matchingObject.get().getUnit());
         List<Index> indices = new ArrayList<Index>();
         indices.add(index);
@@ -178,17 +180,17 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
             }
         }
 
-        if (witsmlObj.getCommonData() != null){
+        if (witsmlObj.getCommonData() != null) {
             CommonData cd = new CommonData();
             cd.setItemState(witsmlObj.getCommonData().getItemState());
             cd.setComments(witsmlObj.getCommonData().getComments());
             cd.setServiceCategory(witsmlObj.getCommonData().getServiceCategory());
             cd.setPrivateGroupOnly(witsmlObj.getCommonData().isPrivateGroupOnly());
             cd.setSourceName(witsmlObj.getCommonData().getSourceName());
-            
-            if (witsmlObj.getCommonData().getAcquisitionTimeZone() != null){
+
+            if (witsmlObj.getCommonData().getAcquisitionTimeZone() != null) {
                 List<AcquisitionTimeZone> tzs = new ArrayList<>();
-                for (TimestampedTimeZone tz : witsmlObj.getCommonData().getAcquisitionTimeZone()){
+                for (TimestampedTimeZone tz : witsmlObj.getCommonData().getAcquisitionTimeZone()) {
                     AcquisitionTimeZone atz = new AcquisitionTimeZone();
                     atz.setDTim(tz.getDTim().toXMLFormat());
                     atz.setValue(tz.getValue());
@@ -197,7 +199,7 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
                 cd.setAcquisitionTimeZone(tzs);
             }
 
-            if (witsmlObj.getCommonData().getDefaultDatum() != null){
+            if (witsmlObj.getCommonData().getDefaultDatum() != null) {
                 DefaultDatum dd = new DefaultDatum();
                 dd.setUidRef(witsmlObj.getCommonData().getDefaultDatum().getUidRef());
                 dd.setValue(witsmlObj.getCommonData().getDefaultDatum().getValue());
@@ -215,17 +217,20 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
 
         List<Channel> channels = new ArrayList<Channel>();
 
-        for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo lci : 
-            witsmlObj.getLogCurveInfo()){
+        for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo lci : witsmlObj.getLogCurveInfo()) {
+            try{
                 Channel channel = new Channel();
                 channel.setUid(lci.getUid());
                 channel.setNamingSystem(lci.getMnemonic().getNamingSystem());
                 channel.setMnemonic(lci.getMnemonic().getValue());
                 channel.setClassWitsml(lci.getClassWitsml());
-                channel.setClassIndex((int)lci.getClassIndex());
+
+                if (lci.getClassIndex() != null)
+                    channel.setClassIndex((int) lci.getClassIndex());
+
                 channel.setUom(lci.getUnit());
-                
-                if (lci.getMnemAlias() != null){
+
+                if (lci.getMnemAlias() != null) {
                     MnemAlias alias = new MnemAlias();
                     alias.setValue(lci.getMnemAlias().getValue());
                     alias.setNamingSystem(lci.getMnemAlias().getNamingSystem());
@@ -234,18 +239,17 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
 
                 channel.setNullValue(lci.getNullValue());
                 channel.setAlternateIndex(lci.isAlternateIndex());
-                
-                if (lci.getWellDatum() != null){
-                    com.hashmapinc.tempus.witsml.valve.dot.model.log.channel.WellDatum ref =
-                        new com.hashmapinc.tempus.witsml.valve.dot.model.log.channel.WellDatum();
+
+                if (lci.getWellDatum() != null) {
+                    com.hashmapinc.tempus.witsml.valve.dot.model.log.channel.WellDatum ref = new com.hashmapinc.tempus.witsml.valve.dot.model.log.channel.WellDatum();
                     ref.setUidRef(lci.getWellDatum().getUidRef());
                     ref.setValue(lci.getWellDatum().getValue());
                     channel.setWellDatum(ref);
                 }
-                
+
                 channel.setDescription(channel.getDescription());
-                
-                if (lci.getSensorOffset() != null){
+
+                if (lci.getSensorOffset() != null) {
                     SensorOffset offset = new SensorOffset();
                     offset.setUom(lci.getSensorOffset().getUom());
                     offset.setValue(lci.getSensorOffset().getValue().toString());
@@ -256,41 +260,41 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
                 channel.setTraceState(lci.getTraceState());
                 channel.setTraceOrigin(lci.getTraceOrigin());
                 channel.setDataType(lci.getTypeLogData());
-                
-                if (lci.getDensData() != null){
+
+                if (lci.getDensData() != null) {
                     DensData dd = new DensData();
                     dd.setUom(lci.getDensData().getUom());
                     dd.setValue(lci.getDensData().getValue().toString());
                     channel.setDensData(dd);
                 }
 
-                if (lci.getAxisDefinition() != null){
+                if (lci.getAxisDefinition() != null) {
                     List<AxisDefinition> axes = new ArrayList<>();
 
-                    for (CsAxisDefinition wmlAxis : lci.getAxisDefinition()){
+                    for (CsAxisDefinition wmlAxis : lci.getAxisDefinition()) {
 
                         AxisDefinition axis = new AxisDefinition();
-                        axis.setAxisCount((int)wmlAxis.getCount());
+                        axis.setAxisCount((int) wmlAxis.getCount());
                         axis.setAxisName(wmlAxis.getName());
                         axis.setAxisPropertyKind(wmlAxis.getPropertyType());
                         axis.setAxisUom(wmlAxis.getUom());
                         axis.setUid(wmlAxis.getUid());
-                        axis.setOrder((int)wmlAxis.getOrder());
+                        axis.setOrder((int) wmlAxis.getOrder());
+
                         if (wmlAxis.getDoubleValues() != null)
                             axis.setDoubleValues(String.join(",", wmlAxis.getDoubleValues()));
                         if (wmlAxis.getStringValues() != null)
                             axis.setStringValues(String.join(",", wmlAxis.getStringValues()));
-                        
-                        if (wmlAxis.getExtensionNameValue() != null){
-                            
+
+                        if (wmlAxis.getExtensionNameValue() != null) {
+
                             List<ExtensionNameValue> envs = new ArrayList<ExtensionNameValue>();
-                            
-                            for (CsExtensionNameValue wmlEnv : wmlAxis.getExtensionNameValue()){
+
+                            for (CsExtensionNameValue wmlEnv : wmlAxis.getExtensionNameValue()) {
                                 ExtensionNameValue env = new ExtensionNameValue();
                                 env.setName(wmlEnv.getName());
-                                if (wmlEnv.getValue() != null){
-                                    com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.Value value = 
-                                    new com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.Value();
+                                if (wmlEnv.getValue() != null) {
+                                    com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.Value value = new com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.Value();
                                     value.setUom(wmlEnv.getValue().getUom());
                                     value.setValue(wmlEnv.getValue().getValue());
                                     env.setValue(value);
@@ -300,9 +304,8 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
                                 env.setIndex(wmlEnv.getIndex());
                                 env.setDescription(wmlEnv.getDescription());
                                 env.setDataType(wmlEnv.getDataType());
-                                
-                                if (wmlEnv.getMd() != null)
-                                {
+
+                                if (wmlEnv.getMd() != null) {
                                     Md md = new Md();
                                     md.setUom(wmlEnv.getMd().getUom());
                                     md.setValue(wmlEnv.getMd().getValue().toString());
@@ -319,27 +322,30 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
                     channel.setAxisDefinition(axes);
                 }
 
-                if (lci.getExtensionNameValue() != null){
-                    
+                if (lci.getExtensionNameValue() != null) {
+
                     List<ExtensionNameValue> envs = new ArrayList<>();
-                    
-                    for (CsExtensionNameValue wmlEnv : lci.getExtensionNameValue()){
+
+                    for (CsExtensionNameValue wmlEnv : lci.getExtensionNameValue()) {
                         ExtensionNameValue env = new ExtensionNameValue();
                         env.setDTim(wmlEnv.getDTim().toXMLFormat());
                         env.setName(wmlEnv.getName());
                         env.setMeasureClass(wmlEnv.getMeasureClass());
-                        
-                        if (wmlEnv.getValue() != null){
-                            com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.Value value = 
-                                new com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.Value();
+
+                        if (wmlEnv.getValue() != null) {
+                            com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.Value value = new com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.Value();
                             value.setUom(wmlEnv.getValue().getUom());
                             value.setValue(wmlEnv.getValue().getValue());
                             env.setValue(value);
                         }
                         envs.add(env);
                     }
-                    //lci.setExtensionNameValues(envs);
+                    // channel.setExtensionNameValues(envs);
                 }
+                channels.add(channel);
+            } catch (Exception ex){
+                continue;
+            }
         }
         return channels;
     }
@@ -353,6 +359,7 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
 
         for (com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogCurveInfo lci : 
             witsmlObj.getLogCurveInfo()){
+            try{
                 Channel channel = new Channel();
                 channel.setUid(lci.getUid());
                 channel.setMnemonic(lci.getMnemonic());
@@ -422,7 +429,17 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
                     }
                     channel.setAxisDefinition(axes);
                 }
+                channels.add(channel);
+            } catch (Exception ex){
+                continue;
+            }
         }
         return channels;
+    }
+
+    public static String channelListToJson(List<Channel> channels) throws JsonProcessingException {
+        ObjectMapper om = new ObjectMapper();
+        om.setDateFormat(new StdDateFormat());
+        return om.writerWithDefaultPrettyPrinter().writeValueAsString(channels);
     }
 }

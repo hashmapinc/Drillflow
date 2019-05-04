@@ -26,6 +26,7 @@ import com.hashmapinc.tempus.witsml.valve.dot.client.UidUuidCache;
 import com.hashmapinc.tempus.witsml.valve.dot.graphql.GraphQLQueryConverter;
 import com.hashmapinc.tempus.witsml.valve.dot.graphql.GraphQLRespConverter;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.LogConverterExtended;
+import com.hashmapinc.tempus.witsml.valve.dot.model.log.channel.Channel;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.ChannelSet;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -40,6 +41,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -425,7 +427,6 @@ public class DotDelegator {
 			if ("1.4.1.1".equals(version)) {
 				uidWell = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj).getUidWell();
 			} else {
-				// TODO work with v1.3.1.1
 				uidWell = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj).getUidWell();
 			}
 			request.queryString("uidWell", uidWell);
@@ -438,8 +439,12 @@ public class DotDelegator {
 			try{
 				if ("1.4.1.1".equals(version)) {
 					channelSetPayload = LogConverterExtended.getChannelSet((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj).toJson();
+					List<Channel> chanList = LogConverterExtended.getChannelList((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj);
+					channelPayload = LogConverterExtended.channelListToJson(chanList);
 				} else {
 					channelSetPayload = LogConverterExtended.getChannelSet((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj).toJson();
+					List<Channel> chanList = LogConverterExtended.getChannelList((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj);
+					channelPayload = LogConverterExtended.channelListToJson(chanList);
 				}
 			} catch (JsonProcessingException e){
 				throw new ValveException("Error converting Log to ChannelSet");
