@@ -19,10 +19,14 @@ import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
+import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.Alias;
+import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.ChannelClass;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.Citation;
+import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.ExtensionNameValue;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.Index;
+import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.NominalHoleSize;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,8 +77,7 @@ import java.util.Map;
     "objectVersion",
     "existenceKind"
 })
-// TODO Is this change necessary? TMS
-@XmlRootElement
+
 public class Channel {
 
     @JsonProperty("uuid")
@@ -94,7 +97,7 @@ public class Channel {
     @JsonProperty("channelState")
     private String channelState;
     @JsonProperty("classIndex")
-    private Integer classIndex;
+    private Short classIndex;
     @JsonProperty("mnemAlias")
     private MnemAlias mnemAlias;
     @JsonProperty("alternateIndex")
@@ -247,12 +250,12 @@ public class Channel {
     }
 
     @JsonProperty("classIndex")
-    public Integer getClassIndex() {
+    public Short getClassIndex() {
         return classIndex;
     }
 
     @JsonProperty("classIndex")
-    public void setClassIndex(Integer classIndex) {
+    public void setClassIndex(Short classIndex) {
         this.classIndex = classIndex;
     }
 
@@ -606,10 +609,125 @@ public class Channel {
         this.additionalProperties.put(name, value);
     }
 
-    public String toJson() throws JsonProcessingException {
+    public String channelToJson() throws JsonProcessingException {
         ObjectMapper om = new ObjectMapper();
         om.setDateFormat(new StdDateFormat());
         return om.writerWithDefaultPrettyPrinter().writeValueAsString(this);
     }
 
+    public static List<Channel> from1411(com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog witsmlObj) {
+
+        if (witsmlObj.getLogCurveInfo() == null)
+            return null;
+
+        List<Channel> channels = new ArrayList<Channel>();
+        // Create the index once for each channel
+        List<Index> indicies = Index.from1411(witsmlObj);
+
+        for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo lci : witsmlObj.getLogCurveInfo()) {
+            try {
+                Channel channel = new Channel();
+
+                Citation c = new Citation();
+                c.setTitle(lci.getMnemonic().getValue());
+
+                channel.setCitation(c);
+                channel.setUid(lci.getUid());
+                channel.setNamingSystem(lci.getMnemonic().getNamingSystem());
+                channel.setMnemonic(lci.getMnemonic().getValue());
+                
+                if (witsmlObj.getIndexType().toLowerCase().contains("depth"))
+                    channel.setTimeDepth("depth");
+                else
+                    channel.setTimeDepth("time");
+                channel.setClassWitsml(lci.getClassWitsml());
+
+                channel.setClassIndex(lci.getClassIndex());
+
+                if (lci.getUnit() == null) {
+                    channel.setUom("unitless");
+                } else {
+                    channel.setUom(lci.getUnit());
+                }
+
+                channel.setIndex(indicies);
+                channel.setMnemAlias(MnemAlias.from1411(lci.getMnemAlias()));
+                channel.setNullValue(lci.getNullValue());
+                channel.setAlternateIndex(lci.isAlternateIndex());
+                channel.setDescription(channel.getDescription());
+                channel.setSource(lci.getDataSource());
+                channel.setTraceState(lci.getTraceState());
+                channel.setTraceOrigin(lci.getTraceOrigin());
+                channel.setDataType(lci.getTypeLogData());
+                channel.setDensData(DensData.from1411(lci.getDensData()));
+                channel.setAxisDefinition(AxisDefinition.from1411(lci.getAxisDefinition()));
+                channel.setExtensionNameValue(ExtensionNameValue.from1411(lci.getExtensionNameValue()));
+                channel.setWellDatum(WellDatum.from1411(lci.getWellDatum()));
+                channel.setSensorOffset(SensorOffset.from1411(lci.getSensorOffset()));
+                channels.add(channel);
+            } catch (Exception ex) {
+                continue;
+            }
+        }
+        return channels;
+    }
+
+    public static List<Channel> from1311(com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog witsmlObj) {
+        if (witsmlObj.getLogCurveInfo() == null)
+            return null;
+
+        List<Channel> channels = new ArrayList<Channel>();
+        // Create the index once for each channel
+        List<Index> indicies = Index.from1311(witsmlObj);
+
+        for (com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogCurveInfo lci : witsmlObj.getLogCurveInfo()) {
+            try {
+                Channel channel = new Channel();
+
+                Citation c = new Citation();
+                c.setTitle(lci.getMnemonic());
+
+                channel.setCitation(c);
+                channel.setUid(lci.getUid());
+                channel.setMnemonic(lci.getMnemonic());
+
+                if (witsmlObj.getIndexType().toLowerCase().contains("depth"))
+                    channel.setTimeDepth("depth");
+                else
+                    channel.setTimeDepth("time");
+                channel.setClassWitsml(lci.getClassWitsml());
+
+                if (lci.getUnit() == null) {
+                    channel.setUom("unitless");
+                } else {
+                    channel.setUom(lci.getUnit());
+                }
+
+                channel.setIndex(indicies);
+                channel.setNullValue(lci.getNullValue());
+                channel.setAlternateIndex(lci.isAlternateIndex());
+                channel.setDescription(channel.getDescription());
+                channel.setSource(lci.getDataSource());
+                channel.setTraceState(lci.getTraceState());
+                channel.setTraceOrigin(lci.getTraceOrigin());
+                channel.setDataType(lci.getTypeLogData());
+                channel.setWellDatum(WellDatum.from1311(lci.getWellDatum()));
+                channel.setSensorOffset(SensorOffset.from1311(lci.getSensorOffset()));
+                channel.setDensData(DensData.from1311(lci.getDensData()));
+                channel.setMnemAlias(MnemAlias.from1311(lci));
+                channel.setAxisDefinition(AxisDefinition.from1311(lci.getAxisDefinition()));
+                
+                channels.add(channel);
+            } catch (Exception ex) {
+                continue;
+            }
+        }
+        return channels;
+    }
+
+    public static String channelListToJson(List<Channel> channels) throws JsonProcessingException {
+        ObjectMapper om = new ObjectMapper();
+        om.setDateFormat(new StdDateFormat());
+        return om.writerWithDefaultPrettyPrinter().writeValueAsString(channels);
+    }
 }

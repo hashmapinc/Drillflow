@@ -64,4 +64,24 @@ public class MnemAlias {
         this.additionalProperties.put(name, value);
     }
 
+    public static MnemAlias from1411(com.hashmapinc.tempus.WitsmlObjects.v1411.ShortNameStruct mnemAlias){
+        if (mnemAlias == null) 
+            return null;
+        
+        MnemAlias alias = new MnemAlias();
+        alias.setValue(mnemAlias.getValue());
+        alias.setNamingSystem(mnemAlias.getNamingSystem());
+        return alias;
+    }
+
+    //There is no ShortNameStruct in 1311 so just pass in the LogCurveInfo to build the MnemAlias
+    public static MnemAlias from1311(com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogCurveInfo lci){
+        if (lci.getMnemAlias() == null) 
+            return null;
+        
+        MnemAlias alias = new MnemAlias();
+        alias.setValue(lci.getMnemAlias());
+        return alias;
+    }
+
 }

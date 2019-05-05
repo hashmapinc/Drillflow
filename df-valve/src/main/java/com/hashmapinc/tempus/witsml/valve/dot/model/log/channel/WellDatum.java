@@ -16,6 +16,7 @@
 package com.hashmapinc.tempus.witsml.valve.dot.model.log.channel;
 
 import com.fasterxml.jackson.annotation.*;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.RefNameString;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -62,6 +63,26 @@ public class WellDatum {
     @JsonAnySetter
     public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
+    }
+
+    public static WellDatum from1411(com.hashmapinc.tempus.WitsmlObjects.v1411.RefNameString wellDatum){
+        if (wellDatum == null)
+            return null;
+
+        WellDatum datum = new WellDatum();
+        datum.setUidRef(wellDatum.getUidRef());
+        datum.setValue(wellDatum.getValue());
+        return datum;
+    }
+
+    public static WellDatum from1311(com.hashmapinc.tempus.WitsmlObjects.v1311.RefNameString wellDatum){
+        if (wellDatum == null)
+            return null;
+
+        WellDatum datum = new WellDatum();
+        datum.setUidRef(wellDatum.getUidRef());
+        datum.setValue(wellDatum.getValue());
+        return datum;
     }
 
 }

@@ -41,7 +41,7 @@ public class ChannelSet {
     @JsonProperty("uuid")
     private String uuid;
     @JsonProperty("bhaRunNumber")
-    private Integer bhaRunNumber;
+    private Short bhaRunNumber;
     @JsonProperty("aliases")
     private List<Alias> aliases = null;
     @JsonProperty("citation")
@@ -128,12 +128,12 @@ public class ChannelSet {
     }
 
     @JsonProperty("bhaRunNumber")
-    public Integer getBhaRunNumber() {
+    public Short getBhaRunNumber() {
         return bhaRunNumber;
     }
 
     @JsonProperty("bhaRunNumber")
-    public void setBhaRunNumber(Integer bhaRunNumber) {
+    public void setBhaRunNumber(Short bhaRunNumber) {
         this.bhaRunNumber = bhaRunNumber;
     }
 
@@ -513,4 +513,75 @@ public class ChannelSet {
         return om.writerWithDefaultPrettyPrinter().writeValueAsString(this);
     }
 
+    public static ChannelSet from1411(com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog witsmlObj) {
+
+        ChannelSet cs = new ChannelSet();
+        Citation citation = new Citation();
+        citation.setTitle(witsmlObj.getName());
+        citation.setDescription(witsmlObj.getDescription());
+        cs.setCitation(citation);
+        cs.setBhaRunNumber(witsmlObj.getBhaRunNumber());
+        cs.setDataGroup(witsmlObj.getDataGroup());
+        cs.setDataDelimiter(witsmlObj.getDataDelimiter());
+        cs.setRunNumber(witsmlObj.getRunNumber());
+        cs.setPassNumber(witsmlObj.getPass());
+        cs.setCurveSensorsAligned(witsmlObj.isCurveSensorsAligned());
+        cs.setCustomData(witsmlObj.getCustomData());
+        cs.setLoggingCompanyName(witsmlObj.getServiceCompany());
+        cs.setNullValue(witsmlObj.getNullValue());
+
+        //Sort out if this is a time or a depth log
+        String indexType = "depth";
+        if (witsmlObj.getIndexType().contains("depth")) {
+            cs.setTimeDepth(indexType);
+            cs.setStartIndex(witsmlObj.getStartIndex().getValue().toString());
+            cs.setEndIndex(witsmlObj.getEndIndex().getValue().toString());
+        } else {
+            indexType = "time";
+            cs.setTimeDepth(indexType);
+            cs.setStartIndex(witsmlObj.getStartDateTimeIndex().toXMLFormat());
+            cs.setEndIndex(witsmlObj.getEndDateTimeIndex().toXMLFormat());
+        }
+
+        cs.setNullValue(witsmlObj.getNullValue());
+        cs.setObjectGrowing(witsmlObj.isObjectGrowing());
+        cs.setStepIncrement(StepIncrement.from1411(witsmlObj.getStepIncrement()));
+        cs.setIndex(Index.from1411(witsmlObj));
+        cs.setLogParam(LogParam.from1411(witsmlObj.getLogParam()));
+        cs.setCommonData(CommonData.getCommonDataFrom1411(witsmlObj.getCommonData()));
+        return cs;
+    }
+
+    public static ChannelSet from1311(com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog witsmlObj) {
+        ChannelSet cs = new ChannelSet();
+        Citation citation = new Citation();
+        citation.setTitle(witsmlObj.getName());
+        citation.setDescription(witsmlObj.getDescription());
+        cs.setCitation(citation);
+        cs.setBhaRunNumber(witsmlObj.getBhaRunNumber());
+        cs.setRunNumber(witsmlObj.getRunNumber());
+        cs.setPassNumber(witsmlObj.getPass());
+        cs.setCustomData(witsmlObj.getCustomData());
+        cs.setLoggingCompanyName(witsmlObj.getServiceCompany());
+        cs.setNullValue(witsmlObj.getNullValue());
+        // Sort out if this is a time or a depth log
+        String indexType = "depth";
+        if (witsmlObj.getIndexType().contains("depth")) {
+            cs.setTimeDepth(indexType);
+            cs.setStartIndex(witsmlObj.getStartIndex().getValue().toString());
+            cs.setEndIndex(witsmlObj.getEndIndex().getValue().toString());
+        } else {
+            indexType = "time";
+            cs.setTimeDepth(indexType);
+            cs.setStartIndex(witsmlObj.getStartDateTimeIndex().toXMLFormat());
+            cs.setEndIndex(witsmlObj.getEndDateTimeIndex().toXMLFormat());
+        }
+        cs.setNullValue(witsmlObj.getNullValue());
+        cs.setObjectGrowing(witsmlObj.isObjectGrowing());
+        cs.setStepIncrement(StepIncrement.from1311(witsmlObj.getStepIncrement()));
+        cs.setIndex(Index.from1311(witsmlObj));
+        cs.setLogParam(LogParam.from1311(witsmlObj.getLogParam()));
+        cs.setCommonData(CommonData.getCommonDataFrom1311(witsmlObj.getCommonData()));
+        return cs;
+    }
 }

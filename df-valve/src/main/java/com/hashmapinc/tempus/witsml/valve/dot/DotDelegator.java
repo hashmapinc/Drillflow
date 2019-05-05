@@ -438,13 +438,13 @@ public class DotDelegator {
 		if ("log".equals(objectType)) {
 			try{
 				if ("1.4.1.1".equals(version)) {
-					channelSetPayload = LogConverterExtended.getChannelSet((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj).toJson();
-					List<Channel> chanList = LogConverterExtended.getChannelList((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj);
-					channelPayload = LogConverterExtended.channelListToJson(chanList);
+					channelSetPayload = ChannelSet.from1411((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj).toJson();
+					List<Channel> chanList = Channel.from1411((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj);
+					channelPayload = Channel.channelListToJson(chanList);
 				} else {
-					channelSetPayload = LogConverterExtended.getChannelSet((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj).toJson();
-					List<Channel> chanList = LogConverterExtended.getChannelList((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj);
-					channelPayload = LogConverterExtended.channelListToJson(chanList);
+					channelSetPayload = ChannelSet.from1311((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj).toJson();
+					List<Channel> chanList = Channel.from1311((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj);
+					channelPayload = Channel.channelListToJson(chanList);
 				}
 			} catch (JsonProcessingException e){
 				throw new ValveException("Error converting Log to ChannelSet");

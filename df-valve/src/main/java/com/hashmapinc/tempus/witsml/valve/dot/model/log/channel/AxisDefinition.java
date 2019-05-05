@@ -16,7 +16,9 @@
 package com.hashmapinc.tempus.witsml.valve.dot.model.log.channel;
 
 import com.fasterxml.jackson.annotation.*;
+import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.ExtensionNameValue;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +44,7 @@ public class AxisDefinition {
     @JsonProperty("axisSpacing")
     private Double axisSpacing;
     @JsonProperty("axisCount")
-    private Integer axisCount;
+    private Short axisCount;
     @JsonProperty("axisName")
     private String axisName;
     @JsonProperty("axisPropertyKind")
@@ -52,7 +54,7 @@ public class AxisDefinition {
     @JsonProperty("uid")
     private String uid;
     @JsonProperty("order")
-    private Integer order;
+    private Short order;
     @JsonProperty("doubleValues")
     private String doubleValues;
     @JsonProperty("stringValues")
@@ -83,12 +85,12 @@ public class AxisDefinition {
     }
 
     @JsonProperty("axisCount")
-    public Integer getAxisCount() {
+    public Short getAxisCount() {
         return axisCount;
     }
 
     @JsonProperty("axisCount")
-    public void setAxisCount(Integer axisCount) {
+    public void setAxisCount(Short axisCount) {
         this.axisCount = axisCount;
     }
 
@@ -133,12 +135,12 @@ public class AxisDefinition {
     }
 
     @JsonProperty("order")
-    public Integer getOrder() {
+    public Short getOrder() {
         return order;
     }
 
     @JsonProperty("order")
-    public void setOrder(Integer order) {
+    public void setOrder(Short order) {
         this.order = order;
     }
 
@@ -180,6 +182,68 @@ public class AxisDefinition {
     @JsonAnySetter
     public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
+    }
+
+    public static List<AxisDefinition> from1411(List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsAxisDefinition> axisDefinitions){
+        if (axisDefinitions == null) {
+            return null;
+        }
+        List<AxisDefinition> axes = new ArrayList<>();
+
+        for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsAxisDefinition wmlAxis : axisDefinitions) {
+
+            AxisDefinition axis = new AxisDefinition();
+            axis.setAxisCount(wmlAxis.getCount());
+            axis.setAxisName(wmlAxis.getName());
+            axis.setAxisPropertyKind(wmlAxis.getPropertyType());
+            axis.setAxisUom(wmlAxis.getUom());
+            axis.setUid(wmlAxis.getUid());
+            axis.setOrder(wmlAxis.getOrder());
+
+            if (wmlAxis.getDoubleValues() != null)
+                axis.setDoubleValues(String.join(",", wmlAxis.getDoubleValues()));
+            if (wmlAxis.getStringValues() != null)
+                axis.setStringValues(String.join(",", wmlAxis.getStringValues()));
+
+            axis.setExtensionNameValue(ExtensionNameValue.from1411(wmlAxis.getExtensionNameValue()));
+            
+            axes.add(axis);
+        }
+
+        return axes;
+    }
+
+    public static List<AxisDefinition> from1311(List<com.hashmapinc.tempus.WitsmlObjects.v1311.CsAxisDefinition> axisDefinitions){
+        if (axisDefinitions == null) {
+            return null;
+        }
+        List<AxisDefinition> axes = new ArrayList<>();
+
+        for (com.hashmapinc.tempus.WitsmlObjects.v1311.CsAxisDefinition wmlAxis : axisDefinitions) {
+
+            AxisDefinition axis = new AxisDefinition();
+            axis.setAxisCount(wmlAxis.getCount());
+            axis.setAxisName(wmlAxis.getName());
+            axis.setAxisPropertyKind(wmlAxis.getPropertyType());
+            axis.setAxisUom(wmlAxis.getUom());
+            axis.setUid(wmlAxis.getUid());
+            axis.setOrder( wmlAxis.getOrder());
+
+            List<String> dblValues = new ArrayList<>();
+            for (Double val : wmlAxis.getDoubleValues()) {
+                dblValues.add(val.toString());
+            }
+
+            if (wmlAxis.getDoubleValues() != null)
+                axis.setDoubleValues(String.join(",", dblValues));
+
+            if (wmlAxis.getStringValues() != null)
+                axis.setStringValues(String.join(",", wmlAxis.getStringValues()));
+            
+            axes.add(axis);
+        }
+
+        return axes;
     }
 
 }

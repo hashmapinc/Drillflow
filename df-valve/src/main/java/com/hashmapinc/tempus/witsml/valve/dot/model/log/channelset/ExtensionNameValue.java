@@ -17,7 +17,9 @@ package com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset;
 
 import com.fasterxml.jackson.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -153,6 +155,46 @@ public class ExtensionNameValue {
     @JsonAnySetter
     public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
+    }
+
+    public static List<ExtensionNameValue> from1411(
+        List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsExtensionNameValue> extensionNameValues
+        ){
+        
+            if (extensionNameValues == null) {
+            return null;
+        }
+
+        List<ExtensionNameValue> envs = new ArrayList<ExtensionNameValue>();
+
+        for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsExtensionNameValue wmlEnv : extensionNameValues) {
+            ExtensionNameValue env = new ExtensionNameValue();
+            env.setName(wmlEnv.getName());
+            if (wmlEnv.getValue() != null) {
+                com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.Value value = 
+                    new com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.Value();
+                value.setUom(wmlEnv.getValue().getUom());
+                value.setValue(wmlEnv.getValue().getValue());
+                env.setValue(value);
+            }
+            env.setMeasureClass(wmlEnv.getMeasureClass());
+            env.setDTim(wmlEnv.getDTim().toXMLFormat());
+            env.setIndex(wmlEnv.getIndex());
+            env.setDescription(wmlEnv.getDescription());
+            env.setDataType(wmlEnv.getDataType());
+
+            if (wmlEnv.getMd() != null) {
+                Md md = new Md();
+                md.setUom(wmlEnv.getMd().getUom());
+                md.setValue(wmlEnv.getMd().getValue().toString());
+                md.setDatum(wmlEnv.getMd().getDatum());
+                env.setMd(md);
+            }
+
+            env.setUid(wmlEnv.getUid());
+            envs.add(env);
+        }
+        return envs;
     }
 
 }

@@ -64,4 +64,24 @@ public class DensData {
         this.additionalProperties.put(name, value);
     }
 
+    public static DensData from1411(com.hashmapinc.tempus.WitsmlObjects.v1411.PerLengthMeasure densData){
+        if (densData == null)
+            return null;
+        
+        DensData dd = new DensData();
+        dd.setUom(densData.getUom());
+        dd.setValue(densData.toString());
+        return dd;
+    }
+
+    public static DensData from1311(com.hashmapinc.tempus.WitsmlObjects.v1311.PerLengthMeasure densData){
+        if (densData == null)
+            return null;
+        
+        DensData dd = new DensData();
+        dd.setUom(densData.getUom());
+        dd.setValue(densData.toString());
+        return dd;
+    }
+
 }

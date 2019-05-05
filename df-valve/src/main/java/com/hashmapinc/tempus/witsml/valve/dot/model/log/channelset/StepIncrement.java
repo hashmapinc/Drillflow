@@ -16,6 +16,7 @@
 package com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset;
 
 import com.fasterxml.jackson.annotation.*;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.RatioGenericMeasure;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -88,6 +89,30 @@ public class StepIncrement {
     @JsonAnySetter
     public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
+    }
+
+    public static StepIncrement from1411(com.hashmapinc.tempus.WitsmlObjects.v1411.RatioGenericMeasure stepIncrement){
+        if (stepIncrement == null)
+            return null;
+
+        StepIncrement inc = new StepIncrement();
+        inc.setNumerator(stepIncrement.getNumerator());
+        inc.setDenominator(stepIncrement.getDenominator());
+        inc.setUom(stepIncrement.getUom());
+        inc.setValue(stepIncrement.getValue().toString());
+        return inc;
+    }
+
+    public static StepIncrement from1311(com.hashmapinc.tempus.WitsmlObjects.v1311.RatioGenericMeasure stepIncrement){
+        if (stepIncrement == null)
+            return null;
+
+        StepIncrement inc = new StepIncrement();
+        inc.setNumerator(stepIncrement.getNumerator());
+        inc.setDenominator(stepIncrement.getDenominator());
+        inc.setUom(stepIncrement.getUom());
+        inc.setValue(stepIncrement.getValue().toString());
+        return inc;
     }
 
 }

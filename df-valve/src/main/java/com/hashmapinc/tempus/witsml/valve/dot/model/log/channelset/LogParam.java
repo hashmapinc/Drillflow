@@ -17,7 +17,9 @@ package com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset;
 
 import com.fasterxml.jackson.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -116,4 +118,40 @@ public class LogParam {
         this.additionalProperties.put(name, value);
     }
 
+    public static List<LogParam> from1411(List<com.hashmapinc.tempus.WitsmlObjects.v1411.IndexedObject> logParams){
+        if (logParams == null)
+            return null;
+
+        List<LogParam> params = new ArrayList<>();
+        for (com.hashmapinc.tempus.WitsmlObjects.v1411.IndexedObject logParam : logParams) {
+            LogParam param = new LogParam();
+            param.setName(logParam.getName());
+            param.setDescription(logParam.getDescription());
+            param.setIndex(logParam.getIndex());
+            param.setUid(logParam.getUid());
+            param.setUom(logParam.getUom());
+            param.setValue(logParam.getValue());
+            params.add(param);
+        }
+
+        return params;
+    }
+
+    public static List<LogParam> from1311(List<com.hashmapinc.tempus.WitsmlObjects.v1311.IndexedObject> logParams){
+        if (logParams == null)
+            return null;
+
+        List<LogParam> params = new ArrayList<>();
+        for (com.hashmapinc.tempus.WitsmlObjects.v1311.IndexedObject logParam : logParams) {
+            LogParam param = new LogParam();
+            param.setName(logParam.getName());
+            param.setDescription(logParam.getDescription());
+            param.setIndex(logParam.getIndex());
+            param.setUom(logParam.getUom());
+            param.setValue(logParam.getValue());
+            params.add(param);
+        }
+
+        return params;
+    }
 }
