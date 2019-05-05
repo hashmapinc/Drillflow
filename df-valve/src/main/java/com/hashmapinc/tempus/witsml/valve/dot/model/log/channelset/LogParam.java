@@ -154,4 +154,42 @@ public class LogParam {
 
         return params;
     }
+
+    public static List<com.hashmapinc.tempus.WitsmlObjects.v1311.IndexedObject> to1311(List<LogParam> logParams){
+        if (logParams == null)
+            return null;
+
+        List<com.hashmapinc.tempus.WitsmlObjects.v1311.IndexedObject> params = new ArrayList<>();
+        for (LogParam logParam : logParams) {
+            com.hashmapinc.tempus.WitsmlObjects.v1311.IndexedObject param = 
+                new com.hashmapinc.tempus.WitsmlObjects.v1311.IndexedObject();
+            param.setName(logParam.getName());
+            param.setDescription(logParam.getDescription());
+            param.setIndex(logParam.getIndex());
+            param.setUom(logParam.getUom());
+            param.setValue(logParam.getValue());
+            params.add(param);
+        }
+
+        return params;
+    }
+
+    public static List<com.hashmapinc.tempus.WitsmlObjects.v1411.IndexedObject> to1411(List<LogParam> logParams){
+        if (logParams == null)
+            return null;
+
+        List<com.hashmapinc.tempus.WitsmlObjects.v1411.IndexedObject> params = new ArrayList<>();
+        for (LogParam logParam : logParams) {
+            com.hashmapinc.tempus.WitsmlObjects.v1411.IndexedObject param = 
+                new com.hashmapinc.tempus.WitsmlObjects.v1411.IndexedObject();
+            param.setName(logParam.getName());
+            param.setDescription(logParam.getDescription());
+            param.setIndex(logParam.getIndex());
+            param.setUom(logParam.getUom());
+            param.setValue(logParam.getValue());
+            params.add(param);
+        }
+
+        return params;
+    }
 }

@@ -18,25 +18,26 @@ package com.hashmapinc.tempus.witsml.valve.dot.model.log.channel;
 import com.fasterxml.jackson.annotation.*;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.ExtensionNameValue;
 
+import java.security.cert.Extension;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-    "axisStart",
-    "axisSpacing",
-    "axisCount",
-    "axisName",
-    "axisPropertyKind",
-    "axisUom",
-    "uid",
-    "order",
-    "doubleValues",
-    "stringValues",
-    "extensionNameValue"
-})
+@JsonPropertyOrder({ "axisStart", "axisSpacing", "axisCount", "axisName", "axisPropertyKind", "axisUom", "uid", "order",
+        "doubleValues", "stringValues", "extensionNameValue" })
 public class AxisDefinition {
 
     @JsonProperty("axisStart")
@@ -184,7 +185,8 @@ public class AxisDefinition {
         this.additionalProperties.put(name, value);
     }
 
-    public static List<AxisDefinition> from1411(List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsAxisDefinition> axisDefinitions){
+    public static List<AxisDefinition> from1411(
+            List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsAxisDefinition> axisDefinitions) {
         if (axisDefinitions == null) {
             return null;
         }
@@ -206,14 +208,15 @@ public class AxisDefinition {
                 axis.setStringValues(String.join(",", wmlAxis.getStringValues()));
 
             axis.setExtensionNameValue(ExtensionNameValue.from1411(wmlAxis.getExtensionNameValue()));
-            
+
             axes.add(axis);
         }
 
         return axes;
     }
 
-    public static List<AxisDefinition> from1311(List<com.hashmapinc.tempus.WitsmlObjects.v1311.CsAxisDefinition> axisDefinitions){
+    public static List<AxisDefinition> from1311(
+            List<com.hashmapinc.tempus.WitsmlObjects.v1311.CsAxisDefinition> axisDefinitions) {
         if (axisDefinitions == null) {
             return null;
         }
@@ -227,7 +230,7 @@ public class AxisDefinition {
             axis.setAxisPropertyKind(wmlAxis.getPropertyType());
             axis.setAxisUom(wmlAxis.getUom());
             axis.setUid(wmlAxis.getUid());
-            axis.setOrder( wmlAxis.getOrder());
+            axis.setOrder(wmlAxis.getOrder());
 
             List<String> dblValues = new ArrayList<>();
             for (Double val : wmlAxis.getDoubleValues()) {
@@ -239,11 +242,74 @@ public class AxisDefinition {
 
             if (wmlAxis.getStringValues() != null)
                 axis.setStringValues(String.join(",", wmlAxis.getStringValues()));
-            
+
             axes.add(axis);
         }
 
         return axes;
+    }
+
+    public static List<com.hashmapinc.tempus.WitsmlObjects.v1311.CsAxisDefinition> to1311(
+            List<AxisDefinition> axisDefinitions) {
+        if (axisDefinitions == null) {
+            return null;
+        }
+
+        List<com.hashmapinc.tempus.WitsmlObjects.v1311.CsAxisDefinition> wmlAxes = new ArrayList<>();
+
+        for (AxisDefinition dotAxis : axisDefinitions) {
+            com.hashmapinc.tempus.WitsmlObjects.v1311.CsAxisDefinition axis = new com.hashmapinc.tempus.WitsmlObjects.v1311.CsAxisDefinition();
+
+            axis.setCount(dotAxis.getAxisCount());
+            axis.setName(dotAxis.getAxisName());
+            axis.setPropertyType(dotAxis.getAxisPropertyKind());
+            axis.setUom(dotAxis.getAxisUom());
+            axis.setUid(dotAxis.getUid());
+            axis.setOrder(dotAxis.getOrder());
+            if (dotAxis.getDoubleValues() != null) {
+                axis.setDoubleValues(Stream.of(dotAxis.getDoubleValues().split(",")).map(String::valueOf)
+                        .collect(Collectors.toList()));
+            }
+            if (dotAxis.getStringValues() != null) {
+                axis.setStringValues(Stream.of(dotAxis.getStringValues().split(",")).map(String::valueOf)
+                        .collect(Collectors.toList()));
+            }
+
+            wmlAxes.add(axis);
+        }
+        return wmlAxes;
+    }
+
+    public static List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsAxisDefinition> to1411(
+            List<AxisDefinition> axisDefinitions) {
+        if (axisDefinitions == null) {
+            return null;
+        }
+
+        List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsAxisDefinition> wmlAxes = new ArrayList<>();
+
+        for (AxisDefinition dotAxis : axisDefinitions) {
+            com.hashmapinc.tempus.WitsmlObjects.v1411.CsAxisDefinition axis = new com.hashmapinc.tempus.WitsmlObjects.v1411.CsAxisDefinition();
+
+            axis.setCount(dotAxis.getAxisCount());
+            axis.setName(dotAxis.getAxisName());
+            axis.setPropertyType(dotAxis.getAxisPropertyKind());
+            axis.setUom(dotAxis.getAxisUom());
+            axis.setUid(dotAxis.getUid());
+            axis.setOrder(dotAxis.getOrder());
+            if (dotAxis.getDoubleValues() != null) {
+                axis.setDoubleValues(Stream.of(dotAxis.getDoubleValues().split(",")).map(Double::valueOf)
+                        .collect(Collectors.toList()));
+            }
+            if (dotAxis.getStringValues() != null) {
+                axis.setStringValues(Stream.of(dotAxis.getStringValues().split(",")).map(String::valueOf)
+                        .collect(Collectors.toList()));
+            }
+            //TODO: This has to be addressed in WOL...the set method is not availalble.
+            //axis.setExtensionNameValue(ExtensionNameValue.to1411(dotAxis.getExtensionNameValue()));
+            wmlAxes.add(axis);
+        }
+        return wmlAxes;
     }
 
 }

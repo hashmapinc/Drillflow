@@ -85,4 +85,26 @@ public class SensorOffset {
         return offset;
     }
 
+    public static com.hashmapinc.tempus.WitsmlObjects.v1411.LengthMeasure to1411(SensorOffset sensorOffset){
+        if (sensorOffset == null)
+            return null;
+
+        com.hashmapinc.tempus.WitsmlObjects.v1411.LengthMeasure wmlOffset = 
+            new com.hashmapinc.tempus.WitsmlObjects.v1411.LengthMeasure();
+        wmlOffset.setUom(sensorOffset.getUom());
+        wmlOffset.setValue(Double.parseDouble(sensorOffset.getValue()));
+        return wmlOffset;
+    }
+
+    public static com.hashmapinc.tempus.WitsmlObjects.v1311.LengthMeasure to1311(SensorOffset sensorOffset){
+        if (sensorOffset == null)
+            return null;
+
+        com.hashmapinc.tempus.WitsmlObjects.v1311.LengthMeasure wmlOffset = 
+            new com.hashmapinc.tempus.WitsmlObjects.v1311.LengthMeasure();
+        wmlOffset.setUom(sensorOffset.getUom());
+        wmlOffset.setValue(Double.parseDouble(sensorOffset.getValue()));
+        return wmlOffset;
+    }
+
 }

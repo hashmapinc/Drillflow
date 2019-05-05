@@ -84,4 +84,15 @@ public class MnemAlias {
         return alias;
     }
 
+    public static com.hashmapinc.tempus.WitsmlObjects.v1411.ShortNameStruct to1411(MnemAlias mnemAlias){
+        if (mnemAlias == null) 
+            return null;
+        
+            com.hashmapinc.tempus.WitsmlObjects.v1411.ShortNameStruct alias = 
+                new com.hashmapinc.tempus.WitsmlObjects.v1411.ShortNameStruct();
+        alias.setValue(mnemAlias.getValue());
+        alias.setNamingSystem(mnemAlias.getNamingSystem());
+        return alias;
+    }
+
 }

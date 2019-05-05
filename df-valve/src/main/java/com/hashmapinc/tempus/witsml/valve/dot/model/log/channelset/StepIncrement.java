@@ -115,4 +115,30 @@ public class StepIncrement {
         return inc;
     }
 
+    public static com.hashmapinc.tempus.WitsmlObjects.v1411.RatioGenericMeasure to1411(StepIncrement stepIncrement){
+        if (stepIncrement == null)
+            return null;
+
+        com.hashmapinc.tempus.WitsmlObjects.v1411.RatioGenericMeasure wmlInc = 
+            new com.hashmapinc.tempus.WitsmlObjects.v1411.RatioGenericMeasure();
+        wmlInc.setNumerator(stepIncrement.getNumerator());
+        wmlInc.setDenominator(stepIncrement.getDenominator());
+        wmlInc.setUom(stepIncrement.getUom());
+        wmlInc.setValue(Double.parseDouble(stepIncrement.getValue()));
+        return wmlInc;
+    }
+
+    public static com.hashmapinc.tempus.WitsmlObjects.v1311.RatioGenericMeasure to1311(StepIncrement stepIncrement){
+        if (stepIncrement == null)
+            return null;
+
+        com.hashmapinc.tempus.WitsmlObjects.v1311.RatioGenericMeasure wmlInc = 
+            new com.hashmapinc.tempus.WitsmlObjects.v1311.RatioGenericMeasure();
+        wmlInc.setNumerator(stepIncrement.getNumerator());
+        wmlInc.setDenominator(stepIncrement.getDenominator());
+        wmlInc.setUom(stepIncrement.getUom());
+        wmlInc.setValue(Double.parseDouble(stepIncrement.getValue()));
+        return wmlInc;
+    }
+
 }

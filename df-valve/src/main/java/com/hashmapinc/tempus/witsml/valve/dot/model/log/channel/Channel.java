@@ -17,8 +17,11 @@ package com.hashmapinc.tempus.witsml.valve.dot.model.log.channel;
 
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.GenericMeasure;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.ShortNameStruct;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.Alias;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.ChannelClass;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.Citation;
@@ -26,10 +29,19 @@ import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.ExtensionName
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.Index;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.NominalHoleSize;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -725,9 +737,151 @@ public class Channel {
         return channels;
     }
 
+    public static List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> to1411(
+        List<Channel> channels) {
+        List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> curves = new ArrayList<>();
+
+        if (channels == null || channels.isEmpty())
+            return null;
+
+        for (Channel c : channels) {
+            try{
+                com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo lci = 
+                new com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo();
+                ShortNameStruct name = new ShortNameStruct();
+                name.setValue(c.getMnemonic());
+                name.setNamingSystem(c.getNamingSystem());
+                lci.setMnemonic(name);
+                lci.setAlternateIndex(c.getAlternateIndex());
+                lci.setClassWitsml(c.getClassWitsml());
+                //NOTE: WE WILL ALWAYS SET THE INDEX TO THE FIRST COLUMN
+                lci.setCurveDescription(c.getCitation().getDescription());
+                lci.setDataSource(c.getSource());
+                lci.setTraceOrigin(c.getTraceOrigin());
+                lci.setTraceState(c.getTraceState());
+                lci.setTypeLogData(c.getDataType());
+                lci.setUid(c.getUid());
+                lci.setUnit(c.getUom());
+                lci.setNullValue(c.getNullValue());
+                lci.setMnemAlias(MnemAlias.to1411(c.mnemAlias));
+                lci.setAxisDefinition(AxisDefinition.to1411(c.getAxisDefinition()));;
+                lci.setDensData(DensData.to1411(c.getDensData()));
+                lci.setSensorOffset(SensorOffset.to1411(c.getSensorOffset()));
+                lci.setWellDatum(WellDatum.to1411(c.getWellDatum()));
+                lci.setClassIndex(c.getClassIndex());
+                if (c.getTimeDepth().toLowerCase().contains("depth")){
+                    if (c.getStartIndex() != null)
+                        lci.setMinDateTimeIndex(convertIsoDateToXML(c.getStartIndex()));
+                    if (c.getEndIndex() != null)    
+                        lci.setMaxDateTimeIndex(convertIsoDateToXML(c.getEndIndex()));
+                } else {
+                    if (c.getStartIndex() != null){
+                        com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure minMeasure = 
+                            new com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure();
+                        minMeasure.setUom("m");
+                        minMeasure.setValue(Double.parseDouble(c.getStartIndex()));
+                        lci.setMinIndex(minMeasure);
+                    }
+                    if (c.getEndIndex() != null){
+                        com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure maxMeasure = 
+                            new com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure();
+                        maxMeasure.setUom("m");
+                        maxMeasure.setValue(Double.parseDouble(c.getEndIndex()));
+                        lci.setMaxIndex(maxMeasure);
+                    }
+                }
+                //Need to address this in wol...does not exist
+                //lci.getExtensionNameValue()
+                curves.add(lci);
+            } catch (Exception ex){
+                continue;
+            }
+        }
+        return curves;
+    }
+
+    public static List<com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogCurveInfo> to1311(
+        List<Channel> channels) {
+        List<com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogCurveInfo> curves = new ArrayList<>();
+
+        if (channels == null || channels.isEmpty())
+            return null;
+
+        for (Channel c : channels) {
+            try{
+                com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogCurveInfo lci = 
+                new com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogCurveInfo();
+                lci.setMnemonic(c.getCitation().getTitle());
+                lci.setAlternateIndex(c.getAlternateIndex());
+                lci.setClassWitsml(c.getClassWitsml());
+                //NOTE: WE WILL ALWAYS SET THE INDEX TO THE FIRST COLUMN
+                lci.setColumnIndex((short)1);
+                lci.setCurveDescription(c.getCitation().getDescription());
+                lci.setDataSource(c.getSource());
+                lci.setTraceOrigin(c.getTraceOrigin());
+                lci.setTraceState(c.getTraceState());
+                lci.setTypeLogData(c.getDataType());
+                lci.setUid(c.getUid());
+                lci.setUnit(c.getUom());
+                lci.setNullValue(c.getNullValue());
+                lci.setMnemAlias(c.getMnemAlias().getValue());
+                lci.setAxisDefinition(AxisDefinition.to1311(c.getAxisDefinition()));;
+                lci.setDensData(DensData.to1311(c.getDensData()));
+                lci.setSensorOffset(SensorOffset.to1311(c.getSensorOffset()));
+                lci.setWellDatum(WellDatum.to1311(c.getWellDatum()));
+                
+                if (c.getTimeDepth().toLowerCase().contains("depth")){
+                    lci.setMinDateTimeIndex(convertIsoDateToXML(c.getStartIndex()));
+                    lci.setMaxDateTimeIndex(convertIsoDateToXML(c.getEndIndex()));
+                } else {
+                    GenericMeasure minMeasure = new GenericMeasure();
+                    minMeasure.setUom("m");
+                    minMeasure.setValue(Double.parseDouble(c.getStartIndex()));
+                    lci.setMinIndex(minMeasure);
+                    GenericMeasure maxMeasure = new GenericMeasure();
+                    maxMeasure.setUom("m");
+                    maxMeasure.setValue(Double.parseDouble(c.getEndIndex()));
+                    lci.setMaxIndex(maxMeasure);
+                }
+            
+                curves.add(lci);
+            } catch (Exception ex){
+                continue;
+            }
+        }
+        return curves;
+    }
+
     public static String channelListToJson(List<Channel> channels) throws JsonProcessingException {
         ObjectMapper om = new ObjectMapper();
         om.setDateFormat(new StdDateFormat());
         return om.writerWithDefaultPrettyPrinter().writeValueAsString(channels);
+    }
+
+    public static List<Channel> jsonToChannelList(String channelsList){
+        return fromJSON(new TypeReference<List<Channel>>() {}, channelsList);
+    }
+
+    public static <T> T fromJSON(final TypeReference<T> type, final String jsonPacket) {
+        T data = null;
+
+        try {
+            data = new ObjectMapper().readValue(jsonPacket, type);
+        } catch (Exception e) {  // Handle the problem
+        }
+        return data;
+    }
+
+    private static XMLGregorianCalendar convertIsoDateToXML(String dateTime)
+            throws DatatypeConfigurationException, ParseException {
+        DateFormat format = new SimpleDateFormat("yyyy-MM-ddThh:mm:ss.SSSXXX");
+        Date date = format.parse("2014-04-24 11:15:00");
+
+        GregorianCalendar cal = new GregorianCalendar();
+        cal.setTime(date);
+
+        XMLGregorianCalendar xmlGregCal =  DatatypeFactory.newInstance().newXMLGregorianCalendar(cal);
+
+        return xmlGregCal;
     }
 }

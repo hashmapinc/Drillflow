@@ -85,4 +85,25 @@ public class WellDatum {
         return datum;
     }
 
+    public static com.hashmapinc.tempus.WitsmlObjects.v1411.RefNameString to1411(WellDatum wellDatum){
+        if (wellDatum == null)
+            return null;
+
+        com.hashmapinc.tempus.WitsmlObjects.v1411.RefNameString wmlDatum = 
+            new com.hashmapinc.tempus.WitsmlObjects.v1411.RefNameString();
+        wmlDatum.setUidRef(wellDatum.getUidRef());
+        wmlDatum.setValue(wellDatum.getValue());
+        return wmlDatum;
+    }
+
+    public static com.hashmapinc.tempus.WitsmlObjects.v1311.RefNameString to1311(WellDatum wellDatum){
+        if (wellDatum == null)
+            return null;
+
+        com.hashmapinc.tempus.WitsmlObjects.v1311.RefNameString wmlDatum = 
+            new com.hashmapinc.tempus.WitsmlObjects.v1311.RefNameString();
+        wmlDatum.setUidRef(wellDatum.getUidRef());
+        wmlDatum.setValue(wellDatum.getValue());
+        return wmlDatum;
+    }
 }

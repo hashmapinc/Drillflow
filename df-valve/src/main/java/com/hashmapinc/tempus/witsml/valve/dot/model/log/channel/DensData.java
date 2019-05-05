@@ -84,4 +84,26 @@ public class DensData {
         return dd;
     }
 
+    public static com.hashmapinc.tempus.WitsmlObjects.v1411.PerLengthMeasure to1411(DensData densData){
+        if (densData == null)
+            return null;
+        
+        com.hashmapinc.tempus.WitsmlObjects.v1411.PerLengthMeasure wmlDensData =
+            new com.hashmapinc.tempus.WitsmlObjects.v1411.PerLengthMeasure();
+        wmlDensData.setUom(densData.getUom());
+        wmlDensData.setValue(Double.parseDouble(densData.getValue()));
+        return wmlDensData;
+    }
+
+    public static com.hashmapinc.tempus.WitsmlObjects.v1311.PerLengthMeasure to1311(DensData densData){
+        if (densData == null)
+            return null;
+        
+        com.hashmapinc.tempus.WitsmlObjects.v1311.PerLengthMeasure wmlDensData =
+            new com.hashmapinc.tempus.WitsmlObjects.v1311.PerLengthMeasure();
+        wmlDensData.setUom(densData.getUom());
+        wmlDensData.setValue(Double.parseDouble(densData.getValue()));
+        return wmlDensData;
+    }
+
 }
