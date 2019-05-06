@@ -16,8 +16,6 @@
 package com.hashmapinc.tempus.witsml.valve.dot.model.log.channel;
 
 import com.fasterxml.jackson.annotation.*;
-import com.hashmapinc.tempus.WitsmlObjects.v1311.LengthMeasure;
-
 import java.util.HashMap;
 import java.util.Map;
 

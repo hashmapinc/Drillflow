@@ -44,7 +44,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.GenericMeasure;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.IndexCurve;
-import com.hashmapinc.tempus.witsml.valve.dot.model.log.channel.Channel;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({ "uuid", "bhaRunNumber", "aliases", "citation", "customData", "extensionNameValue", "objectVersion",
