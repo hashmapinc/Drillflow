@@ -16,11 +16,21 @@
 package com.hashmapinc.tempus.witsml.valve.dot.model.log.channel;
 
 import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.StdDateFormat;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.GenericMeasure;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.ShortNameStruct;
+import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.*;
 
-import javax.xml.bind.annotation.XmlRootElement;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -68,9 +78,8 @@ import java.util.Map;
     "objectVersion",
     "existenceKind"
 })
-// TODO Is this change necessary? TMS
-@XmlRootElement
-public class View {
+
+public class Channel {
 
     @JsonProperty("uuid")
     private String uuid;
@@ -89,7 +98,7 @@ public class View {
     @JsonProperty("channelState")
     private String channelState;
     @JsonProperty("classIndex")
-    private Integer classIndex;
+    private Short classIndex;
     @JsonProperty("mnemAlias")
     private MnemAlias mnemAlias;
     @JsonProperty("alternateIndex")
@@ -242,12 +251,12 @@ public class View {
     }
 
     @JsonProperty("classIndex")
-    public Integer getClassIndex() {
+    public Short getClassIndex() {
         return classIndex;
     }
 
     @JsonProperty("classIndex")
-    public void setClassIndex(Integer classIndex) {
+    public void setClassIndex(Short classIndex) {
         this.classIndex = classIndex;
     }
 
@@ -601,4 +610,268 @@ public class View {
         this.additionalProperties.put(name, value);
     }
 
+    public String channelToJson() throws JsonProcessingException {
+        ObjectMapper om = new ObjectMapper();
+        om.setDateFormat(new StdDateFormat());
+        return om.writerWithDefaultPrettyPrinter().writeValueAsString(this);
+    }
+
+    public static List<Channel> from1411(com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog witsmlObj) {
+
+        if (witsmlObj.getLogCurveInfo() == null)
+            return null;
+
+        List<Channel> channels = new ArrayList<Channel>();
+        // Create the index once for each channel
+        List<Index> indicies = Index.from1411(witsmlObj);
+
+        for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo lci : witsmlObj.getLogCurveInfo()) {
+            try {
+                Channel channel = new Channel();
+
+                Citation c = new Citation();
+                c.setTitle(lci.getMnemonic().getValue());
+
+                channel.setCitation(c);
+                channel.setUid(lci.getUid());
+                channel.setNamingSystem(lci.getMnemonic().getNamingSystem());
+                channel.setMnemonic(lci.getMnemonic().getValue());
+                
+                if (witsmlObj.getIndexType().toLowerCase().contains("depth"))
+                    channel.setTimeDepth("depth");
+                else
+                    channel.setTimeDepth("time");
+                channel.setClassWitsml(lci.getClassWitsml());
+
+                channel.setClassIndex(lci.getClassIndex());
+
+                if (lci.getUnit() == null) {
+                    channel.setUom("unitless");
+                } else {
+                    channel.setUom(lci.getUnit());
+                }
+
+                channel.setIndex(indicies);
+                channel.setMnemAlias(MnemAlias.from1411(lci.getMnemAlias()));
+                channel.setNullValue(lci.getNullValue());
+                channel.setAlternateIndex(lci.isAlternateIndex());
+                channel.setDescription(channel.getDescription());
+                channel.setSource(lci.getDataSource());
+                channel.setTraceState(lci.getTraceState());
+                channel.setTraceOrigin(lci.getTraceOrigin());
+                channel.setDataType(lci.getTypeLogData());
+                channel.setDensData(DensData.from1411(lci.getDensData()));
+                channel.setAxisDefinition(AxisDefinition.from1411(lci.getAxisDefinition()));
+                channel.setExtensionNameValue(ExtensionNameValue.from1411(lci.getExtensionNameValue()));
+                channel.setWellDatum(WellDatum.from1411(lci.getWellDatum()));
+                channel.setSensorOffset(SensorOffset.from1411(lci.getSensorOffset()));
+                channels.add(channel);
+            } catch (Exception ex) {
+                continue;
+            }
+        }
+        return channels;
+    }
+
+    public static List<Channel> from1311(com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog witsmlObj) {
+        if (witsmlObj.getLogCurveInfo() == null)
+            return null;
+
+        List<Channel> channels = new ArrayList<Channel>();
+        // Create the index once for each channel
+        List<Index> indicies = Index.from1311(witsmlObj);
+
+        for (com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogCurveInfo lci : witsmlObj.getLogCurveInfo()) {
+            try {
+                Channel channel = new Channel();
+
+                Citation c = new Citation();
+                c.setTitle(lci.getMnemonic());
+
+                channel.setCitation(c);
+                channel.setUid(lci.getUid());
+                channel.setMnemonic(lci.getMnemonic());
+
+                if (witsmlObj.getIndexType().toLowerCase().contains("depth"))
+                    channel.setTimeDepth("depth");
+                else
+                    channel.setTimeDepth("time");
+                channel.setClassWitsml(lci.getClassWitsml());
+
+                if (lci.getUnit() == null) {
+                    channel.setUom("unitless");
+                } else {
+                    channel.setUom(lci.getUnit());
+                }
+
+                channel.setIndex(indicies);
+                channel.setNullValue(lci.getNullValue());
+                channel.setAlternateIndex(lci.isAlternateIndex());
+                channel.setDescription(channel.getDescription());
+                channel.setSource(lci.getDataSource());
+                channel.setTraceState(lci.getTraceState());
+                channel.setTraceOrigin(lci.getTraceOrigin());
+                channel.setDataType(lci.getTypeLogData());
+                channel.setWellDatum(WellDatum.from1311(lci.getWellDatum()));
+                channel.setSensorOffset(SensorOffset.from1311(lci.getSensorOffset()));
+                channel.setDensData(DensData.from1311(lci.getDensData()));
+                channel.setMnemAlias(MnemAlias.from1311(lci));
+                channel.setAxisDefinition(AxisDefinition.from1311(lci.getAxisDefinition()));
+                
+                channels.add(channel);
+            } catch (Exception ex) {
+                continue;
+            }
+        }
+        return channels;
+    }
+
+    public static List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> to1411(
+        List<Channel> channels) {
+        List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> curves = new ArrayList<>();
+
+        if (channels == null || channels.isEmpty())
+            return null;
+
+        for (Channel c : channels) {
+            try{
+                com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo lci = 
+                new com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo();
+                ShortNameStruct name = new ShortNameStruct();
+                name.setValue(c.getMnemonic());
+                name.setNamingSystem(c.getNamingSystem());
+                lci.setMnemonic(name);
+                lci.setAlternateIndex(c.getAlternateIndex());
+                lci.setClassWitsml(c.getClassWitsml());
+                //NOTE: WE WILL ALWAYS SET THE INDEX TO THE FIRST COLUMN
+                lci.setCurveDescription(c.getCitation().getDescription());
+                lci.setDataSource(c.getSource());
+                lci.setTraceOrigin(c.getTraceOrigin());
+                lci.setTraceState(c.getTraceState());
+                lci.setTypeLogData(c.getDataType());
+                lci.setUid(c.getUid());
+                lci.setUnit(c.getUom());
+                lci.setNullValue(c.getNullValue());
+                lci.setMnemAlias(MnemAlias.to1411(c.mnemAlias));
+                lci.setAxisDefinition(AxisDefinition.to1411(c.getAxisDefinition()));
+                lci.setDensData(DensData.to1411(c.getDensData()));
+                lci.setSensorOffset(SensorOffset.to1411(c.getSensorOffset()));
+                lci.setWellDatum(WellDatum.to1411(c.getWellDatum()));
+                lci.setClassIndex(c.getClassIndex());
+                if (c.getTimeDepth().toLowerCase().contains("depth")){
+                    if (c.getStartIndex() != null)
+                        lci.setMinDateTimeIndex(convertIsoDateToXML(c.getStartIndex()));
+                    if (c.getEndIndex() != null)    
+                        lci.setMaxDateTimeIndex(convertIsoDateToXML(c.getEndIndex()));
+                } else {
+                    if (c.getStartIndex() != null){
+                        com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure minMeasure = 
+                            new com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure();
+                        minMeasure.setUom("m");
+                        minMeasure.setValue(Double.parseDouble(c.getStartIndex()));
+                        lci.setMinIndex(minMeasure);
+                    }
+                    if (c.getEndIndex() != null){
+                        com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure maxMeasure = 
+                            new com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure();
+                        maxMeasure.setUom("m");
+                        maxMeasure.setValue(Double.parseDouble(c.getEndIndex()));
+                        lci.setMaxIndex(maxMeasure);
+                    }
+                }
+                //Need to address this in wol...does not exist
+                //lci.getExtensionNameValue()
+                curves.add(lci);
+            } catch (Exception ex){
+                continue;
+            }
+        }
+        return curves;
+    }
+
+    public static List<com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogCurveInfo> to1311(
+        List<Channel> channels) {
+        List<com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogCurveInfo> curves = new ArrayList<>();
+
+        if (channels == null || channels.isEmpty())
+            return null;
+
+        for (Channel c : channels) {
+            try{
+                com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogCurveInfo lci = 
+                new com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogCurveInfo();
+                lci.setMnemonic(c.getCitation().getTitle());
+                lci.setAlternateIndex(c.getAlternateIndex());
+                lci.setClassWitsml(c.getClassWitsml());
+                //NOTE: WE WILL ALWAYS SET THE INDEX TO THE FIRST COLUMN
+                lci.setColumnIndex((short)1);
+                lci.setCurveDescription(c.getCitation().getDescription());
+                lci.setDataSource(c.getSource());
+                lci.setTraceOrigin(c.getTraceOrigin());
+                lci.setTraceState(c.getTraceState());
+                lci.setTypeLogData(c.getDataType());
+                lci.setUid(c.getUid());
+                lci.setUnit(c.getUom());
+                lci.setNullValue(c.getNullValue());
+                lci.setMnemAlias(c.getMnemAlias().getValue());
+                lci.setAxisDefinition(AxisDefinition.to1311(c.getAxisDefinition()));
+                lci.setDensData(DensData.to1311(c.getDensData()));
+                lci.setSensorOffset(SensorOffset.to1311(c.getSensorOffset()));
+                lci.setWellDatum(WellDatum.to1311(c.getWellDatum()));
+                
+                if (c.getTimeDepth().toLowerCase().contains("depth")){
+                    lci.setMinDateTimeIndex(convertIsoDateToXML(c.getStartIndex()));
+                    lci.setMaxDateTimeIndex(convertIsoDateToXML(c.getEndIndex()));
+                } else {
+                    GenericMeasure minMeasure = new GenericMeasure();
+                    minMeasure.setUom("m");
+                    minMeasure.setValue(Double.parseDouble(c.getStartIndex()));
+                    lci.setMinIndex(minMeasure);
+                    GenericMeasure maxMeasure = new GenericMeasure();
+                    maxMeasure.setUom("m");
+                    maxMeasure.setValue(Double.parseDouble(c.getEndIndex()));
+                    lci.setMaxIndex(maxMeasure);
+                }
+            
+                curves.add(lci);
+            } catch (Exception ex){
+                continue;
+            }
+        }
+        return curves;
+    }
+
+    public static String channelListToJson(List<Channel> channels) throws JsonProcessingException {
+        ObjectMapper om = new ObjectMapper();
+        om.setDateFormat(new StdDateFormat());
+        return om.writerWithDefaultPrettyPrinter().writeValueAsString(channels);
+    }
+
+    public static List<Channel> jsonToChannelList(String channelsList){
+        return fromJSON(new TypeReference<List<Channel>>() {}, channelsList);
+    }
+
+    public static <T> T fromJSON(final TypeReference<T> type, final String jsonPacket) {
+        T data = null;
+
+        try {
+            data = new ObjectMapper().readValue(jsonPacket, type);
+        } catch (Exception e) {  // Handle the problem
+        }
+        return data;
+    }
+
+    private static XMLGregorianCalendar convertIsoDateToXML(String dateTime)
+            throws DatatypeConfigurationException, ParseException {
+        DateFormat format = new SimpleDateFormat("yyyy-MM-ddThh:mm:ss.SSSXXX");
+        //Date date = format.parse("2014-04-24 11:15:00");
+        Date date = format.parse(dateTime);
+
+        GregorianCalendar cal = new GregorianCalendar();
+        cal.setTime(date);
+
+        XMLGregorianCalendar xmlGregCal =  DatatypeFactory.newInstance().newXMLGregorianCalendar(cal);
+
+        return xmlGregCal;
+    }
 }

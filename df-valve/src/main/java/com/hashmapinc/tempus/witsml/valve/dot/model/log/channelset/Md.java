@@ -77,4 +77,28 @@ public class Md {
         this.additionalProperties.put(name, value);
     }
 
+    public static Md from1411(com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord wmlMd){
+        if (wmlMd == null)
+            return null;
+
+        Md md = new Md();
+        md.setUom(wmlMd.getUom());
+        md.setValue(wmlMd.getValue().toString());
+        md.setDatum(wmlMd.getDatum());
+        return md;  
+    }
+
+    public static com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord to1411(Md md){
+        if (md == null)
+            return null;
+
+        com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord wmlMd = 
+            new com.hashmapinc.tempus.WitsmlObjects.v1411.MeasuredDepthCoord();
+
+        wmlMd.setUom(wmlMd.getUom());
+        wmlMd.setValue(wmlMd.getValue());
+        wmlMd.setDatum(wmlMd.getDatum());
+        return wmlMd;  
+    }
+
 }

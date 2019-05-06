@@ -15,10 +15,15 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset;
 
-import com.fasterxml.jackson.annotation.*;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -88,6 +93,56 @@ public class StepIncrement {
     @JsonAnySetter
     public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
+    }
+
+    public static StepIncrement from1411(com.hashmapinc.tempus.WitsmlObjects.v1411.RatioGenericMeasure stepIncrement){
+        if (stepIncrement == null)
+            return null;
+
+        StepIncrement inc = new StepIncrement();
+        inc.setNumerator(stepIncrement.getNumerator());
+        inc.setDenominator(stepIncrement.getDenominator());
+        inc.setUom(stepIncrement.getUom());
+        inc.setValue(stepIncrement.getValue().toString());
+        return inc;
+    }
+
+    public static StepIncrement from1311(com.hashmapinc.tempus.WitsmlObjects.v1311.RatioGenericMeasure stepIncrement){
+        if (stepIncrement == null)
+            return null;
+
+        StepIncrement inc = new StepIncrement();
+        inc.setNumerator(stepIncrement.getNumerator());
+        inc.setDenominator(stepIncrement.getDenominator());
+        inc.setUom(stepIncrement.getUom());
+        inc.setValue(stepIncrement.getValue().toString());
+        return inc;
+    }
+
+    public static com.hashmapinc.tempus.WitsmlObjects.v1411.RatioGenericMeasure to1411(StepIncrement stepIncrement){
+        if (stepIncrement == null)
+            return null;
+
+        com.hashmapinc.tempus.WitsmlObjects.v1411.RatioGenericMeasure wmlInc = 
+            new com.hashmapinc.tempus.WitsmlObjects.v1411.RatioGenericMeasure();
+        wmlInc.setNumerator(stepIncrement.getNumerator());
+        wmlInc.setDenominator(stepIncrement.getDenominator());
+        wmlInc.setUom(stepIncrement.getUom());
+        wmlInc.setValue(Double.parseDouble(stepIncrement.getValue()));
+        return wmlInc;
+    }
+
+    public static com.hashmapinc.tempus.WitsmlObjects.v1311.RatioGenericMeasure to1311(StepIncrement stepIncrement){
+        if (stepIncrement == null)
+            return null;
+
+        com.hashmapinc.tempus.WitsmlObjects.v1311.RatioGenericMeasure wmlInc = 
+            new com.hashmapinc.tempus.WitsmlObjects.v1311.RatioGenericMeasure();
+        wmlInc.setNumerator(stepIncrement.getNumerator());
+        wmlInc.setDenominator(stepIncrement.getDenominator());
+        wmlInc.setUom(stepIncrement.getUom());
+        wmlInc.setValue(Double.parseDouble(stepIncrement.getValue()));
+        return wmlInc;
     }
 
 }
