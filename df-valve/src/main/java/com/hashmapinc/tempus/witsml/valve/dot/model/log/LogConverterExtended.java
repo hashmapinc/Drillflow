@@ -44,7 +44,7 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
      */
 
     public static ObjLog convertDotResponseToWitsml(String channelSet, String channels) throws JsonParseException,
-            JsonMappingException, IOException, DatatypeConfigurationException, ParseException {
+        JsonMappingException, IOException, DatatypeConfigurationException, ParseException {
         List<ChannelSet> cs = ChannelSet.jsonToChannelSetList(channelSet);
         ObjLog log = ChannelSet.to1411(cs.get(0));
         List<Channel> chans = Channel.jsonToChannelList(channels);

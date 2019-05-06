@@ -19,6 +19,8 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.WitsmlObjects.Util.LogConverter;
+import com.hashmapinc.tempus.WitsmlObjects.Util.log.LogDataHelper;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory;
 import com.hashmapinc.tempus.witsml.ValveLogging;
@@ -28,6 +30,7 @@ import com.hashmapinc.tempus.witsml.valve.dot.client.DotClient;
 import com.hashmapinc.tempus.witsml.valve.dot.client.UidUuidCache;
 import com.hashmapinc.tempus.witsml.valve.dot.graphql.GraphQLQueryConverter;
 import com.hashmapinc.tempus.witsml.valve.dot.graphql.GraphQLRespConverter;
+import com.hashmapinc.tempus.witsml.valve.dot.model.log.DotLogDataHelper;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.LogConverterExtended;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channel.Channel;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.ChannelSet;
@@ -63,6 +66,7 @@ public class DotDelegator {
 	private final String LOG_CHANNELSET_METADATA;
 	private final String LOG_CHANNELSET_UUID;
 	private final String LOG_CHANNELS;
+	private final String LOG_CHANNEL_DATA;
 
 	/**
 	 * Map based constructor
@@ -81,6 +85,7 @@ public class DotDelegator {
 		this.LOG_CHANNELSET_METADATA = config.get("log.channelset.metadata.path");
 		this.LOG_CHANNELSET_UUID = config.get("log.channelset.uuid.path");
 		this.LOG_CHANNELS = config.get("log.channels.path");
+		this.LOG_CHANNEL_DATA = config.get("log.channels.data.path");
 	}
 
 	/**
@@ -126,6 +131,9 @@ public class DotDelegator {
 			break;
 		case "channels":
 			endpoint = this.LOG_CHANNELS;
+			break;
+		case "channelData":
+			endpoint = this.LOG_CHANNEL_DATA;
 			break;
 		default:
 			throw new ValveException("Unsupported object type<" + objectType + ">");
@@ -361,10 +369,12 @@ public class DotDelegator {
 		JSONObject objLog;
 		String channelSetPayload = "";
 		String channelPayload = "";
+		String data ="";
 
 		// build the requests (log requires two HttpRequests
 		HttpRequestWithBody request;
 		HttpRequestWithBody channelsRequest;
+		HttpRequestWithBody channelData;
 		if (null == uid || uid.isEmpty() || "log".equals(objectType)) {
 			// create with POST and generate uid
 			request = Unirest.post(endpoint);
@@ -414,6 +424,7 @@ public class DotDelegator {
 					List<Channel> chanList = Channel
 							.from1311((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj);
 					channelPayload = Channel.channelListToJson(chanList);
+					data = DotLogDataHelper.convertDataToWitsml20((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObj);
 				}
 			} catch (JsonProcessingException e) {
 				throw new ValveException("Error converting Log to ChannelSet");
@@ -465,6 +476,23 @@ public class DotDelegator {
 				if (201 == status || 200 == status) {
 					LOG.info(ValveLogging.getLogMsg(exchangeID,
 							logResponse(response, "Received successful status code from DoT create call"), witsmlObj));
+					String chDataEndpoint = endpoint = this.getEndpoint(objectType + "Channel");
+					channelData = Unirest.post(chDataEndpoint);
+					channelData.queryString("channelSetUuid", uuid4CS);
+					channelData.header("Content-Type", "application/json");
+					channelData.body(data);
+					LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(channelsRequest), witsmlObj));
+
+					// get the request response.
+					response = client.makeRequest(channelData, username, password);
+					if (201 == status || 200 == status) {
+						LOG.info(ValveLogging.getLogMsg(exchangeID,
+								logResponse(response, "Received successful status code from DoT add data call"), witsmlObj));
+					} else {
+						LOG.warning(ValveLogging.getLogMsg(exchangeID,
+							logResponse(response, "Received " + status + " from DoT POST" + response.getBody()), witsmlObj));
+							throw new ValveException(response.getBody());
+					}
 				}
 			}
 			return (null == uid || uid.isEmpty()) ? new JsonNode(response.getBody()).getObject().getString("uid") : uid;
@@ -542,12 +570,12 @@ public class DotDelegator {
 		if (201 == status || 200 == status) {
 			// Code logic added to handle log ChannelSet Metadata/Get Channels/get All
 			// Channels
-			// if ("log".equals(objectType)) {
+			if ("log".equals(objectType)) {
 			// TODO Are we to only return channels OR channel set + channels data?
-			finalResponse =
-			getRestCalls(witsmlObject,client,uuid,username,password,exchangeID);
+				finalResponse =
+				getRestCalls(witsmlObject,client,uuid,username,password,exchangeID);
 			// log requires transformation of the response
-			// }
+			}
 			LOG.info(ValveLogging.getLogMsg(exchangeID,
 					logResponse(response, "Successfully executed GET for query object=" + witsmlObject.toString()),
 					witsmlObject));
@@ -611,8 +639,8 @@ public class DotDelegator {
 		// get response
 		channelsResponse = client.makeRequest(channelsRequest, username, password);
 		if (201 == channelsetmetadataResponse.getStatus() || 200 == channelsetmetadataResponse.getStatus()
-				|| 201 == allChannelSet.getStatus() || 201 == allChannelSet.getStatus()
-				|| 201 == channelsResponse.getStatus() || 201 == channelsResponse.getStatus()) {
+				|| 200 == allChannelSet.getStatus() || 201 == allChannelSet.getStatus()
+				|| 200 == channelsResponse.getStatus() || 201 == channelsResponse.getStatus()) {
 			try {
 				finalResponse = LogConverterExtended.convertDotResponseToWitsml(allChannelSet.getBody(),
 						channelsResponse.getBody());
