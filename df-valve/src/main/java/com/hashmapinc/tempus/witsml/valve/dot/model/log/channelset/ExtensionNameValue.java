@@ -18,19 +18,13 @@ package com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset;
 import com.fasterxml.jackson.annotation.*;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.Extensionvalue;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({ "name", "value", "measureClass", "dTim", "index", "description", "dataType", "md", "uid" })
@@ -230,7 +224,8 @@ public class ExtensionNameValue {
     private static XMLGregorianCalendar convertIsoDateToXML(String dateTime)
             throws DatatypeConfigurationException, ParseException {
         DateFormat format = new SimpleDateFormat("yyyy-MM-ddThh:mm:ss.SSSXXX");
-        Date date = format.parse("2014-04-24 11:15:00");
+        // Date date = format.parse("2014-04-24 11:15:00");
+        Date date = format.parse(dateTime);
 
         GregorianCalendar cal = new GregorianCalendar();
         cal.setTime(date);

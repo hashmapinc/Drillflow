@@ -22,26 +22,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.GenericMeasure;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ShortNameStruct;
-import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.Alias;
-import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.ChannelClass;
-import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.Citation;
-import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.ExtensionNameValue;
-import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.Index;
-import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.NominalHoleSize;
-
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.*;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -764,7 +753,7 @@ public class Channel {
                 lci.setUnit(c.getUom());
                 lci.setNullValue(c.getNullValue());
                 lci.setMnemAlias(MnemAlias.to1411(c.mnemAlias));
-                lci.setAxisDefinition(AxisDefinition.to1411(c.getAxisDefinition()));;
+                lci.setAxisDefinition(AxisDefinition.to1411(c.getAxisDefinition()));
                 lci.setDensData(DensData.to1411(c.getDensData()));
                 lci.setSensorOffset(SensorOffset.to1411(c.getSensorOffset()));
                 lci.setWellDatum(WellDatum.to1411(c.getWellDatum()));
@@ -825,7 +814,7 @@ public class Channel {
                 lci.setUnit(c.getUom());
                 lci.setNullValue(c.getNullValue());
                 lci.setMnemAlias(c.getMnemAlias().getValue());
-                lci.setAxisDefinition(AxisDefinition.to1311(c.getAxisDefinition()));;
+                lci.setAxisDefinition(AxisDefinition.to1311(c.getAxisDefinition()));
                 lci.setDensData(DensData.to1311(c.getDensData()));
                 lci.setSensorOffset(SensorOffset.to1311(c.getSensorOffset()));
                 lci.setWellDatum(WellDatum.to1311(c.getWellDatum()));
@@ -875,7 +864,8 @@ public class Channel {
     private static XMLGregorianCalendar convertIsoDateToXML(String dateTime)
             throws DatatypeConfigurationException, ParseException {
         DateFormat format = new SimpleDateFormat("yyyy-MM-ddThh:mm:ss.SSSXXX");
-        Date date = format.parse("2014-04-24 11:15:00");
+        //Date date = format.parse("2014-04-24 11:15:00");
+        Date date = format.parse(dateTime);
 
         GregorianCalendar cal = new GregorianCalendar();
         cal.setTime(date);

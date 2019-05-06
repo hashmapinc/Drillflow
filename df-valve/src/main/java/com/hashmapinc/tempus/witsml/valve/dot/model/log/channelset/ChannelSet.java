@@ -16,26 +16,7 @@
 
 package com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset;
 
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
-
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -44,6 +25,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.GenericMeasure;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.IndexCurve;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({ "uuid", "bhaRunNumber", "aliases", "citation", "customData", "extensionNameValue", "objectVersion",
@@ -705,7 +695,8 @@ public class ChannelSet {
     private static XMLGregorianCalendar convertIsoDateToXML(String dateTime)
         throws DatatypeConfigurationException, ParseException {
         DateFormat format = new SimpleDateFormat("yyyy-MM-ddThh:mm:ss.SSSXXX");
-        Date date = format.parse("2014-04-24 11:15:00");
+        // Date date = format.parse("2014-04-24 11:15:00");
+        Date date = format.parse(dateTime);
 
         GregorianCalendar cal = new GregorianCalendar();
         cal.setTime(date);
