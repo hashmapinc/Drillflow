@@ -150,6 +150,9 @@ public class DotDelegator {
 	 * @param exchangeID - unique string for tracking which exchange called this
 	 *                   method
 	 * @param client     - DotClient to execute requests with
+	 * Suggestions:
+	 * - Break out the uid/uuid identity service for log into a seperate helper method
+	 * - Fix the redundant initalization of the log request
 	 */
 	public void deleteObject(AbstractWitsmlObject witsmlObj, String username, String password, String exchangeID,
 			DotClient client) throws ValveException, UnirestException, ValveAuthException {
@@ -171,7 +174,7 @@ public class DotDelegator {
 		}
 		// create request
 		if ("log".equals(objectType)) {
-			logRequest = Unirest.get(endpoint);
+			logRequest = Unirest.get(endpoint); //<-- What is going on Here?
 			logRequest.header("accept", "application/json");
 
 			request = Unirest.delete(endpoint).header("Content-Type", "application/json");
@@ -227,9 +230,9 @@ public class DotDelegator {
 		if (201 == status || 200 == status || 204 == status) {
 			if ("log".equals(objectType)) {
 				String logDeletEndpoint = this.getEndpoint("channelsetmetadata");
+				logDeletEndpoint = logDeletEndpoint + "/" + uuid;
 				HttpRequest logDeleteRequest = Unirest.delete(logDeletEndpoint).header("Content-Type",
 						"application/json");
-				logDeleteRequest.queryString("uuid", uuid);
 				HttpResponse<String> logDeleteResponse = client.makeRequest(logDeleteRequest, username, password);
 				int deleteStatus = logDeleteResponse.getStatus();
 				if (204 == deleteStatus) {
@@ -238,7 +241,7 @@ public class DotDelegator {
 				} else {
 					LOG.warning(
 							ValveLogging.getLogMsg(exchangeID, logResponse(response, "Unable to delete"), witsmlObj));
-					throw new ValveException("DELETE DoT REST call failed with status code: " + status);
+					throw new ValveException("DELETE DoT REST call failed with status code: " + deleteStatus);
 				}
 			}
 			LOG.info(ValveLogging.getLogMsg(exchangeID,
@@ -352,6 +355,10 @@ public class DotDelegator {
 	 *                   method
 	 * @param client     - DotClient to execute requests with
 	 * @return
+	 * 
+	 * Suggestions:
+	 * -- Rename getrestcalls to something more log specific
+	 * -- make getrestcalls async
 	 */
 	public String createObject(AbstractWitsmlObject witsmlObj, String username, String password, String exchangeID,
 			DotClient client) throws ValveException, ValveAuthException, UnirestException {
