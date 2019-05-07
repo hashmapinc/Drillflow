@@ -16,7 +16,6 @@
 package com.hashmapinc.tempus.witsml.valve.dot.model.log.channel;
 
 import com.fasterxml.jackson.annotation.*;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,4 +63,45 @@ public class WellDatum {
         this.additionalProperties.put(name, value);
     }
 
+    public static WellDatum from1411(com.hashmapinc.tempus.WitsmlObjects.v1411.RefNameString wellDatum){
+        if (wellDatum == null)
+            return null;
+
+        WellDatum datum = new WellDatum();
+        datum.setUidRef(wellDatum.getUidRef());
+        datum.setValue(wellDatum.getValue());
+        return datum;
+    }
+
+    public static WellDatum from1311(com.hashmapinc.tempus.WitsmlObjects.v1311.RefNameString wellDatum){
+        if (wellDatum == null)
+            return null;
+
+        WellDatum datum = new WellDatum();
+        datum.setUidRef(wellDatum.getUidRef());
+        datum.setValue(wellDatum.getValue());
+        return datum;
+    }
+
+    public static com.hashmapinc.tempus.WitsmlObjects.v1411.RefNameString to1411(WellDatum wellDatum){
+        if (wellDatum == null)
+            return null;
+
+        com.hashmapinc.tempus.WitsmlObjects.v1411.RefNameString wmlDatum = 
+            new com.hashmapinc.tempus.WitsmlObjects.v1411.RefNameString();
+        wmlDatum.setUidRef(wellDatum.getUidRef());
+        wmlDatum.setValue(wellDatum.getValue());
+        return wmlDatum;
+    }
+
+    public static com.hashmapinc.tempus.WitsmlObjects.v1311.RefNameString to1311(WellDatum wellDatum){
+        if (wellDatum == null)
+            return null;
+
+        com.hashmapinc.tempus.WitsmlObjects.v1311.RefNameString wmlDatum = 
+            new com.hashmapinc.tempus.WitsmlObjects.v1311.RefNameString();
+        wmlDatum.setUidRef(wellDatum.getUidRef());
+        wmlDatum.setValue(wellDatum.getValue());
+        return wmlDatum;
+    }
 }

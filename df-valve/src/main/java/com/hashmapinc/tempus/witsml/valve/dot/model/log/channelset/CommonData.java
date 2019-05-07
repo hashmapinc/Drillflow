@@ -16,7 +16,9 @@
 package com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset;
 
 import com.fasterxml.jackson.annotation.*;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.TimestampedTimeZone;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +54,7 @@ public class CommonData {
     @JsonProperty("extensionAny")
     private String extensionAny;
     @JsonProperty("extensionNameValue")
-    private List<ExtensionNameValue_> extensionNameValue = null;
+    private List<ExtensionNameValue> extensionNameValue = null;
     @JsonProperty("sourceName")
     private String sourceName;
     @JsonProperty("dTimCreation")
@@ -133,12 +135,12 @@ public class CommonData {
     }
 
     @JsonProperty("extensionNameValue")
-    public List<ExtensionNameValue_> getExtensionNameValue() {
+    public List<ExtensionNameValue> getExtensionNameValue() {
         return extensionNameValue;
     }
 
     @JsonProperty("extensionNameValue")
-    public void setExtensionNameValue(List<ExtensionNameValue_> extensionNameValue) {
+    public void setExtensionNameValue(List<ExtensionNameValue> extensionNameValue) {
         this.extensionNameValue = extensionNameValue;
     }
 
@@ -182,4 +184,49 @@ public class CommonData {
         this.additionalProperties.put(name, value);
     }
 
+    public static CommonData getCommonDataFrom1311(com.hashmapinc.tempus.WitsmlObjects.v1311.CsCommonData witsmlObj){
+        if (witsmlObj == null) {
+            return null;
+        }
+        CommonData cd = new CommonData();
+        cd.setItemState(witsmlObj.getItemState());
+        cd.setComments(witsmlObj.getComments());
+        cd.setSourceName(witsmlObj.getSourceName());
+        cd.setDTimCreation(witsmlObj.getDTimLastChange().toXMLFormat());
+        cd.setDTimLastChange(witsmlObj.getDTimLastChange().toXMLFormat());
+        return cd;
+    }
+
+    public static CommonData getCommonDataFrom1411(com.hashmapinc.tempus.WitsmlObjects.v1411.CsCommonData witsmlObj){
+        if (witsmlObj == null) {
+            return null;
+        }
+
+        CommonData cd = new CommonData();
+        cd.setItemState(witsmlObj.getItemState());
+        cd.setComments(witsmlObj.getComments());
+        cd.setServiceCategory(witsmlObj.getServiceCategory());
+        cd.setPrivateGroupOnly(witsmlObj.isPrivateGroupOnly());
+        cd.setSourceName(witsmlObj.getSourceName());
+
+        if (witsmlObj.getAcquisitionTimeZone() != null) {
+            List<AcquisitionTimeZone> tzs = new ArrayList<>();
+            for (TimestampedTimeZone tz : witsmlObj.getAcquisitionTimeZone()) {
+                AcquisitionTimeZone atz = new AcquisitionTimeZone();
+                atz.setDTim(tz.getDTim().toXMLFormat());
+                atz.setValue(tz.getValue());
+                tzs.add(atz);
+            }
+            cd.setAcquisitionTimeZone(tzs);
+        }
+
+        if (witsmlObj.getDefaultDatum() != null) {
+            DefaultDatum dd = new DefaultDatum();
+            dd.setUidRef(witsmlObj.getDefaultDatum().getUidRef());
+            dd.setValue(witsmlObj.getDefaultDatum().getValue());
+            cd.setDefaultDatum(dd);
+        }
+        
+        return cd;
+    }
 }

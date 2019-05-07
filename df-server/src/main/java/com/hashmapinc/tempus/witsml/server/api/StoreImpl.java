@@ -139,6 +139,10 @@ public class StoreImpl implements IStore {
                 return response;
             }
             String version = WitsmlUtil.getVersionFromXML(XMLin);
+            // TODO Where is aliases? Why is logParam messed up (value = "\n\t\t\t  " & all other fields are null)?
+            //      This uses JAXB to marshall from XML; the witsmlObjects created does not have aliases &
+            //      does something funky to logParam.
+            //      But now I need a parser to put the information into JSON.
             witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, XMLin, version);
             ValveUser user = (ValveUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             QueryContext qc = new QueryContext(
@@ -160,8 +164,13 @@ public class StoreImpl implements IStore {
         } catch (ValveException ve) {
             //TODO: handle exception
             LOG.warning("ValveException in addToStore: " + ve.getMessage());
-            response.setSuppMsgOut(ve.getMessage());
-            response.setResult((short)-1);
+            if (ve.getErrorCode() != -1){
+                response.setSuppMsgOut(witsmlApiConfigUtil.getProperty("basemessages." + ve.getErrorCode()));
+                response.setResult(ve.getErrorCode());
+            } else {
+                response.setSuppMsgOut(ve.getMessage());
+                response.setResult(ve.getErrorCode());
+            }
             return response;
         } catch (Exception e) {
             //TODO: handle exception
@@ -174,6 +183,8 @@ public class StoreImpl implements IStore {
             return response;
         }
 
+        // TODO This is just passing back what was already there from the client &
+        //      not the API response.
         LOG.info("Successfully added object: " + witsmlObjects.get(0).toString());
         response.setSuppMsgOut(uid);
         response.setResult((short)1);
@@ -443,6 +454,19 @@ public class StoreImpl implements IStore {
                 );
 
                 xmlOut = this.valve.getObject(qc).get();
+                // convert to WITSML XML
+                //LogConverterExtended logConverter = new LogConverterExtended();
+                /*
+                try {
+                    com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog witsmlXmlOut =
+                            logConverter.convertTo1411(xmlOut);
+                } catch (JAXBException jaxBEx) {
+                    throw new Exception("JAXB failure trying to generate GetFromStore response: " +
+                            jaxBEx.getMessage());
+                }
+                */
+                // TODO xmlOut is a String; need to go from an ObjLog v1411 to a String & put it into xmlOut
+
             } catch (ValveException ve) {
                 resp.setResult((short) -425);
                 LOG.warning("Valve Exception in GetFromStore: " + ve.getMessage());
@@ -466,7 +490,9 @@ public class StoreImpl implements IStore {
         }
 
         // return response
-        resp.setSuppMsgOut(witsmlApiConfigUtil.getProperty("basemessages." + resp.getResult()));
+        if (resp.getSuppMsgOut().isEmpty())
+            resp.setSuppMsgOut(witsmlApiConfigUtil.getProperty("basemessages." + resp.getResult()));
+
         return resp;
     }
 

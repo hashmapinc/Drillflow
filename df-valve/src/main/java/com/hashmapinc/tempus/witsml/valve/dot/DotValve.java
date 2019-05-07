@@ -265,10 +265,14 @@ public class DotValve implements IValve {
 						this.CLIENT));
 			}
 
-		} catch (Exception e) {
+		} catch (ValveException e) {
+			LOG.warning("Exception in DotValve create object: " + e.getMessage());
+			throw new ValveException(e.getMessage(), e.getErrorCode());
+		} catch (Exception e){
 			LOG.warning("Exception in DotValve create object: " + e.getMessage());
 			throw new ValveException(e.getMessage());
 		}
+		// return the uids created
 		return CompletableFuture.completedFuture(StringUtils.join(uids, ','));
 	}
 
@@ -375,15 +379,20 @@ public class DotValve implements IValve {
 		String[] funcs = { "WMLS_AddToStore", "WMLS_GetFromStore", "WMLS_DeleteFromStore", "WMLS_UpdateInStore" };
 
 		// supported objects for each function
-		AbstractWitsmlObject well = new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell(); // 1311 is arbitrary
-		AbstractWitsmlObject wellbore = new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore(); // 1311 is
-																										// arbitrary
-		AbstractWitsmlObject trajectory = new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory(); // 1311 is
-																											// arbitrary
-		AbstractWitsmlObject[][] supportedObjects = { { well, wellbore, trajectory }, // ADD TO STORE OBJECTS
-				{ well, wellbore, trajectory }, // GET FROM STORE OBJECTS
-				{ well, wellbore, trajectory }, // DELETE FROM STORE OBJECTS
-				{ well, wellbore, trajectory }, // UPDATE IN STORE OBJECTS
+    // choice of 1311 is arbitrary
+		AbstractWitsmlObject well = new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell();
+		// choice of 1311 is arbitrary
+		AbstractWitsmlObject wellbore = new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore();
+		// choice of 1311 is arbitrary
+		AbstractWitsmlObject trajectory = new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory();
+		// choice of 1311 is arbitrary
+		AbstractWitsmlObject log = new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog();
+
+		AbstractWitsmlObject[][] supportedObjects = {
+				{ well, wellbore, trajectory, log }, // ADD TO STORE OBJECTS
+				{ well, wellbore, trajectory, log }, // GET FROM STORE OBJECTS
+				{ well, wellbore, trajectory, log }, // DELETE FROM STORE OBJECTS
+				{ well, wellbore, trajectory, log},  // UPDATE IN STORE OBJECTS
 		};
 
 		// populate cap

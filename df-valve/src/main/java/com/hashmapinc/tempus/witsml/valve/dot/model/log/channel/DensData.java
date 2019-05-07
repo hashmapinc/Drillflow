@@ -64,4 +64,46 @@ public class DensData {
         this.additionalProperties.put(name, value);
     }
 
+    public static DensData from1411(com.hashmapinc.tempus.WitsmlObjects.v1411.PerLengthMeasure densData){
+        if (densData == null)
+            return null;
+        
+        DensData dd = new DensData();
+        dd.setUom(densData.getUom());
+        dd.setValue(densData.toString());
+        return dd;
+    }
+
+    public static DensData from1311(com.hashmapinc.tempus.WitsmlObjects.v1311.PerLengthMeasure densData){
+        if (densData == null)
+            return null;
+        
+        DensData dd = new DensData();
+        dd.setUom(densData.getUom());
+        dd.setValue(densData.toString());
+        return dd;
+    }
+
+    public static com.hashmapinc.tempus.WitsmlObjects.v1411.PerLengthMeasure to1411(DensData densData){
+        if (densData == null)
+            return null;
+        
+        com.hashmapinc.tempus.WitsmlObjects.v1411.PerLengthMeasure wmlDensData =
+            new com.hashmapinc.tempus.WitsmlObjects.v1411.PerLengthMeasure();
+        wmlDensData.setUom(densData.getUom());
+        wmlDensData.setValue(Double.parseDouble(densData.getValue()));
+        return wmlDensData;
+    }
+
+    public static com.hashmapinc.tempus.WitsmlObjects.v1311.PerLengthMeasure to1311(DensData densData){
+        if (densData == null)
+            return null;
+        
+        com.hashmapinc.tempus.WitsmlObjects.v1311.PerLengthMeasure wmlDensData =
+            new com.hashmapinc.tempus.WitsmlObjects.v1311.PerLengthMeasure();
+        wmlDensData.setUom(densData.getUom());
+        wmlDensData.setValue(Double.parseDouble(densData.getValue()));
+        return wmlDensData;
+    }
+
 }

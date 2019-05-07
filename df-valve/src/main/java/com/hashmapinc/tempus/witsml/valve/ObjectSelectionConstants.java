@@ -20,7 +20,7 @@ public class ObjectSelectionConstants {
     // WELL_OBJ_SELECTION variable
     //=========================================================================
     public static final String WELL_OBJ_SELECTION =
-            "<wells xmlns=\"http://www.witsml.org/schemas/1series\"" +
+            "<wells xmlns=\"http://www.witsml.org/schemas/1series \"" +
                     "version=\"1.4.1.1\">" +
                     "<well uid=\"uid_dfTestWell1\">" +
                     "<name>dfTestWell1</name>" +
@@ -37,7 +37,7 @@ public class ObjectSelectionConstants {
     // WELLBORE_OBJ_SELECTION variable
     //=========================================================================
     public static final String WELLBORE_OBJ_SELECTION =
-            "<wellbores xmlns=\"http://www.witsml.org/schemas/1series\"" +
+            "<wellbores xmlns=\"http://www.witsml.org/schemas/1series\" " +
                     "version=\"1.4.1.1\">" +
                     "<wellbore uidWell=\"uid_dfTestWell1\" uid=\"uid_dfTestWellbore1\">" +
                     "<name>dfTestWell1</name>" +
@@ -53,7 +53,7 @@ public class ObjectSelectionConstants {
     // TRAJECTORY_OBJ_SELECTION variable
     //=========================================================================
     public static final String TRAJECTORY_OBJ_SELECTION =
-            "<trajectorys xmlns=\"http://www.witsml.org/schemas/1series\"" +
+            "<trajectorys xmlns=\"http://www.witsml.org/schemas/1series\" " +
                     "version=\"1.4.1.1\">" +
                     "<trajectory uidWell=\"uid_dfTestWell1\" uidWellbore=\"uid_dfTestWellbore1\" uid=\"uid_dfTestTraj1\">" +
                     "<nameWell>dfTestWell1</nameWell>" +
@@ -66,5 +66,4 @@ public class ObjectSelectionConstants {
                     "</trajectory>" +
                     "</trajectorys>";
     //=========================================================================
-
 }

@@ -17,8 +17,11 @@ package com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset;
 
 import com.fasterxml.jackson.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -101,6 +104,51 @@ public class Index {
     @JsonAnySetter
     public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
+    }
+
+    public static List<Index> from1411(com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog log){
+        if (log == null){
+            return null;
+        }
+
+        String indexType = "depth";
+        if (log.getIndexType().contains("time"))
+            indexType = "time";
+
+        Index index = new Index();
+        index.setDirection(log.getDirection());
+        index.setMnemonic(log.getIndexCurve());
+        index.setIndexType(indexType);
+
+        Optional<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> matchingObject = log.getLogCurveInfo().stream()
+                .filter(p -> p.getMnemonic().getValue().equals(log.getIndexCurve())).findFirst();
+        index.setUom(matchingObject.get().getUnit());
+        List<Index> indices = new ArrayList<Index>();
+        indices.add(index);
+        
+        return indices;
+    }
+
+    public static List<Index> from1311(com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog log){
+        if (log == null){
+            return null;
+        }
+
+        String indexType = "depth";
+        if (log.getIndexType().contains("time"))
+            indexType = "time";
+
+        Index index = new Index();
+        index.setIndexType(indexType);
+        index.setDirection(log.getDirection());
+        index.setMnemonic(log.getIndexCurve().getValue());
+        Optional<com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogCurveInfo> matchingObject = log.getLogCurveInfo()
+                .stream().filter(p -> p.getMnemonic().equals(log.getIndexCurve().getValue())).findFirst();
+        index.setUom(matchingObject.get().getUnit());
+        List<Index> indices = new ArrayList<Index>();
+        indices.add(index);
+
+        return indices;
     }
 
 }

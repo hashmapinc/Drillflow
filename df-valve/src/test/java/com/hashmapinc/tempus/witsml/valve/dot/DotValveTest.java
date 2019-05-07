@@ -24,6 +24,7 @@ import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog;
 import com.hashmapinc.tempus.witsml.QueryContext;
 import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
@@ -95,6 +96,41 @@ public class DotValveTest {
 
 		// test
 		String expected = well.getXMLString("1.3.1.1");
+		String actual = this.valve.getObject(qc).get();
+		assertEquals(expected, actual);
+	}
+
+	// code to test getFromStore for Log
+	@Test
+	public void shouldGetLogSingleObject() throws Exception {
+		// build well list
+		ArrayList<AbstractWitsmlObject> witsmlObjects;
+		witsmlObjects = new ArrayList<>();
+		ObjLog log = new ObjLog();
+		log.setUid("HM_800007");
+		log.setUidWell("U2");
+		log.setUidWellbore("WBDD600");
+		witsmlObjects.add(log);
+
+		// build query context
+		QueryContext qc = new QueryContext(
+				"1.4.1.1",
+				"log",
+				new HashMap<>(),
+				"",
+				witsmlObjects,
+				"goodUsername",
+				"goodPassword",
+				"shouldGetSingleObject" // exchange ID
+		);
+
+		// mock delegator behavior
+		when(
+				this.mockDelegator.getObject(log, qc.USERNAME, qc.PASSWORD,qc.EXCHANGE_ID, this.mockClient, qc.OPTIONS_IN)
+		).thenReturn(log);
+
+		// test
+		String expected = log.getXMLString("1.4.1.1");
 		String actual = this.valve.getObject(qc).get();
 		assertEquals(expected, actual);
 	}

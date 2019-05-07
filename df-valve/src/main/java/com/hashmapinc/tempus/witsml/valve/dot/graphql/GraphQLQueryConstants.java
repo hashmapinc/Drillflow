@@ -798,6 +798,7 @@ public class GraphQLQueryConstants {
             "query WellboreQuery($arg: WellboreArgument) {\n" +
                     "  wellbores(wellboreArgument: $arg) {\n" +
                     "    uuid\n" +
+                    "    name\n" +
                     "    well {\n" +
                     "      uuid\n" +
                     "    }\n" +

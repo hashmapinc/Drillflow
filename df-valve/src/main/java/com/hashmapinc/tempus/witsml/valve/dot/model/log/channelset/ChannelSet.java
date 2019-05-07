@@ -13,61 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset;
 
 import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.StdDateFormat;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.GenericMeasure;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.IndexCurve;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-    "uuid",
-    "bhaRunNumber",
-    "aliases",
-    "citation",
-    "customData",
-    "extensionNameValue",
-    "objectVersion",
-    "existenceKind",
-    "index",
-    "objectGrowing",
-    "dataUpateRate",
-    "curveSensorsAligned",
-    "dataGroup",
-    "stepIncrement",
-    "logParam",
-    "dataDelimiter",
-    "nullValue",
-    "channelState",
-    "timeDepth",
-    "channelClass",
-    "runNumber",
-    "passNumber",
-    "startIndex",
-    "endIndex",
-    "loggingCompanyName",
-    "loggingCompanyCode",
-    "toolName",
-    "toolClass",
-    "derivation",
-    "loggingMethod",
-    "nominalHoleSize",
-    "dataContext",
-    "commonData",
-    "uid",
-    "uidWell",
-    "uidWellbore",
-    "wellId",
-    "wellboreId"
-})
-public class View {
+@JsonPropertyOrder({ "uuid", "bhaRunNumber", "aliases", "citation", "customData", "extensionNameValue", "objectVersion",
+        "existenceKind", "index", "objectGrowing", "dataUpateRate", "curveSensorsAligned", "dataGroup", "stepIncrement",
+        "logParam", "dataDelimiter", "nullValue", "channelState", "timeDepth", "channelClass", "runNumber",
+        "passNumber", "startIndex", "endIndex", "loggingCompanyName", "loggingCompanyCode", "toolName", "toolClass",
+        "derivation", "loggingMethod", "nominalHoleSize", "dataContext", "commonData", "uid", "uidWell", "uidWellbore",
+        "wellId", "wellboreId" })
+public class ChannelSet {
 
     @JsonProperty("uuid")
     private String uuid;
     @JsonProperty("bhaRunNumber")
-    private Integer bhaRunNumber;
+    private Short bhaRunNumber;
     @JsonProperty("aliases")
     private List<Alias> aliases = null;
     @JsonProperty("citation")
@@ -154,12 +134,12 @@ public class View {
     }
 
     @JsonProperty("bhaRunNumber")
-    public Integer getBhaRunNumber() {
+    public Short getBhaRunNumber() {
         return bhaRunNumber;
     }
 
     @JsonProperty("bhaRunNumber")
-    public void setBhaRunNumber(Integer bhaRunNumber) {
+    public void setBhaRunNumber(Short bhaRunNumber) {
         this.bhaRunNumber = bhaRunNumber;
     }
 
@@ -533,4 +513,196 @@ public class View {
         this.additionalProperties.put(name, value);
     }
 
+    public String toJson() throws JsonProcessingException {
+        ObjectMapper om = new ObjectMapper();
+        om.setDateFormat(new StdDateFormat());
+        return om.writerWithDefaultPrettyPrinter().writeValueAsString(this);
+    }
+
+    public static ChannelSet from1411(com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog witsmlObj) {
+
+        ChannelSet cs = new ChannelSet();
+        Citation citation = new Citation();
+        citation.setTitle(witsmlObj.getName());
+        citation.setDescription(witsmlObj.getDescription());
+        cs.setCitation(citation);
+        cs.setBhaRunNumber(witsmlObj.getBhaRunNumber());
+        cs.setDataGroup(witsmlObj.getDataGroup());
+        cs.setDataDelimiter(witsmlObj.getDataDelimiter());
+        cs.setRunNumber(witsmlObj.getRunNumber());
+        cs.setPassNumber(witsmlObj.getPass());
+        cs.setCurveSensorsAligned(witsmlObj.isCurveSensorsAligned());
+        cs.setCustomData(witsmlObj.getCustomData());
+        cs.setLoggingCompanyName(witsmlObj.getServiceCompany());
+        cs.setNullValue(witsmlObj.getNullValue());
+
+        // Sort out if this is a time or a depth log
+        String indexType = "depth";
+        if (witsmlObj.getIndexType().contains("depth")) {
+            cs.setTimeDepth(indexType);
+            cs.setStartIndex(witsmlObj.getStartIndex().getValue().toString());
+            cs.setEndIndex(witsmlObj.getEndIndex().getValue().toString());
+        } else {
+            indexType = "time";
+            cs.setTimeDepth(indexType);
+            cs.setStartIndex(witsmlObj.getStartDateTimeIndex().toXMLFormat());
+            cs.setEndIndex(witsmlObj.getEndDateTimeIndex().toXMLFormat());
+        }
+
+        cs.setNullValue(witsmlObj.getNullValue());
+        cs.setObjectGrowing(witsmlObj.isObjectGrowing());
+        cs.setStepIncrement(StepIncrement.from1411(witsmlObj.getStepIncrement()));
+        cs.setIndex(Index.from1411(witsmlObj));
+        cs.setLogParam(LogParam.from1411(witsmlObj.getLogParam()));
+        cs.setCommonData(CommonData.getCommonDataFrom1411(witsmlObj.getCommonData()));
+        return cs;
+    }
+
+    public static ChannelSet from1311(com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog witsmlObj) {
+        ChannelSet cs = new ChannelSet();
+        Citation citation = new Citation();
+        citation.setTitle(witsmlObj.getName());
+        citation.setDescription(witsmlObj.getDescription());
+        cs.setCitation(citation);
+        cs.setBhaRunNumber(witsmlObj.getBhaRunNumber());
+        cs.setRunNumber(witsmlObj.getRunNumber());
+        cs.setPassNumber(witsmlObj.getPass());
+        cs.setCustomData(witsmlObj.getCustomData());
+        cs.setLoggingCompanyName(witsmlObj.getServiceCompany());
+        cs.setNullValue(witsmlObj.getNullValue());
+        // Sort out if this is a time or a depth log
+        String indexType = "depth";
+        if (witsmlObj.getIndexType().contains("depth")) {
+            cs.setTimeDepth(indexType);
+            cs.setStartIndex(witsmlObj.getStartIndex().getValue().toString());
+            cs.setEndIndex(witsmlObj.getEndIndex().getValue().toString());
+        } else {
+            indexType = "time";
+            cs.setTimeDepth(indexType);
+            cs.setStartIndex(witsmlObj.getStartDateTimeIndex().toXMLFormat());
+            cs.setEndIndex(witsmlObj.getEndDateTimeIndex().toXMLFormat());
+        }
+        cs.setNullValue(witsmlObj.getNullValue());
+        cs.setObjectGrowing(witsmlObj.isObjectGrowing());
+        cs.setStepIncrement(StepIncrement.from1311(witsmlObj.getStepIncrement()));
+        cs.setIndex(Index.from1311(witsmlObj));
+        cs.setLogParam(LogParam.from1311(witsmlObj.getLogParam()));
+        cs.setCommonData(CommonData.getCommonDataFrom1311(witsmlObj.getCommonData()));
+        return cs;
+    }
+
+    public static com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog to1411(ChannelSet channelSet)
+            throws DatatypeConfigurationException, ParseException {
+        com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog wmlLog = new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog();
+
+        wmlLog.setUid(channelSet.getUid());
+        wmlLog.setCurveSensorsAligned(channelSet.getCurveSensorsAligned());
+        wmlLog.setDataGroup(channelSet.getDataGroup());
+        wmlLog.setDataDelimiter(channelSet.getDataDelimiter());
+        wmlLog.setName(channelSet.getCitation().getTitle());
+        wmlLog.setServiceCompany(channelSet.getLoggingCompanyName());
+        wmlLog.setRunNumber(channelSet.getRunNumber());
+        wmlLog.setBhaRunNumber(channelSet.getBhaRunNumber());
+        wmlLog.setPass(channelSet.getPassNumber());
+        wmlLog.setDescription(channelSet.getCitation().getDescription());
+        wmlLog.setIndexType(channelSet.getTimeDepth());
+        wmlLog.setStepIncrement(StepIncrement.to1411(channelSet.getStepIncrement()));
+        if (channelSet.getIndex() != null && channelSet.getIndex().size() > 0) {
+            wmlLog.setIndexCurve(channelSet.getIndex().get(0).getMnemonic());
+        }
+        wmlLog.setNullValue(channelSet.getNullValue());
+        wmlLog.setObjectGrowing(channelSet.getObjectGrowing());
+        wmlLog.setLogParam(LogParam.to1411(channelSet.getLogParam()));
+
+        if (channelSet.getTimeDepth().toLowerCase().contains("depth")) {
+            if (channelSet.getStartIndex() != null){
+                com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure startMeasure = new com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure();
+                startMeasure.setUom("m");
+                startMeasure.setValue(Double.parseDouble(channelSet.getStartIndex()));
+                wmlLog.setStartIndex(startMeasure);
+                com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure endMeasure = new com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure();
+                endMeasure.setUom("m");
+                endMeasure.setValue(Double.parseDouble(channelSet.getEndIndex()));
+                wmlLog.setEndIndex(endMeasure);
+            }
+        } else {
+            if (channelSet.getEndIndex() != null){
+                wmlLog.setStartDateTimeIndex(convertIsoDateToXML(channelSet.getStartIndex()));
+                wmlLog.setEndDateTimeIndex(convertIsoDateToXML(channelSet.getEndIndex()));
+            }
+        }
+        return wmlLog;
+    }
+
+    public static com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog to1311(ChannelSet channelSet)
+            throws DatatypeConfigurationException, ParseException {
+        com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog wmlLog = new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog();
+
+        wmlLog.setUid(channelSet.getUid());
+        wmlLog.setName(channelSet.getCitation().getTitle());
+        wmlLog.setServiceCompany(channelSet.getLoggingCompanyName());
+        wmlLog.setRunNumber(channelSet.getRunNumber());
+        wmlLog.setBhaRunNumber(channelSet.getBhaRunNumber());
+        wmlLog.setPass(channelSet.getPassNumber());
+        wmlLog.setDescription(channelSet.getCitation().getDescription());
+        wmlLog.setIndexType(channelSet.getTimeDepth());
+        wmlLog.setStepIncrement(StepIncrement.to1311(channelSet.getStepIncrement()));
+        if (channelSet.getIndex() != null && channelSet.getIndex().size() > 0) {
+            IndexCurve curve = new IndexCurve();
+            curve.setColumnIndex((short) 1);
+            curve.setValue(channelSet.getIndex().get(0).getMnemonic());
+            wmlLog.setIndexCurve(curve);
+        }
+        wmlLog.setNullValue(channelSet.getNullValue());
+        wmlLog.setObjectGrowing(channelSet.getObjectGrowing());
+        wmlLog.setLogParam(LogParam.to1311(channelSet.getLogParam()));
+
+        if (channelSet.getTimeDepth().toLowerCase().contains("depth")) {
+            GenericMeasure startMeasure = new GenericMeasure();
+            startMeasure.setUom("m");
+            startMeasure.setValue(Double.parseDouble(channelSet.getStartIndex()));
+            wmlLog.setStartIndex(startMeasure);
+            GenericMeasure endMeasure = new GenericMeasure();
+            endMeasure.setUom("m");
+            endMeasure.setValue(Double.parseDouble(channelSet.getEndIndex()));
+            wmlLog.setEndIndex(endMeasure);
+        } else {
+            wmlLog.setStartDateTimeIndex(convertIsoDateToXML(channelSet.getStartIndex()));
+            wmlLog.setEndDateTimeIndex(convertIsoDateToXML(channelSet.getEndIndex()));
+        }
+        return wmlLog;
+    }
+
+    public static List<ChannelSet> jsonToChannelSetList(String channelsList){
+        return fromJSON(new TypeReference<List<ChannelSet>>() {}, channelsList);
+    }
+
+    public static <T> T fromJSON(final TypeReference<T> type, final String jsonPacket) {
+        T data = null;
+
+        try {
+            data = new ObjectMapper().readValue(jsonPacket, type);
+        } catch (Exception e) {  // Handle the problem
+        }
+        return data;
+    }
+
+    public static ChannelSet jsonToChannelSet(String channelSet)
+            throws JsonParseException, JsonMappingException, IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.readValue(channelSet, ChannelSet.class);  
+    }
+    private static XMLGregorianCalendar convertIsoDateToXML(String dateTime)
+        throws DatatypeConfigurationException, ParseException {
+        DateFormat format = new SimpleDateFormat("yyyy-MM-ddThh:mm:ss.SSSXXX");
+        // Date date = format.parse("2014-04-24 11:15:00");
+        Date date = format.parse(dateTime);
+
+        GregorianCalendar cal = new GregorianCalendar();
+        cal.setTime(date);
+
+        XMLGregorianCalendar xmlGregCal =  DatatypeFactory.newInstance().newXMLGregorianCalendar(cal);
+
+        return xmlGregCal;
+    }
 }

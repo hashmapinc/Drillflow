@@ -16,7 +16,6 @@
 package com.hashmapinc.tempus.witsml.valve.dot.model.log.channel;
 
 import com.fasterxml.jackson.annotation.*;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -62,6 +61,48 @@ public class SensorOffset {
     @JsonAnySetter
     public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
+    }
+
+    public static SensorOffset from1411(com.hashmapinc.tempus.WitsmlObjects.v1411.LengthMeasure sensorOffset){
+        if (sensorOffset == null)
+            return null;
+
+        SensorOffset offset = new SensorOffset();
+        offset.setUom(sensorOffset.getUom());
+        offset.setValue(sensorOffset.getValue().toString());
+        return offset;
+    }
+
+    public static SensorOffset from1311(com.hashmapinc.tempus.WitsmlObjects.v1311.LengthMeasure sensorOffset){
+        if (sensorOffset == null)
+            return null;
+
+        SensorOffset offset = new SensorOffset();
+        offset.setUom(sensorOffset.getUom());
+        offset.setValue(sensorOffset.getValue().toString());
+        return offset;
+    }
+
+    public static com.hashmapinc.tempus.WitsmlObjects.v1411.LengthMeasure to1411(SensorOffset sensorOffset){
+        if (sensorOffset == null)
+            return null;
+
+        com.hashmapinc.tempus.WitsmlObjects.v1411.LengthMeasure wmlOffset = 
+            new com.hashmapinc.tempus.WitsmlObjects.v1411.LengthMeasure();
+        wmlOffset.setUom(sensorOffset.getUom());
+        wmlOffset.setValue(Double.parseDouble(sensorOffset.getValue()));
+        return wmlOffset;
+    }
+
+    public static com.hashmapinc.tempus.WitsmlObjects.v1311.LengthMeasure to1311(SensorOffset sensorOffset){
+        if (sensorOffset == null)
+            return null;
+
+        com.hashmapinc.tempus.WitsmlObjects.v1311.LengthMeasure wmlOffset = 
+            new com.hashmapinc.tempus.WitsmlObjects.v1311.LengthMeasure();
+        wmlOffset.setUom(sensorOffset.getUom());
+        wmlOffset.setValue(Double.parseDouble(sensorOffset.getValue()));
+        return wmlOffset;
     }
 
 }
