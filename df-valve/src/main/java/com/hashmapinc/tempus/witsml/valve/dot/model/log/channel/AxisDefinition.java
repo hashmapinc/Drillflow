@@ -15,10 +15,7 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot.model.log.channel;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -307,4 +304,24 @@ public class AxisDefinition {
         return wmlAxes;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AxisDefinition that = (AxisDefinition) o;
+        return Objects.equals(axisStart, that.axisStart) &&
+                Objects.equals(axisSpacing, that.axisSpacing) &&
+                Objects.equals(axisCount, that.axisCount) &&
+                Objects.equals(axisName, that.axisName) &&
+                Objects.equals(axisUom, that.axisUom) &&
+                Objects.equals(uid, that.uid) &&
+                Objects.equals(order, that.order) &&
+                Objects.equals(doubleValues, that.doubleValues) &&
+                Objects.equals(stringValues, that.stringValues);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(axisStart, axisSpacing, axisCount, axisName, axisUom, uid, order, doubleValues, stringValues);
+    }
 }

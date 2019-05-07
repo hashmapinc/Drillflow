@@ -421,13 +421,13 @@ public class DotDelegator {
 					List<Channel> chanList = Channel
 							.from1411((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj);
 					channelPayload = Channel.channelListToJson(chanList);
+					data = DotLogDataHelper.convertDataToDot((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObj);
 				} else {
 					channelSetPayload = ChannelSet
 							.from1311((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj).toJson();
 					List<Channel> chanList = Channel
 							.from1311((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj);
 					channelPayload = Channel.channelListToJson(chanList);
-					data = DotLogDataHelper.convertDataToWitsml20((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObj);
 				}
 			} catch (JsonProcessingException e) {
 				throw new ValveException("Error converting Log to ChannelSet");

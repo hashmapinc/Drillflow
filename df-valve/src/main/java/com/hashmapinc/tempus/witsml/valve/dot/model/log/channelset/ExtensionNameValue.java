@@ -234,4 +234,24 @@ public class ExtensionNameValue {
 
         return xmlGregCal;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ExtensionNameValue that = (ExtensionNameValue) o;
+        return Objects.equals(name, that.name) &&
+                Objects.equals(value, that.value) &&
+                Objects.equals(measureClass, that.measureClass) &&
+                Objects.equals(index, that.index) &&
+                Objects.equals(description, that.description) &&
+                Objects.equals(dataType, that.dataType) &&
+                Objects.equals(md, that.md) &&
+                Objects.equals(uid, that.uid);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, value, measureClass, index, description, dataType, md, uid);
+    }
 }

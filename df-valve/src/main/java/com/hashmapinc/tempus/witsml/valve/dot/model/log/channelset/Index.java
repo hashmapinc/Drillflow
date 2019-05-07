@@ -17,11 +17,7 @@ package com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset;
 
 import com.fasterxml.jackson.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -151,4 +147,20 @@ public class Index {
         return indices;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Index index = (Index) o;
+        return Objects.equals(indexType, index.indexType) &&
+                Objects.equals(uom, index.uom) &&
+                Objects.equals(direction, index.direction) &&
+                Objects.equals(mnemonic, index.mnemonic) &&
+                Objects.equals(datumReference, index.datumReference);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(indexType, uom, direction, mnemonic);
+    }
 }
