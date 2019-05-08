@@ -271,4 +271,74 @@ public class GraphQLQueryConverter {
         // return full open query with no variables
         return payload.toString(2);
     }
+
+    /**
+     * This function accepts any wmlObject that has a
+     * wellbore parent and a well grandparent and builds
+     * a graphql query to get the uuid's of the well/wellbore.
+     *
+     * @param wmlObject - log or wellbore object child to query with
+     * @return - graphQL query string needed to get well/wellbore name
+     */
+    public static String getWellboreNameQuery(AbstractWitsmlObject wmlObject){
+        JSONObject payload = new JSONObject();
+
+        // parse json strings
+        String jsonString1411 = wmlObject.getJSONString("1.4.1.1");
+        JSONObject wmlObjJson = new JSONObject(jsonString1411);
+
+
+        // get query fields from the wmlObjJson
+        JSONObject queryFields = new JSONObject();
+
+        if (wmlObjJson.has("uidWellbore") && !JsonUtil.isEmpty(wmlObjJson.get("uidWellbore")))
+            queryFields.put("uid", wmlObjJson.get("uidWellbore")); // add wellbore uid to query fields
+
+        // build variables section
+        JSONObject variables = new JSONObject();
+        variables.put("arg", queryFields);
+        payload.put("variables", variables);
+
+        // build query section of payload
+        payload.put("query", GraphQLQueryConstants.WELLBORENAME_FOR_LOG_QUERY);
+
+        // return payload
+        return payload.toString(2);
+    }
+
+
+    /**
+     * This function accepts any wmlObject that has a
+     * well parent and a well grandparent and builds
+     * a graphql query to get the uuid's of the well/wellbore.
+     *
+     * @param wmlObject - log or well object child to query with
+     * @return - graphQL query string needed to get well/well name
+     */
+    public static String getWellNameQuery(AbstractWitsmlObject wmlObject){
+        JSONObject payload = new JSONObject();
+
+        // parse json strings
+        String jsonString1411 = wmlObject.getJSONString("1.4.1.1");
+        JSONObject wmlObjJson = new JSONObject(jsonString1411);
+
+
+        // get query fields from the wmlObjJson
+        JSONObject queryFields = new JSONObject();
+
+        if (wmlObjJson.has("uidWell") && !JsonUtil.isEmpty(wmlObjJson.get("uidWell")))
+            queryFields.put("uid", wmlObjJson.get("uidWell")); // add well uid to query fields
+
+        // build variables section
+        JSONObject variables = new JSONObject();
+        variables.put("wellArgument", queryFields);
+        payload.put("variables", variables);
+
+        // build query section of payload
+        payload.put("query", GraphQLQueryConstants.WELLNAME_FOR_LOG_QUERY);
+
+        // return payload
+        return payload.toString(2);
+    }
+
 }

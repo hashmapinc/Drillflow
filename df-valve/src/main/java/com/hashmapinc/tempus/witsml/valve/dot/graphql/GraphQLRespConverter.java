@@ -146,4 +146,48 @@ public class GraphQLRespConverter {
         // return the uuid of the first wellbore in the response.
         return data.getJSONArray("wellbores").getJSONObject(0).getString("uuid");
     }
+
+    /**
+     * This function accepts the JSONObject wellbore graphql response
+     * representation and extracts the wellbore's name
+     * @param response
+     * @return
+     */
+    public static String getWellboreNameFromGraphqlResponse(JSONObject response){
+        // check that the response has data
+        if (!response.has("data"))
+            return null;
+
+        // check that wellbores exist in the response
+        JSONObject data = response.getJSONObject("data");
+        if (!data.has("wellbores"))
+            return null;
+        if (data.get("wellbores") == null)
+            return null;
+
+        // return the uuid of the first wellbore in the response.
+        return data.getJSONArray("wellbores").getJSONObject(0).getString("name");
+    }
+
+    /**
+     * This function accepts the JSONObject well graphql response
+     * representation and extracts the well's name
+     * @param response
+     * @return
+     */
+    public static String getWellNameFromGraphqlResponse(JSONObject response){
+        // check that the response has data
+        if (!response.has("data"))
+            return null;
+
+        // check that wellbores exist in the response
+        JSONObject data = response.getJSONObject("data");
+        if (!data.has("wells"))
+            return null;
+        if (data.get("wells") == null)
+            return null;
+
+        // return the uuid of the first wellbore in the response.
+        return data.getJSONArray("wells").getJSONObject(0).getString("name");
+    }
 }

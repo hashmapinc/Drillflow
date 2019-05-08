@@ -414,7 +414,7 @@ public class DotValveTest {
 		logA.setUidWell("U2");
 		logA.setUidWellbore("WBDD600");
 		witsmlObjects.add(logA);
-		wmlObjLogs.addLog(logA);
+		//wmlObjLogs.addLog(witsmlObjects);
 
 
 		// build query context
