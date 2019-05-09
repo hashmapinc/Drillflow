@@ -15,19 +15,15 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot.model.log;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-import java.io.IOException;
-
-import javax.xml.bind.JAXBException;
-
 import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
-import com.hashmapinc.tempus.WitsmlObjects.v1411.IndexedObject;
 import com.hashmapinc.tempus.witsml.valve.dot.TestUtilities;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.ChannelSet;
-
 import org.junit.Test;
+
+import javax.xml.bind.JAXBException;
+import java.io.IOException;
+
+import static org.junit.Assert.assertEquals;
 
 public class ChannelSetConversionTest {
     @Test
