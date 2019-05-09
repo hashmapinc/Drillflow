@@ -19,16 +19,29 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.hashmapinc.tempus.WitsmlObjects.Util.log.LogDataHelper;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData;
 
 
 public class DotLogDataHelper extends LogDataHelper {
 
-    public static String convertDataToWitsml20(com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog log){
+    public static String convertDataToWitsml20From1311(com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog log){
         if (log == null)
             return null;
-        
+
+        return convertStringListToJson(log.getLogData().getData());
+
+    }
+
+    private static String convertDataToWitsml20From1411(com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog log){
+        if (log == null)
+            return null;
+
+        return convertStringListToJson(log.getLogData().get(0).getData());
+    }
+
+    private static String convertStringListToJson(List<String> dataLines){
         String wml20Data = "[";
-        List<String> dataLines = log.getLogData().get(0).getData();
         for (int j = 0; j < dataLines.size(); j++){
             List<String> data = Arrays.asList(dataLines.get(j).split("\\s*,\\s*"));
             for (int i = 0; i < data.size(); i++){
@@ -51,10 +64,23 @@ public class DotLogDataHelper extends LogDataHelper {
         return wml20Data;
     }
 
-    public static String convertDataToDot(com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog log){
+    public static String convertDataToDotFrom1411(com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog log){
         String result = "{";
         result = result + "\"mnemonicList\":" + "\"" + log.getLogData().get(0).getMnemonicList() + "\"" + ",";
-        result = result + "\"data\":" + "\"" + convertDataToWitsml20(log) + "\"}";
+        result = result + "\"data\":" + "\"" + convertDataToWitsml20From1411(log) + "\"}";
+        return result;
+    }
+
+    public static String convertDataToDotFrom1311(com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog log){
+        String result = "{";
+        String mnemList="";
+        for (int i = 0; i < log.getLogCurveInfo().size(); i++){
+            mnemList = mnemList + log.getLogCurveInfo().get(i).getMnemonic();
+            if ((i + 1) < log.getLogCurveInfo().size())
+                mnemList = mnemList + ",";
+        }
+        result = result + "\"mnemonicList\":" + "\"" + mnemList + "\"" + ",";
+        result = result + "\"data\":" + "\"" + convertDataToWitsml20From1311(log) + "\"}";
         return result;
     }
 }
