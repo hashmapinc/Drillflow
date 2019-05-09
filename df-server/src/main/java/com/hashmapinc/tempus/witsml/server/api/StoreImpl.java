@@ -139,10 +139,7 @@ public class StoreImpl implements IStore {
                 return response;
             }
             String version = WitsmlUtil.getVersionFromXML(XMLin);
-            // TODO Where is aliases? Why is logParam messed up (value = "\n\t\t\t  " & all other fields are null)?
-            //      This uses JAXB to marshall from XML; the witsmlObjects created does not have aliases &
-            //      does something funky to logParam.
-            //      But now I need a parser to put the information into JSON.
+            // uses JAXB to marshall from XML
             witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, XMLin, version);
             ValveUser user = (ValveUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             QueryContext qc = new QueryContext(
@@ -212,6 +209,7 @@ public class StoreImpl implements IStore {
                 return response;
             }
             String version = WitsmlUtil.getVersionFromXML(XMLin);
+            // uses JAXB to marshall from XML
             witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, XMLin, version);
             ValveUser user = (ValveUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             QueryContext qc = new QueryContext(

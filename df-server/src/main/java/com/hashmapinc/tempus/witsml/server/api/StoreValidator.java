@@ -127,6 +127,28 @@ public class StoreValidator {
      * @param valve The valve that is currently configured for use with DrillFlow
      * @return The return code, 1 if its all good and can proceed, not one if there is an issue that should be reported
      */
+    /*
+       Temporary note from WITSML_STORE_API_Version_1.4.1.1:
+       For the purpose of the following discussion, a container-element is an element that contains other elements
+            (as opposed to a value).
+       A non-container-element is an element that has a value and/or possibly an attribute but not other elements.
+            • A client MUST [else error -433] provide a data-object with the same type and unique identifier(s)
+                that already exists in the persistent store. (If you are adding a new data-object, use
+                WMLS_AddToStore data-object).
+            • A client MUST [else error -415] include the unique identifier (ID) of the data-object to be updated,
+                thereby uniquely identifying only one data-object to be updated. A client MUST NOT [else error -444]
+                specify multiple data-objects.
+            • The client MUST [else error -401] provide, in the XMLin document, the plural container-element
+                as its root XML element (e.g., wells).
+            • A client MUST [else error -483] provide an XMLin document that complies with the update schema.
+            • A client MUST NOT [else -484] apply an operation that results in a missing mandatory item. (That is,
+                the update cannot result in missing mandatory items, in context of the write schema.)
+            • A server MUST support the data-object as defined in its Capabilities Object.
+            • A server MUST allow an element (container or not) in an existing container-element (recurring or not)
+                to be alterable without changing anything else in the container.
+            • If a client sends a value of NaN in a numeric field to the server, then the server MUST convert it to null
+                or “not given”.
+     */
     public static short validateUpdateInStore(String WMLtypeIn, String xmlIn, Map<String,String> optionsIn, IValve valve){
         return 1;
     }

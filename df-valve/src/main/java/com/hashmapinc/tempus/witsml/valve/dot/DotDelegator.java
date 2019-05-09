@@ -15,15 +15,6 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
-
-import javax.xml.bind.JAXBException;
-import javax.xml.datatype.DatatypeConfigurationException;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog;
@@ -45,8 +36,15 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
-
 import org.json.JSONObject;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.datatype.DatatypeConfigurationException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
 
 public class DotDelegator {
 	private static final Logger LOG = Logger.getLogger(DotDelegator.class.getName());
@@ -298,46 +296,83 @@ public class DotDelegator {
 			DotClient client) throws ValveException, ValveAuthException, UnirestException {
 		String uid = witsmlObj.getUid();
 		String objectType = witsmlObj.getObjectType();
-		String endpoint = this.getEndpoint(objectType) + uid;
+		// for channelset, need         .../witsml/channelSets/{uuid}
+		// for channels' metadata, need .../witsml/channels/metadata?channelSetUuid={channelSetUuid}
+		// for channel data, need       .../witsml/channels/data?channelSetUuid={channelSetUuid}
+		// So currently, I get .../witsml/channelSets + uid
+		String endpoint;
 
-		// get witsmlObj as json string for request payload
+		if ("log".equals(objectType)) {
+			// assume there will be a channelSet update
+			// .../witsml/channelSets at this point in time
+			endpoint = this.getEndpoint(objectType);
+		} else {
+			endpoint = this.getEndpoint(objectType) + uid;
+		}
+
+		// get object as payload string
 		String payload = witsmlObj.getJSONString("1.4.1.1");
 		payload = JsonUtil.removeEmpties(new JSONObject(payload));
 
+		// a log will derive its payload for creating a ChannelSet from "payload"
+		// & then use "payload" again to update the ChannelSet with Log Curve
+		// information (Channel)
+		JSONObject objLog;
+		String channelSetPayload = "";
+		String channelPayload = "";
+		String data ="";
+
+		// build the requests (log potentially requires three HttpRequests
+		HttpRequestWithBody request;
+		HttpRequestWithBody channelsRequest;
+		HttpRequestWithBody channelData;
+
+		HttpResponse<String> response;
+
 		// build the request
-		HttpRequestWithBody request = Unirest.put(endpoint);
-		request.header("Content-Type", "application/json");
-		request.body(payload);
-
-		// add query string params
-		if ("wellbore".equals(objectType)) {
-			request.queryString("uidWell", witsmlObj.getParentUid());
-		} else if ("trajectory".equals(objectType)) {
-			request.queryString("uidWellbore", witsmlObj.getParentUid());
-			String uidWell;
-			if ("1.4.1.1".equals(witsmlObj.getVersion())) {
-				// TODO: maybe replace with this -> uidWell = witsmlObj.getGrandParentUid();
-				uidWell = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory) witsmlObj).getUidWell();
-			} else {
-				uidWell = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory) witsmlObj).getUidWell();
-			}
-			request.queryString("uidWell", uidWell);
-		}
-
-		LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(request), witsmlObj));
-
-		// make the UPDATE call.
-		HttpResponse<String> response = client.makeRequest(request, username, password);
-
-		// check response status
-		int status = response.getStatus();
-		if (201 == status || 200 == status) {
-			LOG.info(ValveLogging.getLogMsg(exchangeID,
-					logResponse(response, "UPDATE for " + witsmlObj + " was successful"), witsmlObj));
+		if ("log".equals(objectType)) {
+			// Determine if there is going to be a channelSet update
+			// TODO what minimally has to be present to know there is a channelSet????
+			// if () {
+				request = Unirest.put(endpoint);
+			// calculate uuid
 		} else {
-			LOG.warning(ValveLogging.getLogMsg(exchangeID,
-					logResponse(response, "Received failure status code from DoT PUT"), witsmlObj));
-			throw new ValveException(response.getBody());
+			request = Unirest.put(endpoint);
+		}
+		request.header("Content-Type", "application/json");
+		if (payload.length()>0) {
+			request.body(payload);
+
+			// add query string params
+			if ("wellbore".equals(objectType)) {
+				request.queryString("uidWell", witsmlObj.getParentUid());
+			} else if ("trajectory".equals(objectType)) {
+				request.queryString("uidWellbore", witsmlObj.getParentUid());
+				String uidWell;
+				if ("1.4.1.1".equals(witsmlObj.getVersion())) {
+					// TODO: maybe replace with this -> uidWell = witsmlObj.getGrandParentUid();
+					uidWell = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory) witsmlObj).getUidWell();
+				} else {
+					uidWell = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory) witsmlObj).getUidWell();
+				}
+				request.queryString("uidWell", uidWell);
+			}
+
+			LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(request), witsmlObj));
+
+			// make the UPDATE call.
+			response = client.makeRequest(request, username, password);
+
+			// check response status
+			int status = response.getStatus();
+			if (201 == status || 200 == status) {
+				LOG.info(ValveLogging.getLogMsg(exchangeID,
+						logResponse(response, "UPDATE for " + witsmlObj + " was successful"), witsmlObj));
+			} else {
+				LOG.warning(ValveLogging.getLogMsg(exchangeID,
+						logResponse(response, "Received failure status code from DoT PUT"), witsmlObj));
+				throw new ValveException(response.getBody());
+			}
 		}
 	}
 
@@ -446,7 +481,7 @@ public class DotDelegator {
 		// check response status
 		int status = response.getStatus();
 		if (409 == status) {
-			LOG.info(ValveLogging.getLogMsg(exchangeID, logResponse(response, "Log alreday in store"), witsmlObj));
+			LOG.info(ValveLogging.getLogMsg(exchangeID, logResponse(response, "Log already in store"), witsmlObj));
 			throw new ValveException("Log already in store", (short) -405);
 		}
 
@@ -543,10 +578,10 @@ public class DotDelegator {
 		
 		 if ("log".equals(objectType)){ // code added to handle log object
 			uidWellbore = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)
-			witsmlObject).getUidWellbore(); 
-			uidWellLog =
-			((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject)
-				.getUidWell(); request.queryString("uid", uid);
+									witsmlObject).getUidWellbore();
+			uidWellLog = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)
+									witsmlObject).getUidWell();
+			request.queryString("uid", uid);
 			request.queryString("uidWellbore", uidWellbore);
 			request.queryString("uidWell", uidWellLog); 
 		} else if ("trajectory".equals(objectType)) {
@@ -576,7 +611,7 @@ public class DotDelegator {
 			if ("log".equals(objectType)) {
 			// TODO Are we to only return channels OR channel set + channels data?
 				finalResponse =
-				getRestCalls(witsmlObject,client,uuid,username,password,exchangeID);
+							getRestCalls(witsmlObject,client,uuid,username,password,exchangeID);
 			// log requires transformation of the response
 			}
 			LOG.info(ValveLogging.getLogMsg(exchangeID,
