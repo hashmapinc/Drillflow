@@ -247,7 +247,7 @@ public class DotDelegator {
 			payload = JsonUtil.removeEmptyArrays(new JSONObject(payload));
 			logElementDeleteRequest.body(payload);
 			LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(logElementDeleteRequest), witsmlObj));
-			
+
 			HttpResponse<String> logElementDeleteResponse = client.makeRequest(logElementDeleteRequest, username, password);
 			int elementDeleteStatus = logElementDeleteResponse.getStatus();
 			if (204 == elementDeleteStatus) {
