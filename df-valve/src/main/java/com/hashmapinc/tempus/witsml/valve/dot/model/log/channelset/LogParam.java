@@ -17,10 +17,7 @@ package com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset;
 
 import com.fasterxml.jackson.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -66,6 +63,24 @@ public class LogParam {
     @JsonProperty("name")
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LogParam logParam = (LogParam) o;
+        return Objects.equals(index, logParam.index) &&
+                Objects.equals(name, logParam.name) &&
+                Objects.equals(uom, logParam.uom) &&
+                Objects.equals(description, logParam.description) &&
+                Objects.equals(uid, logParam.uid) &&
+                Objects.equals(value, logParam.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(index, name, uom, description, uid, value);
     }
 
     @JsonProperty("uom")

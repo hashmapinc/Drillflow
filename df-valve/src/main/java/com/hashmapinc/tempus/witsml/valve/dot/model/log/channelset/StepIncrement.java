@@ -17,6 +17,7 @@ package com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -145,4 +146,19 @@ public class StepIncrement {
         return wmlInc;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StepIncrement that = (StepIncrement) o;
+        return Objects.equals(uom, that.uom) &&
+                Objects.equals(value, that.value) &&
+                Objects.equals(numerator, that.numerator) &&
+                Objects.equals(denominator, that.denominator);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(uom, value, numerator, denominator);
+    }
 }

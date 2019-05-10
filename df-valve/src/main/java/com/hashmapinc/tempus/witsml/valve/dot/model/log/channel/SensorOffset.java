@@ -18,6 +18,7 @@ package com.hashmapinc.tempus.witsml.valve.dot.model.log.channel;
 import com.fasterxml.jackson.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -105,4 +106,17 @@ public class SensorOffset {
         return wmlOffset;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SensorOffset that = (SensorOffset) o;
+        return Objects.equals(uom, that.uom) &&
+                Objects.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(uom, value);
+    }
 }

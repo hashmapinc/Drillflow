@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -155,4 +156,21 @@ public class Citation {
         this.additionalProperties.put(name, value);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Citation citation = (Citation) o;
+        return Objects.equals(title, citation.title) &&
+                Objects.equals(format, citation.format) &&
+                Objects.equals(editor, citation.editor) &&
+                Objects.equals(versionString, citation.versionString) &&
+                Objects.equals(description, citation.description) &&
+                Objects.equals(descriptiveKeywords, citation.descriptiveKeywords);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(title, format, editor, versionString, description, descriptiveKeywords);
+    }
 }

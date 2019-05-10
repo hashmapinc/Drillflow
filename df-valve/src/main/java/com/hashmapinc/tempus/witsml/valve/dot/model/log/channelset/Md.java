@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -101,4 +102,18 @@ public class Md {
         return wmlMd;  
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Md md = (Md) o;
+        return Objects.equals(uom, md.uom) &&
+                Objects.equals(value, md.value) &&
+                Objects.equals(datum, md.datum);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(uom, value, datum);
+    }
 }

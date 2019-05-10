@@ -18,10 +18,7 @@ package com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset;
 import com.fasterxml.jackson.annotation.*;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.TimestampedTimeZone;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -228,5 +225,26 @@ public class CommonData {
         }
         
         return cd;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CommonData that = (CommonData) o;
+        return Objects.equals(itemState, that.itemState) &&
+                Objects.equals(serviceCategory, that.serviceCategory) &&
+                Objects.equals(comments, that.comments) &&
+                Objects.equals(acquisitionTimeZone, that.acquisitionTimeZone) &&
+                Objects.equals(defaultDatum, that.defaultDatum) &&
+                Objects.equals(privateGroupOnly, that.privateGroupOnly) &&
+                Objects.equals(extensionAny, that.extensionAny) &&
+                Objects.equals(dTimCreation, that.dTimCreation) &&
+                Objects.equals(dTimLastChange, that.dTimLastChange);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(itemState, serviceCategory, comments, acquisitionTimeZone, defaultDatum, privateGroupOnly, extensionAny, dTimCreation, dTimLastChange);
     }
 }
