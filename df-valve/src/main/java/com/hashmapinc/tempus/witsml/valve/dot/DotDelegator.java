@@ -206,20 +206,22 @@ public class DotDelegator {
 	}
 
 	public void performElementDelete(AbstractWitsmlObject witsmlObj, String username, String password,
-			String exchangeID, DotClient client) throws ValveException, ValveAuthException, UnirestException {
+									 String exchangeID, DotClient client) throws ValveException, ValveAuthException, UnirestException {
 		// Throwing valve exception as this is currently not supported by DoT until the
 		// Patch API is implemented
 		// We dont want to delete the object because someone thought something was
 		// implemented.
 		String uid = witsmlObj.getUid(); // get uid for delete call
 		String objectType = witsmlObj.getObjectType(); // get obj type for exception handling
-		String uuid = "";
-		String endpoint = "";
-		HttpRequestWithBody request = null;
 
 		// It is an object delete, so re-route there
-		endpoint = this.getEndpoint(objectType) + uid; // add uid for delete call
+		String endpoint = this.getEndpoint(objectType) + uid; // add uid for delete call
 		String payload = witsmlObj.getJSONString("1.4.1.1");
+		// create request
+		HttpRequestWithBody request = Unirest.patch(endpoint).header("Content-Type", "application/json");
+		payload = JsonUtil.removeEmptyArrays(new JSONObject(payload));
+		request.body(payload);
+		LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(request), witsmlObj));
 
 		// add query string params
 		if ("wellbore".equals(objectType)) {
@@ -238,41 +240,14 @@ public class DotDelegator {
 		// make the PATCH call.
 		HttpResponse<String> response = client.makeRequest(request, username, password);
 
-		if ("log".equals(objectType)) {
-			//response = client.makeRequest(logRequest, username, password);
-			uuid = getUUID(uid,witsmlObj,client,username,password);
-			String logElementDeletEndpoint = this.getEndpoint("channelsetmetadata");
-			logElementDeletEndpoint = logElementDeletEndpoint + "/" + uuid;
-			HttpRequestWithBody logElementDeleteRequest = Unirest.patch(logElementDeletEndpoint).header("Content-Type", "application/json");
-			payload = JsonUtil.removeEmptyArrays(new JSONObject(payload));
-			logElementDeleteRequest.body(payload);
-			LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(logElementDeleteRequest), witsmlObj));
-
-			HttpResponse<String> logElementDeleteResponse = client.makeRequest(logElementDeleteRequest, username, password);
-			int elementDeleteStatus = logElementDeleteResponse.getStatus();
-			if (204 == elementDeleteStatus) {
-				LOG.info(ValveLogging.getLogMsg(exchangeID,
-						logResponse(logElementDeleteResponse, "Successfully Element Deleted Object with UID :" + uid + "."), witsmlObj));
-			} else {
-				LOG.warning(
-						ValveLogging.getLogMsg(exchangeID, logResponse(response, "Unable to delete"), witsmlObj));
-				throw new ValveException("DELETE DoT REST call failed with status code: " + elementDeleteStatus);
-			}
+		// check response status
+		int status = response.getStatus();
+		if (201 == status || 200 == status || 204 == status) {
+			LOG.info(ValveLogging.getLogMsg(exchangeID,
+					logResponse(response, "Successfully Patched Object with UID :" + uid + "."), witsmlObj));
 		} else {
-			request = Unirest.patch(endpoint).header("Content-Type", "application/json");
-			payload = JsonUtil.removeEmptyArrays(new JSONObject(payload));
-			request.body(payload);
-			LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(request), witsmlObj));
-			response = client.makeRequest(request, username, password);
-			int status = response.getStatus();
-			if (201 == status || 200 == status || 204 == status) {
-				LOG.info(ValveLogging.getLogMsg(exchangeID,
-						logResponse(response, "Successfully Patched Object with UID :" + uid + "."), witsmlObj));
-			} else {
-				LOG.warning(ValveLogging.getLogMsg(exchangeID, logResponse(response, "Unable to delete"), witsmlObj));
-				throw new ValveException("PATCH DoT REST call failed with status code: " + status);
-			}
-
+			LOG.warning(ValveLogging.getLogMsg(exchangeID, logResponse(response, "Unable to patch"), witsmlObj));
+			throw new ValveException("PATCH DoT REST call failed with status code: " + status);
 		}
 	}
 

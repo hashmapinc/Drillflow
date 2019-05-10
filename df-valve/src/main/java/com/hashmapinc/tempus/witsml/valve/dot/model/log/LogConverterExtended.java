@@ -106,12 +106,6 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
         // check response status
         int status = response.getStatus();
         if (201 == status || 200 == status || 400 == status) {
-/*            LOG.info(ValveLogging.getLogMsg(
-                    exchangeID,
-                    logResponse(response, "Successfully executed POST for query object=" + witsmlObject.toString()),
-                    witsmlObject
-            ));*/
-
             // get the wellborename of the first wellbore in the response
             wellName = GraphQLRespConverter.getWellNameFromGraphqlResponse(new JSONObject(response.getBody()));
 
@@ -151,12 +145,6 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
         // check response status
         int status = response.getStatus();
         if (201 == status || 200 == status || 400 == status) {
-/*            LOG.info(ValveLogging.getLogMsg(
-                    exchangeID,
-                    logResponse(response, "Successfully executed POST for query object=" + witsmlObject.toString()),
-                    witsmlObject
-            ));*/
-
             // get the wellborename of the first wellbore in the response
             wellboreName = GraphQLRespConverter.getWellboreNameFromGraphqlResponse(new JSONObject(response.getBody()));
 
