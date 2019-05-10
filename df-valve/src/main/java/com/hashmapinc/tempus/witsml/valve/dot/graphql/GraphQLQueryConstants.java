@@ -805,4 +805,26 @@ public class GraphQLQueryConstants {
                     "  }\n" +
                     "}";
 
+    //=========================================================================
+    // WELLBORENAME QUERY FOR LOG
+    //=========================================================================
+
+    public static final String WELLBORENAME_FOR_LOG_QUERY =
+            "query WellboreQuery($arg: WellboreArgument) {\n" +
+                    "  wellbores(wellboreArgument: $arg) {\n" +
+                    "    name\n" +
+                    "  }\n" +
+                    "}";
+
+
+    //=========================================================================
+    // WELLNAME QUERY FOR LOG
+    //=========================================================================
+
+    public static final String WELLNAME_FOR_LOG_QUERY =
+            "query WellQuery($wellArgument: WellArgument) {\n" +
+                    "  wells(wellArgument: $wellArgument) {\n" +
+                    "    name\n" +
+                    "  }\n" +
+                    "}";
 }
