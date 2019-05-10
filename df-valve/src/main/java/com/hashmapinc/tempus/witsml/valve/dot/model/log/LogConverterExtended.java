@@ -18,7 +18,6 @@ package com.hashmapinc.tempus.witsml.valve.dot.model.log;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.xml.datatype.DatatypeConfigurationException;
