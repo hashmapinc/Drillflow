@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -64,4 +65,17 @@ public class DefaultDatum {
         this.additionalProperties.put(name, value);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DefaultDatum that = (DefaultDatum) o;
+        return Objects.equals(uidRef, that.uidRef) &&
+                Objects.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(uidRef, value);
+    }
 }

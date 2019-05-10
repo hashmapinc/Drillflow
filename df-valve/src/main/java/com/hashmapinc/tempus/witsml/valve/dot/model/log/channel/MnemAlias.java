@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -95,4 +96,17 @@ public class MnemAlias {
         return alias;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MnemAlias mnemAlias = (MnemAlias) o;
+        return Objects.equals(namingSystem, mnemAlias.namingSystem) &&
+                Objects.equals(value, mnemAlias.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(namingSystem, value);
+    }
 }
