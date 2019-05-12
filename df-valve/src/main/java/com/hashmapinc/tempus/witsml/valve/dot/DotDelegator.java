@@ -55,7 +55,9 @@ public class DotDelegator {
 	private final String WELL_UID = "uidWell";
 	private final String WELLBORE_UID = "uidWellbore";
 	private final String CHANNELSET_UUID = "channelsetuuid";
-
+	private final int	 CS_IDX_4_PAYLOADS=0;
+	private final int	 CHANNELS_IDX_4_PAYLOADS=1;
+	private final int	 DATA_IDX_4_PAYLOADS=2;
 
 	private final String WELL_PATH;
 	private final String WB_PATH;
@@ -268,20 +270,26 @@ public class DotDelegator {
 									throws ValveException, ValveAuthException, UnirestException {
 		String uid = witsmlObj.getUid();
 		String objectType = witsmlObj.getObjectType();
+		String version = witsmlObj.getVersion();
 		String endpoint="";
 		String uuid;
 
 		// get object as payload string
-		String payload = witsmlObj.getJSONString("1.4.1.1");
+		String payload;
+		if ("1.4.1.1".equals(version)) {
+			payload = witsmlObj.getJSONString("1.4.1.1");
+		} else {
+			payload = witsmlObj.getJSONString("1.3.1.1");
+		}
 		payload = JsonUtil.removeEmpties(new JSONObject(payload));
 
-		// a log will derive its payload for updating a ChannelSet from "payload"
-		// & then use "payload" again to update the ChannelSet with Log Curve
-		// information (Channel) & then data information
+		// a log will derive its payloads from "payload":
+		// channelSet, channels, and data (if v1.3.1.1)
+		// TODO if this is right, then createObject must follow suit
 		JSONObject objLog;
 		String channelSetPayload = "";
 		String channelPayload = "";
-		String data ="";
+		String data ="";				// not v1.4.1.1
 
 		// build the requests (log potentially requires three HttpRequests)
 		HttpRequestWithBody request;
@@ -292,18 +300,19 @@ public class DotDelegator {
 
 		// build the request
 		if (LOG_OBJECT.equals(objectType)) {
-			// there may be up to 3 update requests:
-			// 1. channelSet
-			//    if there is a log, there is a channelSet;
-			//    a channelSet is a log metadata; this means it must have a name.
-			//    conclusion; if name exists in the payload, there is a channelSet.
+			// get up to 3 payloads for Log
+			String[] payloads = getPayloadsForLog(witsmlObj.getVersion(), witsmlObj);
+			channelSetPayload = payloads[CS_IDX_4_PAYLOADS];
+			channelPayload = payloads[CHANNELS_IDX_4_PAYLOADS];
+			if (!"1.4.1.1".equals(witsmlObj.getVersion())) {
+				data = payloads[DATA_IDX_4_PAYLOADS];
+			}
+
+			// first handle any channelSet update --
 			if (payload.contains("name")) {
-				// when creating a log, if the uid is not there, one can be generated
-				// however, this is update, so a valid uid must be present
-				// obtain the uuid from this uid...
-				/*
+				/* TMS pick up here
 					Is it in cache? Need to do this for log object too (see
-					getParentWellboreUUID
+					what has been done for Traj; below is for wells):
 
 					// see if the uuid is stored in the uid/uuid cache
 					if (null != UidUuidCache.getUuid(wmlObject.getParentUid(),
@@ -313,7 +322,6 @@ public class DotDelegator {
 					else make the call to get it
 					uuid = getUUID(uid, witsmlObj, client, username, password);
 				*/
-				// TODO put into Redis map for uid --> uuid
 				// .../witsml/channelSets at this point in time
 				endpoint = this.getEndpoint(objectType);
 
@@ -463,24 +471,14 @@ public class DotDelegator {
 		request.header("Content-Type", "application/json");
 
 		if ("log".equals(objectType)) {
-			try {
-				if ("1.4.1.1".equals(version)) {
-					channelSetPayload = ChannelSet
-							.from1411((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj).toJson();
-					List<Channel> chanList = Channel
-							.from1411((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj);
-					channelPayload = Channel.channelListToJson(chanList);
-				} else {
-					channelSetPayload = ChannelSet
-							.from1311((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj).toJson();
-					List<Channel> chanList = Channel
-							.from1311((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj);
-					channelPayload = Channel.channelListToJson(chanList);
-					data = DotLogDataHelper.convertDataToWitsml20((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObj);
-				}
-			} catch (JsonProcessingException e) {
-				throw new ValveException("Error converting Log to ChannelSet");
+			// pick up all of the payloads
+			String[] payloads = getPayloadsForLog(version, witsmlObj);
+			channelSetPayload = payloads[CS_IDX_4_PAYLOADS];
+			channelPayload = payloads[CHANNELS_IDX_4_PAYLOADS];
+			if (!"1.4.1.1".equals(version)) {
+				data = payloads[2];
 			}
+			// make the first rest call with channelSet payload
 			request.body(channelSetPayload);
 		} else {
 
@@ -509,8 +507,8 @@ public class DotDelegator {
 				// build the request...
 				endpoint = this.getEndpoint(objectType + "Channel");
 				endpoint = endpoint + "/metadata";
-				// get the uuid for the channelSet just created from the response
 
+				// get the uuid for the channelSet just created from the response
 				String uuid4CS = new JsonNode(response.getBody()).getObject().getString("uuid");
 
 				// create with POST
@@ -553,6 +551,56 @@ public class DotDelegator {
 					logResponse(response, "Received " + status + " from DoT POST" + response.getBody()), witsmlObj));
 			throw new ValveException(response.getBody());
 		}
+	}
+
+	/**
+	 * creates the POJOs for channelSet & channels and then uses the POJOs (plus data
+	 * if v1.3.1.1) to return an array of the payloads based on the POJOs (and data
+	 * if v1.3.1.1)
+	 *
+	 * @param version 	either 1.4.1.1 or 1.3.1.1
+	 * @param witsmlObj abstracted WITSML XML in JSON format
+	 *
+	 * @return String array representing the payloads (channelSet, channels, & if
+	 * 					1.3.1.1 also data)
+	 * @throws ValveException
+	 */
+	// TODO the payloads need to come from payload and not from witsmlObj
+	public String[] getPayloadsForLog(String version, AbstractWitsmlObject witsmlObj)
+								throws ValveException {
+		String channelSetPayload;
+		String channelPayload;
+		String data;
+		String[] payloads;
+		try {
+			if ("1.4.1.1".equals(version)) {
+				channelSetPayload = ChannelSet
+						.from1411((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj)
+						.toJson();
+				List<Channel> chanList = Channel
+						.from1411((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj);
+				channelPayload = Channel.channelListToJson(chanList);
+				payloads = new String[2];
+				payloads[CS_IDX_4_PAYLOADS] = channelSetPayload;
+				payloads[CHANNELS_IDX_4_PAYLOADS] = channelPayload;
+			} else {
+				channelSetPayload = ChannelSet
+						.from1311((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj)
+						.toJson();
+				List<Channel> chanList = Channel
+						.from1311((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj);
+				channelPayload = Channel.channelListToJson(chanList);
+				data = DotLogDataHelper
+						.convertDataToWitsml20((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObj);
+				payloads = new String[3];
+				payloads[CS_IDX_4_PAYLOADS] = channelSetPayload;
+				payloads[CHANNELS_IDX_4_PAYLOADS] = channelPayload;
+				payloads[2] = data;
+			}
+		} catch (JsonProcessingException e) {
+			throw new ValveException("Error converting Log to ChannelSet");
+		}
+		return payloads;
 	}
 
 	/**
