@@ -386,6 +386,8 @@ public class StoreImpl implements IStore {
         WMLS_GetFromStoreResponse resp = new WMLS_GetFromStoreResponse();
         // try to deserialize
         Map<String,String> optionsMap = WitsmlUtil.parseOptionsIn(OptionsIn);
+        if (!optionsMap.containsKey("returnElements"))
+            optionsMap.put("returnElements", "requested");
         // validates to make sure conditions are met
         short validationResult = StoreValidator.validateGetFromStore(WMLtypeIn, QueryIn, optionsMap, valve);
         if (validationResult != 1){

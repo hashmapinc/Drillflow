@@ -75,23 +75,19 @@ public class DotTranslator {
 
         String result = responseJson.toString();
 
-        // if options does not contain "returnElements" key OR "all" is not specified within it...
-        if (!optionsIn.containsKey("returnElements") || !("all".equals(optionsIn.get("returnElements")))) {
-
+        if ("requested".equals(optionsIn.get("returnElements") )|| "id-only".equals(optionsIn.get("returnElements"))) {
             // Check if the "id-only" case needs to be handled...
             if ("id-only".equals(optionsIn.get("returnElements"))) {
                 queryJson = QueryTemplateProvider.getIDOnly(wmlObject.getObjectType());
             }
-
-            // Perform the selective merge since "all" was not specified
-            //                             OR    the query JSON has been changed for "id-only" case
-            //                             OR    the "returnElements" was not given in "optionsIn" --
-            result = JsonUtil.merge(queryJson, responseJson).toString(); // WARNING: this method modifies query internally
+            result = JsonUtil.merge(queryJson, responseJson).toString();   // WARNING: this method modifies query internally
         }
 
         // doctor some commonly-butchered json keys
+        //TODO: This must be fixed in wol
+        result = result.replaceAll("\"dtimTrajStart\":","\"dTimTrajStart\":");
+        result = result.replaceAll("\"dtimTrajEnd\":","\"dTimTrajEnd\":");
         result = result.replaceAll("\"dtimStn\":","\"dTimStn\":");
-
         // convert the queryJSON back to valid xml
         LOG.finest("Converting merged query JSON to valid XML string");
         try {
@@ -103,17 +99,14 @@ public class DotTranslator {
                     return WitsmlMarshal.deserializeFromJSON(
                         result, ObjWellbore.class);
                 case "trajectory":
-                    ObjTrajectory traj = WitsmlMarshal.deserializeFromJSON(
-                        result, ObjTrajectory.class);
-                    if (optionsIn.containsKey("returnElements")){
-                        //TODO: Please ensure that the options in parser can convert to lowercase on parsing to remove this verbose code
-                        if("station-location-only".equals(optionsIn.get("returnElements").toLowerCase())
-                                || "data-only".equals(optionsIn.get("returnElements").toLowerCase())) {
-                            return buildStationOnlyTrajectory(traj);
-                        } else if ("header-only".equals(optionsIn.get("returnElements").toLowerCase())) {
-                            traj.setTrajectoryStation(null);
-                            return traj;
-                        }
+                    ObjTrajectory traj = WitsmlMarshal.deserializeFromJSON(result, ObjTrajectory.class);
+
+                    if("station-location-only".equals(optionsIn.get("returnElements"))
+                            || "data-only".equals(optionsIn.get("returnElements"))) {
+                        return buildStationOnlyTrajectory(traj);
+                    } else if ("header-only".equals(optionsIn.get("returnElements"))) {
+                        traj.setTrajectoryStation(null);
+                        return traj;
                     }
                     return traj;
                 case "log":

@@ -17,6 +17,7 @@ package com.hashmapinc.tempus.witsml;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 
@@ -73,21 +74,22 @@ public class WitsmlUtil {
     public static HashMap<String,String> parseOptionsIn(
         String optionsIn
     ) {
+        HashMap<String, String> map = new HashMap<>();
         LOG.info("trying to parse optionsIn...");
-        if (optionsIn.isEmpty())
-            return new HashMap<>();
-        //parse the string
+        if (optionsIn.isEmpty()) {
+            return map;
+        }
+
         try {
-            HashMap<String, String> map = new HashMap<>();
             Arrays.stream(optionsIn.split(";")).forEach(optionString -> {
                 String[] option = optionString.split("=");
-                map.put(option[0], option[1]);
+                map.put(option[0], option[1].toLowerCase());
             });
             return map;
         }catch (Exception ex){
             LOG.fine("Error parsing options in.");
         }
 
-        return new HashMap<>();
+        return map;
     }
 }
