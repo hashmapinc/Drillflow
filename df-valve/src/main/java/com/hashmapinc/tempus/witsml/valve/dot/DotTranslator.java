@@ -141,6 +141,7 @@ public class DotTranslator {
         if (traj.getTrajectoryStation() != null) {
             for (CsTrajectoryStation station : traj.getTrajectoryStation()) {
                 CsTrajectoryStation smallStation = new CsTrajectoryStation();
+                smallStation.setUid(station.getUid());
                 smallStation.setDTimStn(station.getDTimStn());
                 smallStation.setTypeTrajStation(station.getTypeTrajStation());
                 smallStation.setMd(station.getMd());
