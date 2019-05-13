@@ -105,10 +105,15 @@ public class DotTranslator {
                 case "trajectory":
                     ObjTrajectory traj = WitsmlMarshal.deserializeFromJSON(
                         result, ObjTrajectory.class);
-                    if (optionsIn.containsKey("returnElements")
-                            && ("station-location-only".equals(optionsIn.get("returnElements").toLowerCase()))
-                            || "data-only".equals(optionsIn.get("returnElements").toLowerCase())) {
-                        return buildStationOnlyTrajectory(traj);
+                    if (optionsIn.containsKey("returnElements")){
+                        //TODO: Please ensure that the options in parser can convert to lowercase on parsing to remove this verbose code
+                        if("station-location-only".equals(optionsIn.get("returnElements").toLowerCase())
+                                || "data-only".equals(optionsIn.get("returnElements").toLowerCase())) {
+                            return buildStationOnlyTrajectory(traj);
+                        } else if ("header-only".equals(optionsIn.get("returnElements").toLowerCase())) {
+                            traj.setTrajectoryStation(null);
+                            return traj;
+                        }
                     }
                     return traj;
                 case "log":
@@ -140,16 +145,18 @@ public class DotTranslator {
             CsCommonData commonData = new CsCommonData();
             commonData.setDTimLastChange(traj.getCommonData().getDTimLastChange());
         }
-        for(CsTrajectoryStation station : traj.getTrajectoryStation()){
-            CsTrajectoryStation smallStation = new CsTrajectoryStation();
-            smallStation.setDTimStn(station.getDTimStn());
-            smallStation.setTypeTrajStation(station.getTypeTrajStation());
-            smallStation.setMd(station.getMd());
-            smallStation.setTvd(station.getTvd());
-            smallStation.setIncl(station.getIncl());
-            smallStation.setAzi(station.getAzi());
-            smallStation.setLocation(station.getLocation());
-            smallTraj.getTrajectoryStation().add(smallStation);
+        if (traj.getTrajectoryStation() != null) {
+            for (CsTrajectoryStation station : traj.getTrajectoryStation()) {
+                CsTrajectoryStation smallStation = new CsTrajectoryStation();
+                smallStation.setDTimStn(station.getDTimStn());
+                smallStation.setTypeTrajStation(station.getTypeTrajStation());
+                smallStation.setMd(station.getMd());
+                smallStation.setTvd(station.getTvd());
+                smallStation.setIncl(station.getIncl());
+                smallStation.setAzi(station.getAzi());
+                smallStation.setLocation(station.getLocation());
+                smallTraj.getTrajectoryStation().add(smallStation);
+            }
         }
         return smallTraj;
     }

@@ -135,6 +135,42 @@ public class DotTranslatorTest {
     }
 
     @Test
+    public void headerOnlyTrajectoryTests() throws JAXBException, IOException, ValveException {
+        // Load the strings from the test resources
+        String dotResponse = TestUtilities.getResourceAsString("trajectory1411.xml");
+        String soapQuery = TestUtilities.getResourceAsString("trajectoryGraphql/FullTrajectoryQuery1411.xml");
+
+        // Get the Query object
+        com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys trajQuery =
+                WitsmlMarshal.deserialize(soapQuery, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys.class);
+        AbstractWitsmlObject trajQuerySingular = trajQuery.getTrajectory().get(0);
+
+        // Create the "DOT Response Object"...which is just a 1411 object (meaning deserialize the string from earlier)
+        com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys respTrajs =
+                WitsmlMarshal.deserialize(dotResponse, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys.class);
+
+        // Get the singluar object
+        AbstractWitsmlObject respTraj = respTrajs.getTrajectory().get(0);
+
+        // Create the JSON to simulate the response from DoT
+        String respJson = respTraj.getJSONString("1.4.1.1");
+
+        // Setup the options in for the test
+        Map<String,String> optionsIn = new HashMap<>();
+        optionsIn.put("returnElements", "header-only");
+
+        // Do the translation
+        AbstractWitsmlObject resp = DotTranslator.translateQueryResponse(trajQuerySingular, respJson, optionsIn);
+
+        // Cast it to the concrete traj object as the response...since the query was 1411 the result of the
+        // translation should be 1411
+        com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory resultTraj =
+                (com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory)resp;
+
+        assertEquals(0, resultTraj.getTrajectoryStation().size());
+    }
+
+    @Test
     public void consolidateObjectsToXMLWellBoreTest() throws ValveException {
 
         // build well list
