@@ -17,7 +17,6 @@ package com.hashmapinc.tempus.witsml;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Logger;
 
 
