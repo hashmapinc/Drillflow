@@ -89,20 +89,50 @@ public class DotTranslatorTest {
 
     @Test
     public void stationLocationOnlyTrajectoryTest() throws JAXBException, IOException, ValveException {
-        String query = TestUtilities.getResourceAsString("trajectory1311.xml");
+        // Load the strings from the test resources
+        String dotResponse = TestUtilities.getResourceAsString("trajectory1411.xml");
         String soapQuery = TestUtilities.getResourceAsString("trajectoryGraphql/FullTrajectoryQuery1411.xml");
+
+        // Get the Query object
         com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys trajQuery =
                 WitsmlMarshal.deserialize(soapQuery, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys.class);
-        com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory trajQuerySingular = trajQuery.getTrajectory().get(0);
-        ObjTrajectorys trajs = WitsmlMarshal.deserialize(query, ObjTrajectorys.class);
-        ObjTrajectory traj = trajs.getTrajectory().get(0);
-        String jsonTraj = traj.getJSONString("1.4.1.1");
+        AbstractWitsmlObject trajQuerySingular = trajQuery.getTrajectory().get(0);
+
+        // Create the "DOT Response Object"...which is just a 1411 object (meaning deserialize the string from earlier)
+        com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys respTrajs =
+                WitsmlMarshal.deserialize(dotResponse, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys.class);
+
+        // Get the singluar object
+        AbstractWitsmlObject respTraj = respTrajs.getTrajectory().get(0);
+
+        // Create the JSON to simulate the response from DoT
+        String respJson = respTraj.getJSONString("1.4.1.1");
+
+        // Setup the options in for the test
         Map<String,String> optionsIn = new HashMap<>();
         optionsIn.put("returnElements", "station-location-only");
-        AbstractWitsmlObject resp = DotTranslator.translateQueryResponse(trajQuerySingular, jsonTraj, optionsIn);
-        assertNotNull(resp);
 
-        assertNotNull(resp.getName());
+        // Do the translation
+        AbstractWitsmlObject resp = DotTranslator.translateQueryResponse(trajQuerySingular, respJson, optionsIn);
+
+        // Cast it to the concrete traj object as the response...since the query was 1411 the result of the
+        // translation should be 1411
+        com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory resultTraj =
+                (com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory)resp;
+
+        assertNull(resultTraj.getServiceCompany());
+        assertNull(resultTraj.getGridCorUsed());
+        assertNull(resultTraj.getAziRef());
+        assertNull(resultTraj.getMagDeclUsed());
+        assertNull(resultTraj.getAziVertSect());
+        assertNotNull(resultTraj.getName());
+        assertNotNull(resultTraj.getUid());
+        assertNotNull(resultTraj.getNameWell());
+        assertNotNull(resultTraj.getUidWell());
+        assertNotNull(resultTraj.getNameWellbore());
+        assertNotNull(resultTraj.getUidWellbore());
+        assertNotNull(resultTraj.getTrajectoryStation());
+        assertEquals(1, resultTraj.getTrajectoryStation().size());
     }
 
     @Test
