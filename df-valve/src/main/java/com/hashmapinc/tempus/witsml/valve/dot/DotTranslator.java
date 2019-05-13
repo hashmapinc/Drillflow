@@ -17,10 +17,7 @@ package com.hashmapinc.tempus.witsml.valve.dot;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.WitsmlObjects.Util.*;
-import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory;
-import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell;
-import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore;
-import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.*;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
 import org.json.JSONObject;
 
@@ -106,8 +103,14 @@ public class DotTranslator {
                     return WitsmlMarshal.deserializeFromJSON(
                         result, ObjWellbore.class);
                 case "trajectory":
-                    return WitsmlMarshal.deserializeFromJSON(
+                    ObjTrajectory traj = WitsmlMarshal.deserializeFromJSON(
                         result, ObjTrajectory.class);
+                    if (optionsIn.containsKey("returnElements")
+                            && ("station-location-only".equals(optionsIn.get("returnElements").toLowerCase()))
+                            || "data-only".equals(optionsIn.get("returnElements").toLowerCase())) {
+                        return buildStationOnlyTrajectory(traj);
+                    }
+                    return traj;
                 case "log":
                     return WitsmlMarshal.deserializeFromJSON(
                             result, ObjLog.class);
@@ -117,6 +120,38 @@ public class DotTranslator {
         } catch (IOException ioe) {
             throw new ValveException(ioe.getMessage());
         }
+    }
+
+    /**
+     * This function builds a station-location-only response for trajectory
+     * @param traj The full trajectory
+     * @return The smaller station-location-only trajectory
+     */
+    private static ObjTrajectory buildStationOnlyTrajectory(ObjTrajectory traj){
+        ObjTrajectory smallTraj = new ObjTrajectory();
+        smallTraj.setUid(traj.getUid());
+        smallTraj.setUidWell(traj.getUidWell());
+        smallTraj.setUidWellbore(traj.getUidWellbore());
+        smallTraj.setNameWell(traj.getNameWell());
+        smallTraj.setNameWellbore(traj.getNameWellbore());
+        smallTraj.setName(traj.getName());
+        smallTraj.setObjectGrowing(traj.isObjectGrowing());
+        if (traj.getCommonData() != null){
+            CsCommonData commonData = new CsCommonData();
+            commonData.setDTimLastChange(traj.getCommonData().getDTimLastChange());
+        }
+        for(CsTrajectoryStation station : traj.getTrajectoryStation()){
+            CsTrajectoryStation smallStation = new CsTrajectoryStation();
+            smallStation.setDTimStn(station.getDTimStn());
+            smallStation.setTypeTrajStation(station.getTypeTrajStation());
+            smallStation.setMd(station.getMd());
+            smallStation.setTvd(station.getTvd());
+            smallStation.setIncl(station.getIncl());
+            smallStation.setAzi(station.getAzi());
+            smallStation.setLocation(station.getLocation());
+            smallTraj.getTrajectoryStation().add(smallStation);
+        }
+        return smallTraj;
     }
 
     /**

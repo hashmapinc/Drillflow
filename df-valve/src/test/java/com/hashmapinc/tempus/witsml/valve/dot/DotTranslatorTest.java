@@ -18,19 +18,23 @@ package com.hashmapinc.tempus.witsml.valve.dot;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectorys;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.CsCommonData;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.WellElevationCoord;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
+import com.hashmapinc.tempus.witsml.valve.dot.model.log.DotLogDataHelper;
+import com.sun.istack.NotNull;
 import org.junit.Test;
 
+import javax.xml.bind.JAXBException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class DotTranslatorTest {
 
@@ -83,6 +87,24 @@ public class DotTranslatorTest {
         actual = DotTranslator.consolidateObjectsToXML(witsmlObjects, clientVersion, objectType);
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void stationLocationOnlyTrajectoryTest() throws JAXBException, IOException, ValveException {
+        String query = TestUtilities.getResourceAsString("trajectory1311.xml");
+        String soapQuery = TestUtilities.getResourceAsString("trajectoryGraphql/FullTrajectoryQuery1411.xml");
+        com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys trajQuery =
+                WitsmlMarshal.deserialize(soapQuery, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys.class);
+        com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory trajQuerySingular = trajQuery.getTrajectory().get(0);
+        ObjTrajectorys trajs = WitsmlMarshal.deserialize(query, ObjTrajectorys.class);
+        ObjTrajectory traj = trajs.getTrajectory().get(0);
+        String jsonTraj = traj.getJSONString("1.4.1.1");
+        Map<String,String> optionsIn = new HashMap<>();
+        optionsIn.put("returnElements", "station-location-only");
+        AbstractWitsmlObject resp = DotTranslator.translateQueryResponse(trajQuerySingular, jsonTraj, optionsIn);
+        assertNotNull(resp);
+
+        assertNotNull(resp.getName());
     }
 
     @Test

@@ -584,13 +584,13 @@ public class ChannelSet {
         cs.setNullValue(witsmlObj.getNullValue());
 
         // Sort out if this is a time or a depth log
-        String indexType = "depth";
-        if (witsmlObj.getIndexType().contains("depth")) {
+        String indexType = "Depth";
+        if (witsmlObj.getIndexType().toLowerCase().contains("depth")) {
             cs.setTimeDepth(indexType);
             cs.setStartIndex(witsmlObj.getStartIndex().getValue().toString());
             cs.setEndIndex(witsmlObj.getEndIndex().getValue().toString());
         } else {
-            indexType = "time";
+            indexType = "Time";
             cs.setTimeDepth(indexType);
             cs.setStartIndex(witsmlObj.getStartDateTimeIndex().toXMLFormat());
             cs.setEndIndex(witsmlObj.getEndDateTimeIndex().toXMLFormat());
@@ -618,13 +618,13 @@ public class ChannelSet {
         cs.setLoggingCompanyName(witsmlObj.getServiceCompany());
         cs.setNullValue(witsmlObj.getNullValue());
         // Sort out if this is a time or a depth log
-        String indexType = "depth";
-        if (witsmlObj.getIndexType().contains("depth")) {
+        String indexType = "Depth";
+        if (witsmlObj.getIndexType().toLowerCase().contains("depth")) {
             cs.setTimeDepth(indexType);
             cs.setStartIndex(witsmlObj.getStartIndex().getValue().toString());
             cs.setEndIndex(witsmlObj.getEndIndex().getValue().toString());
         } else {
-            indexType = "time";
+            indexType = "Time";
             cs.setTimeDepth(indexType);
             cs.setStartIndex(witsmlObj.getStartDateTimeIndex().toXMLFormat());
             cs.setEndIndex(witsmlObj.getEndDateTimeIndex().toXMLFormat());
