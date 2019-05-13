@@ -24,8 +24,6 @@ import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.CsCommonData;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.WellElevationCoord;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
-import com.hashmapinc.tempus.witsml.valve.dot.model.log.DotLogDataHelper;
-import com.sun.istack.NotNull;
 import org.junit.Test;
 
 import javax.xml.bind.JAXBException;
