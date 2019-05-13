@@ -66,18 +66,20 @@ public class DotLogDataHelper extends LogDataHelper {
 
     public static String convertDataToDotFrom1411(com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog log){
         String result = "{";
-        result = result + "\"mnemonicList\":" + "\"" + log.getLogData().get(0).getMnemonicList() + "\"" + ",";
+        String wml20MnemonicList = log.getLogData().get(0).getMnemonicList();
+        String curveMnemonics = wml20MnemonicList.substring(wml20MnemonicList.indexOf(",")+1);
+        result = result + "\"mnemonicList\":" + "\"" + curveMnemonics + "\"" + ",";
         result = result + "\"data\":" + "\"" + convertDataToWitsml20From1411(log) + "\"}";
         return result;
     }
 
     public static String convertDataToDotFrom1311(com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog log){
         String result = "{";
-        String mnemList="";
-        for (int i = 0; i < log.getLogCurveInfo().size(); i++){
-            mnemList = mnemList + log.getLogCurveInfo().get(i).getMnemonic();
+        StringBuilder mnemList= new StringBuilder();
+        for (int i = 1; i < log.getLogCurveInfo().size(); i++){
+            mnemList.append(log.getLogCurveInfo().get(i).getMnemonic());
             if ((i + 1) < log.getLogCurveInfo().size())
-                mnemList = mnemList + ",";
+                mnemList.append(",");
         }
         result = result + "\"mnemonicList\":" + "\"" + mnemList + "\"" + ",";
         result = result + "\"data\":" + "\"" + convertDataToWitsml20From1311(log) + "\"}";

@@ -351,23 +351,11 @@ public class DotDelegator {
 			request.queryString("uidWell", witsmlObj.getParentUid()); // TODO: error handle this?
 		} else if ("trajectory".equals(objectType)) {
 			request.queryString("uidWellbore", witsmlObj.getParentUid());
-			String uidWell;
-			if ("1.4.1.1".equals(version)) {
-				uidWell = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory) witsmlObj).getUidWell();
-			} else {
-				uidWell = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory) witsmlObj).getUidWell();
-			}
-			request.queryString("uidWell", uidWell);
+			request.queryString("uidWell", witsmlObj.getGrandParentUid());
 		} else if ("log".equals(objectType)) {
 			request.queryString("uid", uid);
 			request.queryString("uidWellbore", witsmlObj.getParentUid());
-			String uidWell;
-			if ("1.4.1.1".equals(version)) {
-				uidWell = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj).getUidWell();
-			} else {
-				uidWell = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj).getUidWell();
-			}
-			request.queryString("uidWell", uidWell);
+			request.queryString("uidWell", witsmlObj.getGrandParentUid());
 		}
 
 		// add the header and payload

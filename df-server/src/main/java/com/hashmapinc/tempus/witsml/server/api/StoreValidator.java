@@ -93,8 +93,10 @@ public class StoreValidator {
                 if (xmlIn.contains("uid")) {
                     return -428;
                 }
+                if (optionsMap.size() > 2)
+                    return -427;
                 // there must not be another optionIn present
-                if (optionsMap.size() > 1) {
+                if (optionsMap.size() >= 2 && !optionsMap.containsKey("returnElements")) {
                     return -427;
                 }
             }
