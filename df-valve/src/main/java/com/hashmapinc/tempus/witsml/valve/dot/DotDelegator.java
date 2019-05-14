@@ -302,7 +302,9 @@ public class DotDelegator {
         if (LOG_OBJECT.equals(objectType)) {
             // get up to three (3) payloads for log
             String[] payloads = getPayloads4LogUsingPayloadAndWitsmlObj(version, payload, witsmlObj);
-            channelPayload = payloads[CHANNELS_IDX_4_PAYLOADS];
+            channelSetPayload = payloads[CS_IDX_4_PAYLOADS];
+            // TODO return back here to handle null pointer exceptions
+            // channelPayload = payloads[CHANNELS_IDX_4_PAYLOADS];
             dataPayload = payloads[DATA_IDX_4_PAYLOADS];
             // TODO just a placeholder ... fix this
             request = Unirest.put(endpoint);
@@ -318,6 +320,7 @@ public class DotDelegator {
                 // ************************* CHANNELSET *************************
                 if (null != UidUuidCache.getUuid(witsmlObj.getParentUid(),
                         witsmlObj.getGrandParentUid())) {
+                    // TODO still need to test this path
                     uuid = UidUuidCache.getUuid(witsmlObj.getParentUid(),
                             witsmlObj.getGrandParentUid());
                 } else {
@@ -329,11 +332,11 @@ public class DotDelegator {
                             witsmlObj.getParentUid(),
                             witsmlObj.getGrandParentUid());
                 }
+                // TODO check if there is anything to update
                 // .../witsml/channelSets/{uuid}
                 endpoint = this.getEndpoint(objectType);
-                // TODO add uuid as the query string parameter for rest call
                 endpoint = endpoint + "/{" + uuid + "}";
-                request = Unirest.put(endpoint);
+                request = Unirest.patch(endpoint);
                 makeRequests4Log(request, channelSetPayload, objectType, witsmlObj,
                         exchangeID, username, password, client, response);
             }

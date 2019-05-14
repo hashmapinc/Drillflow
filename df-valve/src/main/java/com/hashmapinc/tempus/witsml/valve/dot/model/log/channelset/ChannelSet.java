@@ -584,9 +584,10 @@ public class ChannelSet {
         cs.setNullValue(witsmlObj.getNullValue());
 
         // Sort out if this is a time or a depth log
-        String indexType = "depth";
+        String indexType;
         if (witsmlObj.getIndexType()!=null){
             if (witsmlObj.getIndexType().contains("depth")) {
+                indexType = "depth";
                 cs.setTimeDepth(indexType);
                 cs.setStartIndex(witsmlObj.getStartIndex().getValue().toString());
                 cs.setEndIndex(witsmlObj.getEndIndex().getValue().toString());

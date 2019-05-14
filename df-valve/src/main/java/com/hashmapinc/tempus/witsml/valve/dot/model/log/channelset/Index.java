@@ -107,19 +107,21 @@ public class Index {
             return null;
         }
 
-        String indexType = "depth";
+        String indexType = null;
 
         if (log.getIndexType()!=null) {
-            if (log.getIndexType().contains("time"))
+            if (log.getIndexType().contains("time")) {
                 indexType = "time";
-        } else {
-            indexType = "";
+            } else {
+                indexType = "depth";
+            }
         }
 
         Index index = new Index();
         index.setDirection(log.getDirection());
         index.setMnemonic(log.getIndexCurve());
-        index.setIndexType(indexType);
+        if (indexType != null)
+            index.setIndexType(indexType);
 
         Optional<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> matchingObject =
                 log
@@ -127,7 +129,10 @@ public class Index {
                 .stream()
                 .filter(p -> p.getMnemonic().getValue().equals(log.getIndexCurve()))
                 .findFirst();
-        index.setUom(matchingObject.get().getUnit());
+        if (!matchingObject.isEmpty()) {
+            index.setUom(matchingObject.get().getUnit());
+        }
+
         List<Index> indices = new ArrayList<Index>();
         indices.add(index);
         
