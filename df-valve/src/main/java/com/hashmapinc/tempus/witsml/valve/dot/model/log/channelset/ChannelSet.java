@@ -493,6 +493,51 @@ public class ChannelSet {
         this.wellId = wellId;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChannelSet that = (ChannelSet) o;
+        return Objects.equals(uuid, that.uuid) &&
+                Objects.equals(bhaRunNumber, that.bhaRunNumber) &&
+                Objects.equals(aliases, that.aliases) &&
+                Objects.equals(citation, that.citation) &&
+                Objects.equals(customData, that.customData) &&
+                Objects.equals(objectVersion, that.objectVersion) &&
+                Objects.equals(index, that.index) &&
+                Objects.equals(dataUpateRate, that.dataUpateRate) &&
+                Objects.equals(curveSensorsAligned, that.curveSensorsAligned) &&
+                Objects.equals(dataGroup, that.dataGroup) &&
+                Objects.equals(stepIncrement, that.stepIncrement) &&
+                Objects.equals(logParam, that.logParam) &&
+                Objects.equals(dataDelimiter, that.dataDelimiter) &&
+                Objects.equals(nullValue, that.nullValue) &&
+                Objects.equals(channelState, that.channelState) &&
+                Objects.equals(timeDepth, that.timeDepth) &&
+                Objects.equals(channelClass, that.channelClass) &&
+                Objects.equals(runNumber, that.runNumber) &&
+                Objects.equals(passNumber, that.passNumber) &&
+                Objects.equals(loggingCompanyName, that.loggingCompanyName) &&
+                Objects.equals(loggingCompanyCode, that.loggingCompanyCode) &&
+                Objects.equals(toolName, that.toolName) &&
+                Objects.equals(toolClass, that.toolClass) &&
+                Objects.equals(derivation, that.derivation) &&
+                Objects.equals(loggingMethod, that.loggingMethod) &&
+                Objects.equals(nominalHoleSize, that.nominalHoleSize) &&
+                Objects.equals(dataContext, that.dataContext) &&
+                Objects.equals(commonData, that.commonData) &&
+                Objects.equals(uid, that.uid) &&
+                Objects.equals(uidWell, that.uidWell) &&
+                Objects.equals(uidWellbore, that.uidWellbore) &&
+                Objects.equals(wellId, that.wellId) &&
+                Objects.equals(wellboreId, that.wellboreId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(uuid, bhaRunNumber, aliases, citation, customData, objectVersion, index, dataUpateRate, curveSensorsAligned, dataGroup, stepIncrement, logParam, dataDelimiter, nullValue, channelState, timeDepth, channelClass, runNumber, passNumber, loggingCompanyName, loggingCompanyCode, toolName, toolClass, derivation, loggingMethod, nominalHoleSize, dataContext, commonData, uid, uidWell, uidWellbore, wellId, wellboreId);
+    }
+
     @JsonProperty("wellboreId")
     public String getWellboreId() {
         return wellboreId;
@@ -525,6 +570,8 @@ public class ChannelSet {
         Citation citation = new Citation();
         citation.setTitle(witsmlObj.getName());
         citation.setDescription(witsmlObj.getDescription());
+        if (witsmlObj.getCreationDate() != null)
+            citation.setCreation(witsmlObj.getCreationDate().toXMLFormat());
         cs.setCitation(citation);
         cs.setBhaRunNumber(witsmlObj.getBhaRunNumber());
         cs.setDataGroup(witsmlObj.getDataGroup());
@@ -538,20 +585,22 @@ public class ChannelSet {
 
         // Sort out if this is a time or a depth log
         String indexType = "depth";
-        if (witsmlObj.getIndexType().contains("depth")) {
-            cs.setTimeDepth(indexType);
-            cs.setStartIndex(witsmlObj.getStartIndex().getValue().toString());
-            cs.setEndIndex(witsmlObj.getEndIndex().getValue().toString());
-        } else {
-            indexType = "time";
-            cs.setTimeDepth(indexType);
-            cs.setStartIndex(witsmlObj.getStartDateTimeIndex().toXMLFormat());
-            cs.setEndIndex(witsmlObj.getEndDateTimeIndex().toXMLFormat());
+        if (witsmlObj.getIndexType()!=null){
+            if (witsmlObj.getIndexType().contains("depth")) {
+                cs.setTimeDepth(indexType);
+                cs.setStartIndex(witsmlObj.getStartIndex().getValue().toString());
+                cs.setEndIndex(witsmlObj.getEndIndex().getValue().toString());
+            } else {
+                indexType = "time";
+                cs.setTimeDepth(indexType);
+                cs.setStartIndex(witsmlObj.getStartDateTimeIndex().toXMLFormat());
+                cs.setEndIndex(witsmlObj.getEndDateTimeIndex().toXMLFormat());
+            }
         }
-
         cs.setNullValue(witsmlObj.getNullValue());
         cs.setObjectGrowing(witsmlObj.isObjectGrowing());
-        cs.setStepIncrement(StepIncrement.from1411(witsmlObj.getStepIncrement()));
+        if (StepIncrement.from1411(witsmlObj.getStepIncrement())!=null)
+            cs.setStepIncrement(StepIncrement.from1411(witsmlObj.getStepIncrement()));
         cs.setIndex(Index.from1411(witsmlObj));
         cs.setLogParam(LogParam.from1411(witsmlObj.getLogParam()));
         cs.setCommonData(CommonData.getCommonDataFrom1411(witsmlObj.getCommonData()));

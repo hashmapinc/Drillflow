@@ -17,11 +17,7 @@ package com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset;
 
 import com.fasterxml.jackson.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -112,16 +108,25 @@ public class Index {
         }
 
         String indexType = "depth";
-        if (log.getIndexType().contains("time"))
-            indexType = "time";
+
+        if (log.getIndexType()!=null) {
+            if (log.getIndexType().contains("time"))
+                indexType = "time";
+        } else {
+            indexType = "";
+        }
 
         Index index = new Index();
         index.setDirection(log.getDirection());
         index.setMnemonic(log.getIndexCurve());
         index.setIndexType(indexType);
 
-        Optional<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> matchingObject = log.getLogCurveInfo().stream()
-                .filter(p -> p.getMnemonic().getValue().equals(log.getIndexCurve())).findFirst();
+        Optional<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> matchingObject =
+                log
+                .getLogCurveInfo()
+                .stream()
+                .filter(p -> p.getMnemonic().getValue().equals(log.getIndexCurve()))
+                .findFirst();
         index.setUom(matchingObject.get().getUnit());
         List<Index> indices = new ArrayList<Index>();
         indices.add(index);
@@ -151,4 +156,20 @@ public class Index {
         return indices;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Index index = (Index) o;
+        return Objects.equals(indexType, index.indexType) &&
+                Objects.equals(uom, index.uom) &&
+                Objects.equals(direction, index.direction) &&
+                Objects.equals(mnemonic, index.mnemonic) &&
+                Objects.equals(datumReference, index.datumReference);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(indexType, uom, direction, mnemonic);
+    }
 }
