@@ -17,10 +17,7 @@ package com.hashmapinc.tempus.witsml.valve.dot;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.WitsmlObjects.Util.*;
-import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory;
-import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell;
-import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore;
-import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.*;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
 import org.json.JSONObject;
 
@@ -78,23 +75,19 @@ public class DotTranslator {
 
         String result = responseJson.toString();
 
-        // if options does not contain "returnElements" key OR "all" is not specified within it...
-        if (!optionsIn.containsKey("returnElements") || !("all".equals(optionsIn.get("returnElements")))) {
-
+        if ("requested".equals(optionsIn.get("returnElements") )|| "id-only".equals(optionsIn.get("returnElements"))) {
             // Check if the "id-only" case needs to be handled...
             if ("id-only".equals(optionsIn.get("returnElements"))) {
                 queryJson = QueryTemplateProvider.getIDOnly(wmlObject.getObjectType());
             }
-
-            // Perform the selective merge since "all" was not specified
-            //                             OR    the query JSON has been changed for "id-only" case
-            //                             OR    the "returnElements" was not given in "optionsIn" --
-            result = JsonUtil.merge(queryJson, responseJson).toString(); // WARNING: this method modifies query internally
+            result = JsonUtil.merge(queryJson, responseJson).toString();   // WARNING: this method modifies query internally
         }
 
         // doctor some commonly-butchered json keys
+        //TODO: This must be fixed in wol
+        result = result.replaceAll("\"dtimTrajStart\":","\"dTimTrajStart\":");
+        result = result.replaceAll("\"dtimTrajEnd\":","\"dTimTrajEnd\":");
         result = result.replaceAll("\"dtimStn\":","\"dTimStn\":");
-
         // convert the queryJSON back to valid xml
         LOG.finest("Converting merged query JSON to valid XML string");
         try {
@@ -106,8 +99,16 @@ public class DotTranslator {
                     return WitsmlMarshal.deserializeFromJSON(
                         result, ObjWellbore.class);
                 case "trajectory":
-                    return WitsmlMarshal.deserializeFromJSON(
-                        result, ObjTrajectory.class);
+                    ObjTrajectory traj = WitsmlMarshal.deserializeFromJSON(result, ObjTrajectory.class);
+
+                    if("station-location-only".equals(optionsIn.get("returnElements"))
+                            || "data-only".equals(optionsIn.get("returnElements"))) {
+                        return buildStationOnlyTrajectory(traj);
+                    } else if ("header-only".equals(optionsIn.get("returnElements"))) {
+                        traj.setTrajectoryStation(null);
+                        return traj;
+                    }
+                    return traj;
                 case "log":
                     return WitsmlMarshal.deserializeFromJSON(
                             result, ObjLog.class);
@@ -117,6 +118,41 @@ public class DotTranslator {
         } catch (IOException ioe) {
             throw new ValveException(ioe.getMessage());
         }
+    }
+
+    /**
+     * This function builds a station-location-only response for trajectory
+     * @param traj The full trajectory
+     * @return The smaller station-location-only trajectory
+     */
+    private static ObjTrajectory buildStationOnlyTrajectory(ObjTrajectory traj){
+        ObjTrajectory smallTraj = new ObjTrajectory();
+        smallTraj.setUid(traj.getUid());
+        smallTraj.setUidWell(traj.getUidWell());
+        smallTraj.setUidWellbore(traj.getUidWellbore());
+        smallTraj.setNameWell(traj.getNameWell());
+        smallTraj.setNameWellbore(traj.getNameWellbore());
+        smallTraj.setName(traj.getName());
+        smallTraj.setObjectGrowing(traj.isObjectGrowing());
+        if (traj.getCommonData() != null){
+            CsCommonData commonData = new CsCommonData();
+            commonData.setDTimLastChange(traj.getCommonData().getDTimLastChange());
+        }
+        if (traj.getTrajectoryStation() != null) {
+            for (CsTrajectoryStation station : traj.getTrajectoryStation()) {
+                CsTrajectoryStation smallStation = new CsTrajectoryStation();
+                smallStation.setUid(station.getUid());
+                smallStation.setDTimStn(station.getDTimStn());
+                smallStation.setTypeTrajStation(station.getTypeTrajStation());
+                smallStation.setMd(station.getMd());
+                smallStation.setTvd(station.getTvd());
+                smallStation.setIncl(station.getIncl());
+                smallStation.setAzi(station.getAzi());
+                smallStation.setLocation(station.getLocation());
+                smallTraj.getTrajectoryStation().add(smallStation);
+            }
+        }
+        return smallTraj;
     }
 
     /**

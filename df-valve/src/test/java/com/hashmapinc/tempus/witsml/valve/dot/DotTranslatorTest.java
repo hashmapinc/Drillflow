@@ -25,12 +25,13 @@ import com.hashmapinc.tempus.WitsmlObjects.v1411.WellElevationCoord;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
 import org.junit.Test;
 
+import javax.xml.bind.JAXBException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class DotTranslatorTest {
 
@@ -83,6 +84,90 @@ public class DotTranslatorTest {
         actual = DotTranslator.consolidateObjectsToXML(witsmlObjects, clientVersion, objectType);
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void stationLocationOnlyTrajectoryTest() throws JAXBException, IOException, ValveException {
+        // Load the strings from the test resources
+        String dotResponse = TestUtilities.getResourceAsString("trajectory1411.xml");
+        String soapQuery = TestUtilities.getResourceAsString("trajectoryGraphql/FullTrajectoryQuery1411.xml");
+
+        // Get the Query object
+        com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys trajQuery =
+                WitsmlMarshal.deserialize(soapQuery, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys.class);
+        AbstractWitsmlObject trajQuerySingular = trajQuery.getTrajectory().get(0);
+
+        // Create the "DOT Response Object"...which is just a 1411 object (meaning deserialize the string from earlier)
+        com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys respTrajs =
+                WitsmlMarshal.deserialize(dotResponse, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys.class);
+
+        // Get the singluar object
+        AbstractWitsmlObject respTraj = respTrajs.getTrajectory().get(0);
+
+        // Create the JSON to simulate the response from DoT
+        String respJson = respTraj.getJSONString("1.4.1.1");
+
+        // Setup the options in for the test
+        Map<String,String> optionsIn = new HashMap<>();
+        optionsIn.put("returnElements", "station-location-only");
+
+        // Do the translation
+        AbstractWitsmlObject resp = DotTranslator.translateQueryResponse(trajQuerySingular, respJson, optionsIn);
+
+        // Cast it to the concrete traj object as the response...since the query was 1411 the result of the
+        // translation should be 1411
+        com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory resultTraj =
+                (com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory)resp;
+
+        assertNull(resultTraj.getServiceCompany());
+        assertNull(resultTraj.getGridCorUsed());
+        assertNull(resultTraj.getAziRef());
+        assertNull(resultTraj.getMagDeclUsed());
+        assertNull(resultTraj.getAziVertSect());
+        assertNotNull(resultTraj.getName());
+        assertNotNull(resultTraj.getUid());
+        assertNotNull(resultTraj.getNameWell());
+        assertNotNull(resultTraj.getUidWell());
+        assertNotNull(resultTraj.getNameWellbore());
+        assertNotNull(resultTraj.getUidWellbore());
+        assertNotNull(resultTraj.getTrajectoryStation());
+        assertEquals(1, resultTraj.getTrajectoryStation().size());
+    }
+
+    @Test
+    public void headerOnlyTrajectoryTests() throws JAXBException, IOException, ValveException {
+        // Load the strings from the test resources
+        String dotResponse = TestUtilities.getResourceAsString("trajectory1411.xml");
+        String soapQuery = TestUtilities.getResourceAsString("trajectoryGraphql/FullTrajectoryQuery1411.xml");
+
+        // Get the Query object
+        com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys trajQuery =
+                WitsmlMarshal.deserialize(soapQuery, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys.class);
+        AbstractWitsmlObject trajQuerySingular = trajQuery.getTrajectory().get(0);
+
+        // Create the "DOT Response Object"...which is just a 1411 object (meaning deserialize the string from earlier)
+        com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys respTrajs =
+                WitsmlMarshal.deserialize(dotResponse, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys.class);
+
+        // Get the singluar object
+        AbstractWitsmlObject respTraj = respTrajs.getTrajectory().get(0);
+
+        // Create the JSON to simulate the response from DoT
+        String respJson = respTraj.getJSONString("1.4.1.1");
+
+        // Setup the options in for the test
+        Map<String,String> optionsIn = new HashMap<>();
+        optionsIn.put("returnElements", "header-only");
+
+        // Do the translation
+        AbstractWitsmlObject resp = DotTranslator.translateQueryResponse(trajQuerySingular, respJson, optionsIn);
+
+        // Cast it to the concrete traj object as the response...since the query was 1411 the result of the
+        // translation should be 1411
+        com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory resultTraj =
+                (com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory)resp;
+
+        assertEquals(0, resultTraj.getTrajectoryStation().size());
     }
 
     @Test
@@ -261,6 +346,7 @@ public class DotTranslatorTest {
         String responseString = "{\"country\":\"US\",\"dTimLicense\":\"2001-05-15T13:20:00+00:00\",\"numLicense\":\"Company License Number\",\"county\":\"Montgomery\",\"waterDepth\":{\"uom\":\"ft\",\"value\":520},\"operator\":\"Operating Company\",\"pcInterest\":{\"uom\":\"%\",\"value\":65},\"dTimPa\":\"2001-07-15T15:30:00+00:00\",\"uid\":\"randy\",\"nameLegal\":\"Company Legal Name\",\"block\":\"Block Name\",\"state\":\"TX\",\"operatorDiv\":\"Division Name\",\"groundElevation\":{\"uom\":\"FT\",\"value\":250},\"commonData\":{\"comments\":\"These are the comments associated with the Well data object.\",\"dTimLastChange\":\"2019-01-30T14:09:27.268843+00:00\",\"acquisitionTimeZone\":[],\"defaultDatum\":{\"value\":\"Kelly Bushing\",\"uidRef\":\"KB\"},\"itemState\":\"PLAN\",\"extensionNameValue\":[],\"dTimCreation\":\"2019-01-24T16:59:38.88059+00:00\"},\"timeZone\":\"-06:00\",\"statusWell\":\"DRILLING\",\"purposeWell\":\"EXPLORATION\",\"numAPI\":\"123-543-987AZ\",\"referencePoint\":[{\"uid\":\"SRP1\",\"name\":\"Slot Bay Centre\",\"location\":[{\"uid\":\"loc-1\",\"easting\":{\"uom\":\"m\",\"value\":425366.47},\"wellCRS\":{\"value\":\"ED50 \\/ UTM Zone 31N\",\"uidRef\":\"proj1\"},\"extensionNameValue\":[],\"northing\":{\"uom\":\"m\",\"value\":6623781.95}},{\"uid\":\"loc-2\",\"wellCRS\":{\"value\":\"WellOneWSP\",\"uidRef\":\"localWell1\"},\"localY\":{\"uom\":\"m\",\"value\":-3.74},\"description\":\"Location of the Site Reference Point with respect to the well surface point\",\"localX\":{\"uom\":\"m\",\"value\":12.63},\"extensionNameValue\":[]}],\"type\":\"Site Reference Point\",\"extensionNameValue\":[]},{\"elevation\":{\"datum\":\"SL\",\"uom\":\"FT\",\"value\":-118.4},\"uid\":\"WRP2\",\"measuredDepth\":{\"datum\":\"KB\",\"uom\":\"FT\",\"value\":173.09},\"name\":\"Sea Bed\",\"location\":[{\"uid\":\"loc-1\",\"easting\":{\"uom\":\"m\",\"value\":425353.84},\"wellCRS\":{\"value\":\"ED50 \\/ UTM Zone 31N\",\"uidRef\":\"proj1\"},\"extensionNameValue\":[],\"northing\":{\"uom\":\"m\",\"value\":6623785.69}},{\"uid\":\"loc-2\",\"wellCRS\":{\"value\":\"ED50\",\"uidRef\":\"geog1\"},\"latitude\":{\"uom\":\"dega\",\"value\":59.743844},\"extensionNameValue\":[],\"longitude\":{\"uom\":\"dega\",\"value\":1.67198083}}],\"type\":\"Well Reference Point\",\"extensionNameValue\":[]}],\"wellLocation\":[{\"uid\":\"loc-1\",\"easting\":{\"uom\":\"m\",\"value\":425353.84},\"wellCRS\":{\"value\":\"ED50 \\/ UTM Zone 31N\",\"uidRef\":\"proj1\"},\"description\":\"Location of well surface point in projected system.\",\"extensionNameValue\":[],\"northing\":{\"uom\":\"m\",\"value\":6623785.69}}],\"wellheadElevation\":{\"uom\":\"FT\",\"value\":500},\"field\":\"Big Field\",\"dTimSpud\":\"2001-05-31T08:15:00+00:00\",\"wellCRS\":[{\"uid\":\"geog1\",\"geodeticCRS\":{\"value\":\"4230\",\"uidRef\":\"4230\"},\"name\":\"ED50\",\"description\":\"ED50 system with EPSG code 4230.\",\"extensionNameValue\":[]},{\"uid\":\"proj1\",\"mapProjectionCRS\":{\"value\":\"ED50 \\/ UTM Zone 31N\",\"uidRef\":\"23031\"},\"name\":\"ED50 \\/ UTM Zone 31N\",\"extensionNameValue\":[]},{\"uid\":\"localWell1\",\"localCRS\":{\"usesWellAsOrigin\":true,\"xRotationCounterClockwise\":false,\"yAxisAzimuth\":{\"uom\":\"dega\",\"northDirection\":\"GRID_NORTH\",\"value\":0}},\"name\":\"WellOneWSP\",\"extensionNameValue\":[]}],\"district\":\"District Name\",\"name\":\"6507\\/7-A-42\",\"numGovt\":\"Govt-Number\",\"region\":\"Region Name\",\"wellDatum\":[{\"elevation\":{\"datum\":\"SL\",\"uom\":\"FT\",\"value\":78.5},\"uid\":\"KB\",\"code\":\"KB\",\"kind\":[],\"name\":\"Kelly Bushing\",\"extensionNameValue\":[]},{\"uid\":\"SL\",\"code\":\"SL\",\"datumName\":{\"namingSystem\":\"EPSG\",\"code\":\"5106\",\"value\":\"Caspian Sea\"},\"kind\":[],\"name\":\"Sea Level\",\"extensionNameValue\":[]}]}";
 
         Map<String, String> optionsIn = new HashMap<>();
+        optionsIn.put("returnElements", "requested");
 
         // get query response
         AbstractWitsmlObject abstractWitsmlObject = DotTranslator.translateQueryResponse(wmlObject, responseString, optionsIn);

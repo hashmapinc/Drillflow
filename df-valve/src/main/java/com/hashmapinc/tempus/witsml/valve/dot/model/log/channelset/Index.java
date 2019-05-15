@@ -107,9 +107,9 @@ public class Index {
             return null;
         }
 
-        String indexType = "depth";
+        String indexType = "Depth";
         if (log.getIndexType().contains("time"))
-            indexType = "time";
+            indexType = "Time";
 
         Index index = new Index();
         index.setDirection(log.getDirection());
@@ -130,9 +130,9 @@ public class Index {
             return null;
         }
 
-        String indexType = "depth";
+        String indexType = "Depth";
         if (log.getIndexType().contains("time"))
-            indexType = "time";
+            indexType = "Time";
 
         Index index = new Index();
         index.setIndexType(indexType);

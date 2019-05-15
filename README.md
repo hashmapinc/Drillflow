@@ -20,6 +20,14 @@ A dockerized WITSML API Server that is agnostic of the backend.
 
 ## Features
 
+Drillflow is an API facade that allows Oil and Gas software systems that currently expose drilling data to leverage WITSML to exchange data between other software systems and vendors. It is packaged as a docker image or a Spring Boot application to allow for minimum hassle at deploy time. It is also intended to be extensible and horizontally scalable to handle everything from a one time bulk load to a streaming application.
+
+### WHY?!?!?
+
+WITSML servers have been implemented in many forms and fashions over the relatively long lifespan of WITSML. The point of Drillflow is to ease the burden for software developers and system integrators to make use of WITSML data. Our goal is that if we can get this hurdle out of the way quicker, time to value is reduced.
+
+Our goal was to implement a WITSML server on a modern stack: Java 11, Spring Boot with CXF, deployed with docker.
+
 ## Requirements
 
 -   JDK 11 

@@ -31,9 +31,9 @@ public class WitsmlUtilTests {
         
         // create correct map
         HashMap<String,String> correctMap = new HashMap<>();
-        correctMap.put("coolOption", "coolValue");
-        correctMap.put("awesomeOption", "awesomeValue");
-        correctMap.put("chillOption", "chillValue");
+        correctMap.put("coolOption", "coolvalue");
+        correctMap.put("awesomeOption", "awesomevalue");
+        correctMap.put("chillOption", "chillvalue");
 
         // get parsed map
         HashMap<String,String> parsedMap = WitsmlUtil.parseOptionsIn(optionsIn);
