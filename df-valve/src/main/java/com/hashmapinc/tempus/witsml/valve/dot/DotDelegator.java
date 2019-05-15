@@ -28,7 +28,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory;
-import com.hashmapinc.tempus.WitsmlObjects.v1411.ShortNameStruct;
 import com.hashmapinc.tempus.witsml.ValveLogging;
 import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
@@ -189,9 +188,9 @@ public class DotDelegator {
 		// make the DELETE call.
 		HttpResponse<String> response=null;
 		if ("log".equals(objectType)) {
-			int logCurveSize = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj).getLogCurveInfo().size();
+			int logCurveSize = ((ObjLog) witsmlObj).getLogCurveInfo().size();
 			if (logCurveSize != 0) {
-				logCurveInfoUid = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj).getLogCurveInfo().get(0).getUid();
+				logCurveInfoUid = ((ObjLog) witsmlObj).getLogCurveInfo().get(0).getUid();
 				uuid = getUUID(uid,witsmlObj,client,username,password);
 				// Build Request for Get Channels
 				channelsEndPoint = this.getEndpoint("channels");
@@ -271,8 +270,6 @@ public class DotDelegator {
 		String endpoint = "";
 		HttpRequestWithBody request = null;
 		HttpResponse<String> response = null;
-		String serviceCompany = "";
-		String runNumber = "";
 
 		// It is an object delete, so re-route there
 		endpoint = this.getEndpoint(objectType) + uid; // add uid for delete call
