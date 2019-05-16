@@ -22,6 +22,7 @@ import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLogs;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog;
@@ -400,6 +401,133 @@ public class DotValveTest {
 
 		// verify
 		verify(this.mockDelegator).deleteObject(wellboreA, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.mockClient);
+		verifyNoMoreInteractions(this.mockDelegator);
+	}
+
+	@Test
+	public void shouldDeleteLogRecurringElement() throws Exception {
+		// build witsmlObjects lists
+		ArrayList<AbstractWitsmlObject> logs1311 = new ArrayList<>();
+		ArrayList<AbstractWitsmlObject> logs1411 = new ArrayList<>();
+
+		ObjLogs logsObj1311 = new ObjLogs();
+		com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLogs logsObj1411 = new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLogs();
+
+		// get traj 1311
+		ObjLog log1311 = new ObjLog();
+		log1311.setUid("HM_800023");
+		log1311.setUidWell("U2");
+		log1311.setUidWellbore("WBDD600");
+		com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo csLogCurveInfo = new com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo();
+		csLogCurveInfo.setUid("lci-13");
+		List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> csLogCurveInfoList = new ArrayList<>();
+		csLogCurveInfoList.add(csLogCurveInfo);
+		log1311.setLogCurveInfo(csLogCurveInfoList);
+		logs1311.add(log1311);
+		logsObj1311.addLog(log1311);
+
+		// get traj 1411
+		com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog log1411 = new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog();
+		log1411.setUid("HM_800023");
+		log1411.setUidWell("U2");
+		log1411.setUidWellbore("WBDD600");
+		csLogCurveInfo.setUid("lci-13");
+		csLogCurveInfoList.add(csLogCurveInfo);
+		log1411.setLogCurveInfo(csLogCurveInfoList);
+		logs1411.add(log1411);
+		logsObj1411.addLog(log1411);
+
+		// build query contexts
+		QueryContext qc1311 = new QueryContext(
+				"1.3.1.1",
+				"log",
+				null,
+				WitsmlMarshal.serialize(logsObj1311),
+				logs1311,
+				"goodUsername",
+				"goodPassword",
+				"shouldDeleteLogRecurringElement-1311" // exchange ID
+		);
+		QueryContext qc1411 = new QueryContext(
+				"1.4.1.1",
+				"log",
+				null,
+				WitsmlMarshal.serialize(logsObj1411),
+				logs1411,
+				"goodUsername",
+				"goodPassword",
+				"shouldDeleteLogRecurringElement-1411" // exchange ID
+		);
+
+		// test deletes
+		this.valve.deleteObject(qc1311);
+		this.valve.deleteObject(qc1411);
+
+		// verify
+		verify(this.mockDelegator).deleteObject(log1311, qc1311.USERNAME, qc1311.PASSWORD, qc1311.EXCHANGE_ID, this.mockClient);
+		verify(this.mockDelegator).deleteObject(log1411, qc1411.USERNAME, qc1411.PASSWORD, qc1411.EXCHANGE_ID, this.mockClient);
+		verifyNoMoreInteractions(this.mockDelegator);
+	}
+
+
+	@Test
+	public void shouldDeleteLogSubNode() throws Exception {
+		// build witsmlObjects lists
+		ArrayList<AbstractWitsmlObject> logs1311 = new ArrayList<>();
+		ArrayList<AbstractWitsmlObject> logs1411 = new ArrayList<>();
+
+		ObjLogs logsObj1311 = new ObjLogs();
+		com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLogs logsObj1411 = new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLogs();
+
+		// get log 1311
+		ObjLog log1311 = new ObjLog();
+		log1311.setUid("HM_800023");
+		log1311.setUidWell("U2");
+		log1311.setUidWellbore("WBDD600");
+		log1311.setServiceCompany(null);
+		log1311.setRunNumber(null);
+		logs1311.add(log1311);
+		logsObj1311.addLog(log1311);
+
+		// get log 1411
+		com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog log1411 = new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog();
+		log1411.setUid("HM_800023");
+		log1411.setUidWell("U2");
+		log1411.setUidWellbore("WBDD600");
+		log1411.setServiceCompany(null);
+		log1411.setRunNumber(null);
+		logs1411.add(log1411);
+		logsObj1411.addLog(log1411);
+
+		// build query contexts
+		QueryContext qc1311 = new QueryContext(
+				"1.3.1.1",
+				"log",
+				null,
+				WitsmlMarshal.serialize(logsObj1311),
+				logs1311,
+				"goodUsername",
+				"goodPassword",
+				"shouldDeleteLogSubNode-1311" // exchange ID
+		);
+		QueryContext qc1411 = new QueryContext(
+				"1.4.1.1",
+				"log",
+				null,
+				WitsmlMarshal.serialize(logsObj1411),
+				logs1411,
+				"goodUsername",
+				"goodPassword",
+				"shouldDeleteLogSubNode-1411" // exchange ID
+		);
+
+		// test deletes
+		this.valve.deleteObject(qc1311);
+		this.valve.deleteObject(qc1411);
+
+		// verify
+		verify(this.mockDelegator).deleteObject(log1311, qc1311.USERNAME, qc1311.PASSWORD, qc1311.EXCHANGE_ID, this.mockClient);
+		verify(this.mockDelegator).deleteObject(log1411, qc1411.USERNAME, qc1411.PASSWORD, qc1411.EXCHANGE_ID, this.mockClient);
 		verifyNoMoreInteractions(this.mockDelegator);
 	}
 
