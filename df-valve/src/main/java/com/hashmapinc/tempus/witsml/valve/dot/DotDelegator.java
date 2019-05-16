@@ -37,7 +37,7 @@ import com.hashmapinc.tempus.witsml.valve.dot.graphql.GraphQLQueryConverter;
 import com.hashmapinc.tempus.witsml.valve.dot.graphql.GraphQLRespConverter;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.DotLogDataHelper;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.LogConverterExtended;
-import com.hashmapinc.tempus.witsml.valve.dot.model.log.channel.Channel;
+import com.hashmapinc.tempus.witsml.valve.dot.model.log.channel.*;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.ChannelSet;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -63,6 +63,7 @@ public class DotDelegator {
 	private final String LOG_CHANNELSET_UUID;
 	private final String LOG_CHANNELS;
 	private final String LOG_CHANNEL_DATA;
+	private final String LOG_MNEMONIC_PATH;
 
 	/**
 	 * Map based constructor
@@ -82,6 +83,7 @@ public class DotDelegator {
 		this.LOG_CHANNELSET_UUID = config.get("log.channelset.uuid.path");
 		this.LOG_CHANNELS = config.get("log.channels.path");
 		this.LOG_CHANNEL_DATA = config.get("log.channels.data.path");
+		this.LOG_MNEMONIC_PATH = config.get("log.mnemonic.data.path");
 	}
 
 	/**
@@ -131,6 +133,9 @@ public class DotDelegator {
 		case "channelData":
 			endpoint = this.LOG_CHANNEL_DATA;
 			break;
+		case "logMenmonicPath":
+			endpoint = this.LOG_MNEMONIC_PATH;
+			break;
 		default:
 			throw new ValveException("Unsupported object type<" + objectType + ">");
 		}
@@ -158,6 +163,11 @@ public class DotDelegator {
 		String uuid = "";
 		String endpoint = "";
 		HttpRequest request = null;
+		String logCurveInfoUid = "";
+		String mnemonic = "";
+		String channelsEndPoint;
+		HttpRequest channelsRequest;
+		HttpResponse<String> channelsResponse;
 
 		endpoint = this.getEndpoint(objectType) + uid; // add uid for rest call
 		// add query string params
@@ -178,22 +188,62 @@ public class DotDelegator {
 		// make the DELETE call.
 		HttpResponse<String> response=null;
 		if ("log".equals(objectType)) {
-			//response = client.makeRequest(logRequest, username, password);
-			uuid = getUUID(uid,witsmlObj,client,username,password);
-			String logDeletEndpoint = this.getEndpoint("channelsetmetadata");
-			logDeletEndpoint = logDeletEndpoint + "/" + uuid;
-			HttpRequest logDeleteRequest = Unirest.delete(logDeletEndpoint).header("Content-Type",
-					"application/json");
-			HttpResponse<String> logDeleteResponse = client.makeRequest(logDeleteRequest, username, password);
-			int deleteStatus = logDeleteResponse.getStatus();
-			if (204 == deleteStatus) {
-				LOG.info(ValveLogging.getLogMsg(exchangeID,
-						logResponse(logDeleteResponse, "Successfully Deleted Object with UID :" + uid + "."), witsmlObj));
-			} else {
-				LOG.warning(
-						ValveLogging.getLogMsg(exchangeID, logResponse(response, "Unable to delete"), witsmlObj));
-				throw new ValveException("DELETE DoT REST call failed with status code: " + deleteStatus);
+			int logCurveSize = ((ObjLog) witsmlObj).getLogCurveInfo().size();
+			if (logCurveSize != 0) {
+				logCurveInfoUid = ((ObjLog) witsmlObj).getLogCurveInfo().get(0).getUid();
+				uuid = getUUID(uid,witsmlObj,client,username,password);
+				// Build Request for Get Channels
+				channelsEndPoint = this.getEndpoint("channels");
+				channelsRequest = Unirest.get(channelsEndPoint);
+				channelsRequest.header("accept", "application/json");
+				channelsRequest.queryString("channelSetUuid", uuid);
+				// get response
+				channelsResponse = client.makeRequest(channelsRequest, username, password);
+				List<Channel> channels = Channel.jsonToChannelList(channelsResponse.getBody());
+				for (Channel c : channels) {
+					try{
+						if(logCurveInfoUid.equals(c.getUid())){
+							mnemonic = c.getMnemonic();
+							break;
+						}
+					} catch (Exception ex){
+						continue;
+					}
+				}
+				String logMnemonicEndpoint = this.getEndpoint("logMenmonicPath");
+				//logMnemonicEndpoint = logMnemonicEndpoint + "/" + uuid;
+				HttpRequest logMnemonicRequest = Unirest.delete(logMnemonicEndpoint).header("Content-Type",
+						"application/json");
+				logMnemonicRequest.queryString("channelSetUuid", uuid);
+				logMnemonicRequest.queryString("mnemonic", mnemonic);
+				HttpResponse<String> logMnemoniceResponse = client.makeRequest(logMnemonicRequest, username, password);
+				int mnemonicDeleteStatus = logMnemoniceResponse.getStatus();
+				if (204 == mnemonicDeleteStatus) {
+					LOG.info(ValveLogging.getLogMsg(exchangeID,
+							logResponse(logMnemoniceResponse, "Successfully Element Deleted Object with UID :" + uid + "."), witsmlObj));
+				} else {
+					LOG.warning(
+							ValveLogging.getLogMsg(exchangeID, logResponse(response, "Unable to delete"), witsmlObj));
+					throw new ValveException("DELETE DoT REST call failed with status code: " + mnemonicDeleteStatus);
+				}
+			}else{
+				uuid = getUUID(uid,witsmlObj,client,username,password);
+				String logDeletEndpoint = this.getEndpoint("channelsetmetadata");
+				logDeletEndpoint = logDeletEndpoint + "/" + uuid;
+				HttpRequest logDeleteRequest = Unirest.delete(logDeletEndpoint).header("Content-Type",
+						"application/json");
+				HttpResponse<String> logDeleteResponse = client.makeRequest(logDeleteRequest, username, password);
+				int deleteStatus = logDeleteResponse.getStatus();
+				if (204 == deleteStatus) {
+					LOG.info(ValveLogging.getLogMsg(exchangeID,
+							logResponse(logDeleteResponse, "Successfully Deleted Object with UID :" + uid + "."), witsmlObj));
+				} else {
+					LOG.warning(
+							ValveLogging.getLogMsg(exchangeID, logResponse(response, "Unable to delete"), witsmlObj));
+					throw new ValveException("DELETE DoT REST call failed with status code: " + deleteStatus);
+				}
 			}
+
 		} else {
 			response = client.makeRequest(request, username, password);
 			int status = response.getStatus();
@@ -209,22 +259,21 @@ public class DotDelegator {
 	}
 
 	public void performElementDelete(AbstractWitsmlObject witsmlObj, String username, String password,
-			String exchangeID, DotClient client) throws ValveException, ValveAuthException, UnirestException {
+									 String exchangeID, DotClient client) throws ValveException, ValveAuthException, UnirestException {
 		// Throwing valve exception as this is currently not supported by DoT until the
 		// Patch API is implemented
 		// We dont want to delete the object because someone thought something was
 		// implemented.
 		String uid = witsmlObj.getUid(); // get uid for delete call
 		String objectType = witsmlObj.getObjectType(); // get obj type for exception handling
+		String uuid = "";
+		String endpoint = "";
+		HttpRequestWithBody request = null;
+		HttpResponse<String> response = null;
 
 		// It is an object delete, so re-route there
-		String endpoint = this.getEndpoint(objectType) + uid; // add uid for delete call
+		endpoint = this.getEndpoint(objectType) + uid; // add uid for delete call
 		String payload = witsmlObj.getJSONString("1.4.1.1");
-		// create request
-		HttpRequestWithBody request = Unirest.patch(endpoint).header("Content-Type", "application/json");
-		payload = JsonUtil.removeEmptyArrays(new JSONObject(payload));
-		request.body(payload);
-		LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(request), witsmlObj));
 
 		// add query string params
 		if ("wellbore".equals(objectType)) {
@@ -239,18 +288,39 @@ public class DotDelegator {
 			}
 			request.queryString("uidWell", uidWell);
 		}
+		if ("log".equals(objectType)) {
+				uuid = getUUID(uid,witsmlObj,client,username,password);
+				String logElementDeletEndpoint = this.getEndpoint("channelsetmetadata");
+				logElementDeletEndpoint = logElementDeletEndpoint + "/" + uuid;
+				request = Unirest.patch(logElementDeletEndpoint).header("Content-Type", "application/json");
+				payload = JsonUtil.removeEmptyArrays(new JSONObject(payload));
+				request.body(payload);
+				LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(request), witsmlObj));
+				response = client.makeRequest(request, username, password);
+				int elementDeleteStatus = response.getStatus();
+				if (201 == elementDeleteStatus || 200 == elementDeleteStatus || 204 == elementDeleteStatus) {
+					LOG.info(ValveLogging.getLogMsg(exchangeID,
+							logResponse(response, "Successfully Element Deleted Object with UID :" + uid + "."), witsmlObj));
+				} else {
+					LOG.warning(
+							ValveLogging.getLogMsg(exchangeID, logResponse(response, "Unable to delete"), witsmlObj));
+					throw new ValveException("DELETE DoT REST call failed with status code: " + elementDeleteStatus);
+				}
 
-		// make the PATCH call.
-		HttpResponse<String> response = client.makeRequest(request, username, password);
-
-		// check response status
-		int status = response.getStatus();
-		if (201 == status || 200 == status || 204 == status) {
-			LOG.info(ValveLogging.getLogMsg(exchangeID,
-					logResponse(response, "Successfully Patched Object with UID :" + uid + "."), witsmlObj));
 		} else {
-			LOG.warning(ValveLogging.getLogMsg(exchangeID, logResponse(response, "Unable to patch"), witsmlObj));
-			throw new ValveException("PATCH DoT REST call failed with status code: " + status);
+				request = Unirest.patch(endpoint).header("Content-Type", "application/json");
+				payload = JsonUtil.removeEmptyArrays(new JSONObject(payload));
+				request.body(payload);
+				LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(request), witsmlObj));
+				response = client.makeRequest(request, username, password);
+				int status = response.getStatus();
+				if (201 == status || 200 == status || 204 == status) {
+					LOG.info(ValveLogging.getLogMsg(exchangeID,
+							logResponse(response, "Successfully Patched Object with UID :" + uid + "."), witsmlObj));
+				} else {
+					LOG.warning(ValveLogging.getLogMsg(exchangeID, logResponse(response, "Unable to delete"), witsmlObj));
+					throw new ValveException("PATCH DoT REST call failed with status code: " + status);
+				}
 		}
 	}
 
