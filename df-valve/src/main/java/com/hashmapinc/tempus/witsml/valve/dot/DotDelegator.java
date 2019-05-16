@@ -267,11 +267,13 @@ public class DotDelegator {
                              String password,
                              String exchangeID,
                              DotClient client)
-            throws ValveException, ValveAuthException, UnirestException {
+            		throws ValveException, ValveAuthException, UnirestException {
         String uid = witsmlObj.getUid();
         String objectType = witsmlObj.getObjectType();
         String version = witsmlObj.getVersion();
-        String endpoint = "";
+        String endpoint;
+        String channelsEndpoint;
+        String dataEndpoint;
         String uuid;
 
         // get object as payload string
@@ -294,45 +296,39 @@ public class DotDelegator {
         // build the requests (log potentially requires three HttpRequests)
         HttpRequestWithBody request;
         HttpRequestWithBody channelsRequest;
-        HttpRequestWithBody channelData;
+        HttpRequestWithBody channelDataRequest;
 
         HttpResponse<String> response = null;
 
         // build the request
         if (LOG_OBJECT.equals(objectType)) {
+			// TODO Redis -- caching Wrapper for Traj -- to prepare for caching
+			//               went looking, but couldn't find this -- where is it?
+			// see if the uuid is stored in the uid/uuid cache
+			if (null != UidUuidCache.getUuid(witsmlObj.getParentUid(),
+					witsmlObj.getGrandParentUid())) {
+				// TODO still need to test this path
+				uuid = UidUuidCache.getUuid(witsmlObj.getParentUid(),
+						witsmlObj.getGrandParentUid());
+			} else {
+				// make the call to get uuid, and put it in cache for next time
+				uuid = getUUID(uid, witsmlObj, client, username, password);
+				UidUuidCache.putInCache(
+						uuid,
+						uid,
+						witsmlObj.getParentUid(),
+						witsmlObj.getGrandParentUid());
+			}
+			// TODO check if there is anything to update with Redis cache
+
             // get up to three (3) payloads for log
             String[] payloads = getPayloads4LogUsingPayloadAndWitsmlObj(version, payload, witsmlObj);
             channelSetPayload = payloads[CS_IDX_4_PAYLOADS];
-            // TODO return back here to handle null pointer exceptions
-            // channelPayload = payloads[CHANNELS_IDX_4_PAYLOADS];
+            channelPayload = payloads[CHANNELS_IDX_4_PAYLOADS];
             dataPayload = payloads[DATA_IDX_4_PAYLOADS];
-            // TODO just a placeholder ... fix this
-            request = Unirest.put(endpoint);
-
-            // TODO Consider the transactions as "independent", so even if a
-            //      prior update fails, continue on or throw the error & exit;
-            //		look at how AddToStore was handled ... in all cases, no rollback
             // first handle any channelSet update --
-            if (!"".equals(channelSetPayload)) {
-                // TODO Redis -- caching Wrapper for Traj -- to prepare for caching
-                //               went looking, but couldn't find this -- where is it?
-                // see if the uuid is stored in the uid/uuid cache
+			if (channelSetPayload!=null && !channelSetPayload.isEmpty()) {
                 // ************************* CHANNELSET *************************
-                if (null != UidUuidCache.getUuid(witsmlObj.getParentUid(),
-                        witsmlObj.getGrandParentUid())) {
-                    // TODO still need to test this path
-                    uuid = UidUuidCache.getUuid(witsmlObj.getParentUid(),
-                            witsmlObj.getGrandParentUid());
-                } else {
-                    // make the call to get uuid, and put it in cache for next time
-                    uuid = getUUID(uid, witsmlObj, client, username, password);
-                    UidUuidCache.putInCache(
-                            uuid,
-                            uid,
-                            witsmlObj.getParentUid(),
-                            witsmlObj.getGrandParentUid());
-                }
-                // TODO check if there is anything to update
                 // .../witsml/channelSets/{uuid}
                 endpoint = this.getEndpoint(objectType);
                 endpoint = endpoint + "/{" + uuid + "}";
@@ -341,18 +337,28 @@ public class DotDelegator {
                         exchangeID, username, password, client, response);
             }
             // second handle any channels update --
-            if (!"".equals(channelPayload)) {
+			// TODO need to catch channelPayload = "[]"
+			// TODO what about nulls within the payloads?
+			if (channelPayload!=null && !channelPayload.isEmpty()) {
                 // ************************** CHANNELS **************************
                 // .../witsml/channels/metadata?channelSetUuid={channelSetUuid}
-                endpoint = this.getEndpoint("channels");
-                // add channelSetUuid as the parameter for rest call
-                // TODO add chanelSetUuid for rest call
+                channelsEndpoint = this.getEndpoint("channels");
+				channelsRequest = Unirest.post(channelsEndpoint);
+				// add channelSetUuid={channelSetUuid} as a query parameter
+				addQueryStringParams4Log(channelsRequest, uuid);
+				makeRequests4Log(channelsRequest, channelPayload, objectType, witsmlObj,
+						exchangeID, username, password, client, response);
             }
             // finally handle any data update...
-            if (!"".equals(dataPayload)) {
+            if (dataPayload!=null && !dataPayload.isEmpty()) {
                 // **************************** DATA *****************************
                 // .../witsml/channels/data?channelSetUuid={channelSetUuid}
-                endpoint = this.getEndpoint("channelData");
+                dataEndpoint = this.getEndpoint("channelData");
+				channelDataRequest = Unirest.post(dataEndpoint);
+				// add channelSetUuid={channelSetUuid} as a query parameter
+				addQueryStringParams4Log(channelDataRequest, uuid);
+                makeRequests4Log(channelDataRequest, dataPayload, objectType, witsmlObj,
+                        exchangeID, username, password, client, response);
             }
         } else {
             endpoint = this.getEndpoint(objectType) + uid;
@@ -368,7 +374,7 @@ public class DotDelegator {
 
                 LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(request), witsmlObj));
 
-                // make the UPDATE call.
+                // make the UPDATE call
                 response = client.makeRequest(request, username, password);
 
                 // check response status
@@ -391,12 +397,12 @@ public class DotDelegator {
 	 * builds out the HttpRequestWithBody request with parameters
 	 *
 	 * @param objectType - well, wellbore, trajectory (log is not handled here)
-	 *        request -    request to build out with the parameters
-	 *        witsmlObj -  abstracted WITSML in JSON format
+	 * @param request -    request to build out with the parameters
+	 * @param witsmlObj -  abstracted WITSML in JSON format
 	 */
 	private void addQueryStringParams(String objectType,
-											 HttpRequestWithBody request,
-											 AbstractWitsmlObject witsmlObj) {
+									  HttpRequestWithBody request,
+									  AbstractWitsmlObject witsmlObj) {
 		if (WELLBORE_OBJECT.equals(objectType)) {
 			request.queryString(WELL_UID, witsmlObj.getParentUid());
 		} else if (TRAJECTORY_OBJECT.equals(objectType)) {
@@ -410,6 +416,17 @@ public class DotDelegator {
 			}
 			request.queryString(WELL_UID, uidWell);
 		}
+	}
+
+	/**
+	 * builds out the HttpRequestWithBody request with parameters for log only
+	 *
+	 * @param request - request to modify
+	 * @param uuid - channelSet uuid
+	 */
+	private void addQueryStringParams4Log(HttpRequestWithBody request,
+									  	  String uuid) {
+		request.queryString("channelSetUuid", uuid);
 	}
 
 	/**
@@ -606,7 +623,7 @@ public class DotDelegator {
 				}
 				if (payloadJSON.has("logCurveInfo")) {
 					List<Channel> chanList = Channel
-							.from1411((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj);
+												.from1411((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj);
 					channelPayload = Channel.channelListToJson(chanList);
 					payloads[CHANNELS_IDX_4_PAYLOADS] = channelPayload;
 				} else {
@@ -1072,9 +1089,6 @@ public class DotDelegator {
         request.header("Content-Type", "application/json");
         if (payload.length() > 0) {
             request.body(payload);
-
-            // add query string params
-            addQueryStringParams(objectType, request, witsmlObj);
 
             LOG.info(ValveLogging.getLogMsg(
                     exchangeID,

@@ -636,11 +636,15 @@ public class Channel {
                 channel.setUid(lci.getUid());
                 channel.setNamingSystem(lci.getMnemonic().getNamingSystem());
                 channel.setMnemonic(lci.getMnemonic().getValue());
-                
-                if (witsmlObj.getIndexType().toLowerCase().contains("depth"))
-                    channel.setTimeDepth("depth");
-                else
-                    channel.setTimeDepth("time");
+
+                if (witsmlObj.getIndexType() != null) {
+                    if (witsmlObj.getIndexType().toLowerCase().contains("depth")) {
+                        channel.setTimeDepth("depth");
+                    } else {
+                        if (witsmlObj.getIndexType().toLowerCase().contains("time"))
+                            channel.setTimeDepth("time");
+                    }
+                }
                 channel.setClassWitsml(lci.getClassWitsml());
 
                 channel.setClassIndex(lci.getClassIndex());
@@ -873,5 +877,54 @@ public class Channel {
         XMLGregorianCalendar xmlGregCal =  DatatypeFactory.newInstance().newXMLGregorianCalendar(cal);
 
         return xmlGregCal;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Channel channel = (Channel) o;
+        return Objects.equals(uuid, channel.uuid) &&
+                Objects.equals(uid, channel.uid) &&
+                Objects.equals(wellDatum, channel.wellDatum) &&
+                Objects.equals(nullValue, channel.nullValue) &&
+                Objects.equals(channelState, channel.channelState) &&
+                Objects.equals(classIndex, channel.classIndex) &&
+                Objects.equals(mnemAlias, channel.mnemAlias) &&
+                Objects.equals(alternateIndex, channel.alternateIndex) &&
+                Objects.equals(sensorOffset, channel.sensorOffset) &&
+                Objects.equals(densData, channel.densData) &&
+                Objects.equals(traceOrigin, channel.traceOrigin) &&
+                Objects.equals(traceState, channel.traceState) &&
+                Objects.equals(namingSystem, channel.namingSystem) &&
+                Objects.equals(mnemonic, channel.mnemonic) &&
+                Objects.equals(dataType, channel.dataType) &&
+                Objects.equals(description, channel.description) &&
+                Objects.equals(uom, channel.uom) &&
+                Objects.equals(source, channel.source) &&
+                Objects.equals(axisDefinition, channel.axisDefinition) &&
+                Objects.equals(timeDepth, channel.timeDepth) &&
+                Objects.equals(channelClass, channel.channelClass) &&
+                Objects.equals(classWitsml, channel.classWitsml) &&
+                Objects.equals(runNumber, channel.runNumber) &&
+                Objects.equals(passNumber, channel.passNumber) &&
+                Objects.equals(loggingCompanyName, channel.loggingCompanyName) &&
+                Objects.equals(loggingCompanyCode, channel.loggingCompanyCode) &&
+                Objects.equals(toolName, channel.toolName) &&
+                Objects.equals(toolClass, channel.toolClass) &&
+                Objects.equals(derivation, channel.derivation) &&
+                Objects.equals(loggingMethod, channel.loggingMethod) &&
+                Objects.equals(nominalHoleSize, channel.nominalHoleSize) &&
+                Objects.equals(index, channel.index) &&
+                Objects.equals(aliases, channel.aliases) &&
+                Objects.equals(citation, channel.citation) &&
+                Objects.equals(customData, channel.customData) &&
+                Objects.equals(objectVersion, channel.objectVersion) &&
+                Objects.equals(existenceKind, channel.existenceKind);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(uuid, uid, wellDatum, nullValue, channelState, classIndex, mnemAlias, alternateIndex, sensorOffset, densData, traceOrigin, traceState, namingSystem, mnemonic, dataType, description, uom, source, axisDefinition, timeDepth, channelClass, classWitsml, runNumber, passNumber, loggingCompanyName, loggingCompanyCode, toolName, toolClass, derivation, loggingMethod, nominalHoleSize, index, aliases, citation, customData, objectVersion, existenceKind);
     }
 }
