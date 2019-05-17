@@ -178,6 +178,7 @@ public class DotDelegator {
 		HttpResponse<String> channelsResponse;
 
 		endpoint = this.getEndpoint(objectType) + uid; // add uid for rest call
+		request = Unirest.delete(endpoint).header("Content-Type", "application/json");
 		// add query string params
 		if ("wellbore".equals(objectType)) {
 			request = Unirest.delete(endpoint).header("Content-Type", "application/json");
@@ -196,9 +197,8 @@ public class DotDelegator {
 		// make the DELETE call.
 		HttpResponse<String> response=null;
 		if ("log".equals(objectType)) {
-			int logCurveSize = ((ObjLog) witsmlObj).getLogCurveInfo().size();
-			if (logCurveSize != 0) {
-				logCurveInfoUid = ((ObjLog) witsmlObj).getLogCurveInfo().get(0).getUid();
+			if (((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj).getLogCurveInfo().size() != 0) {
+				logCurveInfoUid = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj).getLogCurveInfo().get(0).getUid();
 				uuid = getUUID(uid,witsmlObj,client,username,password);
 				// Build Request for Get Channels
 				channelsEndPoint = this.getEndpoint("channels");
