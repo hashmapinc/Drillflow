@@ -197,8 +197,8 @@ public class DotDelegator {
 		// make the DELETE call.
 		HttpResponse<String> response=null;
 		if ("log".equals(objectType)) {
-			if (((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj).getLogCurveInfo().size() != 0) {
-				logCurveInfoUid = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj).getLogCurveInfo().get(0).getUid();
+			if (((ObjLog) witsmlObj).getLogCurveInfo().size() != 0) {
+				logCurveInfoUid = ((ObjLog) witsmlObj).getLogCurveInfo().get(0).getUid();
 				uuid = getUUID(uid,witsmlObj,client,username,password);
 				// Build Request for Get Channels
 				channelsEndPoint = this.getEndpoint("channels");
