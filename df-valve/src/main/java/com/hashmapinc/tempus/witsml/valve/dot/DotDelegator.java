@@ -196,9 +196,8 @@ public class DotDelegator {
 		// make the DELETE call.
 		HttpResponse<String> response=null;
 		if ("log".equals(objectType)) {
-			int logCurveSize = ((ObjLog) witsmlObj).getLogCurveInfo().size();
-			if (logCurveSize != 0) {
-				logCurveInfoUid = ((ObjLog) witsmlObj).getLogCurveInfo().get(0).getUid();
+			if (((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj).getLogCurveInfo().size() != 0) {
+				logCurveInfoUid = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj).getLogCurveInfo().get(0).getUid();
 				uuid = getUUID(uid,witsmlObj,client,username,password);
 				// Build Request for Get Channels
 				channelsEndPoint = this.getEndpoint("channels");
@@ -253,6 +252,7 @@ public class DotDelegator {
 			}
 
 		} else {
+			request = Unirest.delete(endpoint).header("Content-Type", "application/json");
 			response = client.makeRequest(request, username, password);
 			int status = response.getStatus();
 			if (201 == status || 200 == status || 204 == status) {
