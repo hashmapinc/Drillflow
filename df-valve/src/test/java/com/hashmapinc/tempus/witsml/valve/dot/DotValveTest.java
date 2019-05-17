@@ -380,8 +380,7 @@ public class DotValveTest {
 		wellboreA.setUid("wellbore-A");
 		witsmlObjects.add(wellboreA);
 		wmlObjWellbores.addWellbore(wellboreA);
-
-
+		
 		// build query context
 		QueryContext qc = new QueryContext(
 			"1.3.1.1",
@@ -394,10 +393,8 @@ public class DotValveTest {
 			"shouldDeleteSingleObject" // exchange ID
 		);
 
-
 		// test getObject
 		this.valve.deleteObject(qc);
-
 
 		// verify
 		verify(this.mockDelegator).deleteObject(wellboreA, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.mockClient);

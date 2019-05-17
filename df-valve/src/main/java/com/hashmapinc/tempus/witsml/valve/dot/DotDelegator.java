@@ -176,6 +176,7 @@ public class DotDelegator {
 		String channelsEndPoint;
 		HttpRequest channelsRequest;
 		HttpResponse<String> channelsResponse;
+		int logCurveInfosize = 0;
 
 		endpoint = this.getEndpoint(objectType) + uid; // add uid for rest call
 		request = Unirest.delete(endpoint).header("Content-Type", "application/json");
@@ -197,8 +198,13 @@ public class DotDelegator {
 		// make the DELETE call.
 		HttpResponse<String> response=null;
 		if ("log".equals(objectType)) {
-			if (((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj).getLogCurveInfo().size() != 0) {
-				logCurveInfoUid = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj).getLogCurveInfo().get(0).getUid();
+			if("1.4.1.1".equals(witsmlObj.getVersion())){
+				logCurveInfosize = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj).getLogCurveInfo().size();
+			}else{
+				logCurveInfosize = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj).getLogCurveInfo().size();
+			}
+			if (logCurveInfosize != 0) {
+				logCurveInfoUid = ((ObjLog) witsmlObj).getLogCurveInfo().get(0).getUid();
 				uuid = getUUID(uid,witsmlObj,client,username,password);
 				// Build Request for Get Channels
 				channelsEndPoint = this.getEndpoint("channels");
