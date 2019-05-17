@@ -31,6 +31,7 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
+//import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,23 +43,29 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 public class DotDelegatorTest {
+
+    private DotDelegator mockDelegator;
     private DotDelegator delegator;
-    private DotClient client;
+    private DotClient    mockClient;
+
     private String url;
     private String trajectoryPath;
     private String graphQlWellPath;
+
+    /*
     private String graphQlWellborePath;
     private String graphQlTrajectoryPath;
+    */
 
-    //private String logChannelsetPath;
-    //private String logChannelPath;
-
-    //private GenericMeasure testGM = new GenericMeasure();
-    //private CsLogData csLogData = new CsLogData();
-    //private CsLogCurveInfo csLogCurveInfo = new CsLogCurveInfo();
-    //private List<CsLogCurveInfo> logCurveInfoList = new ArrayList<>();
-    //private List<CsLogData> dataList = new ArrayList<>();
+    private String logChannelsetPath;
+    private String logChannelPath;
     /*
+    private GenericMeasure  testGM = new GenericMeasure();          // v1.4.1.1
+    private CsLogData       csLogData = new CsLogData();            // v1.4.1.1
+    private CsLogCurveInfo  csLogCurveInfo = new CsLogCurveInfo();  // v1.4.1.1
+    private List<CsLogCurveInfo> logCurveInfoList = new ArrayList<>();
+    private List<CsLogData> dataList = new ArrayList<>();
+
     private static final String AB =
             "0123456789"
                     + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -69,19 +76,19 @@ public class DotDelegatorTest {
         for( int i = 0; i < len; i++ )
             sb.append( AB.charAt( rnd.nextInt(AB.length()) ) );
         return sb.toString();
-    }
-    */
+    }*/
 
     @Before
     public void init() {
         // instantiate strings
+        // TODO Verify that these are correct
         this.url = "test.com";
         this.trajectoryPath = "/trajectory/";
         this.graphQlWellPath = "/well/graphql/";
-        this.graphQlWellborePath = "/wellbore/graphql/";
-        this.graphQlTrajectoryPath = "/trajectory/graphql";
-        //this.logChannelsetPath = "/channelSets/";
-        //this.logChannelPath = "/channels/";
+        //this.graphQlWellborePath = "/wellbore/graphql/";
+        //this.graphQlTrajectoryPath = "/trajectory/graphql";
+        this.logChannelsetPath = "/channelSets/";
+        this.logChannelPath = "/channels/";
 
         // build config
         HashMap<String, String> config = new HashMap<>();
@@ -92,14 +99,15 @@ public class DotDelegatorTest {
         config.put("well.gql.path", this.url + "/well/graphql/");
         config.put("wellbore.gql.path", this.url + "/wellbore/graphql/");
         config.put("trajectory.gql.path", this.url + "/trajectory/graphql");
-        //config.put("log.channelset.path", this.url + logChannelsetPath);
-        //config.put("log.channel.path", this.url + logChannelPath);
+        config.put("log.channelset.path", this.url + logChannelsetPath);
+        config.put("log.channel.path", this.url + logChannelPath);
 
         // instantiate delegator
         this.delegator = new DotDelegator(config);
 
-        // mock client
-        this.client = mock(DotClient.class);
+        // mock Delegator & Client
+        this.mockDelegator = mock(DotDelegator.class);
+        this.mockClient = mock(DotClient.class);
     }
 
     @Test
@@ -144,15 +152,15 @@ public class DotDelegatorTest {
         when(resp.getBody()).thenReturn("{\"uid\": \"" + traj.getUid() + "\"}");
         when(resp.getStatus()).thenReturn(200);
 
-        // mock client behavior
-        when(this.client.makeRequest(argThat(someReq -> (
+        // mock mockClient behavior
+        when(this.mockClient.makeRequest(argThat(someReq -> (
             someReq.getHttpMethod().name().equals(req.getHttpMethod().name()) &&
             someReq.getUrl().equals(req.getUrl()) &&
             someReq.getHeaders().containsKey("Content-Type")
         )), eq("goodUsername"), eq("goodPassword"))).thenReturn(resp);
 
         // test
-        String actualUid = this.delegator.createObject(traj, "goodUsername", "goodPassword", "exchangeID", this.client);
+        String actualUid = this.delegator.createObject(traj, "goodUsername", "goodPassword", "exchangeID", this.mockClient);
         String expectedUid = traj.getUid();
         assertEquals(expectedUid, actualUid);
     }
@@ -160,8 +168,7 @@ public class DotDelegatorTest {
     /*
        Version 1.4.1.1
    */
-    /*
-    @Test
+    /*@Test
     public void shouldCreateLog() throws Exception {
 
         // ***************** create channelSet log object ***************** //
@@ -169,6 +176,8 @@ public class DotDelegatorTest {
         String randomUID = randomString(10);
         String prefixUID = "HM_Test";
         log.setUid(prefixUID + randomUID);
+        // TODO Find a better way - see Chris' script for choosing the 1st from
+        //      a list? Or something from within this code base?
         log.setUidWell("U2");
         log.setUidWellbore("WBDD600");
 
@@ -242,27 +251,25 @@ public class DotDelegatorTest {
         HttpRequestWithBody reqCH = Unirest.put(endpoint);
         reqCH.body(channelPayload);
 
-        // mock client behavior
-        when(this.client.makeRequest(argThat(someReq -> (
+        // mock mockClient behavior
+        when(this.mockClient.makeRequest(argThat(someReq -> (
                 someReq.getHttpMethod().name().equals(reqCS.getHttpMethod().name()) &&
                 someReq.getUrl().equals(reqCS.getUrl()) &&
                 someReq.getHeaders().containsKey("Content-Type")
         )), eq("goodUsername"), eq("goodPassword"))).thenReturn(respCS);
 
         // test
-        String actualUid = this.delegator.createObject(
+        String actualUid = this.mockDelegator.createObject(
                 log,
                 "goodUsername",
                 "goodPassword",
                 "exchangeID",
-                this.client);
+                this.mockClient);
 
-        String actualUid = "0";
         String expectedUid = logUid;
         assertEquals(expectedUid, actualUid);
 
-    }
-    */
+    }*/
 
     @Test
     public void shouldCreateTrajectoryWithoutUid() throws Exception {
@@ -289,15 +296,15 @@ public class DotDelegatorTest {
         when(resp.getBody()).thenReturn("{\"uid\": \"traj-a\"}");
         when(resp.getStatus()).thenReturn(200);
 
-        // mock client behavior
-        when(this.client.makeRequest(argThat(someReq -> (
+        // mock mockClient behavior
+        when(this.mockClient.makeRequest(argThat(someReq -> (
             someReq.getHttpMethod().name().equals(req.getHttpMethod().name()) &&
             someReq.getUrl().equals(req.getUrl()) &&
             someReq.getHeaders().containsKey("Content-Type")
         )), eq("goodUsername"), eq("goodPassword"))).thenReturn(resp);
 
         // test
-        String actualUid = this.delegator.createObject(traj, "goodUsername", "goodPassword", "exchangeID", this.client);
+        String actualUid = this.delegator.createObject(traj, "goodUsername", "goodPassword", "exchangeID", this.mockClient);
         String expectedUid = "traj-a";
         assertEquals(expectedUid, actualUid);
     }
@@ -321,13 +328,13 @@ public class DotDelegatorTest {
         when(resp.getBody()).thenReturn(response);
         when(resp.getStatus()).thenReturn(200);
 
-        when(this.client.makeRequest(argThat(someReq -> (
+        when(this.mockClient.makeRequest(argThat(someReq -> (
                 someReq.getHttpMethod().name().equals(req.getHttpMethod().name()) &&
                         someReq.getUrl().equals(req.getUrl()) &&
                         someReq.getHeaders().containsKey("Content-Type")
         )), eq("goodUsername"), eq("goodPassword"))).thenReturn(resp);
 
-        ArrayList<AbstractWitsmlObject> foundObjects = this.delegator.search(singleWell, "goodUsername", "goodPassword", "exchangeID", this.client, new HashMap<>());
+        ArrayList<AbstractWitsmlObject> foundObjects = this.delegator.search(singleWell, "goodUsername", "goodPassword", "exchangeID", this.mockClient, new HashMap<>());
         assertEquals(3, foundObjects.size());
     }
     
@@ -350,18 +357,18 @@ public class DotDelegatorTest {
         HttpResponse<String> resp = mock(HttpResponse.class);
         when(resp.getStatus()).thenReturn(204);
 
-        // mock client behavior
-        when(this.client.makeRequest(argThat(someReq -> (
+        // mock mockClient behavior
+        when(this.mockClient.makeRequest(argThat(someReq -> (
             someReq.getHttpMethod().name().equals(req.getHttpMethod().name()) &&
                 someReq.getUrl().equals(req.getUrl()) &&
                 someReq.getHeaders().containsKey("Content-Type")
         )), eq("goodUsername"), eq("goodPassword"))).thenReturn(resp);
 
         // test
-        this.delegator.deleteObject(traj, "goodUsername", "goodPassword", "exchangeID", this.client);
+        this.delegator.deleteObject(traj, "goodUsername", "goodPassword", "exchangeID", this.mockClient);
 
         // verify
-        verify(this.client).makeRequest(argThat(someReq -> (
+        verify(this.mockClient).makeRequest(argThat(someReq -> (
             someReq.getHttpMethod().name().equals(req.getHttpMethod().name()) &&
                 someReq.getUrl().equals(req.getUrl()) &&
                 someReq.getHeaders().containsKey("Content-Type")
@@ -391,18 +398,18 @@ public class DotDelegatorTest {
         HttpResponse<String> resp = mock(HttpResponse.class);
         when(resp.getStatus()).thenReturn(200);
 
-        // mock client behavior
-        when(this.client.makeRequest(argThat(someReq -> (
+        // mock mockClient behavior
+        when(this.mockClient.makeRequest(argThat(someReq -> (
             someReq.getHttpMethod().name().equals(req1311.getHttpMethod().name()) &&
             someReq.getUrl().equals(req1311.getUrl()) &&
             someReq.getHeaders().containsKey("Content-Type")
         )), eq("goodUsername"), eq("goodPassword"))).thenReturn(resp);
 
         // test
-        this.delegator.updateObject(traj1311, "goodUsername", "goodPassword", "exchangeID", this.client);
+        this.delegator.updateObject(traj1311, "goodUsername", "goodPassword", "exchangeID", this.mockClient);
 
         // verify
-        verify(this.client).makeRequest(argThat(someReq -> (
+        verify(this.mockClient).makeRequest(argThat(someReq -> (
             someReq.getHttpMethod().name().equals(req1311.getHttpMethod().name()) &&
             someReq.getUrl().equals(req1311.getUrl()) &&
             someReq.getHeaders().containsKey("Content-Type")
@@ -433,18 +440,18 @@ public class DotDelegatorTest {
         HttpResponse<String> resp = mock(HttpResponse.class);
         when(resp.getStatus()).thenReturn(200);
 
-        // mock client behavior
-        when(this.client.makeRequest(argThat(someReq -> (
+        // mock mockClient behavior
+        when(this.mockClient.makeRequest(argThat(someReq -> (
             someReq.getHttpMethod().name().equals(req1411.getHttpMethod().name()) &&
             someReq.getUrl().equals(req1411.getUrl()) &&
             someReq.getHeaders().containsKey("Content-Type")
         )), eq("goodUsername"), eq("goodPassword"))).thenReturn(resp);
 
         // test
-        this.delegator.updateObject(traj1411, "goodUsername", "goodPassword", "exchangeID", this.client);
+        this.delegator.updateObject(traj1411, "goodUsername", "goodPassword", "exchangeID", this.mockClient);
 
         // verify
-        verify(this.client).makeRequest(argThat(someReq -> (
+        verify(this.mockClient).makeRequest(argThat(someReq -> (
             someReq.getHttpMethod().name().equals(req1411.getHttpMethod().name()) &&
             someReq.getUrl().equals(req1411.getUrl()) &&
             someReq.getHeaders().containsKey("Content-Type")
