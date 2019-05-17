@@ -584,21 +584,26 @@ public class ChannelSet {
         cs.setNullValue(witsmlObj.getNullValue());
 
         // Sort out if this is a time or a depth log
-        String indexType = "Depth";
-        if (witsmlObj.getIndexType().toLowerCase().contains("depth")) {
-            cs.setTimeDepth(indexType);
-            cs.setStartIndex(witsmlObj.getStartIndex().getValue().toString());
-            cs.setEndIndex(witsmlObj.getEndIndex().getValue().toString());
-        } else {
-            indexType = "Time";
-            cs.setTimeDepth(indexType);
-            cs.setStartIndex(witsmlObj.getStartDateTimeIndex().toXMLFormat());
-            cs.setEndIndex(witsmlObj.getEndDateTimeIndex().toXMLFormat());
+        String indexType;
+        if (witsmlObj.getIndexType()!=null){
+            if (witsmlObj.getIndexType().contains("depth")) {
+                indexType = "depth";
+                cs.setTimeDepth(indexType);
+                cs.setStartIndex(witsmlObj.getStartIndex().getValue().toString());
+                cs.setEndIndex(witsmlObj.getEndIndex().getValue().toString());
+            }else {
+                indexType = "time";
+                cs.setTimeDepth(indexType);
+                cs.setStartIndex(witsmlObj.getStartDateTimeIndex().toXMLFormat());
+                cs.setEndIndex(witsmlObj.getEndDateTimeIndex().toXMLFormat());
+            }
         }
 
         cs.setNullValue(witsmlObj.getNullValue());
         cs.setObjectGrowing(witsmlObj.isObjectGrowing());
-        cs.setStepIncrement(StepIncrement.from1411(witsmlObj.getStepIncrement()));
+        if (StepIncrement.from1411(witsmlObj.getStepIncrement())!=null)
+            cs.setStepIncrement(StepIncrement.from1411(witsmlObj.getStepIncrement()));
+
         cs.setIndex(Index.from1411(witsmlObj));
         cs.setLogParam(LogParam.from1411(witsmlObj.getLogParam()));
         cs.setCommonData(CommonData.getCommonDataFrom1411(witsmlObj.getCommonData()));
