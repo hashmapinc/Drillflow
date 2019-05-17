@@ -178,6 +178,7 @@ public class DotDelegator {
 		HttpResponse<String> channelsResponse;
 
 		endpoint = this.getEndpoint(objectType) + uid; // add uid for rest call
+		request = Unirest.delete(endpoint).header("Content-Type", "application/json");
 		// add query string params
 		if ("wellbore".equals(objectType)) {
 			request = Unirest.delete(endpoint).header("Content-Type", "application/json");
@@ -252,7 +253,6 @@ public class DotDelegator {
 			}
 
 		} else {
-			request = Unirest.delete(endpoint).header("Content-Type", "application/json");
 			response = client.makeRequest(request, username, password);
 			int status = response.getStatus();
 			if (201 == status || 200 == status || 204 == status) {
