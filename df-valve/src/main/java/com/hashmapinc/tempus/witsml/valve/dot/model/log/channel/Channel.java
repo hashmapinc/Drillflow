@@ -636,12 +636,16 @@ public class Channel {
                 channel.setUid(lci.getUid());
                 channel.setNamingSystem(lci.getMnemonic().getNamingSystem());
                 channel.setMnemonic(lci.getMnemonic().getValue());
-                
-                if (witsmlObj.getIndexType().toLowerCase().contains("depth"))
-                    channel.setTimeDepth("Depth");
-                else
-                    channel.setTimeDepth("Time");
-                channel.setClassWitsml(lci.getClassWitsml());
+
+                if (witsmlObj.getIndexType() != null) {
+                    if (witsmlObj.getIndexType().toLowerCase().contains("depth")) {
+                        channel.setTimeDepth("depth");
+                    } else {
+                        if (witsmlObj.getIndexType().toLowerCase().contains("time"))
+                            channel.setTimeDepth("time");
+                    }
+                }
+
 
                 channel.setClassIndex(lci.getClassIndex());
 
