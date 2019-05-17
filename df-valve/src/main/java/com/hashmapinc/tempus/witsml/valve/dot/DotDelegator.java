@@ -738,10 +738,11 @@ public class DotDelegator {
 						break;
 					case "1.4.1.1":
 						payloads[CS_IDX_4_PAYLOADS] = ChannelSet.from1411(
-								(com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj).toJson();
+								(ObjLog) witsmlObj).toJson();
 						break;
 					default:
 						payloads[CS_IDX_4_PAYLOADS] = "";
+						break;
 				}
 			} else {
 				payloads[CS_IDX_4_PAYLOADS] = "";
@@ -756,10 +757,11 @@ public class DotDelegator {
 						break;
 					case "1.4.1.1":
 						payloads[CHANNELS_IDX_4_PAYLOADS] = Channel.channelListToJson(
-								Channel.from1411((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj));
+								Channel.from1411( (ObjLog)witsmlObj));
 						break;
 					default:
 						payloads[CHANNELS_IDX_4_PAYLOADS] = "";
+						break;
 				}
 			} else {
 				payloads[CHANNELS_IDX_4_PAYLOADS] = "";
@@ -774,10 +776,11 @@ public class DotDelegator {
 						break;
 					case "1.4.1.1":
 						payloads[DATA_IDX_4_PAYLOADS] = DotLogDataHelper.convertDataToDotFrom1411(
-								(com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj);
+								(ObjLog) witsmlObj);
 						break;
 					default:
 						payloads[DATA_IDX_4_PAYLOADS] = "";
+						break;
 				}
 			} else {
 				payloads[DATA_IDX_4_PAYLOADS] = "";
