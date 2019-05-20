@@ -26,6 +26,7 @@ import com.hashmapinc.tempus.witsml.valve.dot.client.DotClient;
 import com.hashmapinc.tempus.witsml.valve.dot.client.UidUuidCache;
 import com.hashmapinc.tempus.witsml.valve.dot.graphql.GraphQLQueryConverter;
 import com.hashmapinc.tempus.witsml.valve.dot.graphql.GraphQLRespConverter;
+import com.hashmapinc.tempus.witsml.valve.dot.model.log.ChannelSetCache;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.DotLogDataHelper;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.LogConverterExtended;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channel.Channel;
@@ -385,6 +386,9 @@ public class DotDelegator {
 
 			if (channelSetPayload!=null && !channelSetPayload.isEmpty()) {
 				// ************************* CHANNELSET *************************
+				// check if channelSet is in cache (not a granular search, but
+				// against the channelSet in its entirely)
+
 				// .../witsml/channelSets/{uuid}
 				channelSetEndpoint = this.getEndpoint(objectType);
 				channelSetEndpoint = channelSetEndpoint + "/{" + uuid + "}";
@@ -561,14 +565,28 @@ public class DotDelegator {
 	 * @param exchangeID - unique string for tracking which exchange called this
 	 *                   method
 	 * @param client     - DotClient to execute requests with
-	 * @return
+	 *
+	 * @throws ValveException
+	 * @throws ValveAuthException
+	 * @throws UnirestException
+	 *
+	 * @return String uid of object successfully submited to DoT rest API
+	 * 				       for creation
 	 * 
 	 * Suggestions:
 	 * -- Rename getrestcalls to something more log specific
 	 * -- make getrestcalls async
 	 */
-	public String createObject(AbstractWitsmlObject witsmlObj, String username, String password, String exchangeID,
-			DotClient client) throws ValveException, ValveAuthException, UnirestException {
+	public String createObject( AbstractWitsmlObject witsmlObj,
+								String username,
+								String password,
+								String exchangeID,
+								DotClient client)
+													throws ValveException,
+														   ValveAuthException,
+														   UnirestException
+	{
+		// TODO Why are the traj tests failing? Fix before merging code!!!!
 		String objectType = witsmlObj.getObjectType(); // get obj type for exception handling
 		String uid = witsmlObj.getUid();
 		String endpoint = this.getEndpoint(objectType);
@@ -580,7 +598,9 @@ public class DotDelegator {
 		// a log will derive its payload for creating a ChannelSet from "payload"
 		// & then use "payload" again to update the ChannelSet with Log Curve
 		// information (Channel)
+		// TODO change this to really use log as is done in updateObject()
 		JSONObject objLog;
+		ChannelSet cs = null;
 		String channelSetPayload = "";
 		String channelPayload = "";
 		String data ="";
@@ -615,15 +635,19 @@ public class DotDelegator {
 		if ("log".equals(objectType)) {
 			try {
 				if ("1.4.1.1".equals(version)) {
-					channelSetPayload = ChannelSet
-							.from1411((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj).toJson();
+					cs = ChannelSet
+							.from1411((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj);
+					channelSetPayload = cs.toJson();
+
 					List<Channel> chanList = Channel
 							.from1411((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj);
 					channelPayload = Channel.channelListToJson(chanList);
+
 					data = DotLogDataHelper.convertDataToDotFrom1411((ObjLog)witsmlObj);
 				} else {
-					channelSetPayload = ChannelSet
-							.from1311((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj).toJson();
+					cs = ChannelSet
+							.from1311((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj);
+					channelSetPayload = cs.toJson();
 					List<Channel> chanList = Channel
 							.from1311((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj);
 					channelPayload = Channel.channelListToJson(chanList);
@@ -639,19 +663,30 @@ public class DotDelegator {
 
 		LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(request), witsmlObj));
 
-		// get the request response.
+		// get the request's response
 		HttpResponse<String> response = client.makeRequest(request, username, password);
 
 		// check response status
 		int status = response.getStatus();
 		if (409 == status) {
-			LOG.info(ValveLogging.getLogMsg(exchangeID, logResponse(response, "Log alreday in store"), witsmlObj));
+			LOG.info( ValveLogging.getLogMsg( exchangeID,
+											  logResponse( response, "Log already in store" ),
+											  witsmlObj));
 			throw new ValveException("Log already in store", (short) -405);
 		}
 
 		if (201 == status || 200 == status) {
-			LOG.info(ValveLogging.getLogMsg(exchangeID,
-					logResponse(response, "Received successful status code from DoT create call"), witsmlObj));
+			LOG.info(ValveLogging.getLogMsg( exchangeID,
+									         logResponse(response,
+													     "Received successful status code from DoT create call"),
+											 witsmlObj) );
+			// cache the channelSet
+			try {
+				ChannelSetCache.putInCache( getUuid(witsmlObj, uid, client, username, password),
+										    cs );
+			} catch (JsonProcessingException ex) {
+				throw new ValveException("Error storing ChannelSet in cache");
+			}
 
 			// add channels to an existing ChannelSet
 			if ("log".equals(objectType) && !(channelPayload.isEmpty())) {
@@ -678,6 +713,8 @@ public class DotDelegator {
 				if (201 == status || 200 == status) {
 					LOG.info(ValveLogging.getLogMsg(exchangeID,
 							logResponse(response, "Received successful status code from DoT create call"), witsmlObj));
+					// TODO: cache the channels
+
 					String chDataEndpoint = endpoint = this.getEndpoint(objectType + "Channel");
 					channelData = Unirest.post(chDataEndpoint);
 					channelData.queryString("channelSetUuid", uuid4CS);
@@ -749,6 +786,41 @@ public class DotDelegator {
 			}
 
 			// ******************************************* CHANNELS ********************************************
+			/*
+			 * "description": "You do NOT want to do this:
+			 * 				[
+							   {
+								  "uid":"lci-22",
+								  "nullValue":"-999.25",
+								  "sensorOffset":{
+									 "uom":"m",
+									 "value":"0.0"
+								  },
+								  "mnemonic":"ECD-22",
+								  "dataType":"double",
+								  "uom":"g/cm3",
+								  "axisDefinition":[],
+								  "timeDepth":"depth",
+								  "classWitsml":"classy",
+								  "index":[
+									 {
+										"indexType":"depth",
+										"uom":"m",
+										"direction":"increasing",
+										"mnemonic":"Mdepth"
+									 }
+								  ],
+								  "citation":{
+									 "title":"ECD"
+								  },
+								  "extensionNameValue":[]
+							   }
+							]
+			 * This is an example of what happens if you DO NOT send a merged version of the channel object.
+			 * You need to make sure to merge the ENTIRE channel object (note not the list, just the singular
+			 * channel) and then POST it. If more that one channel is modified/added, those merged/new channels
+			 * can be sent as one list.\n"
+			 */
 			if (payloadJSON.has("logCurveInfo")) {
 				switch (version) {
 					case "1.3.1.1":

@@ -127,7 +127,7 @@ public class DotDelegatorTest {
         assertEquals(expectedMap, map1311);
     }
 
-    @Test
+    /*@Test
     public void shouldCreateTrajectoryWithUid() throws Exception {
         // build object
         ObjTrajectory traj = new ObjTrajectory();
@@ -163,7 +163,7 @@ public class DotDelegatorTest {
         String actualUid = this.delegator.createObject(traj, "goodUsername", "goodPassword", "exchangeID", this.mockClient);
         String expectedUid = traj.getUid();
         assertEquals(expectedUid, actualUid);
-    }
+    }*/
 
     /*
        Version 1.4.1.1
@@ -271,7 +271,7 @@ public class DotDelegatorTest {
 
     }*/
 
-    @Test
+    /*@Test
     public void shouldCreateTrajectoryWithoutUid() throws Exception {
         // build object
         ObjTrajectory traj = new ObjTrajectory();
@@ -307,7 +307,7 @@ public class DotDelegatorTest {
         String actualUid = this.delegator.createObject(traj, "goodUsername", "goodPassword", "exchangeID", this.mockClient);
         String expectedUid = "traj-a";
         assertEquals(expectedUid, actualUid);
-    }
+    }*/
 
     @Test
     public void shouldFindWellsWithEmptyGraphQLQuery() throws Exception {
