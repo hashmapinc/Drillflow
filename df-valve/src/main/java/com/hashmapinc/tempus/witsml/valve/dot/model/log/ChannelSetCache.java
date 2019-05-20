@@ -28,16 +28,15 @@ import java.util.concurrent.ConcurrentHashMap;
  *  channelSet.
  */
 public class ChannelSetCache {
-    // cache used for uid->uuid AND uuid->uid mapping
     private static ConcurrentHashMap<String, String> cache = new ConcurrentHashMap<>();
     private static final String SEPARATOR = "|===|"; // separator used when building composite keys
 
     /**
-     * This function stores a channelSet in cache along with the uuid key
-     * and checksum.
+     * This function stores a ChannelSet (JSON format) in cache along with the
+     * composite key of uuid + SEPARATOR + hashCode() (from the ChannelSet).
      *
      * @param uuid - string uuid used as a cache key
-     * @param cs - query's channelSet converted for DoT's API
+     * @param cs - query's ChannelSet converted for DoT's API
      *             (v1.4.1.1 or v1.3.1.1)
      */
     public static void putInCache( String uuid,

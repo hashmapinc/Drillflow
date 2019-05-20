@@ -605,7 +605,7 @@ public class DotDelegator {
 		String channelPayload = "";
 		String data ="";
 
-		// build the requests (log requires two HttpRequests
+		// build the requests (log requires three HttpRequests
 		HttpRequestWithBody request;
 		HttpRequestWithBody channelsRequest;
 		HttpRequestWithBody channelData;
@@ -672,6 +672,9 @@ public class DotDelegator {
 			LOG.info( ValveLogging.getLogMsg( exchangeID,
 											  logResponse( response, "Log already in store" ),
 											  witsmlObj));
+			// TODO this could be any type, not just log, at this point in the code
+			//		pull out log from other types because it is too difficult to tell
+			//		what type you are working on due to the complicated code structure
 			throw new ValveException("Log already in store", (short) -405);
 		}
 
@@ -680,57 +683,64 @@ public class DotDelegator {
 									         logResponse(response,
 													     "Received successful status code from DoT create call"),
 											 witsmlObj) );
-			// cache the channelSet
-			try {
-				ChannelSetCache.putInCache( getUuid(witsmlObj, uid, client, username, password),
-										    cs );
-			} catch (JsonProcessingException ex) {
-				throw new ValveException("Error storing ChannelSet in cache");
-			}
+			// cache the channelSet if this is a log
+			if ("log".equals(objectType)) {
+				try {
+					ChannelSetCache.putInCache(getUuid(witsmlObj, uid, client, username, password),
+							cs);
+				} catch (JsonProcessingException ex) {
+					// not being able to cache should not stop the workflow -- log it & continue
+					LOG.severe(ValveLogging.getLogMsg(exchangeID,
+							"JSON Processing Exception trying to cache a ChannelSet "
+									+ ex.getMessage(),
+							witsmlObj));
+				}
 
-			// add channels to an existing ChannelSet
-			if ("log".equals(objectType) && !(channelPayload.isEmpty())) {
+				// add channels to an existing ChannelSet
+				if ( !(channelPayload.isEmpty()) ) {
 
-				// build the request...
-				endpoint = this.getEndpoint(objectType + "Channel");
-				endpoint = endpoint + "/metadata";
-				// get the uuid for the channelSet just created from the response
+					// build the request...
+					endpoint = this.getEndpoint(objectType + "Channel");
+					endpoint = endpoint + "/metadata";
 
-				String uuid4CS = new JsonNode(response.getBody()).getObject().getString("uuid");
+					// get the uuid for the channelSet just created from the response
+					String uuid4CS = new JsonNode(response.getBody()).getObject().getString("uuid");
 
-				// create with POST
-				channelsRequest = Unirest.post(endpoint);
-				channelsRequest.queryString("channelSetUuid", uuid4CS);
-				channelsRequest.header("Content-Type", "application/json");
-				channelsRequest.body(channelPayload);
+					// create with POST
+					channelsRequest = Unirest.post(endpoint);
+					channelsRequest.queryString("channelSetUuid", uuid4CS);
+					channelsRequest.header("Content-Type", "application/json");
+					channelsRequest.body(channelPayload);
 
-				LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(channelsRequest), witsmlObj));
-
-				// get the request response.
-				response = client.makeRequest(channelsRequest, username, password);
-				// check response status
-				status = response.getStatus();
-				if (201 == status || 200 == status) {
-					LOG.info(ValveLogging.getLogMsg(exchangeID,
-							logResponse(response, "Received successful status code from DoT create call"), witsmlObj));
-					// TODO: cache the channels
-
-					String chDataEndpoint = endpoint = this.getEndpoint(objectType + "Channel");
-					channelData = Unirest.post(chDataEndpoint);
-					channelData.queryString("channelSetUuid", uuid4CS);
-					channelData.header("Content-Type", "application/json");
-					channelData.body(data);
 					LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(channelsRequest), witsmlObj));
 
 					// get the request response.
-					response = client.makeRequest(channelData, username, password);
+					response = client.makeRequest(channelsRequest, username, password);
+
+					// check response status
+					status = response.getStatus();
 					if (201 == status || 200 == status) {
 						LOG.info(ValveLogging.getLogMsg(exchangeID,
-								logResponse(response, "Received successful status code from DoT add data call"), witsmlObj));
-					} else {
-						LOG.warning(ValveLogging.getLogMsg(exchangeID,
-							logResponse(response, "Received " + status + " from DoT POST" + response.getBody()), witsmlObj));
+								logResponse(response, "Received successful status code from DoT create call"), witsmlObj));
+						// TODO: cache the channels
+// START HERE
+						String chDataEndpoint = endpoint = this.getEndpoint(objectType + "Channel");
+						channelData = Unirest.post(chDataEndpoint);
+						channelData.queryString("channelSetUuid", uuid4CS);
+						channelData.header("Content-Type", "application/json");
+						channelData.body(data);
+						LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(channelsRequest), witsmlObj));
+
+						// get the request response.
+						response = client.makeRequest(channelData, username, password);
+						if (201 == status || 200 == status) {
+							LOG.info(ValveLogging.getLogMsg(exchangeID,
+									logResponse(response, "Received successful status code from DoT add data call"), witsmlObj));
+						} else {
+							LOG.warning(ValveLogging.getLogMsg(exchangeID,
+									logResponse(response, "Received " + status + " from DoT POST" + response.getBody()), witsmlObj));
 							throw new ValveException(response.getBody());
+						}
 					}
 				}
 			}
