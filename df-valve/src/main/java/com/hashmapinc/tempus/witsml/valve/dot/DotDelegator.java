@@ -72,6 +72,7 @@ public class DotDelegator {
 	private final String LOG_CHANNELS;
 	private final String LOG_CHANNEL_DATA;
 	private final String LOG_MNEMONIC_PATH;
+	private final String LOG_DEPTH_PATH;
 
 	/**
 	 * Map based constructor
@@ -92,6 +93,7 @@ public class DotDelegator {
 		this.LOG_CHANNELS = config.get("log.channels.path");
 		this.LOG_CHANNEL_DATA = config.get("log.channels.data.path");
 		this.LOG_MNEMONIC_PATH = config.get("log.mnemonic.data.path");
+		this.LOG_DEPTH_PATH = config.get("log.channel.depthData.path");
 	}
 
 	/**
@@ -144,6 +146,9 @@ public class DotDelegator {
 		case "logMenmonicPath":
 			endpoint = this.LOG_MNEMONIC_PATH;
 			break;
+			case "logDepthPath":
+				endpoint = this.LOG_DEPTH_PATH;
+				break;
 		default:
 			throw new ValveException("Unsupported object type<" + objectType + ">");
 		}
@@ -877,7 +882,12 @@ public class DotDelegator {
 		String channelsEndPoint;
 		HttpRequest channelsRequest;
 		HttpResponse<String> channelsResponse;
+		String channelsDepthEndPoint;
+		HttpRequest channelsDepthRequest;
+		HttpResponse<String> channelsDepthResponse;
 		ObjLog finalResponse = null;
+		String data ="";
+		String payload="";
 
 		// Build Request for Get ChannelSet Metadata
 		channelsetmetadataEndpoint = this.getEndpoint("channelsetmetadata");
@@ -900,6 +910,22 @@ public class DotDelegator {
 		channelsRequest.queryString("channelSetUuid", uuid);
 		// get response
 		channelsResponse = client.makeRequest(channelsRequest, username, password);
+
+		// Build Request for Get Channels Depth
+		List<Channel> channels = Channel.jsonToChannelList(channelsResponse.getBody());
+		channelsDepthEndPoint = this.getEndpoint("logDepthPath");
+		channelsDepthRequest = Unirest.post(channelsDepthEndPoint);
+		channelsDepthRequest.header("Content-Type", "application/json");
+		channelsDepthRequest.queryString("containerId", uuid);
+		channelsRequest.queryString("deepSearch", "false");
+		channelsRequest.queryString("channels", channels);
+		channelsRequest.queryString("indexUnit", "m");
+		channelsRequest.queryString("sortDesc", "true");
+		// get response
+		channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
+
+
+
 		if (201 == channelsetmetadataResponse.getStatus() || 200 == channelsetmetadataResponse.getStatus()
 				|| 200 == allChannelSet.getStatus() || 201 == allChannelSet.getStatus()
 				|| 200 == channelsResponse.getStatus() || 201 == channelsResponse.getStatus()) {

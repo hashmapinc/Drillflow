@@ -25,6 +25,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog;
 import com.hashmapinc.tempus.witsml.ValveLogging;
 import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
@@ -71,6 +72,9 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
         List<Channel> chans = Channel.jsonToChannelList(channels);
         List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> lcis = Channel.to1411(chans);
         log.setLogCurveInfo(lcis);
+        //Todo construct LogData from response
+        //List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData> dataList ;
+        //log.setLogData(dataList);
         return log;
     }
 
