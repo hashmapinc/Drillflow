@@ -21,6 +21,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.GenericMeasure;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ShortNameStruct;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.*;
 
@@ -845,6 +846,32 @@ public class Channel {
         return curves;
     }
 
+
+    public static List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData> to1411LogData(
+            List<CsLogData> logDatas) {
+        List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData> curves = new ArrayList<>();
+
+        if (logDatas == null || logDatas.isEmpty())
+            return null;
+
+        for (CsLogData ld : logDatas) {
+            try{
+                com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData ldi =
+                        new com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData();
+                ldi.setData(ld.getData());
+                ldi.setMnemonicList(ld.getMnemonicList());
+                ldi.setUnitList(ld.getUnitList());
+                //Need to address this in wol...does not exist
+                //lci.getExtensionNameValue()
+                curves.add(ldi);
+            } catch (Exception ex){
+                continue;
+            }
+        }
+        return curves;
+    }
+
+
     public static String channelListToJson(List<Channel> channels) throws JsonProcessingException {
         ObjectMapper om = new ObjectMapper();
         om.setDateFormat(new StdDateFormat());
@@ -853,6 +880,10 @@ public class Channel {
 
     public static List<Channel> jsonToChannelList(String channelsList){
         return fromJSON(new TypeReference<List<Channel>>() {}, channelsList);
+    }
+
+    public static List<CsLogData> jsonToCsLogDataList(String csLogDataList){
+        return fromJSON(new TypeReference<List<CsLogData>>() {}, csLogDataList);
     }
 
     public static <T> T fromJSON(final TypeReference<T> type, final String jsonPacket) {

@@ -62,7 +62,7 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
      */
 
     public static ObjLog convertDotResponseToWitsml(String wellSearchEndpoint,String wellBoreSearchEndpoint,DotClient client, String username,
-                                                    String password, String exchangeID,AbstractWitsmlObject witsmlObject,String channelSet, String channels) throws JsonParseException,
+                                                    String password, String exchangeID,AbstractWitsmlObject witsmlObject,String channelSet, String channels,String channelsDepthResponse) throws JsonParseException,
             JsonMappingException, IOException, DatatypeConfigurationException, ParseException,ValveException, ValveAuthException, UnirestException {
         List<ChannelSet> cs = ChannelSet.jsonToChannelSetList(channelSet);
         ObjLog log = ChannelSet.to1411(cs.get(0));
@@ -73,8 +73,9 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
         List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> lcis = Channel.to1411(chans);
         log.setLogCurveInfo(lcis);
         //Todo construct LogData from response
-        //List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData> dataList ;
-        //log.setLogData(dataList);
+        List<CsLogData> logdatas = Channel.jsonToCsLogDataList(channelsDepthResponse);
+        List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData> lld = Channel.to1411LogData(logdatas);
+        log.setLogData(lld);
         return log;
     }
 
