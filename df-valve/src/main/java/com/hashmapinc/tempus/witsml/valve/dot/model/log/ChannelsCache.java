@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot.model.log;
 
+// TODO Provide the code for local caching, then move on to Redis.
 public class ChannelsCache {
     /**
      *  This cache stores channels.

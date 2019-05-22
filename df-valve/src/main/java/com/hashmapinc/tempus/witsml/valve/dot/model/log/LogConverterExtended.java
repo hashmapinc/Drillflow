@@ -15,13 +15,6 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot.model.log;
 
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.List;
-import java.util.logging.Logger;
-
-import javax.xml.datatype.DatatypeConfigurationException;
-
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
@@ -41,6 +34,12 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequestWithBody;
 import org.json.JSONObject;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import java.io.IOException;
+import java.text.ParseException;
+import java.util.List;
+import java.util.logging.Logger;
 
 public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Util.LogConverter {
     private static final Logger LOG = Logger.getLogger(DotDelegator.class.getName());

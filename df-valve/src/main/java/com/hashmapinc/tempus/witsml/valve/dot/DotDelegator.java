@@ -345,6 +345,7 @@ public class DotDelegator {
 		String uid = witsmlObj.getUid();
 		String objectType = witsmlObj.getObjectType();
 		String version = witsmlObj.getVersion();
+		ChannelSet cs = null;
 
 		// get object as payload string
 		String payload;
@@ -388,7 +389,30 @@ public class DotDelegator {
 				// ************************* CHANNELSET *************************
 				// check if channelSet is in cache (not a granular search, but
 				// against the channelSet in its entirely)
+				boolean bypass = false;
+				try {
+					if ("1.4.1.1".equals(version)) {
+						cs = ChannelSet
+								.from1411((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj);
+						channelSetPayload = cs.toJson();
+					} else {
+						cs = ChannelSet
+								.from1311((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj);
+						channelSetPayload = cs.toJson();
+					}
+				} catch (JsonProcessingException ex) {
+					LOG.warning(ValveLogging.getLogMsg(exchangeID,
+													  "Could not produce JSON payload for ChannelSet.",
+													   witsmlObj));
+					throw new ValveException("Could not produce JSON payload for ChannelSet");
+				}
 
+				// TODO Check if CS was found in cache (if so, bypass update)
+				/*
+				if (ChannelSetCache.getCS(uuid, cs)) {
+
+				}
+				*/
 				// .../witsml/channelSets/{uuid}
 				channelSetEndpoint = this.getEndpoint(objectType);
 				channelSetEndpoint = channelSetEndpoint + "/{" + uuid + "}";
@@ -586,7 +610,6 @@ public class DotDelegator {
 														   ValveAuthException,
 														   UnirestException
 	{
-		// TODO Why are the traj tests failing? Fix before merging code!!!!
 		String objectType = witsmlObj.getObjectType(); // get obj type for exception handling
 		String uid = witsmlObj.getUid();
 		String endpoint = this.getEndpoint(objectType);
@@ -651,6 +674,8 @@ public class DotDelegator {
 					List<Channel> chanList = Channel
 							.from1311((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj);
 					channelPayload = Channel.channelListToJson(chanList);
+					data = DotLogDataHelper.convertDataToDotFrom1311(
+							(com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj);
 				}
 			} catch (JsonProcessingException e) {
 				throw new ValveException("Error converting Log to ChannelSet");
@@ -723,8 +748,9 @@ public class DotDelegator {
 						LOG.info(ValveLogging.getLogMsg(exchangeID,
 								logResponse(response, "Received successful status code from DoT create call"), witsmlObj));
 						// TODO: cache the channels
-// START HERE
-						String chDataEndpoint = endpoint = this.getEndpoint(objectType + "Channel");
+
+						// .../witsml/channels/data?channelSetUuid={{channelSetUuid}}
+						String chDataEndpoint = this.getEndpoint("channelData");
 						channelData = Unirest.post(chDataEndpoint);
 						channelData.queryString("channelSetUuid", uuid4CS);
 						channelData.header("Content-Type", "application/json");
@@ -763,9 +789,9 @@ public class DotDelegator {
 	 * @param version	either 1.4.1.1 or 1.3.1.1
 	 * @param payload	JSON String with empties removed (important since witsmlObj
 	 *                      may contain null) & correct for the version
-	 * @param witsmlObj abstract WITSML XML in JSON format
+	 * @param witsmlObj WITSML XML in JSON format
 	 *
-	 * @return String array representing the payloads (channelSet, channels, & data)
+	 * @return String 	array representing the payloads (channelSet, channels, & data)
 	 *
 	 * @throws ValveException
 	 */
@@ -796,41 +822,6 @@ public class DotDelegator {
 			}
 
 			// ******************************************* CHANNELS ********************************************
-			/*
-			 * "description": "You do NOT want to do this:
-			 * 				[
-							   {
-								  "uid":"lci-22",
-								  "nullValue":"-999.25",
-								  "sensorOffset":{
-									 "uom":"m",
-									 "value":"0.0"
-								  },
-								  "mnemonic":"ECD-22",
-								  "dataType":"double",
-								  "uom":"g/cm3",
-								  "axisDefinition":[],
-								  "timeDepth":"depth",
-								  "classWitsml":"classy",
-								  "index":[
-									 {
-										"indexType":"depth",
-										"uom":"m",
-										"direction":"increasing",
-										"mnemonic":"Mdepth"
-									 }
-								  ],
-								  "citation":{
-									 "title":"ECD"
-								  },
-								  "extensionNameValue":[]
-							   }
-							]
-			 * This is an example of what happens if you DO NOT send a merged version of the channel object.
-			 * You need to make sure to merge the ENTIRE channel object (note not the list, just the singular
-			 * channel) and then POST it. If more that one channel is modified/added, those merged/new channels
-			 * can be sent as one list.\n"
-			 */
 			if (payloadJSON.has("logCurveInfo")) {
 				switch (version) {
 					case "1.3.1.1":
@@ -839,7 +830,7 @@ public class DotDelegator {
 						break;
 					case "1.4.1.1":
 						payloads[CHANNELS_IDX_4_PAYLOADS] = Channel.channelListToJson(
-								Channel.from1411( (ObjLog)witsmlObj));
+								Channel.from1411((ObjLog)witsmlObj));
 						break;
 					default:
 						payloads[CHANNELS_IDX_4_PAYLOADS] = "";
@@ -1288,9 +1279,9 @@ public class DotDelegator {
 		response = client.makeRequest( request,
 									   username,
 									   password );
-		// check response status
+		// check response status (202 is the only valid response for data)
 		int status = response.getStatus();
-		if (201 == status || 200 == status) {
+		if (201 == status || 200 == status || 202 == status) {
 			LOG.info(ValveLogging.getLogMsg( exchangeID,
 					logResponse(response, "UPDATE for " + witsmlObj + " was successful"),
 					witsmlObj));

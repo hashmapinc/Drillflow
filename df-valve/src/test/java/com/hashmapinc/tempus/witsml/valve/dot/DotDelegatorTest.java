@@ -21,6 +21,7 @@ import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.*;
 import com.hashmapinc.tempus.witsml.valve.dot.client.DotClient;
 import com.hashmapinc.tempus.witsml.valve.dot.graphql.GraphQLQueryConverter;
 import com.mashape.unirest.http.HttpResponse;
@@ -31,16 +32,16 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
-//import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.security.SecureRandom;
+import java.util.*;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
+
+//import java.security.SecureRandom;
 
 public class DotDelegatorTest {
 
@@ -52,17 +53,15 @@ public class DotDelegatorTest {
     private String trajectoryPath;
     private String graphQlWellPath;
 
-    /*
     private String graphQlWellborePath;
     private String graphQlTrajectoryPath;
-    */
 
     private String logChannelsetPath;
     private String logChannelPath;
-    /*
-    private GenericMeasure  testGM = new GenericMeasure();          // v1.4.1.1
-    private CsLogData       csLogData = new CsLogData();            // v1.4.1.1
-    private CsLogCurveInfo  csLogCurveInfo = new CsLogCurveInfo();  // v1.4.1.1
+
+    private GenericMeasure testGM = new GenericMeasure();          // v1.4.1.1
+    private CsLogData csLogData = new CsLogData();            // v1.4.1.1
+    private CsLogCurveInfo csLogCurveInfo = new CsLogCurveInfo();  // v1.4.1.1
     private List<CsLogCurveInfo> logCurveInfoList = new ArrayList<>();
     private List<CsLogData> dataList = new ArrayList<>();
 
@@ -76,7 +75,7 @@ public class DotDelegatorTest {
         for( int i = 0; i < len; i++ )
             sb.append( AB.charAt( rnd.nextInt(AB.length()) ) );
         return sb.toString();
-    }*/
+    }
 
     @Before
     public void init() {
@@ -127,7 +126,7 @@ public class DotDelegatorTest {
         assertEquals(expectedMap, map1311);
     }
 
-    /*@Test
+    @Test
     public void shouldCreateTrajectoryWithUid() throws Exception {
         // build object
         ObjTrajectory traj = new ObjTrajectory();
@@ -163,12 +162,12 @@ public class DotDelegatorTest {
         String actualUid = this.delegator.createObject(traj, "goodUsername", "goodPassword", "exchangeID", this.mockClient);
         String expectedUid = traj.getUid();
         assertEquals(expectedUid, actualUid);
-    }*/
+    }
 
     /*
-       Version 1.4.1.1
+       Version 1.4.1.1 but will modify for 1.3.1.1
    */
-    /*@Test
+    @Test
     public void shouldCreateLog() throws Exception {
 
         // ***************** create channelSet log object ***************** //
@@ -176,17 +175,18 @@ public class DotDelegatorTest {
         String randomUID = randomString(10);
         String prefixUID = "HM_Test";
         log.setUid(prefixUID + randomUID);
-        // TODO Find a better way - see Chris' script for choosing the 1st from
-        //      a list? Or something from within this code base?
-        log.setUidWell("U2");
-        log.setUidWellbore("WBDD600");
+        // TODO Find a better way -
+        //      such as below, have a string stored somewhere and use that rather than
+        //      creating it every time; also, WellUid and WellboreUid needs to be one
+        //      that will always be there
+        // String expectedJson = TestUtilities.getResourceAsString("updateTest/WellCountryUpdateResult1311.json");
+        log.setUidWell("Energistics-well-0001");
+        log.setUidWellbore("Energistics-w1-wellbore-0001");
 
         log.setNameWell("Awing");
         log.setNameWellbore("AwingWB1");
         log.setName("Baker Logs Section1 - MD Log");
         log.setServiceCompany("Schlumberger");
-        // TODO why does any other value, such as "measured depth",
-        //      fail the API call?
         log.setIndexType("time");
         log.setDirection("increasing");
         log.setIndexCurve("Mdepth");
@@ -269,9 +269,9 @@ public class DotDelegatorTest {
         String expectedUid = logUid;
         assertEquals(expectedUid, actualUid);
 
-    }*/
+    }
 
-    /*@Test
+    @Test
     public void shouldCreateTrajectoryWithoutUid() throws Exception {
         // build object
         ObjTrajectory traj = new ObjTrajectory();
@@ -307,7 +307,7 @@ public class DotDelegatorTest {
         String actualUid = this.delegator.createObject(traj, "goodUsername", "goodPassword", "exchangeID", this.mockClient);
         String expectedUid = "traj-a";
         assertEquals(expectedUid, actualUid);
-    }*/
+    }
 
     @Test
     public void shouldFindWellsWithEmptyGraphQLQuery() throws Exception {

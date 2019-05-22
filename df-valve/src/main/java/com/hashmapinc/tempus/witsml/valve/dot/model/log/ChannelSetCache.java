@@ -58,126 +58,25 @@ public class ChannelSetCache {
     }
 
     /**
-     * This function stores a mapping between a uid and uuid.
+     * This function returns the matching ChannelSet from cache to the
+     * one passed in.
      *
-     * This function is used for parent-only objects
+     * @param uuid - string value of the uuid to use for ChannelSet lookup
+     * @param cs - ChannelSet to check for a match within the cache
      *
-     * @param uuid - string uuid to cache
-     * @param uid - string uid to cache
-     * @param parentUid - string uid of the parent object needed for
-     *                  building the composite key
+     * @return - ChannelSet found channel set; null otherwise
      */
-    public static void putInCache(
-            String uuid,
-            String uid,
-            String parentUid
-    ) {
-        // build composite key
-        String compositeKey = parentUid + SEPARATOR + uid;
-
-        // store 2-way mappings in cache
-        cache.put(uuid, uid);          // uuid->uid
-        cache.put(compositeKey, uuid); // uid->uuid
-    }
-
-    /**
-     * This function stores a mapping between a uid and uuid.
-     *
-     * This function is used for grandparent-only objects
-     *
-     * @param uuid - string uuid to cache
-     * @param uid - string uid to cache
-     * @param parentUid - string uid of the parent object needed for
-     *                    building the composite key
-     * @param grandparentUid - string uid of the grandparent object needed
-     *                         for building the composite key
-     */
-    public static void putInCache(
-            String uuid,
-            String uid,
-            String parentUid,
-            String grandparentUid
-    ) {
-        // build composite key
-        String compositeKey = grandparentUid + SEPARATOR + parentUid + SEPARATOR + uid;
-
-        // store 2-way mappings in cache
-        cache.put(uuid, uid);          // uuid->uid
-        cache.put(compositeKey, uuid); // uid->uuid
-    }
-
-    /**
-     * This function checks the cache for a matching uid.
-     *
-     * If a match is found, it is returned.
-     *
-     * @param uuid - string value of the uuid to use for uid lookup
-     * @return - uid String found mapped to the given uuid.
-     */
-    public static String getUid(String uuid) {
+    public static String getCS( String uuid,
+                                ChannelSet cs )
+    {
         // check cache
-        if (cache.containsKey(uuid))
+        if (cache.containsKey(uuid + SEPARATOR + (cs.hashCode()))) {
             return cache.get(uuid);
+        }
 
         return null; // no match found
     }
 
-    /**
-     * returns the uuid for a parentless object with given uid.
-     *
-     * @param uid - string identifier for the object uuid being requested
-     * @return - uuid string if a uuid can be found, otherwise null is returned
-     */
-    public static String getUuid(String uid) {
-        // check cache
-        if (cache.containsKey(uid))
-            return cache.get(uid);
-
-        return null; // no match found
-    }
-
-    /**
-     * returns the uuid for a grandparent-only object with
-     * the given uid and parentUid.
-     *
-     * @param uid - string identifier for the object uuid being requested
-     * @param parentUid - string uid of the parent of the object UUID being requested
-     * @return - uuid string if a uuid can be found, otherwise null is returned
-     */
-    public static String getUuid(
-            String uid,
-            String parentUid
-    ) {
-        // build composite key
-        String compositeKey = parentUid + SEPARATOR + uid;
-
-        // check cache
-        if (cache.containsKey(compositeKey))
-            return cache.get(compositeKey);
-
-        return null; // no match found
-    }
-
-    /**
-     * returns the uuid for a grandparent-only object with
-     * the given uid, parentUid, and grandparentUid.
-     *
-     * @param uid - string identifier for the object uuid being requested
-     * @param parentUid - string uid of the parent of the object UUID being requested
-     * @return - uuid string if a uuid can be found, otherwise null is returned
-     */
-    public static String getUuid(
-            String uid,
-            String parentUid,
-            String grandparentUid
-    ) {
-        // build composite key
-        String compositeKey = grandparentUid + SEPARATOR + parentUid + SEPARATOR + uid;
-
-        // check cache
-        if (cache.containsKey(compositeKey))
-            return cache.get(compositeKey);
-
-        return null; // no match found
-    }
+    // TODO Should there be a "cache cleanup" function just in case it needs
+    //      to be cleared out?
 }
