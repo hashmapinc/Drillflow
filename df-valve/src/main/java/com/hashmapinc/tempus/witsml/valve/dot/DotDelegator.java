@@ -934,40 +934,23 @@ public class DotDelegator {
 		List<Channel> channels = Channel.jsonToChannelList(channelsResponse.getBody());
 		// Build Request for Get Channels Depth
 		if(indexType.equals("depth")){
-			if ("1.4.1.1".equals(witsmlObject.getVersion())) {
-				channelPayload = Channel.channelListToJson(channels);
-			} else {
-
-				List<Channel> chanList = Channel
-						.from1311((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObject);
-				channelPayload = Channel.channelListToJson(channels);
-			}
+			String sortDesc = "true";
+			data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels,uuid,sortDesc);
 			// create with POST
 			channelsDepthEndPoint = this.getEndpoint("logDepthPath");
 			channelsDepthRequest = Unirest.post(channelsDepthEndPoint);
-			channelsDepthRequest.queryString("containerId", uuid);
-			channelsDepthRequest.queryString("sortDesc", "true");
 			channelsDepthRequest.header("Content-Type", "application/json");
-			channelsDepthRequest.body(channelPayload);
-			LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(channelsDepthRequest), witsmlObject));
+			channelsDepthRequest.body(data);
 			// get the request response.
 			channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
 		}else{
-			if ("1.4.1.1".equals(witsmlObject.getVersion())) {
-				channelPayload = Channel.channelListToJson(channels);
-			} else {
-				List<Channel> chanList = Channel
-						.from1311((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObject);
-				channelPayload = Channel.channelListToJson(channels);
-			}
+			String sortDesc = "true";
+			data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels,uuid,sortDesc);
 			// create with POST
 			channelsDepthEndPoint = this.getEndpoint("logTimePath");
 			channelsDepthRequest = Unirest.post(channelsDepthEndPoint);
-			channelsDepthRequest.queryString("containerId", uuid);
-			channelsDepthRequest.queryString("sortDesc", "true");
 			channelsDepthRequest.header("Content-Type", "application/json");
-			channelsDepthRequest.body(channelPayload);
-			LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(channelsDepthRequest), witsmlObject));
+			channelsDepthRequest.body(data);
 			// get the request response.
 			channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
 		}
