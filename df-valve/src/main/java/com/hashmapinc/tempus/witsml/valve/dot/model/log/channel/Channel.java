@@ -639,10 +639,10 @@ public class Channel {
 
                 if (witsmlObj.getIndexType() != null) {
                     if (witsmlObj.getIndexType().toLowerCase().contains("depth")) {
-                        channel.setTimeDepth("depth");
+                        channel.setTimeDepth("Depth");
                     } else {
                         if (witsmlObj.getIndexType().toLowerCase().contains("time"))
-                            channel.setTimeDepth("time");
+                            channel.setTimeDepth("Time");
                     }
                 }
 
@@ -697,9 +697,9 @@ public class Channel {
                 channel.setMnemonic(lci.getMnemonic());
 
                 if (witsmlObj.getIndexType().toLowerCase().contains("depth"))
-                    channel.setTimeDepth("depth");
+                    channel.setTimeDepth("Depth");
                 else
-                    channel.setTimeDepth("time");
+                    channel.setTimeDepth("Time");
                 channel.setClassWitsml(lci.getClassWitsml());
 
                 if (lci.getUnit() == null) {

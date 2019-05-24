@@ -199,8 +199,8 @@ public class DotDelegatorTest {
 
     /*
    */
-    @Test
-    public void shouldCreateLog1411() throws Exception {
+    //@Test
+    /*public void shouldCreateLog1411() throws Exception {
         // get the raw WITSML XML request from resource file
         String rawXML = TestUtilities.getResourceAsString("log1411.xml");
         // extract the AbstractWitsmlObject(s)
@@ -255,7 +255,7 @@ public class DotDelegatorTest {
                                                         this.mockClient );
         String expectedUid = log.getUid();
         assertEquals(expectedUid, actualUid);
-/*
+*//*
         // build second http request to create channels for
         // the channelSet
         endpoint = this.url + this.logChannelPath;
@@ -279,8 +279,8 @@ public class DotDelegatorTest {
 
         String expectedUid = logUid;
         assertEquals(expectedUid, actualUid);
-*/
-    }
+*//*
+    }*/
 
     @Test
     public void shouldCreateTrajectoryWithoutUid() throws Exception {
