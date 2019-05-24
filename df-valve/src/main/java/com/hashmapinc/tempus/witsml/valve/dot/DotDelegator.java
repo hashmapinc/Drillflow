@@ -621,7 +621,6 @@ public class DotDelegator {
 
 		String uid = witsmlObj.getUid();
 		String endpoint = this.getEndpoint(objectType);
-		String version = witsmlObj.getVersion();
 
 		// get object as payload string
 		String payload = witsmlObj.getJSONString("1.4.1.1");
