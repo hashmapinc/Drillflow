@@ -43,8 +43,6 @@ public class ChannelSetCache {
                                    ChannelSet cs )
                                         throws JsonProcessingException
     {
-        int checksum = 0;
-
         // store mapping in cache
         // **********************
         // use a composite key of uuid and the hash code of the

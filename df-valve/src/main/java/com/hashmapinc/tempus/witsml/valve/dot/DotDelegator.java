@@ -390,7 +390,7 @@ public class DotDelegator {
 				// ************************* CHANNELSET *************************
 				// check if channelSet is in cache (not a granular search, but
 				// against the channelSet in its entirely)
-				boolean bypass = false;
+				// boolean bypass = false;
 				try {
 					if ("1.4.1.1".equals(version)) {
 						cs = ChannelSet
@@ -685,7 +685,6 @@ public class DotDelegator {
 											   					   UnirestException
 	{
 		HttpResponse<String> response;
-		ChannelSet cs = null;
 		String objectType = witsmlObj.getObjectType();
 		String uid = witsmlObj.getUid();
 		String version = witsmlObj.getVersion();
@@ -812,10 +811,10 @@ public class DotDelegator {
 							JSONObject payloadAsJsonObj = new JSONObject(payload);
 							if (payloadAsJsonObj.has("indexType")) {
 								indexType = payloadAsJsonObj.getString("indexType");
-								if (indexType.equals("time")) {
+								if ("time".equals(indexType)) {
 									System.out.println("Call the rest endpoint for time");
 								} else {
-									if (indexType.equals("depth")) {
+									if ("depth".equals(indexType)) {
 										JSONObject payloadForDataFetch = new JSONObject();
 										payloadForDataFetch.put("containerId", uuid4CS);
 										JSONArray channelsArray = new JSONArray();

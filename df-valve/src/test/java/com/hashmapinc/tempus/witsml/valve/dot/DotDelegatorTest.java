@@ -21,10 +21,8 @@ import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells;
-import com.hashmapinc.tempus.WitsmlObjects.v1411.*;
 import com.hashmapinc.tempus.witsml.valve.dot.client.DotClient;
 import com.hashmapinc.tempus.witsml.valve.dot.graphql.GraphQLQueryConverter;
-import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.ChannelSet;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.request.HttpRequest;
@@ -33,10 +31,8 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
@@ -56,34 +52,10 @@ public class DotDelegatorTest {
     private String trajectoryPath;
     private String graphQlWellPath;
 
-    private String graphQlWellborePath;
-    private String graphQlTrajectoryPath;
-
     private String logChannelsetPath;
     private String logChannelPath;
 
-    private GenericMeasure genericMeasure = new GenericMeasure();  // v1.4.1.1
-    private RatioGenericMeasure ratioGenericMeasure =
-                                        new RatioGenericMeasure(); // v1.4.1.1
-    private CsLogData csLogData = new CsLogData();                 // v1.4.1.1
-    private CsLogCurveInfo csLogCurveInfo = new CsLogCurveInfo();  // v1.4.1.1
-    private CsCommonData csCommonData = new CsCommonData();        // v1.4.1.1
-    private List<CsLogCurveInfo> logCurveInfoList = new ArrayList<>();
-    private List<CsLogData> dataList = new ArrayList<>();
-
-    private static final String AB =
-            "0123456789"
-                    + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                    + "abcdefghijklmnopqrstuvwxyz";
-    private static SecureRandom rnd = new SecureRandom();
-    private String randomString( int len ){
-        StringBuilder sb = new StringBuilder( len );
-        for( int i = 0; i < len; i++ )
-            sb.append( AB.charAt( rnd.nextInt(AB.length()) ) );
-        return sb.toString();
-    }
-
-
+    /*
     private static List<com.hashmapinc.tempus.WitsmlObjects.v1411.IndexedObject> generateLogParmFor1411() {
 
         List<com.hashmapinc.tempus.WitsmlObjects.v1411.IndexedObject> params = new ArrayList<>();
@@ -109,7 +81,7 @@ public class DotDelegatorTest {
 
         return params;
     }
-
+    */
 
     @Before
     public void init() {
