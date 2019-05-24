@@ -137,9 +137,9 @@ public class Index {
             return null;
         }
 
-        String indexType = "Depth";
+        String indexType = "depth";
         if (log.getIndexType().contains("time"))
-            indexType = "Time";
+            indexType = "time";
 
         Index index = new Index();
         index.setIndexType(indexType);

@@ -697,9 +697,9 @@ public class Channel {
                 channel.setMnemonic(lci.getMnemonic());
 
                 if (witsmlObj.getIndexType().toLowerCase().contains("depth"))
-                    channel.setTimeDepth("Depth");
+                    channel.setTimeDepth("depth");
                 else
-                    channel.setTimeDepth("Time");
+                    channel.setTimeDepth("time");
                 channel.setClassWitsml(lci.getClassWitsml());
 
                 if (lci.getUnit() == null) {

@@ -805,15 +805,15 @@ public class DotDelegator {
 						JSONObject payloadAsJsonObj = new JSONObject(payload);
 						if (payloadAsJsonObj.has("indexType")) {
 							indexType = payloadAsJsonObj.getString("indexType");
-							if (indexType.equals("time")) {
+							if (indexType.toLowerCase().contains("time")) {
 								System.out.println("Call the rest endpoint for time");
 							} else {
-								if (indexType.equals("depth")) {
+								if (indexType.contains("depth")) {
 									JSONObject payloadForDataFetch = new JSONObject();
 									payloadForDataFetch.put("containerId", uuid4CS);
 									JSONArray channelsArray = new JSONArray();
 									JSONObject channelObj = new JSONObject();
-									channelObj.put("name", "Vdepth");
+									channelObj.put("name", "ROP");
 									channelsArray.put(channelObj);
 									payloadForDataFetch.put("channels", channelsArray);
 									if (payloadAsJsonObj.has("indexUnit")) {
