@@ -43,6 +43,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -683,42 +684,46 @@ public class DotDelegator {
 																   ValveAuthException,
 											   					   UnirestException
 	{
-		HttpRequestWithBody request;
-
+		HttpResponse<String> response;
 		ChannelSet cs = null;
-
 		String objectType = witsmlObj.getObjectType();
 		String uid = witsmlObj.getUid();
 		String version = witsmlObj.getVersion();
+		HashMap<String,String> requestParams;
+		String endpoint;
 
 		// get WITSML abstract object as JSON string
 		String payload = ("1.4.1.1".equals(version) ? witsmlObj.getJSONString("1.4.1.1") :
 													  witsmlObj.getJSONString("1.3.1.1") );
 
 		// separate out from the payload the sub-payloads for
-		// ChannelSet, Channels and Data...
+		// 		ChannelSet (CS_IDX_4_PAYLOADS),
+		// 		Channels (CHANNELS_IDX_4_PAYLOADS),
+		// 		and Data (DATA_IDX_4_PAYLOADS)
 		String[] allPayloads = getPayloads4Log( version,
 												payload,
 												witsmlObj );
 
-		// create with POST and generate uid
-		// endpoint: .../channelSets?uid={uid}&uidWellbore={uidWellbore}&uidWell={uidWell}
-		request = Unirest.post(this.getEndpoint(objectType));
+		// set-up for channel set creation..
+		// ... endpoint url
+		endpoint = this.getEndpoint(objectType);
+		// ... parameters for url
+		requestParams = new HashMap<>();
+		requestParams.put("uid", uid);
+		requestParams.put("uidWellbore", witsmlObj.getParentUid());
+		requestParams.put("uidWell", witsmlObj.getGrandParentUid());
 
-		// add remaining query string params
-		request.queryString("uid", uid);
-		request.queryString("uidWellbore", witsmlObj.getParentUid());
-		request.queryString("uidWell", witsmlObj.getGrandParentUid());
 
-		// add the header
-		request.header("Content-Type", "application/json");
-		// add the ChannelSet payload
-		request.body(allPayloads[CS_IDX_4_PAYLOADS]);
-
-		LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(request), witsmlObj));
-
-		// get the channelSetRequest's response
-		HttpResponse<String> response = client.makeRequest(request, username, password);
+		// call a central method to finish the REST set-up
+		// and execute the rest call for ChannelSet
+		response = performRestCall( allPayloads[CS_IDX_4_PAYLOADS],
+									endpoint,
+									requestParams,
+									client,
+									username,
+									password,
+									witsmlObj,
+									exchangeID );
 
 		// check response status
 		int status = response.getStatus();
@@ -732,11 +737,11 @@ public class DotDelegator {
 
 		// actually a 201...
 		if (201 == status) {
-			LOG.info(ValveLogging.getLogMsg( exchangeID,
-											 logResponse( response,
-														 "Received successful "
-																 + "status code from DoT create call"),
-											 witsmlObj) );
+			LOG.info(ValveLogging.getLogMsg(exchangeID,
+					logResponse(response,
+							"Received successful "
+									+ "status code from DoT create call"),
+					witsmlObj));
 			// cache the channelSet - null pointer exception now
 			/*
 			try {
@@ -752,26 +757,26 @@ public class DotDelegator {
 			*/
 
 			// add channels to an existing ChannelSet
-			if ( !(allPayloads[CHANNELS_IDX_4_PAYLOADS].isEmpty()) ) {
+			if (!(allPayloads[CHANNELS_IDX_4_PAYLOADS].isEmpty())) {
 
 				// build the channelSetRequest...
 				// endpoint: .../channels/metadata?channelSetUuid={channelSetUuid}
-				String endpoint = this.getEndpoint(objectType + "Channel");
+				endpoint = this.getEndpoint(objectType + "Channel");
 				endpoint = endpoint + "/metadata";
-
 				// get the uuid for the channelSet just created from the response
 				String uuid4CS = new JsonNode(response.getBody()).getObject().getString("uuid");
-
-				// create with POST
-				request = Unirest.post(endpoint);
-				request.queryString("channelSetUuid", uuid4CS);
-				request.header("Content-Type", "application/json");
-				request.body(allPayloads[CHANNELS_IDX_4_PAYLOADS]);
-
-				LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(request), witsmlObj));
-
-				// get the channelSetRequest response.
-				response = client.makeRequest(request, username, password);
+				requestParams = new HashMap<>();
+				requestParams.put("channelSetUuid", uuid4CS);
+				// call a central method to finish the REST set-up
+				// and execute the rest call for ChannelSet
+				response = performRestCall( allPayloads[CHANNELS_IDX_4_PAYLOADS],
+											endpoint,
+											requestParams,
+											client,
+											username,
+											password,
+											witsmlObj,
+											exchangeID );
 
 				// check response status
 				status = response.getStatus();
@@ -784,61 +789,65 @@ public class DotDelegator {
 					// TODO: cache the channels
 
 					// .../channels/data?channelSetUuid={channelSetUuid}
-					String chDataEndpoint = this.getEndpoint("channelData");
-					request = Unirest.post(chDataEndpoint);
-					request.queryString("channelSetUuid", uuid4CS);
-					request.header("Content-Type", "application/json");
-					request.body(allPayloads[DATA_IDX_4_PAYLOADS]);
-					LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(request), witsmlObj));
-
-					// get the channelSetRequest response.
-					response = client.makeRequest(request, username, password);
-
+					endpoint = this.getEndpoint("channelData");
+					// Use same requestParams as for the previous call (channelSetUuid={channelSetUuid})
+					// call a central method to finish the REST set-up
+					// and execute the rest call for ChannelSet
+					response = performRestCall( allPayloads[DATA_IDX_4_PAYLOADS],
+												endpoint,
+												requestParams,
+												client,
+												username,
+												password,
+												witsmlObj,
+												exchangeID );
 					// check response status
 					status = response.getStatus();
 					// actually this requires a 202...
-					if (202 == status) {
-						LOG.info(ValveLogging.getLogMsg(exchangeID,
-								logResponse(response, "Received successful status code from DoT add data call"), witsmlObj));
-						// perform a data check
-						String indexType="";
-						JSONObject payloadAsJsonObj = new JSONObject(payload);
-						if (payloadAsJsonObj.has("indexType")) {
-							indexType = payloadAsJsonObj.getString("indexType");
-							if (indexType.equals("time")) {
-								System.out.println("Call the rest endpoint for time");
-							} else {
-								if (indexType.equals("depth")) {
-									JSONObject payloadForDataFetch = new JSONObject();
-									payloadForDataFetch.put("containerId", uuid4CS);
-									JSONArray channelsArray = new JSONArray();
-									JSONObject channelObj = new JSONObject();
-									channelObj.put("name", "Vdepth");
-									channelsArray.put(channelObj);
-									payloadForDataFetch.put("channels", channelsArray);
-									if (payloadAsJsonObj.has("indexUnit")) {
-										payloadForDataFetch.put("indexUnit",
-												payloadAsJsonObj.get("indexUnit"));
-									}
-									payloadForDataFetch.put("sortDesc", "true");
-									// endpoint: https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/channels/depthdata
-									endpoint = this.getEndpoint(objectType + "Channel");
-									endpoint = endpoint.substring(0, endpoint.indexOf("witsml")) + "channels";
-									endpoint = endpoint + "/depthdata";
-									request = Unirest.post(endpoint);
-									request.header("Content-Type", "application/json");
-									request.body(payloadForDataFetch);
-									// get the channelSetRequest response
-									response = client.makeRequest(request, username, password);
-									// check response status
-									status = response.getStatus();
-									// actually this requires a 200...
-									if (200 == status) {
-										System.out.println(response.getBody());
+						if (202 == status) {
+							LOG.info(ValveLogging.getLogMsg(exchangeID,
+									logResponse(response, "Received successful status code from DoT add data call"), witsmlObj));
+							// perform a data check
+							String indexType="";
+							JSONObject payloadAsJsonObj = new JSONObject(payload);
+							if (payloadAsJsonObj.has("indexType")) {
+								indexType = payloadAsJsonObj.getString("indexType");
+								if (indexType.equals("time")) {
+									System.out.println("Call the rest endpoint for time");
+								} else {
+									if (indexType.equals("depth")) {
+										JSONObject payloadForDataFetch = new JSONObject();
+										payloadForDataFetch.put("containerId", uuid4CS);
+										JSONArray channelsArray = new JSONArray();
+										JSONObject channelObj = new JSONObject();
+										channelObj.put("name", "ROP");
+										channelsArray.put(channelObj);
+										payloadForDataFetch.put("channels", channelsArray);
+										if (payloadAsJsonObj.has("indexUnit")) {
+											payloadForDataFetch.put("indexUnit",
+													payloadAsJsonObj.get("indexUnit"));
+										}
+										payloadForDataFetch.put("sortDesc", "true");
+
+										// endpoint: https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/channels/depthdata
+										endpoint = this.getEndpoint(objectType + "Channel");
+										endpoint = endpoint.substring(0, endpoint.indexOf("witsml")) + "channels";
+										endpoint = endpoint + "/depthdata";
+
+										HttpRequestWithBody req = Unirest.post(endpoint);
+										req.header("Content-Type", "application/json");
+										req.body(payloadForDataFetch);
+										// get the channelSetRequest response
+										response = client.makeRequest(req, username, password);
+										// check response status
+										status = response.getStatus();
+										// actually this requires a 200...
+										if (200 == status) {
+											System.out.println(response.getBody());
+										}
 									}
 								}
 							}
-						}
 
 					} else {
 						LOG.warning(ValveLogging.getLogMsg(exchangeID,
@@ -846,6 +855,7 @@ public class DotDelegator {
 						throw new ValveException(response.getBody());
 					}
 				}
+
 			}
 			return (null == uid || uid.isEmpty()) ? new JsonNode(response.getBody()).getObject().getString("uid") :
 												    uid;
@@ -859,7 +869,54 @@ public class DotDelegator {
 		}
 	}
 
+	/**
+	 * Perform a REST call.
+	 *
+	 * @param payload
+	 * @param endpoint
+	 * @param requestParams
+	 * @param client
+	 * @param username
+	 * @param password
+	 * @return response to the REST call
+	 * @throws ValveAuthException
+	 * @throws UnirestException
+	 * @throws ValveException
+	 */
+	public HttpResponse<String> performRestCall( String payload,
+												 String endpoint,
+												 HashMap<String,String> requestParams,
+												 DotClient client,
+												 String username,
+												 String password,
+												 AbstractWitsmlObject witsmlObj,
+												 String exchangeID )
+														throws ValveAuthException,
+															   UnirestException,
+															   ValveException {
 
+		// create with POST and generate uid
+		// CS endpoint:    .../channelSets?uid={uid}&uidWellbore={uidWellbore}&uidWell={uidWell}
+		// Channels endpt: .../channels/metadata?channelSetUuid={channelSetUuid}
+		// Data endpoint:  .../channels/data?channelSetUuid={channelSetUuid}
+		HttpRequestWithBody request = Unirest.post(endpoint);
+		// all requests will have the same header, so it get it taken
+		// care of now, once
+		request.header("Content-Type", "application/json");
+		request.body(payload);
+		// place the request parameters, if any, into the request
+		if (!requestParams.isEmpty()) {
+			requestParams.forEach(
+				(key, value) -> { request.queryString((String)key, value); }
+			);
+		}
+
+		LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(request), witsmlObj));
+
+		// return the response
+		return client.makeRequest(request, username, password);
+
+	}
 
 	/**
 	 * creates an array of payloads:
