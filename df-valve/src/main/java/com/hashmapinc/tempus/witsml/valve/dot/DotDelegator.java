@@ -36,7 +36,6 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javax.xml.bind.JAXBException;
@@ -805,49 +804,10 @@ public class DotDelegator {
 					// actually this requires a 202...
 						if (202 == status) {
 							LOG.info(ValveLogging.getLogMsg(exchangeID,
-									logResponse(response, "Received successful status code from DoT add data call"), witsmlObj));
-							// perform a data check
-							String indexType="";
-							JSONObject payloadAsJsonObj = new JSONObject(payload);
-							if (payloadAsJsonObj.has("indexType")) {
-								indexType = payloadAsJsonObj.getString("indexType");
-								if ("time".equals(indexType)) {
-									System.out.println("Call the rest endpoint for time");
-								} else {
-									if ("depth".equals(indexType)) {
-										JSONObject payloadForDataFetch = new JSONObject();
-										payloadForDataFetch.put("containerId", uuid4CS);
-										JSONArray channelsArray = new JSONArray();
-										JSONObject channelObj = new JSONObject();
-										channelObj.put("name", "ROP");
-										channelsArray.put(channelObj);
-										payloadForDataFetch.put("channels", channelsArray);
-										if (payloadAsJsonObj.has("indexUnit")) {
-											payloadForDataFetch.put("indexUnit",
-													payloadAsJsonObj.get("indexUnit"));
-										}
-										payloadForDataFetch.put("sortDesc", "true");
-
-										// endpoint: https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/channels/depthdata
-										endpoint = this.getEndpoint(objectType + "Channel");
-										endpoint = endpoint.substring(0, endpoint.indexOf("witsml")) + "channels";
-										endpoint = endpoint + "/depthdata";
-
-										HttpRequestWithBody req = Unirest.post(endpoint);
-										req.header("Content-Type", "application/json");
-										req.body(payloadForDataFetch);
-										// get the channelSetRequest response
-										response = client.makeRequest(req, username, password);
-										// check response status
-										status = response.getStatus();
-										// actually this requires a 200...
-										if (200 == status) {
-											System.out.println(response.getBody());
-										}
-									}
-								}
-							}
-
+									logResponse(response,
+											   "Received successful "
+													+ "status code from DoT add data call"),
+												witsmlObj));
 					} else {
 						LOG.warning(ValveLogging.getLogMsg(exchangeID,
 								logResponse(response, "Received " + status + " from DoT POST" + response.getBody()), witsmlObj));
