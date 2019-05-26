@@ -85,6 +85,8 @@ public class DotLogDataHelper extends LogDataHelper {
         return result;
     }
 
+    // Code added to build logdata request
+    
     public static String convertChannelDepthDataToDotFrom(List<Channel> channels , String containerId, String sortDesc){
         String result = "{";
         String channelName = "";
