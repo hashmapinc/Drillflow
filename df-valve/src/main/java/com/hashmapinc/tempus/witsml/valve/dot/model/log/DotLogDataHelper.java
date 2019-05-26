@@ -19,8 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.hashmapinc.tempus.WitsmlObjects.Util.log.LogDataHelper;
-import com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo;
-import com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData;
+import com.hashmapinc.tempus.witsml.valve.dot.model.log.channel.Channel;
 
 
 public class DotLogDataHelper extends LogDataHelper {
@@ -83,6 +82,20 @@ public class DotLogDataHelper extends LogDataHelper {
         }
         result = result + "\"mnemonicList\":" + "\"" + mnemList + "\"" + ",";
         result = result + "\"data\":" + "\"" + convertDataToWitsml20From1311(log) + "\"}";
+        return result;
+    }
+
+    public static String convertChannelDepthDataToDotFrom(List<Channel> channels , String containerId, String sortDesc){
+        String result = "{";
+        String channelName = "";
+        for (int i = 0; i < channels.size(); i++){
+            channelName = channelName + "\"name\":" + "\"" + channels.get(i).getMnemonic() + "\"";
+            if ((i + 1) < channels.size())
+                channelName = channelName + ",";
+        }
+        result = result + "\"containerId\":" + "\"" + containerId + "\"" + ",";
+        result = result + "\"sortDesc\":" + "\"" + sortDesc + "\"" + ",";
+        result = result + "\"channels\":" + "[{" + channelName + "}]}";
         return result;
     }
 }
