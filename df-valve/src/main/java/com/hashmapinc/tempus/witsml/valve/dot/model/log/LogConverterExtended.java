@@ -72,32 +72,27 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
         List<Channel> chans = Channel.jsonToChannelList(channels);
         List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> lcis = Channel.to1411(chans);
         log.setLogCurveInfo(lcis);
-
+        // Code added to build log data response
         //Todo construct LogData from response
-
         List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData> curves = new ArrayList<>();
         JSONObject jsonObj = new JSONObject(channelsDepthResponse);
         JSONArray logData = jsonObj.getJSONArray("value");
-
         // now get the first element:
         JSONObject firstSport = logData.getJSONObject(0);
         // and so on
         String mnemonicList = firstSport.getString("name"); // basketball
         String unitList = firstSport.getString("unit");
         JSONArray logValues = firstSport.getJSONArray("values");
-
         List<String> list = new ArrayList<String>();
         for(int i = 0; i < logValues.length(); i++){
             list.add(logValues.toString());
         }
-
         CsLogData ld = new CsLogData();
         ld.setMnemonicList(mnemonicList);
         ld.setUnitList(unitList);
         ld.setData(list);
         curves.add(ld);
         log.setLogData(curves);
-
         return log;
     }
 
