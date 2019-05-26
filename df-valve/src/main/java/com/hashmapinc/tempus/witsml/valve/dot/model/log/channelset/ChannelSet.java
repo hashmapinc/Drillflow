@@ -535,7 +535,12 @@ public class ChannelSet {
 
     @Override
     public int hashCode() {
-        return Objects.hash(uuid, bhaRunNumber, aliases, citation, customData, objectVersion, index, dataUpateRate, curveSensorsAligned, dataGroup, stepIncrement, logParam, dataDelimiter, nullValue, channelState, timeDepth, channelClass, runNumber, passNumber, loggingCompanyName, loggingCompanyCode, toolName, toolClass, derivation, loggingMethod, nominalHoleSize, dataContext, commonData, uid, uidWell, uidWellbore, wellId, wellboreId);
+        return Objects.hash(uuid, bhaRunNumber, aliases, citation, customData, objectVersion,
+                            index, dataUpateRate, curveSensorsAligned, dataGroup, stepIncrement,
+                            logParam, dataDelimiter, nullValue, channelState, timeDepth,
+                            channelClass, runNumber, passNumber, loggingCompanyName, loggingCompanyCode,
+                            toolName, toolClass, derivation, loggingMethod, nominalHoleSize,
+                            dataContext, commonData, uid, uidWell, uidWellbore, wellId, wellboreId);
     }
 
     @JsonProperty("wellboreId")
@@ -655,7 +660,8 @@ public class ChannelSet {
 
     public static com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog to1411(ChannelSet channelSet)
             throws DatatypeConfigurationException, ParseException {
-        com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog wmlLog = new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog();
+        com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog wmlLog =
+                new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog();
 
         wmlLog.setUid(channelSet.getUid());
         wmlLog.setCurveSensorsAligned(channelSet.getCurveSensorsAligned());
@@ -678,11 +684,13 @@ public class ChannelSet {
 
         if (channelSet.getTimeDepth().toLowerCase().contains("depth")) {
             if (channelSet.getStartIndex() != null){
-                com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure startMeasure = new com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure();
+                com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure startMeasure =
+                        new com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure();
                 startMeasure.setUom("m");
                 startMeasure.setValue(Double.parseDouble(channelSet.getStartIndex()));
                 wmlLog.setStartIndex(startMeasure);
-                com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure endMeasure = new com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure();
+                com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure endMeasure =
+                        new com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure();
                 endMeasure.setUom("m");
                 endMeasure.setValue(Double.parseDouble(channelSet.getEndIndex()));
                 wmlLog.setEndIndex(endMeasure);
@@ -698,7 +706,8 @@ public class ChannelSet {
 
     public static com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog to1311(ChannelSet channelSet)
             throws DatatypeConfigurationException, ParseException {
-        com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog wmlLog = new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog();
+        com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog wmlLog =
+                new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog();
 
         wmlLog.setUid(channelSet.getUid());
         wmlLog.setName(channelSet.getCitation().getTitle());

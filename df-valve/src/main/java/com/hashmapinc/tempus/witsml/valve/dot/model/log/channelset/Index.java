@@ -21,11 +21,11 @@ import java.util.*;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "indexType",
-    "uom",
-    "direction",
-    "mnemonic",
-    "datumReference"
+        "indexType",
+        "uom",
+        "direction",
+        "mnemonic",
+        "datumReference"
 })
 public class Index {
 
@@ -110,9 +110,9 @@ public class Index {
         String indexType = null;
         if (log.getIndexType() != null) {
             if (log.getIndexType().contains("time")) {
-                indexType = "time";
+                indexType = "Time";
             } else {
-                indexType = "depth";
+                indexType = "Depth";
             }
         }
 
@@ -128,7 +128,7 @@ public class Index {
         }
         List<Index> indices = new ArrayList<Index>();
         indices.add(index);
-        
+
         return indices;
     }
 

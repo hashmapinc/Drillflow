@@ -44,8 +44,7 @@ public class WitsmlObjectParser {
         String version
     ) throws Exception {
 
-        // TODO Where is aliases? Why is logParam messed up (value = "\n\t\t\t  " & all other fields are null)?
-        List<AbstractWitsmlObject> witsmlObjects = new ArrayList<AbstractWitsmlObject>();
+        List<AbstractWitsmlObject> witsmlObjects = new ArrayList<>();
         
         // handle version 1.3.1.1
         if ("1.3.1.1".equals(version)) {

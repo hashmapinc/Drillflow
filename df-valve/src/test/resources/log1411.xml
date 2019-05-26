@@ -8,7 +8,7 @@
 	version="1.4.1.1">
 <!-- 
 These examples are only intended to demonstrate the type of data that can be exchanged.
-They totally artificial and are not intended to demonstrate best practices. 
+They are totally artificial and are not intended to demonstrate best practices.
 -->
 	<documentInfo>
 		<documentName>Log</documentName>

@@ -31,7 +31,6 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
-//import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,52 +41,57 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
+//import java.security.SecureRandom;
+
 public class DotDelegatorTest {
 
     private DotDelegator mockDelegator;
     private DotDelegator delegator;
     private DotClient    mockClient;
-
     private String url;
     private String trajectoryPath;
     private String graphQlWellPath;
 
-    /*
-    private String graphQlWellborePath;
-    private String graphQlTrajectoryPath;
-    */
-
     private String logChannelsetPath;
     private String logChannelPath;
-    /*
-    private GenericMeasure  testGM = new GenericMeasure();          // v1.4.1.1
-    private CsLogData       csLogData = new CsLogData();            // v1.4.1.1
-    private CsLogCurveInfo  csLogCurveInfo = new CsLogCurveInfo();  // v1.4.1.1
-    private List<CsLogCurveInfo> logCurveInfoList = new ArrayList<>();
-    private List<CsLogData> dataList = new ArrayList<>();
 
-    private static final String AB =
-            "0123456789"
-                    + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                    + "abcdefghijklmnopqrstuvwxyz";
-    private static SecureRandom rnd = new SecureRandom();
-    private String randomString( int len ){
-        StringBuilder sb = new StringBuilder( len );
-        for( int i = 0; i < len; i++ )
-            sb.append( AB.charAt( rnd.nextInt(AB.length()) ) );
-        return sb.toString();
-    }*/
+    /*
+    private static List<com.hashmapinc.tempus.WitsmlObjects.v1411.IndexedObject> generateLogParmFor1411() {
+
+        List<com.hashmapinc.tempus.WitsmlObjects.v1411.IndexedObject> params = new ArrayList<>();
+
+        // generate two <logParam> test items
+        com.hashmapinc.tempus.WitsmlObjects.v1411.IndexedObject param1 =
+                    new com.hashmapinc.tempus.WitsmlObjects.v1411.IndexedObject();
+        param1.setName("MRES");
+        param1.setDescription("Mud Resistivity");
+        param1.setUom("ohm.m");
+        param1.setValue("1.25");
+        param1.setUid("lp-1");
+        params.add(param1);
+
+        com.hashmapinc.tempus.WitsmlObjects.v1411.IndexedObject param2 =
+                new com.hashmapinc.tempus.WitsmlObjects.v1411.IndexedObject();
+        param2.setName("BDIA");
+        param1.setDescription("Bit Diameter");
+        param1.setUom("in");
+        param1.setValue("12.25");
+        param1.setUid("lp-2");
+        params.add(param2);
+
+        return params;
+    }
+    */
 
     @Before
     public void init() {
         // instantiate strings
-        // TODO Verify that these are correct
         this.url = "test.com";
         this.trajectoryPath = "/trajectory/";
         this.graphQlWellPath = "/well/graphql/";
         //this.graphQlWellborePath = "/wellbore/graphql/";
         //this.graphQlTrajectoryPath = "/trajectory/graphql";
-        this.logChannelsetPath = "/channelSets/";
+        this.logChannelsetPath = "/channelSets";
         this.logChannelPath = "/channels/";
 
         // build config
@@ -166,85 +170,64 @@ public class DotDelegatorTest {
     }
 
     /*
-       Version 1.4.1.1
    */
-    /*@Test
-    public void shouldCreateLog() throws Exception {
+    //@Test
+    /*public void shouldCreateLog1411() throws Exception {
+        // get the raw WITSML XML request from resource file
+        String rawXML = TestUtilities.getResourceAsString("log1411.xml");
+        // extract the AbstractWitsmlObject(s)
+        List<AbstractWitsmlObject> witsmlObjects = new ArrayList<>();
 
-        // ***************** create channelSet log object ***************** //
-        ObjLog log = new ObjLog();
-        String randomUID = randomString(10);
-        String prefixUID = "HM_Test";
-        log.setUid(prefixUID + randomUID);
-        // TODO Find a better way - see Chris' script for choosing the 1st from
-        //      a list? Or something from within this code base?
-        log.setUidWell("U2");
-        log.setUidWellbore("WBDD600");
 
-        log.setNameWell("Awing");
-        log.setNameWellbore("AwingWB1");
-        log.setName("Baker Logs Section1 - MD Log");
-        log.setServiceCompany("Schlumberger");
-        // TODO why does any other value, such as "measured depth",
-        //      fail the API call?
-        log.setIndexType("time");
-        log.setDirection("increasing");
-        log.setIndexCurve("Mdepth");
-           // Using example from the WITSML API Guide, p. 122, item 7
-           // only changed "measured depth" to "time" for indexType.
-        // TODO: try it with StartIndex & EndIndex
-        // StartIndex & EndIndex was not available in the example.
-        // testGM.setUom("ft");
-        // testGM.setValue(0.0);
-        // log.setStartIndex(testGM);
-        // testGM.setValue(8201.77);
-        // log.setEndIndex(testGM);
-        // TODO if it becomes important to create "creationDate", then
-        // an XMLGregorianCalendar object can be created for testing
-        // log.setObjectGrowing(true);
-        csLogData.setMnemonicList("Mdepth,TQ on btm");
-        csLogData.setUnitList("m,kft.lbf");
-        List<String> data = Arrays.asList("498,-0.33,0.1");
-        csLogData.setData(data);
-        dataList.add(csLogData);
-        log.setLogData(dataList);
+        // handle version 1.4.1.1 (in real production code, version is a parameter;
+        // but for testing purposes, this method will handle 1411 & we will create
+        // another for 1311
+        com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLogs logs = WitsmlMarshal.deserialize(
+                rawXML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLogs.class
+        );
 
-        // ******************* create channel log object ****************** //
-        // log = new ObjLog();
-        csLogCurveInfo.setUid("Mdepth");
-        ShortNameStruct shortNameStruct = new ShortNameStruct();
-        shortNameStruct.setNamingSystem("naming system");
-        shortNameStruct.setValue("Mdepth");
-        csLogCurveInfo.setMnemonic(shortNameStruct);
-        csLogCurveInfo.setClassWitsml("measured depth of hole");
-        csLogCurveInfo.setUnit("m");
-        csLogCurveInfo.setTypeLogData("double");
-        logCurveInfoList.add(csLogCurveInfo);
-        log.setLogCurveInfo(logCurveInfoList);
+        // for testing, there is only 1 log under test, so obtain that one
+        com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog log = logs.getLog().get(0);
 
-        String channelSetPayload = ((AbstractWitsmlObject) log)
-                .getJSONString("1.4.1.1");
-        String channelPayload = ((AbstractWitsmlObject) log)
-                                     .getJSONString("1.4.1.1");
+        ChannelSet channelSet = ChannelSet.from1411(log);
+        // remove empties
+        String jsonChannelSet = channelSet.toJson();
+        // create the Channel Set payload
+        String csPayload = JsonUtil.removeEmpties(new JSONObject(jsonChannelSet));
 
         // build first http request that creates a channelSet
+        // url: .../channelSets
         String endpoint = this.url + this.logChannelsetPath;
         HttpRequestWithBody reqCS = Unirest.put(endpoint);
         reqCS.header("Content-Type", "application/json");
 
         // create the payload for create ChannelSet
-        reqCS.body(channelSetPayload);
+        reqCS.body(csPayload);
+        // add query string params for log: uid, uidWellbore, and uidWell
         reqCS.queryString("uid", log.getUid());
         reqCS.queryString("uidWellbore", log.getUidWellbore());
         reqCS.queryString("uidWell", log.getUidWell());
 
         // build first http response mock
         HttpResponse<String> respCS = mock(HttpResponse.class);
-        //when(resp.getBody()).thenReturn("{\"uid\": \"traj-a\"}");
-        String logUid = prefixUID + randomUID;
-        when(respCS.getBody()).thenReturn("{\"uid\": \"" + logUid + "\"}" );
+        when(respCS.getBody()).thenReturn("{\"uid\": \"" + log.getUid() + "\"}" );
         when(respCS.getStatus()).thenReturn(200);
 
+        // mock mockClient behavior
+        when(this.mockClient.makeRequest(argThat(someReq -> (
+                        someReq.getHttpMethod().name().equals(reqCS.getHttpMethod().name()) &&
+                        someReq.getUrl().equals(reqCS.getUrl()) &&
+                        someReq.getHeaders().containsKey("Content-Type")
+        )), eq("goodUsername"), eq("goodPassword"))).thenReturn(respCS);
+
+        String actualUid = this.delegator.createObject( log,
+                                                        "goodUsername",
+                                                        "goodPassword",
+                                                        "exchangeID",
+                                                        this.mockClient );
+        String expectedUid = log.getUid();
+        assertEquals(expectedUid, actualUid);
+*//*
         // build second http request to create channels for
         // the channelSet
         endpoint = this.url + this.logChannelPath;
@@ -268,7 +251,7 @@ public class DotDelegatorTest {
 
         String expectedUid = logUid;
         assertEquals(expectedUid, actualUid);
-
+*//*
     }*/
 
     @Test
