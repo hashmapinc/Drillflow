@@ -1077,9 +1077,9 @@ public class DotDelegator {
 
 		// Build Request for Get ChannelSet Metadata
 		channelsetmetadataEndpoint = this.getEndpoint("channelsetmetadata");
+		channelsetmetadataEndpoint = channelsetmetadataEndpoint + "/" + uuid;
 		channelsetmetadataRequest = Unirest.get(channelsetmetadataEndpoint);
 		channelsetmetadataRequest.header("accept", "application/json");
-		channelsetmetadataRequest.queryString("uuid", uuid);
 		// get response
 		channelsetmetadataResponse = client.makeRequest(channelsetmetadataRequest, username, password);
 		// Build Request for Get All ChannelSet

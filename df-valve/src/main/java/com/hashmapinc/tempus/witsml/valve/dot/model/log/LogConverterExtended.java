@@ -84,9 +84,10 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
         String unitList = firstSport.getString("unit");
         JSONArray logValues = firstSport.getJSONArray("values");
         List<String> list = new ArrayList<String>();
-        for(int i = 0; i < logValues.length(); i++){
+        list.add(logValues.toString());
+/*        for(int i = 0; i < logValues.length(); i++){
             list.add(logValues.toString());
-        }
+        }*/
         CsLogData ld = new CsLogData();
         ld.setMnemonicList(mnemonicList);
         ld.setUnitList(unitList);
