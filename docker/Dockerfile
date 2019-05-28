@@ -16,8 +16,8 @@
 
 FROM openjdk:11-jdk-slim
 
-RUN apt-get -y install ca-certificates \
-    && apt-get update \
+RUN apt-get update \
+    && apt-get -y install ca-certificates \
     && apt-get install -y --no-install-recommends curl \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
