@@ -121,8 +121,11 @@ public class Index {
         index.setMnemonic(log.getIndexCurve());
         if (indexType != null)
             index.setIndexType(indexType);
-        Optional<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> matchingObject =
-                log.getLogCurveInfo().stream().filter(p -> p.getMnemonic().getValue().equals(log.getIndexCurve())).findFirst();
+        Optional<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> matchingObject = log
+                .getLogCurveInfo()
+                .stream()
+                .filter(p -> p.getMnemonic().getValue().equals(log.getIndexCurve()))
+                .findFirst();
         if (!matchingObject.isEmpty()) {
             index.setUom(matchingObject.get().getUnit());
         }
@@ -142,11 +145,15 @@ public class Index {
             indexType = "Time";
 
         Index index = new Index();
-        index.setIndexType(indexType);
         index.setDirection(log.getDirection());
         index.setMnemonic(log.getIndexCurve().getValue());
-        Optional<com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogCurveInfo> matchingObject = log.getLogCurveInfo()
-                .stream().filter(p -> p.getMnemonic().equals(log.getIndexCurve().getValue())).findFirst();
+        if (indexType!=null)
+            index.setIndexType(indexType);
+        Optional<com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogCurveInfo> matchingObject = log
+                .getLogCurveInfo()
+                .stream()
+                .filter(p -> p.getMnemonic().equals(log.getIndexCurve().getValue()))
+                .findFirst();
         index.setUom(matchingObject.get().getUnit());
         List<Index> indices = new ArrayList<Index>();
         indices.add(index);

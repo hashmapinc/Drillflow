@@ -74,6 +74,10 @@ public class DotDelegator {
 	private final String LOG_CHANNEL_DATA;
 	private final String LOG_MNEMONIC_PATH;
 
+	private final int CREATE_CS_LOG = 1;
+	private final int CREATE_CHANNELS_LOG = 2;
+	private final int CREATE_DATA_LOG = 3;
+
 	/**
 	 * Map based constructor
 	 *
@@ -345,7 +349,7 @@ public class DotDelegator {
 		String uid = witsmlObj.getUid();
 		String objectType = witsmlObj.getObjectType();
 		String version = witsmlObj.getVersion();
-		ChannelSet cs = null;
+		ChannelSet cs;
 
 		// get object as payload string
 		String payload;
@@ -702,7 +706,7 @@ public class DotDelegator {
 												witsmlObj );
 
 		// set-up for channel set creation..
-		// ... endpoint url
+		// ... endpoint url: /channelSets
 		endpoint = this.getEndpoint(objectType);
 		// ... parameters for url
 		requestParams = new HashMap<>();
@@ -713,7 +717,8 @@ public class DotDelegator {
 
 		// call a central method to finish the REST set-up
 		// and execute the rest call for ChannelSet
-		response = performRestCall( allPayloads[CS_IDX_4_PAYLOADS],
+		response = performRestCall( CREATE_CS_LOG,
+								    allPayloads[CS_IDX_4_PAYLOADS],
 									endpoint,
 									requestParams,
 									client,
@@ -722,7 +727,7 @@ public class DotDelegator {
 									witsmlObj,
 									exchangeID );
 
-		// check response status
+		// check response status; nullpointer during mocking....why?
 		int status = response.getStatus();
 		if (409 == status) {
 			LOG.info( ValveLogging.getLogMsg( exchangeID,
@@ -733,14 +738,15 @@ public class DotDelegator {
 		}
 
 		// actually a 201...
-		if (201 == status) {
+		// TODO Verify that it is acceptable to allow 200 for testing purposes...check traj stuff
+		if (201 == status || 200 == status) {
 			LOG.info(ValveLogging.getLogMsg(exchangeID,
 					logResponse(response,
-							"Received successful "
+								"Received successful "
 									+ "status code from DoT create call"),
 					witsmlObj));
+/*
 			// cache the channelSet - null pointer exception now
-			/*
 			try {
 				ChannelSetCache.putInCache(getUuid(witsmlObj, uid, client, username, password),
 										   cs);
@@ -751,8 +757,7 @@ public class DotDelegator {
 								+ ex.getMessage(),
 						witsmlObj));
 			}
-			*/
-
+*/
 			// add channels to an existing ChannelSet
 			if (!(allPayloads[CHANNELS_IDX_4_PAYLOADS].isEmpty())) {
 
@@ -761,12 +766,16 @@ public class DotDelegator {
 				endpoint = this.getEndpoint(objectType + "Channel");
 				endpoint = endpoint + "/metadata";
 				// get the uuid for the channelSet just created from the response
-				String uuid4CS = new JsonNode(response.getBody()).getObject().getString("uuid");
+				String uuid4CS = new JsonNode(response.getBody())
+												.getObject()
+												.getString("uuid");
+
 				requestParams = new HashMap<>();
 				requestParams.put("channelSetUuid", uuid4CS);
 				// call a central method to finish the REST set-up
 				// and execute the rest call for ChannelSet
-				response = performRestCall( allPayloads[CHANNELS_IDX_4_PAYLOADS],
+				response = performRestCall( CREATE_CHANNELS_LOG,
+											allPayloads[CHANNELS_IDX_4_PAYLOADS],
 											endpoint,
 											requestParams,
 											client,
@@ -790,7 +799,8 @@ public class DotDelegator {
 					// Use same requestParams as for the previous call (channelSetUuid={channelSetUuid})
 					// call a central method to finish the REST set-up
 					// and execute the rest call for ChannelSet
-					response = performRestCall( allPayloads[DATA_IDX_4_PAYLOADS],
+					response = performRestCall( CREATE_DATA_LOG,
+											    allPayloads[DATA_IDX_4_PAYLOADS],
 												endpoint,
 												requestParams,
 												client,
@@ -800,13 +810,13 @@ public class DotDelegator {
 												exchangeID );
 					// check response status
 					status = response.getStatus();
-					// actually this requires a 202...
-						if (202 == status) {
-							LOG.info(ValveLogging.getLogMsg(exchangeID,
-									logResponse(response,
-											   "Received successful "
-													+ "status code from DoT add data call"),
-												witsmlObj));
+					// actually this requires a 200...
+					if (200 == status) {
+						LOG.info(ValveLogging.getLogMsg( exchangeID,
+														 logResponse(response,
+											   						"Received successful "
+																			+ "status code from DoT add data call"),
+																	 witsmlObj));
 					} else {
 						LOG.warning(ValveLogging.getLogMsg(exchangeID,
 								logResponse(response, "Received " + status + " from DoT POST" + response.getBody()), witsmlObj));
@@ -841,7 +851,8 @@ public class DotDelegator {
 	 * @throws UnirestException
 	 * @throws ValveException
 	 */
-	public HttpResponse<String> performRestCall( String payload,
+	public HttpResponse<String> performRestCall( int createWhichPartOfLog,
+												 String payload,
 												 String endpoint,
 												 HashMap<String,String> requestParams,
 												 DotClient client,
@@ -858,21 +869,20 @@ public class DotDelegator {
 		// Channels endpt: .../channels/metadata?channelSetUuid={channelSetUuid}
 		// Data endpoint:  .../channels/data?channelSetUuid={channelSetUuid}
 		HttpRequestWithBody request = Unirest.post(endpoint);
-		// all requests will have the same header, so it get it taken
-		// care of now, once
 		request.header("Content-Type", "application/json");
 		request.body(payload);
 		// place the request parameters, if any, into the request
 		if (!requestParams.isEmpty()) {
 			requestParams.forEach(
-				(key, value) -> { request.queryString((String)key, value); }
+				(key, value) -> { request.queryString(key, value); }
 			);
 		}
 
 		LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(request), witsmlObj));
 
 		// return the response
-		return client.makeRequest(request, username, password);
+		HttpResponse<String> response = client.makeRequest(request, username, password);
+		return response;
 
 	}
 
@@ -1371,6 +1381,7 @@ public class DotDelegator {
 		HttpResponse<String> response;
 		request.header( "Content-Type", "application/json" );
 		request.body(payload);
+
 		LOG.info(ValveLogging.getLogMsg( exchangeID,
 										 logRequest(request),
 										 witsmlObj) );
