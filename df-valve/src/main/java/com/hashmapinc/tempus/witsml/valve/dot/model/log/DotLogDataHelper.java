@@ -110,6 +110,8 @@ public class DotLogDataHelper extends LogDataHelper {
         return result;
     }
 
+    //code added for logData Transformation
+
     public static CsLogData convertTo1411FromDot(JSONObject object){
         JSONArray jsonValues = (JSONArray)object.get("value");
         String[] mnems = new String[jsonValues.length()];
