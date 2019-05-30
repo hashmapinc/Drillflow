@@ -1053,7 +1053,7 @@ public class DotDelegator {
 	}
 
 	/**
-	 * All other rest calls to verify channelSetMetadata,ChannelSet,Channels
+	 * All other rest calls to verify channelSetMetadata,ChannelSet,Channels,logData
 	 *
 	 * @param witsmlObject - AbstractWitsmlObject to get
 	 * @param username     - auth username

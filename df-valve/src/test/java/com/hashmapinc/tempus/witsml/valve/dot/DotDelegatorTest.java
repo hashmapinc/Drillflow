@@ -82,6 +82,8 @@ public class DotDelegatorTest {
         return params;
     }
 */
+
+
     @Before
     public void init() {
         // instantiate strings
@@ -112,6 +114,7 @@ public class DotDelegatorTest {
         this.mockDelegator = mock(DotDelegator.class);
         this.mockClient = mock(DotClient.class);
     }
+
 
     @Test
     public void shouldCreateAnUpdateInStoreQueryWithoutEmptyArrays() throws Exception{

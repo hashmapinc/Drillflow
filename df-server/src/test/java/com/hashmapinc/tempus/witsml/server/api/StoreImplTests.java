@@ -39,6 +39,37 @@ public class StoreImplTests {
 			"<well/>" +
 			"</wells>";
 
+	private String logQueryTemplate =
+			"<logs xmlns=\"http://www.witsml.org/schemas/131\" version=\"1.3.1.1\">\n" +
+					"<log uidWell=\"Energistics-well-0001\" uidWellbore=\"Energistics-w1-wellbore-0001\" uid=\"HM_fb49c4b1-6638-452d-8043-bba10f109179\">\n" +
+					"    <startIndex uom=\"ft\">0</startIndex>\n" +
+					"    <endIndex uom=\"ft\">5050</endIndex>\n" +
+					"    <logCurveInfo>\n" +
+					"      <mnemonic>MTIN</mnemonic>\n" +
+					"      <unit></unit>\n" +
+					"    </logCurveInfo>\n" +
+					"    <logCurveInfo>\n" +
+					"      <mnemonic>MTOUT</mnemonic>\n" +
+					"      <unit></unit>\n" +
+					"    </logCurveInfo>\n" +
+					"    <logCurveInfo>\n" +
+					"      <mnemonic>MIN_5FT</mnemonic>\n" +
+					"      <unit></unit>\n" +
+					"    </logCurveInfo>\n" +
+					"    <logCurveInfo>\n" +
+					"      <mnemonic>MOTOR_RPM</mnemonic>\n" +
+					"      <unit></unit>\n" +
+					"    </logCurveInfo>\n" +
+					"    <logCurveInfo>\n" +
+					"      <mnemonic>MRIN</mnemonic>\n" +
+					"      <unit></unit>\n" +
+					"    </logCurveInfo>\n" +
+					"    <logData>\n" +
+					"      <data />\n" +
+					"    </logData>\n" +
+					"  </log>\n" +
+					"</logs>";
+
 	@Test
 	public void contextLoads() {
 		assertThat(witsmlServer).isNotNull();
