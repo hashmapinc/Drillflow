@@ -55,8 +55,8 @@ public class DotDelegatorTest {
     private String logChannelsetPath;
     private String logChannelPath;
 
-    /*
-    private static List<com.hashmapinc.tempus.WitsmlObjects.v1411.IndexedObject> generateLogParmFor1411() {
+/*
+    private static List<IndexedObject> generateLogParmFor1411() {
 
         List<com.hashmapinc.tempus.WitsmlObjects.v1411.IndexedObject> params = new ArrayList<>();
 
@@ -81,8 +81,7 @@ public class DotDelegatorTest {
 
         return params;
     }
-    */
-
+*/
     @Before
     public void init() {
         // instantiate strings
@@ -164,27 +163,26 @@ public class DotDelegatorTest {
         )), eq("goodUsername"), eq("goodPassword"))).thenReturn(resp);
 
         // test
-        String actualUid = this.delegator.createObject(traj, "goodUsername", "goodPassword", "exchangeID", this.mockClient);
+        String actualUid = this.delegator.createObject( traj,
+                                                       "goodUsername",
+                                                       "goodPassword",
+                                                       "exchangeID",
+                                                        this.mockClient );
         String expectedUid = traj.getUid();
         assertEquals(expectedUid, actualUid);
     }
 
-    /*
-   */
-    //@Test
-    /*public void shouldCreateLog1411() throws Exception {
+    /*@Test
+    public void shouldCreateLog1411() throws Exception {
+
         // get the raw WITSML XML request from resource file
         String rawXML = TestUtilities.getResourceAsString("log1411.xml");
-        // extract the AbstractWitsmlObject(s)
-        List<AbstractWitsmlObject> witsmlObjects = new ArrayList<>();
-
 
         // handle version 1.4.1.1 (in real production code, version is a parameter;
         // but for testing purposes, this method will handle 1411 & we will create
-        // another for 1311
+        // another test for 1311)
         com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLogs logs = WitsmlMarshal.deserialize(
-                rawXML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLogs.class
-        );
+                rawXML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLogs.class);
 
         // for testing, there is only 1 log under test, so obtain that one
         com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog log = logs.getLog().get(0);
@@ -196,29 +194,38 @@ public class DotDelegatorTest {
         String csPayload = JsonUtil.removeEmpties(new JSONObject(jsonChannelSet));
 
         // build first http request that creates a channelSet
-        // url: .../channelSets
-        String endpoint = this.url + this.logChannelsetPath;
-        HttpRequestWithBody reqCS = Unirest.put(endpoint);
-        reqCS.header("Content-Type", "application/json");
+        // build the channelSetRequest...
+        // endpoint: .../channelSet?channelSetUuid={channelSetUuid}
+        String endpoint = this.url + this.logChannelsetPath;  // .../channelSets
+        HttpRequestWithBody request = Unirest.put(endpoint);
+        request.header("Content-Type", "application/json");
 
         // create the payload for create ChannelSet
-        reqCS.body(csPayload);
+        request.body(csPayload);
         // add query string params for log: uid, uidWellbore, and uidWell
-        reqCS.queryString("uid", log.getUid());
-        reqCS.queryString("uidWellbore", log.getUidWellbore());
-        reqCS.queryString("uidWell", log.getUidWell());
+        request.queryString("uid", log.getUid());
+        request.queryString("uidWellbore", log.getUidWellbore());
+        request.queryString("uidWell", log.getUidWell());
 
-        // build first http response mock
-        HttpResponse<String> respCS = mock(HttpResponse.class);
-        when(respCS.getBody()).thenReturn("{\"uid\": \"" + log.getUid() + "\"}" );
-        when(respCS.getStatus()).thenReturn(200);
+        // build http response mock - this will work for all 3 log REST calls?
+        HttpResponse<String> resp = mock(HttpResponse.class);
+        when(resp.getBody()).thenReturn("{\"uid\": \""  + log.getUid() + "\"}");
+                                      //  + "{\"uuid\": \"testUUID\"}");
+        when(resp.getStatus()).thenReturn(200);
+
+        // TODO
+        // String uuid4CS = new JsonNode(response.getBody())
+        //                              .getObject()
+        //                              .getString("uuid");
+        JsonNode jsonNode = mock(JsonNode.class);
+        when(jsonNode.getObject().getString("uuid")).thenReturn("testUUID");
 
         // mock mockClient behavior
         when(this.mockClient.makeRequest(argThat(someReq -> (
-                        someReq.getHttpMethod().name().equals(reqCS.getHttpMethod().name()) &&
-                        someReq.getUrl().equals(reqCS.getUrl()) &&
+                        //someReq.getHttpMethod().name().equals(request.getHttpMethod().name()) &&
+                        someReq.getUrl().equals(request.getUrl()) &&
                         someReq.getHeaders().containsKey("Content-Type")
-        )), eq("goodUsername"), eq("goodPassword"))).thenReturn(respCS);
+        )), eq("goodUsername"), eq("goodPassword"))).thenReturn(resp);
 
         String actualUid = this.delegator.createObject( log,
                                                         "goodUsername",
@@ -227,31 +234,6 @@ public class DotDelegatorTest {
                                                         this.mockClient );
         String expectedUid = log.getUid();
         assertEquals(expectedUid, actualUid);
-*//*
-        // build second http request to create channels for
-        // the channelSet
-        endpoint = this.url + this.logChannelPath;
-        HttpRequestWithBody reqCH = Unirest.put(endpoint);
-        reqCH.body(channelPayload);
-
-        // mock mockClient behavior
-        when(this.mockClient.makeRequest(argThat(someReq -> (
-                someReq.getHttpMethod().name().equals(reqCS.getHttpMethod().name()) &&
-                someReq.getUrl().equals(reqCS.getUrl()) &&
-                someReq.getHeaders().containsKey("Content-Type")
-        )), eq("goodUsername"), eq("goodPassword"))).thenReturn(respCS);
-
-        // test
-        String actualUid = this.mockDelegator.createObject(
-                log,
-                "goodUsername",
-                "goodPassword",
-                "exchangeID",
-                this.mockClient);
-
-        String expectedUid = logUid;
-        assertEquals(expectedUid, actualUid);
-*//*
     }*/
 
     @Test
