@@ -30,9 +30,10 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.IOException;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.*;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -601,9 +602,9 @@ public class ChannelSet {
             } else {
                 indexType = "time";
                 cs.setTimeDepth(indexType);
-                if (witsmlObj.getStartIndex() != null)
+                if (witsmlObj.getStartDateTimeIndex() != null)
                     cs.setStartIndex(witsmlObj.getStartDateTimeIndex().toXMLFormat());
-                if (witsmlObj.getEndIndex() != null)
+                if (witsmlObj.getEndDateTimeIndex() != null)
                     cs.setEndIndex(witsmlObj.getEndDateTimeIndex().toXMLFormat());
             }
         }
@@ -765,15 +766,17 @@ public class ChannelSet {
     }
     private static XMLGregorianCalendar convertIsoDateToXML(String dateTime)
         throws DatatypeConfigurationException, ParseException {
-        DateFormat format = new SimpleDateFormat("yyyy-MM-ddThh:mm:ss.SSSXXX");
+        //DateFormat format = new SimpleDateFormat("yyyy-MM-ddThh:mm:ss.SSSXXX");
         // Date date = format.parse("2014-04-24 11:15:00");
-        Date date = format.parse(dateTime);
+        //Date date = format.parse(dateTime);
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ISO_DATE_TIME;
+        TemporalAccessor accessor = timeFormatter.parse(dateTime);
+
+        Date date = Date.from(Instant.from(accessor));
 
         GregorianCalendar cal = new GregorianCalendar();
         cal.setTime(date);
 
-        XMLGregorianCalendar xmlGregCal =  DatatypeFactory.newInstance().newXMLGregorianCalendar(cal);
-
-        return xmlGregCal;
+        return DatatypeFactory.newInstance().newXMLGregorianCalendar(cal);
     }
 }
