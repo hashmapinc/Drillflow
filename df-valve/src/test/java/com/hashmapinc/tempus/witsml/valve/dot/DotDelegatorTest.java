@@ -21,7 +21,6 @@ import com.hashmapinc.tempus.WitsmlObjects.Util.WitsmlMarshal;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells;
-import com.hashmapinc.tempus.WitsmlObjects.v1411.IndexedObject;
 import com.hashmapinc.tempus.witsml.valve.dot.client.DotClient;
 import com.hashmapinc.tempus.witsml.valve.dot.graphql.GraphQLQueryConverter;
 import com.mashape.unirest.http.HttpResponse;
@@ -34,7 +33,6 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
@@ -57,7 +55,7 @@ public class DotDelegatorTest {
     private String logChannelsetPath;
     private String logChannelPath;
 
-
+/*
     private static List<IndexedObject> generateLogParmFor1411() {
 
         List<com.hashmapinc.tempus.WitsmlObjects.v1411.IndexedObject> params = new ArrayList<>();
@@ -83,7 +81,7 @@ public class DotDelegatorTest {
 
         return params;
     }
-
+*/
     @Before
     public void init() {
         // instantiate strings
