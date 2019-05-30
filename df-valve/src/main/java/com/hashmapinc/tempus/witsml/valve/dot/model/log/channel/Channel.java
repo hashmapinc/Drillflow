@@ -31,6 +31,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -762,7 +763,7 @@ public class Channel {
                 lci.setSensorOffset(SensorOffset.to1411(c.getSensorOffset()));
                 lci.setWellDatum(WellDatum.to1411(c.getWellDatum()));
                 lci.setClassIndex(c.getClassIndex());
- /*               if (c.getTimeDepth().toLowerCase().contains("depth")){
+/*                if (c.getTimeDepth().toLowerCase().contains("depth")){
                     if (c.getStartIndex() != null)
                         lci.setMinDateTimeIndex(convertIsoDateToXML(c.getStartIndex()));
                     if (c.getEndIndex() != null)

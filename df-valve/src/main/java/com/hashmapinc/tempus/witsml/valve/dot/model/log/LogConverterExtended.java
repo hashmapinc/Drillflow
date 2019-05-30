@@ -36,12 +36,13 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequestWithBody;
 import org.json.JSONObject;
 import org.json.JSONArray;
-import java.util.ArrayList;
 import javax.xml.datatype.DatatypeConfigurationException;
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+
 
 public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Util.LogConverter {
     private static final Logger LOG = Logger.getLogger(DotDelegator.class.getName());
@@ -74,25 +75,11 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
         log.setLogCurveInfo(lcis);
         // Code added to build log data response
         //Todo construct LogData from response
+
+        JSONObject logDataJsonObject = new JSONObject(channelsDepthResponse);
         List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData> curves = new ArrayList<>();
-        JSONObject jsonObj = new JSONObject(channelsDepthResponse);
-        JSONArray logData = jsonObj.getJSONArray("value");
-        // now get the first element:
-        JSONObject firstSport = logData.getJSONObject(0);
-        // and so on
-        String mnemonicList = firstSport.getString("name"); // basketball
-        String unitList = firstSport.getString("unit");
-        JSONArray logValues = firstSport.getJSONArray("values");
-        List<String> list = new ArrayList<String>();
-        list.add(logValues.toString());
-/*        for(int i = 0; i < logValues.length(); i++){
-            list.add(logValues.toString());
-        }*/
-        CsLogData ld = new CsLogData();
-        ld.setMnemonicList(mnemonicList);
-        ld.setUnitList(unitList);
-        ld.setData(list);
-        curves.add(ld);
+
+        curves.add(DotLogDataHelper.convertTo1411FromDot(logDataJsonObject));
         log.setLogData(curves);
         return log;
     }
