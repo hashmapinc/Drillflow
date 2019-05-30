@@ -18,6 +18,7 @@ package com.hashmapinc.tempus.witsml.valve.dot.model.log;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog;
 import com.hashmapinc.tempus.witsml.ValveLogging;
 import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
@@ -34,7 +35,8 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequestWithBody;
 import org.json.JSONObject;
-
+import org.json.JSONArray;
+import java.util.ArrayList;
 import javax.xml.datatype.DatatypeConfigurationException;
 import java.io.IOException;
 import java.text.ParseException;
@@ -60,7 +62,7 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
      */
 
     public static ObjLog convertDotResponseToWitsml(String wellSearchEndpoint,String wellBoreSearchEndpoint,DotClient client, String username,
-                                                    String password, String exchangeID,AbstractWitsmlObject witsmlObject,String channelSet, String channels) throws JsonParseException,
+                                                    String password, String exchangeID,AbstractWitsmlObject witsmlObject,String channelSet, String channels,String channelsDepthResponse) throws JsonParseException,
             JsonMappingException, IOException, DatatypeConfigurationException, ParseException,ValveException, ValveAuthException, UnirestException {
         List<ChannelSet> cs = ChannelSet.jsonToChannelSetList(channelSet);
         ObjLog log = ChannelSet.to1411(cs.get(0));
@@ -70,6 +72,28 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
         List<Channel> chans = Channel.jsonToChannelList(channels);
         List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> lcis = Channel.to1411(chans);
         log.setLogCurveInfo(lcis);
+        // Code added to build log data response
+        //Todo construct LogData from response
+        List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData> curves = new ArrayList<>();
+        JSONObject jsonObj = new JSONObject(channelsDepthResponse);
+        JSONArray logData = jsonObj.getJSONArray("value");
+        // now get the first element:
+        JSONObject firstSport = logData.getJSONObject(0);
+        // and so on
+        String mnemonicList = firstSport.getString("name"); // basketball
+        String unitList = firstSport.getString("unit");
+        JSONArray logValues = firstSport.getJSONArray("values");
+        List<String> list = new ArrayList<String>();
+        list.add(logValues.toString());
+/*        for(int i = 0; i < logValues.length(); i++){
+            list.add(logValues.toString());
+        }*/
+        CsLogData ld = new CsLogData();
+        ld.setMnemonicList(mnemonicList);
+        ld.setUnitList(unitList);
+        ld.setData(list);
+        curves.add(ld);
+        log.setLogData(curves);
         return log;
     }
 

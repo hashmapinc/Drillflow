@@ -73,6 +73,9 @@ public class DotDelegator {
 	private final String LOG_CHANNELS;
 	private final String LOG_CHANNEL_DATA;
 	private final String LOG_MNEMONIC_PATH;
+	private final String LOG_DEPTH_PATH;
+	private final String LOG_TIME_PATH;
+
 
 	private final int CREATE_CS_LOG = 1;
 	private final int CREATE_CHANNELS_LOG = 2;
@@ -97,6 +100,9 @@ public class DotDelegator {
 		this.LOG_CHANNELS = config.get("log.channels.path");
 		this.LOG_CHANNEL_DATA = config.get("log.channels.data.path");
 		this.LOG_MNEMONIC_PATH = config.get("log.mnemonic.data.path");
+		this.LOG_DEPTH_PATH = config.get("log.channel.depthData.path");
+		this.LOG_TIME_PATH = config.get("log.channel.depthData.path");
+
 	}
 
 	/**
@@ -149,6 +155,12 @@ public class DotDelegator {
 		case "logMenmonicPath":
 			endpoint = this.LOG_MNEMONIC_PATH;
 			break;
+		case "logDepthPath":
+				endpoint = this.LOG_DEPTH_PATH;
+				break;
+		case "logTimePath":
+				endpoint = this.LOG_TIME_PATH;
+				break;
 		default:
 			throw new ValveException("Unsupported object type<" + objectType + ">");
 		}
@@ -181,6 +193,7 @@ public class DotDelegator {
 		String channelsEndPoint;
 		HttpRequest channelsRequest;
 		HttpResponse<String> channelsResponse;
+		int logCurveInfosize = 0;
 
 		endpoint = this.getEndpoint(objectType) + uid; // add uid for rest call
 		request = Unirest.delete(endpoint).header("Content-Type", "application/json");
@@ -202,7 +215,12 @@ public class DotDelegator {
 		// make the DELETE call.
 		HttpResponse<String> response=null;
 		if ("log".equals(objectType)) {
-			if (((ObjLog) witsmlObj).getLogCurveInfo().size() != 0) {
+			if("1.4.1.1".equals(witsmlObj.getVersion())){
+				logCurveInfosize = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObj).getLogCurveInfo().size();
+			}else{
+				logCurveInfosize = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj).getLogCurveInfo().size();
+			}
+			if (logCurveInfosize != 0) {
 				logCurveInfoUid = ((ObjLog) witsmlObj).getLogCurveInfo().get(0).getUid();
 				uuid = getUUID(uid,witsmlObj,client,username,password);
 				// Build Request for Get Channels
@@ -1058,13 +1076,20 @@ public class DotDelegator {
 		String channelsEndPoint;
 		HttpRequest channelsRequest;
 		HttpResponse<String> channelsResponse;
+		String channelsDepthEndPoint;
+		HttpRequestWithBody channelsDepthRequest;
+		HttpResponse<String> channelsDepthResponse;
 		ObjLog finalResponse = null;
+		String data ="";
+		String payload="";
+		String indexType="";
+		String channelPayload="";
 
 		// Build Request for Get ChannelSet Metadata
 		channelsetmetadataEndpoint = this.getEndpoint("channelsetmetadata");
+		channelsetmetadataEndpoint = channelsetmetadataEndpoint + "/" + uuid;
 		channelsetmetadataRequest = Unirest.get(channelsetmetadataEndpoint);
 		channelsetmetadataRequest.header("accept", "application/json");
-		channelsetmetadataRequest.queryString("uuid", uuid);
 		// get response
 		channelsetmetadataResponse = client.makeRequest(channelsetmetadataRequest, username, password);
 		// Build Request for Get All ChannelSet
@@ -1074,6 +1099,21 @@ public class DotDelegator {
 		channelsetuuidRequest.queryString("containerId", uuid);
 		// get response
 		allChannelSet = client.makeRequest(channelsetuuidRequest, username, password);
+
+		List<ChannelSet> cs = ChannelSet.jsonToChannelSetList(allChannelSet.getBody());
+
+		for (ChannelSet channelSet : cs) {
+			try{
+				if (channelSet.getTimeDepth().toLowerCase().contains("depth")) {
+					indexType = "depth";
+				}else{
+					indexType = "time";
+				}
+			} catch (Exception ex){
+				continue;
+			}
+		}
+
 		// Build Request for Get Channels
 		channelsEndPoint = this.getEndpoint("channels");
 		channelsRequest = Unirest.get(channelsEndPoint);
@@ -1081,6 +1121,31 @@ public class DotDelegator {
 		channelsRequest.queryString("channelSetUuid", uuid);
 		// get response
 		channelsResponse = client.makeRequest(channelsRequest, username, password);
+
+		List<Channel> channels = Channel.jsonToChannelList(channelsResponse.getBody());
+		// Build Request for Get Channels Depth
+		if(indexType.equals("depth")){
+			String sortDesc = "true";
+			data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels,uuid,sortDesc);
+			// create with POST
+			channelsDepthEndPoint = this.getEndpoint("logDepthPath");
+			channelsDepthRequest = Unirest.post(channelsDepthEndPoint);
+			channelsDepthRequest.header("Content-Type", "application/json");
+			channelsDepthRequest.body(data);
+			// get the request response.
+			channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
+		}else{
+			String sortDesc = "true";
+			data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels,uuid,sortDesc);
+			// create with POST
+			channelsDepthEndPoint = this.getEndpoint("logTimePath");
+			channelsDepthRequest = Unirest.post(channelsDepthEndPoint);
+			channelsDepthRequest.header("Content-Type", "application/json");
+			channelsDepthRequest.body(data);
+			// get the request response.
+			channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
+		}
+
 		if (201 == channelsetmetadataResponse.getStatus() || 200 == channelsetmetadataResponse.getStatus()
 				|| 200 == allChannelSet.getStatus() || 201 == allChannelSet.getStatus()
 				|| 200 == channelsResponse.getStatus() || 201 == channelsResponse.getStatus()) {
@@ -1088,7 +1153,7 @@ public class DotDelegator {
 				String wellSearchEndpoint = this.getEndpoint("wellsearch");
 				String wellBoreSearchEndpoint = this.getEndpoint("wellboresearch");
 				finalResponse = LogConverterExtended.convertDotResponseToWitsml(wellSearchEndpoint,wellBoreSearchEndpoint,client,username,password,exchangeID, witsmlObject,allChannelSet.getBody(),
-						channelsResponse.getBody());
+						channelsResponse.getBody(),channelsDepthResponse.getBody());
 			} catch (Exception e) {
 				LOG.info(ValveLogging.getLogMsg(
 						exchangeID,
