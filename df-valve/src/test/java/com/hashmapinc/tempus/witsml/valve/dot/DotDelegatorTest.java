@@ -213,9 +213,11 @@ public class DotDelegatorTest {
 
         // build http response mock - this will work for all 3 log REST calls?
         HttpResponse<String> resp = mock(HttpResponse.class);
-        when(resp.getBody()).thenReturn("{\"uid\": \"" + log.getUid() + "\"}" );
+        when(resp.getBody()).thenReturn("{\"uid\": \""  + log.getUid() + "\"}");
+                                      //  + "{\"uuid\": \"testUUID\"}");
         when(resp.getStatus()).thenReturn(200);
 
+        // TODO
         // String uuid4CS = new JsonNode(response.getBody())
         //                              .getObject()
         //                              .getString("uuid");

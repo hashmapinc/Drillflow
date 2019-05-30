@@ -767,8 +767,8 @@ public class DotDelegator {
 				endpoint = endpoint + "/metadata";
 				// get the uuid for the channelSet just created from the response
 				String uuid4CS = new JsonNode(response.getBody())
-												.getObject()
-												.getString("uuid");
+																 .getObject()
+																 .getString("uuid");
 
 				requestParams = new HashMap<>();
 				requestParams.put("channelSetUuid", uuid4CS);
