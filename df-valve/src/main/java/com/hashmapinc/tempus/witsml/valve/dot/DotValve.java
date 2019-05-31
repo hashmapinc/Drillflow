@@ -225,7 +225,7 @@ public class DotValve implements IValve {
 		// handle each object
 		if (qc.WITSML_OBJECTS.size() > 1)
 			LOG.info("Query received with more than one singular object, not supported");
-
+			// TODO: Throw exception here
 		// handle search
 		ArrayList<AbstractWitsmlObject> queryResponses;
 		try {

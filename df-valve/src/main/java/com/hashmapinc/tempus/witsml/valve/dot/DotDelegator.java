@@ -36,6 +36,7 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javax.xml.bind.JAXBException;
@@ -75,6 +76,7 @@ public class DotDelegator {
 	private final String LOG_MNEMONIC_PATH;
 	private final String LOG_DEPTH_PATH;
 	private final String LOG_TIME_PATH;
+	private final String LOG_SEARCH_PATH;
 
 
 	private final int CREATE_CS_LOG = 1;
@@ -102,7 +104,7 @@ public class DotDelegator {
 		this.LOG_MNEMONIC_PATH = config.get("log.mnemonic.data.path");
 		this.LOG_DEPTH_PATH = config.get("log.channel.depthData.path");
 		this.LOG_TIME_PATH = config.get("log.channel.timeData.path");
-
+		this.LOG_SEARCH_PATH = config.get("log.channelset.search");
 	}
 
 	/**
@@ -161,6 +163,9 @@ public class DotDelegator {
 		case "logTimePath":
 				endpoint = this.LOG_TIME_PATH;
 				break;
+		case "logSearch":
+			endpoint = this.LOG_SEARCH_PATH;
+			break;
 		default:
 			throw new ValveException("Unsupported object type<" + objectType + ">");
 		}
@@ -1045,10 +1050,24 @@ public class DotDelegator {
 
 
 		if ("log".equals(objectType)) {
+			boolean shouldGetData = false;
+			if (witsmlObject.getVersion().equals("1.3.1.1")){
+				com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog log = (com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject;
+				if (log.getLogData() != null){
+					shouldGetData = true;
+				}
+			}else{
+				com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog log = (com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject;
+				if (log.getLogData() != null){
+					shouldGetData = true;
+				}
+			}
+
 			uuid = getUUID(uid,witsmlObject,client,username,password);
 			if (uuid == null)
 				return null;
-			finalResponse =  getFromStoreRestCalls(witsmlObject,client,uuid,username,password,exchangeID);
+
+			finalResponse =  getFromStoreRestCalls(witsmlObject,client,uuid,username,password,exchangeID,shouldGetData);
 			return DotTranslator.translateQueryResponse(witsmlObject, finalResponse, optionsIn);
 
 		}else{
@@ -1080,7 +1099,7 @@ public class DotDelegator {
 	 */
 
 	private String getFromStoreRestCalls(AbstractWitsmlObject witsmlObject, DotClient client, String uuid, String username,
-										 String password, String exchangeID)
+										 String password, String exchangeID, boolean getData)
 			throws ValveException, ValveAuthException, UnirestException, JAXBException {
 
 		String channelsetmetadataEndpoint;
@@ -1140,26 +1159,30 @@ public class DotDelegator {
 
 		List<Channel> channels = Channel.jsonToChannelList(channelsResponse.getBody());
 		// Build Request for Get Channels Depth
-		if(indexType.equals("depth")){
-			String sortDesc = "true";
-			data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels,uuid,sortDesc);
-			// create with POST
-			channelsDepthEndPoint = this.getEndpoint("logDepthPath");
-			channelsDepthRequest = Unirest.post(channelsDepthEndPoint);
-			channelsDepthRequest.header("Content-Type", "application/json");
-			channelsDepthRequest.body(data);
-			// get the request response.
-			channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
-		}else{
-			String sortDesc = "true";
-			data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels,uuid,sortDesc);
-			// create with POST
-			channelsDepthEndPoint = this.getEndpoint("logTimePath");
-			channelsDepthRequest = Unirest.post(channelsDepthEndPoint);
-			channelsDepthRequest.header("Content-Type", "application/json");
-			channelsDepthRequest.body(data);
-			// get the request response.
-			channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
+		String channelData = null;
+		if (getData) {
+			if (indexType.equals("depth")) {
+				String sortDesc = "true";
+				data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc);
+				// create with POST
+				channelsDepthEndPoint = this.getEndpoint("logDepthPath");
+				channelsDepthRequest = Unirest.post(channelsDepthEndPoint);
+				channelsDepthRequest.header("Content-Type", "application/json");
+				channelsDepthRequest.body(data);
+				// get the request response.
+				channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
+			} else {
+				String sortDesc = "true";
+				data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc);
+				// create with POST
+				channelsDepthEndPoint = this.getEndpoint("logTimePath");
+				channelsDepthRequest = Unirest.post(channelsDepthEndPoint);
+				channelsDepthRequest.header("Content-Type", "application/json");
+				channelsDepthRequest.body(data);
+				// get the request response.
+				channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
+			}
+			channelData = channelsDepthResponse.getBody();
 		}
 
 		if (201 == channelsetmetadataResponse.getStatus() || 200 == channelsetmetadataResponse.getStatus()
@@ -1169,7 +1192,7 @@ public class DotDelegator {
 				String wellSearchEndpoint = this.getEndpoint("wellsearch");
 				String wellBoreSearchEndpoint = this.getEndpoint("wellboresearch");
 				finalResponse = LogConverterExtended.convertDotResponseToWitsml(wellSearchEndpoint,wellBoreSearchEndpoint,client,username,password,exchangeID, witsmlObject,allChannelSet.getBody(),
-						channelsResponse.getBody(),channelsDepthResponse.getBody());
+						channelsResponse.getBody(),channelData);
 			} catch (Exception e) {
 				LOG.info(ValveLogging.getLogMsg(
 						exchangeID,
@@ -1212,8 +1235,12 @@ public class DotDelegator {
 			String exchangeID,
 			DotClient client,
 			Map<String, String> optionsIn
-	) throws ValveException, ValveAuthException, UnirestException, IOException, DatatypeConfigurationException {
+	) throws ValveException, ValveAuthException, UnirestException, IOException, DatatypeConfigurationException, JAXBException {
 		String objectType = witsmlObject.getObjectType();
+
+		if (objectType.equals("log"))
+			return performLogSearch(witsmlObject, username, password, exchangeID, client, optionsIn);
+
 		String endpoint = this.getEndpoint(objectType + "search");
 
 		String query;
@@ -1221,6 +1248,9 @@ public class DotDelegator {
 			//TODO: Shift to does not = well || wellbore
 			if ("trajectory".equals(objectType)) {
 				String wellboreUuid = getParentWellboreUUID(witsmlObject, exchangeID, client, username, password);
+				if (wellboreUuid == null){
+					return null;
+				}
 				query = GraphQLQueryConverter.getQuery(witsmlObject, wellboreUuid);
 			} else {
 				query = GraphQLQueryConverter.getQuery(witsmlObject);
@@ -1285,6 +1315,43 @@ public class DotDelegator {
 		}
 	}
 
+	private ArrayList<AbstractWitsmlObject> performLogSearch(AbstractWitsmlObject witsmlObject,
+															 String username,
+															 String password,
+															 String exchangeID,
+															 DotClient client,
+															 Map<String, String> optionsIn) throws ValveAuthException, UnirestException, ValveException, JAXBException {
+		String containerID = getParentWellboreUUID(witsmlObject, exchangeID, client, username, password);
+		if (containerID == null){
+			return null;
+		}
+		String logSearchEndpoint = this.getEndpoint("logSearch");
+		HttpRequest logSearchRequest = Unirest.get(logSearchEndpoint);
+		logSearchRequest.queryString("containerId", containerID);
+		HttpResponse<String> logSearchResponse = client.makeRequest(logSearchRequest, username, password);
+		JSONArray foundChannelSets = new JSONArray(logSearchResponse.getBody());
+
+		if (foundChannelSets.length() == 0)
+			return null;
+
+		List<String> foundUuids = new ArrayList<>();
+		for (int i = 0; i < foundChannelSets.length(); i++){
+			JSONObject currentCS = (JSONObject)foundChannelSets.get(i);
+			foundUuids.add(currentCS.get("uuid").toString());
+		}
+
+		ArrayList<AbstractWitsmlObject> logs = new ArrayList<>();
+		for (String uuid : foundUuids){
+			String fullLog =  getFromStoreRestCalls(witsmlObject,client,uuid,username,password,exchangeID, false);
+			DotTranslator.translateQueryResponse(witsmlObject, fullLog, optionsIn);
+			logs.add(DotTranslator.translateQueryResponse(witsmlObject, fullLog, optionsIn));
+		}
+		return logs;
+
+	}
+
+
+
 	/**
 	 *
 	 * @param wmlObject - trajectory or log child of the wellbore in question
@@ -1348,7 +1415,8 @@ public class DotDelegator {
 
 			// get the UUID of the first wellbore in the response
 			String wellboreUUID = GraphQLRespConverter.getWellboreUuidFromGraphqlResponse(new JSONObject(response.getBody()));
-
+			if (wellboreUUID == null)
+				return null;
 			// cache the wellbore uuid/uid
 			UidUuidCache.putInCache(wellboreUUID, wmlObject.getParentUid(), wmlObject.getGrandParentUid());
 

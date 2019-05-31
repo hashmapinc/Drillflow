@@ -75,11 +75,13 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
         // Code added to build log data response
         //Todo construct LogData from response
 
-        JSONObject logDataJsonObject = new JSONObject(channelsDepthResponse);
-        List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData> curves = new ArrayList<>();
+        if (channelsDepthResponse != null) {
+            JSONObject logDataJsonObject = new JSONObject(channelsDepthResponse);
+            List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData> curves = new ArrayList<>();
 
-        curves.add(DotLogDataHelper.convertTo1411FromDot(logDataJsonObject));
-        log.setLogData(curves);
+            curves.add(DotLogDataHelper.convertTo1411FromDot(logDataJsonObject));
+            log.setLogData(curves);
+        }
         return log;
     }
 
@@ -118,7 +120,7 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
             wellName = GraphQLRespConverter.getWellNameFromGraphqlResponse(new JSONObject(response.getBody()));
 
             // cache the wellbore uuid/uid
-            UidUuidCache.putInCache(wellName, witsmlObject.getParentUid(), witsmlObject.getGrandParentUid());
+            //UidUuidCache.putInCache(wellName, witsmlObject.getParentUid(), witsmlObject.getGrandParentUid());
 
         }
         return wellName;
@@ -157,7 +159,7 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
             wellboreName = GraphQLRespConverter.getWellboreNameFromGraphqlResponse(new JSONObject(response.getBody()));
 
             // cache the wellbore uuid/uid
-            UidUuidCache.putInCache(wellboreName, witsmlObject.getParentUid(), witsmlObject.getGrandParentUid());
+            //UidUuidCache.putInCache(wellboreName, witsmlObject.getParentUid(), witsmlObject.getGrandParentUid());
 
         }
         return wellboreName;
