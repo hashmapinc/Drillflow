@@ -303,6 +303,7 @@ public class StoreImpl implements IStore {
             resp.setSuppMsgOut(e.getMessage());
             if (e.getErrorCode() != null){
                 resp.setResult(e.getErrorCode());
+                resp.setSuppMsgOut(witsmlApiConfigUtil.getProperty("basemessages." + e.getErrorCode()));
             }
             return resp;
         } catch (Exception ex){

@@ -313,6 +313,8 @@ public class DotValve implements IValve {
 			}
 		} catch (Exception e) {
 			LOG.warning("Got exception in DotValve delete object: " + e.getMessage());
+			if (e.getClass() == ValveException.class)
+				throw ((ValveException)e);
 			throw new ValveException(e.getMessage());
 		}
 		return CompletableFuture.completedFuture(result);

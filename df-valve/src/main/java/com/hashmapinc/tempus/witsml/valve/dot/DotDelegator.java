@@ -224,7 +224,7 @@ public class DotDelegator {
 				logCurveInfoUid = ((ObjLog) witsmlObj).getLogCurveInfo().get(0).getUid();
 				uuid = getUUID(uid,witsmlObj,client,username,password);
 				if (uuid == null){
-					throw new ValveException("Not Found", (short)-433);
+					throw new ValveException("", (short)-433);
 				}
 				// Build Request for Get Channels
 				channelsEndPoint = this.getEndpoint("channels");
@@ -262,6 +262,9 @@ public class DotDelegator {
 				}
 			}else{
 				uuid = getUUID(uid,witsmlObj,client,username,password);
+				if (uuid == null){
+					throw new ValveException("Not Found", (short)-433);
+				}
 				String logDeletEndpoint = this.getEndpoint("channelsetmetadata");
 				logDeletEndpoint = logDeletEndpoint + "/" + uuid;
 				HttpRequest logDeleteRequest = Unirest.delete(logDeletEndpoint).header("Content-Type",
