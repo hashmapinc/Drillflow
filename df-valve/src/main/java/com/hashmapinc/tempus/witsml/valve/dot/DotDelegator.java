@@ -1329,6 +1329,10 @@ public class DotDelegator {
 		HttpRequest logSearchRequest = Unirest.get(logSearchEndpoint);
 		logSearchRequest.queryString("containerId", containerID);
 		HttpResponse<String> logSearchResponse = client.makeRequest(logSearchRequest, username, password);
+
+		if (logSearchResponse.getStatus() != 200)
+			throw new ValveException("Error searching for logs in container " + containerID);
+
 		JSONArray foundChannelSets = new JSONArray(logSearchResponse.getBody());
 
 		if (foundChannelSets.length() == 0)
