@@ -101,7 +101,7 @@ public class DotDelegator {
 		this.LOG_CHANNEL_DATA = config.get("log.channels.data.path");
 		this.LOG_MNEMONIC_PATH = config.get("log.mnemonic.data.path");
 		this.LOG_DEPTH_PATH = config.get("log.channel.depthData.path");
-		this.LOG_TIME_PATH = config.get("log.channel.depthData.path");
+		this.LOG_TIME_PATH = config.get("log.channel.timeData.path");
 
 	}
 
