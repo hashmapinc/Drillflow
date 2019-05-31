@@ -96,21 +96,22 @@ public class DotLogDataHelper extends LogDataHelper {
         dotDataObject.put("sortDesc", true);
         JSONArray requestedChannels = new JSONArray();
 
+        String indexUnit = "";
         for (Channel wmlCurrentChannel : channels){
             JSONObject dotCurrentChannel = new JSONObject();
             dotCurrentChannel.put("name", wmlCurrentChannel.getMnemonic());
-            if (wmlCurrentChannel.getStartIndex() != null && !wmlCurrentChannel.getStartIndex().isEmpty()){
-                dotCurrentChannel.put("startIndex", wmlCurrentChannel.getStartIndex());
-            }
-            if (wmlCurrentChannel.getEndIndex() != null && !wmlCurrentChannel.getEndIndex().isEmpty()){
-                dotCurrentChannel.put("endIndex", wmlCurrentChannel.getEndIndex());
-            }
+//            if (wmlCurrentChannel.getStartIndex() != null && !wmlCurrentChannel.getStartIndex().isEmpty()){
+//                dotCurrentChannel.put("startIndex", wmlCurrentChannel.getStartIndex());
+//            }
+//            if (wmlCurrentChannel.getEndIndex() != null && !wmlCurrentChannel.getEndIndex().isEmpty()){
+//                dotCurrentChannel.put("endIndex", wmlCurrentChannel.getEndIndex());
+//            }
             requestedChannels.put(dotCurrentChannel);
         }
 
         dotDataObject.put("channels", requestedChannels);
         dotDataObject.put("containerId", containerId);
-
+        //dotDataObject.put("indexUnit", )
         return dotDataObject.toString();
     }
 
