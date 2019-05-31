@@ -15,19 +15,13 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot.model.log;
 
-import java.util.Arrays;
-import java.util.List;
+import com.hashmapinc.tempus.WitsmlObjects.Util.log.LogDataHelper;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData;
+import com.hashmapinc.tempus.witsml.valve.dot.model.log.channel.Channel;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.hashmapinc.tempus.WitsmlObjects.Util.log.LogDataHelper;
-import com.hashmapinc.tempus.witsml.valve.dot.model.log.channel.Channel;
-import com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 
 
@@ -96,18 +90,33 @@ public class DotLogDataHelper extends LogDataHelper {
 
     // Code added to build log data request
 
-    public static String convertChannelDepthDataToDotFrom(List<Channel> channels , String containerId, String sortDesc){
-        String result = "{";
-        String channelName = "";
-        for (int i = 0; i < channels.size(); i++){
-            channelName = channelName + "{\"name\":" + "\"" + channels.get(i).getMnemonic() + "\"}";
-            if ((i + 1) < channels.size())
-                channelName = channelName + ",";
+    public static String convertChannelDepthDataToDotFrom(List<Channel> channels , String containerId, String sortDesc, String startIndex, String endIndex){
+
+        JSONObject dotDataObject = new JSONObject();
+        dotDataObject.put("sortDesc", true);
+        JSONArray requestedChannels = new JSONArray();
+
+        for (Channel wmlCurrentChannel : channels){
+            JSONObject dotCurrentChannel = new JSONObject();
+            dotCurrentChannel.put("name", wmlCurrentChannel.getMnemonic());
+            if (wmlCurrentChannel.getStartIndex() != null && !wmlCurrentChannel.getStartIndex().isEmpty()){
+                dotCurrentChannel.put("startIndex", wmlCurrentChannel.getStartIndex());
+            }
+            if (wmlCurrentChannel.getEndIndex() != null && !wmlCurrentChannel.getEndIndex().isEmpty()){
+                dotCurrentChannel.put("endIndex", wmlCurrentChannel.getEndIndex());
+            }
+            requestedChannels.put(dotCurrentChannel);
         }
-        result = result + "\"containerId\":" + "\"" + containerId + "\"" + ",";
-        result = result + "\"sortDesc\":" + "\"" + sortDesc + "\"" + ",";
-        result = result + "\"channels\":" + "[" + channelName + "]}";
-        return result;
+
+        dotDataObject.put("channels", requestedChannels);
+        dotDataObject.put("containerId", containerId);
+
+        return dotDataObject.toString();
+    }
+
+    public static String convertChannelDepthDataToDotFrom(List<Channel> channels , String containerId, String sortDesc){
+
+        return convertChannelDepthDataToDotFrom(channels, containerId, sortDesc, null, null);
     }
 
     //code added for logData Transformation

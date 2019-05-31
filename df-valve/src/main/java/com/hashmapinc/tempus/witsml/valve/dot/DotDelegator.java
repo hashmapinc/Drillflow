@@ -17,8 +17,10 @@ package com.hashmapinc.tempus.witsml.valve.dot;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogCurveInfo;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.ShortNameStruct;
 import com.hashmapinc.tempus.witsml.ValveLogging;
 import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
@@ -1158,6 +1160,7 @@ public class DotDelegator {
 		channelsResponse = client.makeRequest(channelsRequest, username, password);
 
 		List<Channel> channels = Channel.jsonToChannelList(channelsResponse.getBody());
+		channels = filterChannelsBasedOnRequest(channels, witsmlObject);
 		// Build Request for Get Channels Depth
 		String channelData = null;
 		if (getData) {
@@ -1192,7 +1195,7 @@ public class DotDelegator {
 				String wellSearchEndpoint = this.getEndpoint("wellsearch");
 				String wellBoreSearchEndpoint = this.getEndpoint("wellboresearch");
 				finalResponse = LogConverterExtended.convertDotResponseToWitsml(wellSearchEndpoint,wellBoreSearchEndpoint,client,username,password,exchangeID, witsmlObject,allChannelSet.getBody(),
-						channelsResponse.getBody(),channelData);
+						channels,channelData);
 			} catch (Exception e) {
 				LOG.info(ValveLogging.getLogMsg(
 						exchangeID,
@@ -1216,6 +1219,84 @@ public class DotDelegator {
 			return finalResponse.getJSONString("1.4.1.1");
 		else
 			return null;
+	}
+
+	private List<Channel> filterChannelsBasedOnRequest(List<Channel> allChannels, AbstractWitsmlObject requestObject) throws ValveException{
+		List<Channel> requestedChannels = new ArrayList<>();
+
+		if (allChannels.size() == 0){
+			LOG.info("No channels returned for request");
+			return null;
+		}
+
+		if ("1.3.1.1".equals(requestObject.getVersion())) {
+			List<CsLogCurveInfo> infos =
+					((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) requestObject).getLogCurveInfo();
+			if (infos.size() == 1 && infos.get(0).getMnemonic().isEmpty()){
+				return allChannels;
+			} else {
+				//extract index
+				String indexMnem = allChannels.get(0).getIndex().get(0).getMnemonic();
+				boolean alreadyRequested = false;
+				for (CsLogCurveInfo lci : infos){
+					if (lci.getMnemonic().equals(indexMnem)){
+						alreadyRequested = true;
+					}
+				}
+				if (!alreadyRequested){
+					//create index request
+					CsLogCurveInfo lci = new CsLogCurveInfo();
+					lci.setMnemonic(indexMnem);
+					infos.add(lci);
+				}
+			}
+		} else if ("1.4.1.1".equals(requestObject.getVersion())){
+			List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> infos =
+					((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) requestObject).getLogCurveInfo();
+			if (infos.size() == 1 && infos.get(0).getMnemonic().getValue().isEmpty()){
+				return allChannels;
+			}else {
+				//extract index
+				String indexMnem = allChannels.get(0).getIndex().get(0).getMnemonic();
+				boolean alreadyRequested = false;
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo lci : infos){
+					if (lci.getMnemonic().getValue().equals(indexMnem)){
+						alreadyRequested = true;
+					}
+				}
+				if (!alreadyRequested){
+					//create index request
+					com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo lci
+							= new com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo();
+					ShortNameStruct sns = new ShortNameStruct();
+					sns.setValue(indexMnem);
+					lci.setMnemonic(sns);
+					infos.add(lci);
+				}
+			}
+		} else {
+			throw new ValveException("Unsupported WITSML version for Log");
+		}
+
+		for (Channel currentChannel : allChannels){
+			if ("1.3.1.1".equals(requestObject.getVersion())){
+				for (CsLogCurveInfo lci : ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) requestObject).getLogCurveInfo()){
+					if (lci.getMnemonic().equals(currentChannel.getMnemonic())){
+						requestedChannels.add(currentChannel);
+					}
+				}
+
+			} else if ("1.4.1.1".equals(requestObject.getVersion())){
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo lci : ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) requestObject).getLogCurveInfo()){
+					if (lci.getMnemonic().getValue().equals(currentChannel.getMnemonic())){
+						requestedChannels.add(currentChannel);
+					}
+				}
+			} else{
+				throw new ValveException("Unknown WITSML version for log");
+			}
+		}
+		return requestedChannels;
 	}
 
 	/**
