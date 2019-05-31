@@ -100,6 +100,7 @@ public class DotLogDataHelper extends LogDataHelper {
         for (Channel wmlCurrentChannel : channels){
             JSONObject dotCurrentChannel = new JSONObject();
             dotCurrentChannel.put("name", wmlCurrentChannel.getMnemonic());
+
 //            if (wmlCurrentChannel.getStartIndex() != null && !wmlCurrentChannel.getStartIndex().isEmpty()){
 //                dotCurrentChannel.put("startIndex", wmlCurrentChannel.getStartIndex());
 //            }

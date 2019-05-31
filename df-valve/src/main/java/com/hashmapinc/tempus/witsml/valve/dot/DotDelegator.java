@@ -1291,7 +1291,7 @@ public class DotDelegator {
 			if ("1.3.1.1".equals(requestObject.getVersion())){
 				for (CsLogCurveInfo lci : ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) requestObject).getLogCurveInfo()){
 					if (lci.getMnemonic().equals(currentChannel.getMnemonic())){
-						if (((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) requestObject).getIndexType().toLowerCase().contains("time")){
+						if (currentChannel.getIndex().get(0).getIndexType().toLowerCase().contains("time")){
 							if (lci.getMaxDateTimeIndex() != null)
 								currentChannel.setEndIndex(lci.getMaxDateTimeIndex().toXMLFormat());
 							if (lci.getMinDateTimeIndex() != null)
@@ -1310,11 +1310,11 @@ public class DotDelegator {
 			} else if ("1.4.1.1".equals(requestObject.getVersion())){
 				for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo lci : ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) requestObject).getLogCurveInfo()){
 					if (lci.getMnemonic().getValue().equals(currentChannel.getMnemonic())){
-						if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) requestObject).getIndexType().toLowerCase().contains("time")){
+						if (currentChannel.getIndex().get(0).getIndexType().toLowerCase().contains("time")){
 							if (lci.getMaxDateTimeIndex() != null)
 								currentChannel.setEndIndex(lci.getMaxDateTimeIndex().toXMLFormat());
 							if (lci.getMinDateTimeIndex() != null)
-								currentChannel.setStartIndex(lci.getMaxDateTimeIndex().toXMLFormat());
+								currentChannel.setStartIndex(lci.getMinDateTimeIndex().toXMLFormat());
 						} else {
 							if (lci.getMaxIndex() != null)
 								currentChannel.setEndIndex(lci.getMaxIndex().getValue().toString());
