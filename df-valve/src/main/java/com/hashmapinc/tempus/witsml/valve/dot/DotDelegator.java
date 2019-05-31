@@ -1173,9 +1173,40 @@ public class DotDelegator {
 		// Build Request for Get Channels Depth
 		String channelData = null;
 		if (getData) {
+			String startIndex = null;
+			String endIndex = null;
+
+			if ("1.3.1.1".equals(witsmlObject.getVersion())){
+				if (((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getStartDateTimeIndex() != null){
+					startIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getStartDateTimeIndex().toXMLFormat();
+				} else if (((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getStartIndex() != null &&
+						((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getStartIndex().getValue() != null){
+					startIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getStartIndex().getValue().toString();
+				}
+				if (((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getEndDateTimeIndex() != null){
+					endIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getEndDateTimeIndex().toXMLFormat();
+				} else if (((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getEndIndex() != null&&
+						((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getEndIndex().getValue() != null){
+					endIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getEndIndex().getValue().toString();
+				}
+			} else if ("1.4.1.1".equals(witsmlObject.getVersion())) {
+				if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getStartDateTimeIndex() != null){
+					startIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getStartDateTimeIndex().toXMLFormat();
+				} else if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getStartIndex() != null &&
+						((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getStartIndex().getValue() != null){
+					startIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getStartIndex().getValue().toString();
+				}
+				if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getEndDateTimeIndex() != null){
+					endIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getEndDateTimeIndex().toXMLFormat();
+				} else if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getEndIndex() != null &&
+						((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getEndIndex().getValue() != null){
+					endIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getEndIndex().getValue().toString();
+				}
+			}
+
 			if (indexType.equals("depth")) {
 				String sortDesc = "true";
-				data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc);
+				data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
 				// create with POST
 				channelsDepthEndPoint = this.getEndpoint("logDepthPath");
 				channelsDepthRequest = Unirest.post(channelsDepthEndPoint);
@@ -1185,7 +1216,7 @@ public class DotDelegator {
 				channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
 			} else {
 				String sortDesc = "true";
-				data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc);
+				data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
 				// create with POST
 				channelsDepthEndPoint = this.getEndpoint("logTimePath");
 				channelsDepthRequest = Unirest.post(channelsDepthEndPoint);
@@ -1294,13 +1325,21 @@ public class DotDelegator {
 						if (currentChannel.getIndex().get(0).getIndexType().toLowerCase().contains("time")){
 							if (lci.getMaxDateTimeIndex() != null)
 								currentChannel.setEndIndex(lci.getMaxDateTimeIndex().toXMLFormat());
+							else
+								currentChannel.setEndIndex(null);
 							if (lci.getMinDateTimeIndex() != null)
 								currentChannel.setStartIndex(lci.getMaxDateTimeIndex().toXMLFormat());
+							else
+								currentChannel.setStartIndex(null);
 						} else {
 							if (lci.getMaxIndex() != null)
 								currentChannel.setEndIndex(lci.getMaxIndex().getValue().toString());
+							else
+								currentChannel.setEndIndex(null);
 							if (lci.getMinIndex() != null)
 								currentChannel.setStartIndex(lci.getMinIndex().getValue().toString());
+							else
+								currentChannel.setEndIndex(null);
 						}
 						requestedChannels.add(currentChannel);
 
@@ -1313,13 +1352,21 @@ public class DotDelegator {
 						if (currentChannel.getIndex().get(0).getIndexType().toLowerCase().contains("time")){
 							if (lci.getMaxDateTimeIndex() != null)
 								currentChannel.setEndIndex(lci.getMaxDateTimeIndex().toXMLFormat());
+							else
+								currentChannel.setEndIndex(null);
 							if (lci.getMinDateTimeIndex() != null)
 								currentChannel.setStartIndex(lci.getMinDateTimeIndex().toXMLFormat());
+							else
+								currentChannel.setStartIndex(null);
 						} else {
 							if (lci.getMaxIndex() != null)
 								currentChannel.setEndIndex(lci.getMaxIndex().getValue().toString());
+							else
+								currentChannel.setEndIndex(null);
 							if (lci.getMinIndex() != null)
 								currentChannel.setStartIndex(lci.getMinIndex().getValue().toString());
+							else
+								currentChannel.setStartIndex(null);
 						}
 						requestedChannels.add(currentChannel);
 					}

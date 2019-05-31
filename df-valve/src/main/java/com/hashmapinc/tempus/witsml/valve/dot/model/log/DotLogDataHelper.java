@@ -95,24 +95,30 @@ public class DotLogDataHelper extends LogDataHelper {
         JSONObject dotDataObject = new JSONObject();
         dotDataObject.put("sortDesc", true);
         JSONArray requestedChannels = new JSONArray();
-
         String indexUnit = "";
         for (Channel wmlCurrentChannel : channels){
             JSONObject dotCurrentChannel = new JSONObject();
-            dotCurrentChannel.put("name", wmlCurrentChannel.getMnemonic());
 
-//            if (wmlCurrentChannel.getStartIndex() != null && !wmlCurrentChannel.getStartIndex().isEmpty()){
-//                dotCurrentChannel.put("startIndex", wmlCurrentChannel.getStartIndex());
-//            }
-//            if (wmlCurrentChannel.getEndIndex() != null && !wmlCurrentChannel.getEndIndex().isEmpty()){
-//                dotCurrentChannel.put("endIndex", wmlCurrentChannel.getEndIndex());
-//            }
+            dotCurrentChannel.put("name", wmlCurrentChannel.getMnemonic());
+            indexUnit = wmlCurrentChannel.getIndex().get(0).getUom();
+            if (wmlCurrentChannel.getStartIndex() != null && !wmlCurrentChannel.getStartIndex().isEmpty()){
+                dotCurrentChannel.put("startIndex", wmlCurrentChannel.getStartIndex());
+            } else {
+                if (startIndex != null)
+                    dotCurrentChannel.put("startIndex", startIndex);
+            }
+            if (wmlCurrentChannel.getEndIndex() != null && !wmlCurrentChannel.getEndIndex().isEmpty()){
+                dotCurrentChannel.put("endIndex", wmlCurrentChannel.getEndIndex());
+            }else {
+                if (endIndex != null)
+                    dotCurrentChannel.put("endIndex", endIndex);
+            }
             requestedChannels.put(dotCurrentChannel);
         }
 
         dotDataObject.put("channels", requestedChannels);
         dotDataObject.put("containerId", containerId);
-        //dotDataObject.put("indexUnit", )
+        dotDataObject.put("indexUnit", indexUnit);
         return dotDataObject.toString();
     }
 
