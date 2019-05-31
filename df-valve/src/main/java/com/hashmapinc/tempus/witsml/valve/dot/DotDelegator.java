@@ -223,6 +223,9 @@ public class DotDelegator {
 			if (logCurveInfosize != 0) {
 				logCurveInfoUid = ((ObjLog) witsmlObj).getLogCurveInfo().get(0).getUid();
 				uuid = getUUID(uid,witsmlObj,client,username,password);
+				if (uuid == null){
+					throw new ValveException("Not Found", (short)-433);
+				}
 				// Build Request for Get Channels
 				channelsEndPoint = this.getEndpoint("channels");
 				channelsRequest = Unirest.get(channelsEndPoint);
@@ -321,6 +324,9 @@ public class DotDelegator {
 		}
 		if ("log".equals(objectType)) {
 				uuid = getUUID(uid,witsmlObj,client,username,password);
+				if (uuid == null){
+					throw new ValveException("Not Found", (short)-433);
+				}
 				String logElementDeletEndpoint = this.getEndpoint("channelsetmetadata");
 				logElementDeletEndpoint = logElementDeletEndpoint + "/" + uuid;
 				request = Unirest.patch(logElementDeletEndpoint).header("Content-Type", "application/json");
@@ -397,6 +403,9 @@ public class DotDelegator {
 			// TODO Redis -- caching Wrapper for Traj -- to prepare for caching
 			//               went looking, but couldn't find this -- where is it?
 			uuid = getUuid(witsmlObj, uid, client, username, password);
+			if (uuid == null){
+				throw new ValveException("Not Found", (short)-433);
+			}
 
 			// TODO check if there is anything to update with Redis cache
 			//		for the payload object with cache object
@@ -558,6 +567,8 @@ public class DotDelegator {
 		} else {
 			// make the call to get uuid, and put it in cache for next time
 			uuid = getUUID(uid, witsmlObj, client, username, password);
+			if (uuid == null)
+				return null;
 			UidUuidCache.putInCache( uuid,
 									 uid,
 									 witsmlObj.getParentUid(),
@@ -1032,6 +1043,8 @@ public class DotDelegator {
 
 		if ("log".equals(objectType)) {
 			uuid = getUUID(uid,witsmlObject,client,username,password);
+			if (uuid == null)
+				return null;
 			finalResponse =  getFromStoreRestCalls(witsmlObject,client,uuid,username,password,exchangeID);
 			return DotTranslator.translateQueryResponse(witsmlObject, finalResponse, optionsIn);
 
@@ -1425,9 +1438,11 @@ public class DotDelegator {
 		HttpResponse<String> response;
 		response = client.makeRequest(logRequest, username, password);
 		if (response.getBody().isEmpty()) {
-			throw new ValveException("No log found for delete.");
+			throw new ValveException("No log found.");
 		}
 		JSONObject responseJson = new JSONObject(response.getBody());
+		if (!responseJson.has("uuid"))
+			return null;
 		uuid = responseJson.getString("uuid");
 		return uuid;
 	}
