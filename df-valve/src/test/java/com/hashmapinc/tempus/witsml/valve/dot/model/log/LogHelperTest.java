@@ -100,4 +100,10 @@ public class LogHelperTest {
         assertNotNull(data);
     }
 
+    @Test
+    public void shouldCreateDotTimeDataRequestObject() throws IOException {
+        String dotLogData = TestUtilities.getResourceAsString("dotConversion/log1411Time.xml");
+
+    }
+
 }

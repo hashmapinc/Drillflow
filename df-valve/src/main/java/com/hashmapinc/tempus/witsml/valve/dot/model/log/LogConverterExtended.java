@@ -62,15 +62,14 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
      */
 
     public static ObjLog convertDotResponseToWitsml(String wellSearchEndpoint,String wellBoreSearchEndpoint,DotClient client, String username,
-                                                    String password, String exchangeID,AbstractWitsmlObject witsmlObject,String channelSet, String channels,String channelsDepthResponse) throws JsonParseException,
+                                                    String password, String exchangeID,AbstractWitsmlObject witsmlObject,String channelSet, List<Channel> channels,String channelsDepthResponse) throws JsonParseException,
             JsonMappingException, IOException, DatatypeConfigurationException, ParseException,ValveException, ValveAuthException, UnirestException {
         List<ChannelSet> cs = ChannelSet.jsonToChannelSetList(channelSet);
         ObjLog log = ChannelSet.to1411(cs.get(0));
         log.setNameWell(getWellName( wellSearchEndpoint,client,  username,password,  exchangeID,witsmlObject));
         log.setNameWellbore(getWelBorelName( wellBoreSearchEndpoint,client,  username, password,  exchangeID,witsmlObject));
 
-        List<Channel> chans = Channel.jsonToChannelList(channels);
-        List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> lcis = Channel.to1411(chans);
+        List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> lcis = Channel.to1411(channels);
         log.setLogCurveInfo(lcis);
         // Code added to build log data response
         //Todo construct LogData from response

@@ -17,8 +17,10 @@ package com.hashmapinc.tempus.witsml.valve.dot;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogCurveInfo;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.ShortNameStruct;
 import com.hashmapinc.tempus.witsml.ValveLogging;
 import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
@@ -1051,15 +1053,21 @@ public class DotDelegator {
 
 		if ("log".equals(objectType)) {
 			boolean shouldGetData = false;
-			if (witsmlObject.getVersion().equals("1.3.1.1")){
-				com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog log = (com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject;
-				if (log.getLogData() != null){
-					shouldGetData = true;
-				}
-			}else{
-				com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog log = (com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject;
-				if (log.getLogData() != null){
-					shouldGetData = true;
+			boolean getAllChannels = false;
+			if (optionsIn.containsKey("returnElements") && optionsIn.get("returnElements").equals("all")){
+				shouldGetData = true;
+				getAllChannels = true;
+			} else {
+				if (witsmlObject.getVersion().equals("1.3.1.1")) {
+					com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog log = (com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObject;
+					if (log.getLogData() != null) {
+						shouldGetData = true;
+					}
+				} else {
+					com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog log = (com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObject;
+					if (log.getLogData() != null) {
+						shouldGetData = true;
+					}
 				}
 			}
 
@@ -1067,7 +1075,7 @@ public class DotDelegator {
 			if (uuid == null)
 				return null;
 
-			finalResponse =  getFromStoreRestCalls(witsmlObject,client,uuid,username,password,exchangeID,shouldGetData);
+			finalResponse =  getFromStoreRestCalls(witsmlObject,client,uuid,username,password,exchangeID,shouldGetData, getAllChannels);
 			return DotTranslator.translateQueryResponse(witsmlObject, finalResponse, optionsIn);
 
 		}else{
@@ -1099,7 +1107,7 @@ public class DotDelegator {
 	 */
 
 	private String getFromStoreRestCalls(AbstractWitsmlObject witsmlObject, DotClient client, String uuid, String username,
-										 String password, String exchangeID, boolean getData)
+										 String password, String exchangeID, boolean getData, boolean getAllChannels)
 			throws ValveException, ValveAuthException, UnirestException, JAXBException {
 
 		String channelsetmetadataEndpoint;
@@ -1158,6 +1166,10 @@ public class DotDelegator {
 		channelsResponse = client.makeRequest(channelsRequest, username, password);
 
 		List<Channel> channels = Channel.jsonToChannelList(channelsResponse.getBody());
+
+		if (!getAllChannels)
+			channels = filterChannelsBasedOnRequest(channels, witsmlObject);
+
 		// Build Request for Get Channels Depth
 		String channelData = null;
 		if (getData) {
@@ -1192,7 +1204,7 @@ public class DotDelegator {
 				String wellSearchEndpoint = this.getEndpoint("wellsearch");
 				String wellBoreSearchEndpoint = this.getEndpoint("wellboresearch");
 				finalResponse = LogConverterExtended.convertDotResponseToWitsml(wellSearchEndpoint,wellBoreSearchEndpoint,client,username,password,exchangeID, witsmlObject,allChannelSet.getBody(),
-						channelsResponse.getBody(),channelData);
+						channels,channelData);
 			} catch (Exception e) {
 				LOG.info(ValveLogging.getLogMsg(
 						exchangeID,
@@ -1216,6 +1228,107 @@ public class DotDelegator {
 			return finalResponse.getJSONString("1.4.1.1");
 		else
 			return null;
+	}
+
+	private List<Channel> filterChannelsBasedOnRequest(List<Channel> allChannels, AbstractWitsmlObject requestObject) throws ValveException{
+		List<Channel> requestedChannels = new ArrayList<>();
+
+		if (allChannels.size() == 0){
+			LOG.info("No channels returned for request");
+			return null;
+		}
+
+		if ("1.3.1.1".equals(requestObject.getVersion())) {
+			List<CsLogCurveInfo> infos =
+					((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) requestObject).getLogCurveInfo();
+			if (infos.size() == 1 && infos.get(0).getMnemonic().isEmpty()){
+				return allChannels;
+			} else {
+				//extract index
+				String indexMnem = allChannels.get(0).getIndex().get(0).getMnemonic();
+				boolean alreadyRequested = false;
+				for (CsLogCurveInfo lci : infos){
+					if (lci.getMnemonic().equals(indexMnem)){
+						alreadyRequested = true;
+					}
+				}
+				if (!alreadyRequested){
+					//create index request
+					CsLogCurveInfo lci = new CsLogCurveInfo();
+					lci.setMnemonic(indexMnem);
+					infos.add(lci);
+				}
+			}
+		} else if ("1.4.1.1".equals(requestObject.getVersion())){
+			List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> infos =
+					((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) requestObject).getLogCurveInfo();
+			if (infos.size() == 1 && infos.get(0).getMnemonic().getValue().isEmpty()){
+				return allChannels;
+			}else {
+				//extract index
+				String indexMnem = allChannels.get(0).getIndex().get(0).getMnemonic();
+				boolean alreadyRequested = false;
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo lci : infos){
+					if (lci.getMnemonic().getValue().equals(indexMnem)){
+						alreadyRequested = true;
+					}
+				}
+				if (!alreadyRequested){
+					//create index request
+					com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo lci
+							= new com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo();
+					ShortNameStruct sns = new ShortNameStruct();
+					sns.setValue(indexMnem);
+					lci.setMnemonic(sns);
+					infos.add(lci);
+				}
+			}
+		} else {
+			throw new ValveException("Unsupported WITSML version for Log");
+		}
+
+		for (Channel currentChannel : allChannels){
+			if ("1.3.1.1".equals(requestObject.getVersion())){
+				for (CsLogCurveInfo lci : ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) requestObject).getLogCurveInfo()){
+					if (lci.getMnemonic().equals(currentChannel.getMnemonic())){
+						if (((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) requestObject).getIndexType().toLowerCase().contains("time")){
+							if (lci.getMaxDateTimeIndex() != null)
+								currentChannel.setEndIndex(lci.getMaxDateTimeIndex().toXMLFormat());
+							if (lci.getMinDateTimeIndex() != null)
+								currentChannel.setStartIndex(lci.getMaxDateTimeIndex().toXMLFormat());
+						} else {
+							if (lci.getMaxIndex() != null)
+								currentChannel.setEndIndex(lci.getMaxIndex().getValue().toString());
+							if (lci.getMinIndex() != null)
+								currentChannel.setStartIndex(lci.getMinIndex().getValue().toString());
+						}
+						requestedChannels.add(currentChannel);
+
+					}
+				}
+
+			} else if ("1.4.1.1".equals(requestObject.getVersion())){
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo lci : ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) requestObject).getLogCurveInfo()){
+					if (lci.getMnemonic().getValue().equals(currentChannel.getMnemonic())){
+						if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) requestObject).getIndexType().toLowerCase().contains("time")){
+							if (lci.getMaxDateTimeIndex() != null)
+								currentChannel.setEndIndex(lci.getMaxDateTimeIndex().toXMLFormat());
+							if (lci.getMinDateTimeIndex() != null)
+								currentChannel.setStartIndex(lci.getMaxDateTimeIndex().toXMLFormat());
+						} else {
+							if (lci.getMaxIndex() != null)
+								currentChannel.setEndIndex(lci.getMaxIndex().getValue().toString());
+							if (lci.getMinIndex() != null)
+								currentChannel.setStartIndex(lci.getMinIndex().getValue().toString());
+						}
+						requestedChannels.add(currentChannel);
+					}
+				}
+			} else{
+				throw new ValveException("Unknown WITSML version for log");
+			}
+		}
+		return requestedChannels;
 	}
 
 	/**
@@ -1344,9 +1457,15 @@ public class DotDelegator {
 			foundUuids.add(currentCS.get("uuid").toString());
 		}
 
+		boolean getAllChannels = false;
+		if (optionsIn.containsKey("returnElements") && optionsIn.get("returnElements").equals("all")) {
+			getAllChannels = true;
+		}
+
 		ArrayList<AbstractWitsmlObject> logs = new ArrayList<>();
 		for (String uuid : foundUuids){
-			String fullLog =  getFromStoreRestCalls(witsmlObject,client,uuid,username,password,exchangeID, false);
+			// Note never get data for a log search
+			String fullLog =  getFromStoreRestCalls(witsmlObject,client,uuid,username,password,exchangeID, false, getAllChannels);
 			DotTranslator.translateQueryResponse(witsmlObject, fullLog, optionsIn);
 			logs.add(DotTranslator.translateQueryResponse(witsmlObject, fullLog, optionsIn));
 		}

@@ -16,17 +16,23 @@
 package com.hashmapinc.tempus.witsml.valve.dot.model.log.channel;
 
 import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.GenericMeasure;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ShortNameStruct;
+import com.hashmapinc.tempus.witsml.valve.ValveException;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.*;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -99,6 +105,7 @@ public class Channel {
     @JsonProperty("channelState")
     private String channelState;
     @JsonProperty("classIndex")
+    @JsonDeserialize(using = ClassIndexDeserializer.class)
     private Short classIndex;
     @JsonProperty("mnemAlias")
     private MnemAlias mnemAlias;
@@ -252,11 +259,13 @@ public class Channel {
     }
 
     @JsonProperty("classIndex")
+    @JsonDeserialize(using = ClassIndexDeserializer.class)
     public Short getClassIndex() {
         return classIndex;
     }
 
     @JsonProperty("classIndex")
+    @JsonDeserialize(using = ClassIndexDeserializer.class)
     public void setClassIndex(Short classIndex) {
         this.classIndex = classIndex;
     }
@@ -802,14 +811,14 @@ public class Channel {
             return null;
 
         for (Channel c : channels) {
-            try{
+            try {
                 com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogCurveInfo lci =
                         new com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogCurveInfo();
                 lci.setMnemonic(c.getCitation().getTitle());
                 lci.setAlternateIndex(c.getAlternateIndex());
                 lci.setClassWitsml(c.getClassWitsml());
                 //NOTE: WE WILL ALWAYS SET THE INDEX TO THE FIRST COLUMN
-                lci.setColumnIndex((short)1);
+                lci.setColumnIndex((short) 1);
                 lci.setCurveDescription(c.getCitation().getDescription());
                 lci.setDataSource(c.getSource());
                 lci.setTraceOrigin(c.getTraceOrigin());
@@ -839,12 +848,13 @@ public class Channel {
                 }*/
 
                 curves.add(lci);
-            } catch (Exception ex){
+            } catch (Exception ex) {
                 continue;
             }
         }
         return curves;
     }
+
 
     public static String channelListToJson(List<Channel> channels) throws JsonProcessingException {
         ObjectMapper om = new ObjectMapper();
@@ -852,16 +862,17 @@ public class Channel {
         return om.writerWithDefaultPrettyPrinter().writeValueAsString(channels);
     }
 
-    public static List<Channel> jsonToChannelList(String channelsList){
+    public static List<Channel> jsonToChannelList(String channelsList) throws ValveException{
         return fromJSON(new TypeReference<List<Channel>>() {}, channelsList);
     }
 
-    public static <T> T fromJSON(final TypeReference<T> type, final String jsonPacket) {
+    public static <T> T fromJSON(final TypeReference<T> type, final String jsonPacket) throws ValveException {
         T data = null;
 
         try {
             data = new ObjectMapper().readValue(jsonPacket, type);
         } catch (Exception e) {  // Handle the problem
+            throw new ValveException(e.getMessage());
         }
         return data;
     }
