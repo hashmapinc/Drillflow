@@ -23,7 +23,9 @@ import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells;
 import com.hashmapinc.tempus.witsml.valve.dot.client.DotClient;
 import com.hashmapinc.tempus.witsml.valve.dot.graphql.GraphQLQueryConverter;
+import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.ChannelSet;
 import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
@@ -175,7 +177,7 @@ public class DotDelegatorTest {
         assertEquals(expectedUid, actualUid);
     }
 
-    /*@Test
+    @Test
     public void shouldCreateLog1411() throws Exception {
 
         // get the raw WITSML XML request from resource file
@@ -212,8 +214,8 @@ public class DotDelegatorTest {
 
         // build http response mock - this will work for all 3 log REST calls?
         HttpResponse<String> resp = mock(HttpResponse.class);
-        when(resp.getBody()).thenReturn("{\"uid\": \""  + log.getUid() + "\"}");
-                                      //  + "{\"uuid\": \"testUUID\"}");
+        when(resp.getBody()).thenReturn(  "{\"uid\": \""  + log.getUid() + "\","
+                                        + "\"uuid\": \"testUUID\"}" );
         when(resp.getStatus()).thenReturn(200);
 
         // TODO
@@ -221,6 +223,8 @@ public class DotDelegatorTest {
         //                              .getObject()
         //                              .getString("uuid");
         JsonNode jsonNode = mock(JsonNode.class);
+        jsonNode = new JsonNode("[{\"uid\": \""  + log.getUid() + "\","
+                + "\"uuid\": \"testUUID\"}]");
         when(jsonNode.getObject().getString("uuid")).thenReturn("testUUID");
 
         // mock mockClient behavior
@@ -237,7 +241,7 @@ public class DotDelegatorTest {
                                                         this.mockClient );
         String expectedUid = log.getUid();
         assertEquals(expectedUid, actualUid);
-    }*/
+    }
 
     @Test
     public void shouldCreateTrajectoryWithoutUid() throws Exception {
