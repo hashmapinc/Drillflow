@@ -736,10 +736,14 @@ public class DotDelegator {
 
 		// call a central method to finish the REST set-up
 		// and execute the rest call for ChannelSet
-		response = performRestCall( CREATE_CS_LOG,
+		response = performRestCall( // everything below is what has been created
+									// by this method
+									CREATE_CS_LOG,
 								    allPayloads[CS_IDX_4_PAYLOADS],
 									endpoint,
 									requestParams,
+									// everything below is what was passed into
+									// this method
 									client,
 									username,
 									password,
@@ -780,13 +784,13 @@ public class DotDelegator {
 			// add channels to an existing ChannelSet
 			if (!(allPayloads[CHANNELS_IDX_4_PAYLOADS].isEmpty())) {
 
-				// build the channelSetRequest...
+				// build the channels request...
 				// endpoint: .../channels/metadata?channelSetUuid={channelSetUuid}
 				endpoint = this.getEndpoint(objectType + "Channel");
-				endpoint = endpoint + "/metadata";
+				endpoint = endpoint + "metadata";
 				// get the uuid for the channelSet just created from the response
 				String uuid4CS = new JsonNode(response.getBody())
-																 .getObject()
+															.getObject()
 																 .getString("uuid");
 
 				requestParams = new HashMap<>();
