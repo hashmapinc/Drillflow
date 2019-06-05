@@ -20,7 +20,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
-import com.hashmapinc.tempus.WitsmlObjects.v1311.GenericMeasure;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ShortNameStruct;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.*;
 
@@ -31,7 +30,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -43,7 +41,8 @@ import com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData;
         "wellDatum",
         "nullValue",
         "channelState",
-        "classIndex",
+        "classIndex",       // v1411
+        "columnIndex",      // v1311
         "mnemAlias",
         "alternateIndex",
         "sensorOffset",
@@ -99,7 +98,9 @@ public class Channel {
     @JsonProperty("channelState")
     private String channelState;
     @JsonProperty("classIndex")
-    private Short classIndex;
+    private Short classIndex;       // v1411
+    @JsonProperty("columnIndex")
+    private Short columnIndex;      // v1311
     @JsonProperty("mnemAlias")
     private MnemAlias mnemAlias;
     @JsonProperty("alternateIndex")
@@ -254,12 +255,22 @@ public class Channel {
     @JsonProperty("classIndex")
     public Short getClassIndex() {
         return classIndex;
-    }
+    }   // v1411
 
     @JsonProperty("classIndex")
     public void setClassIndex(Short classIndex) {
         this.classIndex = classIndex;
-    }
+    }  // v1411
+
+    @JsonProperty("colummIndex")
+    public Short getColumnIndex() {
+        return columnIndex;
+    }   // v1311
+
+    @JsonProperty("columnIndex")
+    public void setColumnIndex(Short columnIndex) {
+        this.columnIndex = columnIndex;
+    }  // v1311
 
     @JsonProperty("mnemAlias")
     public MnemAlias getMnemAlias() {
@@ -647,7 +658,6 @@ public class Channel {
                     }
                 }
 
-
                 channel.setClassIndex(lci.getClassIndex());
 
                 if (lci.getUnit() == null) {
@@ -708,7 +718,8 @@ public class Channel {
                 } else {
                     channel.setUom(lci.getUnit());
                 }
-
+                // Card #454
+                channel.setClassIndex(lci.getColumnIndex());
                 channel.setIndex(indicies);
                 channel.setNullValue(lci.getNullValue());
                 channel.setAlternateIndex(lci.isAlternateIndex());
@@ -749,6 +760,9 @@ public class Channel {
                 lci.setAlternateIndex(c.getAlternateIndex());
                 lci.setClassWitsml(c.getClassWitsml());
                 //NOTE: WE WILL ALWAYS SET THE INDEX TO THE FIRST COLUMN
+                // Card #460 -- needs the right value,
+                //              not just zero for the index to the first column
+                lci.setClassIndex(c.getClassIndex());
                 lci.setCurveDescription(c.getCitation().getDescription());
                 lci.setDataSource(c.getSource());
                 lci.setTraceOrigin(c.getTraceOrigin());
@@ -808,8 +822,10 @@ public class Channel {
                 lci.setMnemonic(c.getCitation().getTitle());
                 lci.setAlternateIndex(c.getAlternateIndex());
                 lci.setClassWitsml(c.getClassWitsml());
-                //NOTE: WE WILL ALWAYS SET THE INDEX TO THE FIRST COLUMN
-                lci.setColumnIndex((short)1);
+                // NOTE: WE WILL ALWAYS SET THE INDEX TO THE FIRST COLUMN
+                // Card #454
+                // lci.setColumnIndex((short)1);
+                lci.setColumnIndex(c.getColumnIndex());
                 lci.setCurveDescription(c.getCitation().getDescription());
                 lci.setDataSource(c.getSource());
                 lci.setTraceOrigin(c.getTraceOrigin());
@@ -889,8 +905,9 @@ public class Channel {
                 Objects.equals(uid, channel.uid) &&
                 Objects.equals(wellDatum, channel.wellDatum) &&
                 Objects.equals(nullValue, channel.nullValue) &&
-                Objects.equals(channelState, channel.channelState) &&
+                // TODO Verify this works for both v1311 & v1411
                 Objects.equals(classIndex, channel.classIndex) &&
+                Objects.equals(columnIndex, channel.columnIndex) &&
                 Objects.equals(mnemAlias, channel.mnemAlias) &&
                 Objects.equals(alternateIndex, channel.alternateIndex) &&
                 Objects.equals(sensorOffset, channel.sensorOffset) &&
@@ -926,6 +943,7 @@ public class Channel {
 
     @Override
     public int hashCode() {
-        return Objects.hash(uuid, uid, wellDatum, nullValue, channelState, classIndex, mnemAlias, alternateIndex, sensorOffset, densData, traceOrigin, traceState, namingSystem, mnemonic, dataType, description, uom, source, axisDefinition, timeDepth, channelClass, classWitsml, runNumber, passNumber, loggingCompanyName, loggingCompanyCode, toolName, toolClass, derivation, loggingMethod, nominalHoleSize, index, aliases, citation, customData, objectVersion, existenceKind);
+        // TODO Verify this works for both v1311 & v1411
+        return Objects.hash(uuid, uid, wellDatum, nullValue, channelState, classIndex, columnIndex, mnemAlias, alternateIndex, sensorOffset, densData, traceOrigin, traceState, namingSystem, mnemonic, dataType, description, uom, source, axisDefinition, timeDepth, channelClass, classWitsml, runNumber, passNumber, loggingCompanyName, loggingCompanyCode, toolName, toolClass, derivation, loggingMethod, nominalHoleSize, index, aliases, citation, customData, objectVersion, existenceKind);
     }
 }

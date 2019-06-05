@@ -724,15 +724,14 @@ public class DotDelegator {
 												payload,
 												witsmlObj );
 
-		// set-up for channel set creation..
-		// ... endpoint url: /channelSets
+		// set-up for channel set creation
+		// endpoint: .../channelSets
 		endpoint = this.getEndpoint(objectType);
-		// ... parameters for url
+		// parameters for url
 		requestParams = new HashMap<>();
 		requestParams.put("uid", uid);
 		requestParams.put("uidWellbore", witsmlObj.getParentUid());
 		requestParams.put("uidWell", witsmlObj.getGrandParentUid());
-
 
 		// call a central method to finish the REST set-up
 		// and execute the rest call for ChannelSet
@@ -750,7 +749,7 @@ public class DotDelegator {
 									witsmlObj,
 									exchangeID );
 
-		// check response status; nullpointer during mocking....why?
+		// check response status
 		int status = response.getStatus();
 		if (409 == status) {
 			LOG.info( ValveLogging.getLogMsg( exchangeID,
@@ -760,10 +759,10 @@ public class DotDelegator {
 			throw new ValveException("Log already in store", (short) -405);
 		}
 
-		// actually a 201...
-		// TODO Verify that it is acceptable to allow 200 for testing purposes...check traj stuff
-		if (201 == status || 200 == status) {
-			LOG.info(ValveLogging.getLogMsg(exchangeID,
+		// actually a 201 per API is success...
+		if (201 == status) {
+			LOG.info(ValveLogging.getLogMsg(
+					exchangeID,
 					logResponse(response,
 								"Received successful "
 									+ "status code from DoT create call"),
@@ -787,7 +786,7 @@ public class DotDelegator {
 				// build the channels request...
 				// endpoint: .../channels/metadata?channelSetUuid={channelSetUuid}
 				endpoint = this.getEndpoint(objectType + "Channel");
-				endpoint = endpoint + "metadata";
+				endpoint = endpoint + "/metadata";
 				// get the uuid for the channelSet just created from the response
 				String uuid4CS = new JsonNode(response.getBody())
 															.getObject()
@@ -840,6 +839,7 @@ public class DotDelegator {
 											   						"Received successful "
 																			+ "status code from DoT add data call"),
 																	 witsmlObj));
+						// TODO Remove data check once code confidence increases
 						// perform a data check
 						String indexType="";
 						JSONObject payloadAsJsonObj = new JSONObject(payload);
@@ -1046,27 +1046,38 @@ public class DotDelegator {
 	}
 
 	/**
-	 * Submits the query to the DoT rest API for object GETing
+	 * Submits the query to the DoT rest APIs for object GETing
 	 *
-	 * @param witsmlObject - AbstractWitsmlObject to get
-	 * @param username     - auth username
-	 * @param password     - auth password
-	 * @param exchangeID   - unique string for tracking which exchange called this
-	 *                     method
-	 * @param client       - DotClient to execute requests with
-	 * @return get results AbstractWitsmlObject
+	 * @param witsmlObject - AbstractWitsmlObject with GET request
+	 * @param username     - username for authentication
+	 * @param password     - password for authentication
+	 * @param exchangeID   - unique string for tracking which exchange
+	 *                       called this method
+	 * @param client       - DotClient for request execution
+	 *
+	 * @return AbstractWitsmlObject - containing GET response from DoT
 	 */
-	public AbstractWitsmlObject getObject(AbstractWitsmlObject witsmlObject, String username, String password,
-										  String exchangeID, DotClient client, Map<String, String> optionsIn)
-			throws ValveException, ValveAuthException, UnirestException, JAXBException {
+	public AbstractWitsmlObject getObject(AbstractWitsmlObject witsmlObject,
+										  String username,
+										  String password,
+										  String exchangeID,
+										  DotClient client,
+										  Map<String, String> optionsIn)
+												throws ValveException,
+													   ValveAuthException,
+													   UnirestException,
+													   JAXBException {
 		String uid = witsmlObject.getUid();
 		String objectType = witsmlObject.getObjectType();
-		String endpoint = "";
-		String uuid = "";
-		String finalResponse = null;
+		String endpoint;
+		String uuid;
+		String finalResponse;
 
-		endpoint = this.getEndpoint(objectType) + uid; // add uid for rest call
+		// ************************************* ChannelSet ************************************* //
+		// endpoint url: /channelSets{uid}
+		endpoint = this.getEndpoint(objectType) + uid;
 		String version = witsmlObject.getVersion();
+
 		// build request
 		HttpRequest request = Unirest.get(endpoint);
 		request.header("accept", "application/json");
@@ -1147,6 +1158,7 @@ public class DotDelegator {
 		channelsetmetadataRequest.header("accept", "application/json");
 		// get response
 		channelsetmetadataResponse = client.makeRequest(channelsetmetadataRequest, username, password);
+
 		// Build Request for Get All ChannelSet
 		channelsetuuidEndpoint = this.getEndpoint("log");
 		channelsetuuidRequest = Unirest.get(channelsetuuidEndpoint);

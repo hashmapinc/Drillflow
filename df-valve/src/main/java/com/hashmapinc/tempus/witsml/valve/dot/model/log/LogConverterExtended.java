@@ -18,7 +18,6 @@ package com.hashmapinc.tempus.witsml.valve.dot.model.log;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
-import com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog;
 import com.hashmapinc.tempus.witsml.ValveLogging;
 import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
@@ -35,7 +34,7 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequestWithBody;
 import org.json.JSONObject;
-import org.json.JSONArray;
+
 import javax.xml.datatype.DatatypeConfigurationException;
 import java.io.IOException;
 import java.text.ParseException;
@@ -48,13 +47,12 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
     private static final Logger LOG = Logger.getLogger(DotDelegator.class.getName());
 
     /**
-     * convertToChannelSet1311 takes in a v1.3.1.1 JSON string that was produced
-     * client-side from SOAP WITSML XML & translates as necessary to adhere to DoT's
-     * "Create a new ChannelSet" API.
+     * convertDotResponseToWitsml
      *
      * @param witsmlObj Represents the client's WITSML object (complete) It is a
      *                  JSON String created from the ObjLog1311
      * @return JSON String representing the conversion
+     *
      * @throws IOException
      * @throws JsonMappingException
      * @throws JsonParseException
@@ -62,9 +60,21 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
      * @throws DatatypeConfigurationException
      */
 
-    public static ObjLog convertDotResponseToWitsml(String wellSearchEndpoint,String wellBoreSearchEndpoint,DotClient client, String username,
-                                                    String password, String exchangeID,AbstractWitsmlObject witsmlObject,String channelSet, String channels,String channelsDepthResponse) throws JsonParseException,
-            JsonMappingException, IOException, DatatypeConfigurationException, ParseException,ValveException, ValveAuthException, UnirestException {
+    public static ObjLog convertDotResponseToWitsml(String wellSearchEndpoint,
+                                                    String wellBoreSearchEndpoint,
+                                                    DotClient client,
+                                                    String username,
+                                                    String password,
+                                                    String exchangeID,
+                                                    AbstractWitsmlObject witsmlObject,
+                                                    String channelSet,
+                                                    String channels,
+                                                    String channelsDepthResponse)
+                                                                throws DatatypeConfigurationException,
+                                                                       ParseException,
+                                                                       ValveException,
+                                                                       ValveAuthException,
+                                                                       UnirestException {
         List<ChannelSet> cs = ChannelSet.jsonToChannelSetList(channelSet);
         ObjLog log = ChannelSet.to1411(cs.get(0));
         log.setNameWell(getWellName( wellSearchEndpoint,client,  username,password,  exchangeID,witsmlObject));
@@ -85,8 +95,15 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
     }
 
 
-    private static String getWellName(String wellSearchEndpoint,DotClient client, String username,
-                                      String password, String exchangeID,AbstractWitsmlObject witsmlObject) throws ValveException, ValveAuthException, UnirestException {
+    private static String getWellName(String wellSearchEndpoint,
+                                      DotClient client,
+                                      String username,
+                                      String password,
+                                      String exchangeID,
+                                      AbstractWitsmlObject witsmlObject)
+                                                throws ValveException,
+                                                       ValveAuthException,
+                                                       UnirestException {
         // REST call
         String wellName=null;
         String query;
