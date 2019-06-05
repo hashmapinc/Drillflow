@@ -832,6 +832,7 @@ public class Channel {
                 lci.setDensData(DensData.to1311(c.getDensData()));
                 lci.setSensorOffset(SensorOffset.to1311(c.getSensorOffset()));
                 lci.setWellDatum(WellDatum.to1311(c.getWellDatum()));
+                lci.setColumnIndex(c.classIndex);
 
                 if (c.getTimeDepth().toLowerCase().contains("time")){
                     lci.setMinDateTimeIndex(convertIsoDateToXML(c.getStartIndex()));
