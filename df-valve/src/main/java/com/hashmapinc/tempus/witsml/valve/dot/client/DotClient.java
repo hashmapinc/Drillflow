@@ -15,17 +15,6 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot.client;
 
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.util.Date;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
@@ -36,12 +25,21 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
-
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Date;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 
 public class DotClient {
     private static final Logger LOG = Logger.getLogger(DotClient.class.getName());
@@ -54,8 +52,8 @@ public class DotClient {
     /**
      * DotClient constructor
      *
-     * @param URL
      * @param API_KEY
+     * @param tokenPath
      * @throws ValveAuthException
      */
     public DotClient(String API_KEY, String tokenPath)  throws ValveAuthException{

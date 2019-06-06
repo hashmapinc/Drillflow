@@ -1150,6 +1150,7 @@ public class DotDelegator {
 		String payload="";
 		String indexType="";
 		String channelPayload="";
+		String version = witsmlObject.getVersion();
 
 		// Build Request for Get ChannelSet Metadata
 		channelsetmetadataEndpoint = this.getEndpoint("channelsetmetadata");
@@ -1219,8 +1220,25 @@ public class DotDelegator {
 			try {
 				String wellSearchEndpoint = this.getEndpoint("wellsearch");
 				String wellBoreSearchEndpoint = this.getEndpoint("wellboresearch");
-				finalResponse = LogConverterExtended.convertDotResponseToWitsml(wellSearchEndpoint,wellBoreSearchEndpoint,client,username,password,exchangeID, witsmlObject,allChannelSet.getBody(),
-						channelsResponse.getBody(),channelsDepthResponse.getBody());
+
+				if ("1.4.1.1".equals(version)) {
+					finalResponse = LogConverterExtended.convertDotResponseToWitsml1411(
+							wellSearchEndpoint, wellBoreSearchEndpoint, client, username,
+							password, exchangeID, witsmlObject, allChannelSet.getBody(),
+							channelsResponse.getBody(), channelsDepthResponse.getBody());
+				} else {
+					finalResponse = LogConverterExtended.convertDotResponseToWitsml1311(
+							wellSearchEndpoint,
+							wellBoreSearchEndpoint,
+							client,
+							username,
+							password,
+							exchangeID,
+							witsmlObject,
+							allChannelSet.getBody(),
+							channelsResponse.getBody(),
+							channelsDepthResponse.getBody());
+				}
 			} catch (Exception e) {
 				LOG.info(ValveLogging.getLogMsg(
 						exchangeID,
@@ -1241,7 +1259,9 @@ public class DotDelegator {
 			throw new ValveException(channelsResponse.getBody());
 		}
 		if (finalResponse != null)
-			return finalResponse.getJSONString("1.4.1.1");
+			// TODO This is a problem because you do not know which version the response is for (it could be 1.3.1.1)
+			return ("1.4.1.1".equals(version) ?
+					finalResponse.getJSONString("1.4.1.1") : finalResponse.getJSONString("1.3.1.1"));
 		else
 			return null;
 	}

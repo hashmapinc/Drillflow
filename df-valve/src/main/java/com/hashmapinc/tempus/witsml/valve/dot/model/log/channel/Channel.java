@@ -30,6 +30,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.IntStream;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -41,8 +42,7 @@ import java.util.*;
         "wellDatum",
         "nullValue",
         "channelState",
-        "classIndex",       // v1411
-        "columnIndex",      // v1311
+        "classIndex",
         "mnemAlias",
         "alternateIndex",
         "sensorOffset",
@@ -98,9 +98,7 @@ public class Channel {
     @JsonProperty("channelState")
     private String channelState;
     @JsonProperty("classIndex")
-    private Short classIndex;       // v1411
-    @JsonProperty("columnIndex")
-    private Short columnIndex;      // v1311
+    private Short classIndex;
     @JsonProperty("mnemAlias")
     private MnemAlias mnemAlias;
     @JsonProperty("alternateIndex")
@@ -255,22 +253,10 @@ public class Channel {
     @JsonProperty("classIndex")
     public Short getClassIndex() {
         return classIndex;
-    }   // v1411
+    }
 
     @JsonProperty("classIndex")
-    public void setClassIndex(Short classIndex) {
-        this.classIndex = classIndex;
-    }  // v1411
-
-    @JsonProperty("colummIndex")
-    public Short getColumnIndex() {
-        return columnIndex;
-    }   // v1311
-
-    @JsonProperty("columnIndex")
-    public void setColumnIndex(Short columnIndex) {
-        this.columnIndex = columnIndex;
-    }  // v1311
+    public void setClassIndex(Short classIndex) { this.classIndex = classIndex; }
 
     @JsonProperty("mnemAlias")
     public MnemAlias getMnemAlias() {
@@ -641,6 +627,9 @@ public class Channel {
             try {
                 Channel channel = new Channel();
 
+                //channel.setMinIndex(lci.getMinIndex());
+                //channel.setMaxIndex(lci.getMaxIndex());
+
                 Citation c = new Citation();
                 c.setTitle(lci.getMnemonic().getValue());
 
@@ -648,15 +637,6 @@ public class Channel {
                 channel.setUid(lci.getUid());
                 channel.setNamingSystem(lci.getMnemonic().getNamingSystem());
                 channel.setMnemonic(lci.getMnemonic().getValue());
-
-                if (witsmlObj.getIndexType() != null) {
-                    if (witsmlObj.getIndexType().toLowerCase().contains("depth")) {
-                        channel.setTimeDepth("Depth");
-                    } else {
-                        if (witsmlObj.getIndexType().toLowerCase().contains("time"))
-                            channel.setTimeDepth("Time");
-                    }
-                }
 
                 channel.setClassIndex(lci.getClassIndex());
 
@@ -809,7 +789,8 @@ public class Channel {
     }
 
     public static List<com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogCurveInfo> to1311(
-            List<Channel> channels) {
+            List<Channel> channels, String[] mnemonicList) {
+
         List<com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogCurveInfo> curves = new ArrayList<>();
 
         if (channels == null || channels.isEmpty())
@@ -822,10 +803,17 @@ public class Channel {
                 lci.setMnemonic(c.getCitation().getTitle());
                 lci.setAlternateIndex(c.getAlternateIndex());
                 lci.setClassWitsml(c.getClassWitsml());
-                // NOTE: WE WILL ALWAYS SET THE INDEX TO THE FIRST COLUMN
-                // Card #454
-                // lci.setColumnIndex((short)1);
-                lci.setColumnIndex(c.getColumnIndex());
+                // find the index of the mnemonic from the current lci
+                // within the mnemonicList
+                OptionalInt indexOpt = IntStream.range(0, mnemonicList.length)
+                        .filter(i -> lci.getMnemonic().equals(mnemonicList[i]))
+                        // TODO is findfirst() necessary?
+                        .findFirst();
+                if (indexOpt.isPresent()) {
+                    lci.setColumnIndex((short)indexOpt.getAsInt());
+                } else {
+                    lci.setColumnIndex((short)0);
+                }
                 lci.setCurveDescription(c.getCitation().getDescription());
                 lci.setDataSource(c.getSource());
                 lci.setTraceOrigin(c.getTraceOrigin());
@@ -907,7 +895,6 @@ public class Channel {
                 Objects.equals(nullValue, channel.nullValue) &&
                 // TODO Verify this works for both v1311 & v1411
                 Objects.equals(classIndex, channel.classIndex) &&
-                Objects.equals(columnIndex, channel.columnIndex) &&
                 Objects.equals(mnemAlias, channel.mnemAlias) &&
                 Objects.equals(alternateIndex, channel.alternateIndex) &&
                 Objects.equals(sensorOffset, channel.sensorOffset) &&
@@ -944,6 +931,6 @@ public class Channel {
     @Override
     public int hashCode() {
         // TODO Verify this works for both v1311 & v1411
-        return Objects.hash(uuid, uid, wellDatum, nullValue, channelState, classIndex, columnIndex, mnemAlias, alternateIndex, sensorOffset, densData, traceOrigin, traceState, namingSystem, mnemonic, dataType, description, uom, source, axisDefinition, timeDepth, channelClass, classWitsml, runNumber, passNumber, loggingCompanyName, loggingCompanyCode, toolName, toolClass, derivation, loggingMethod, nominalHoleSize, index, aliases, citation, customData, objectVersion, existenceKind);
+        return Objects.hash(uuid, uid, wellDatum, nullValue, channelState, classIndex, mnemAlias, alternateIndex, sensorOffset, densData, traceOrigin, traceState, namingSystem, mnemonic, dataType, description, uom, source, axisDefinition, timeDepth, channelClass, classWitsml, runNumber, passNumber, loggingCompanyName, loggingCompanyCode, toolName, toolClass, derivation, loggingMethod, nominalHoleSize, index, aliases, citation, customData, objectVersion, existenceKind);
     }
 }
