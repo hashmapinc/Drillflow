@@ -772,7 +772,7 @@ public class Channel {
                 lci.setSensorOffset(SensorOffset.to1411(c.getSensorOffset()));
                 lci.setWellDatum(WellDatum.to1411(c.getWellDatum()));
                 lci.setClassIndex(c.getClassIndex());
-/*                if (c.getTimeDepth().toLowerCase().contains("depth")){
+                if (c.getTimeDepth().toLowerCase().contains("time")){
                     if (c.getStartIndex() != null)
                         lci.setMinDateTimeIndex(convertIsoDateToXML(c.getStartIndex()));
                     if (c.getEndIndex() != null)
@@ -792,7 +792,7 @@ public class Channel {
                         maxMeasure.setValue(Double.parseDouble(c.getEndIndex()));
                         lci.setMaxIndex(maxMeasure);
                     }
-                }*/
+                }
                 //Need to address this in wol...does not exist
                 //lci.getExtensionNameValue()
                 curves.add(lci);
@@ -832,8 +832,9 @@ public class Channel {
                 lci.setDensData(DensData.to1311(c.getDensData()));
                 lci.setSensorOffset(SensorOffset.to1311(c.getSensorOffset()));
                 lci.setWellDatum(WellDatum.to1311(c.getWellDatum()));
+                lci.setColumnIndex(c.classIndex);
 
-/*                if (c.getTimeDepth().toLowerCase().contains("depth")){
+                if (c.getTimeDepth().toLowerCase().contains("time")){
                     lci.setMinDateTimeIndex(convertIsoDateToXML(c.getStartIndex()));
                     lci.setMaxDateTimeIndex(convertIsoDateToXML(c.getEndIndex()));
                 } else {
@@ -845,7 +846,7 @@ public class Channel {
                     maxMeasure.setUom("m");
                     maxMeasure.setValue(Double.parseDouble(c.getEndIndex()));
                     lci.setMaxIndex(maxMeasure);
-                }*/
+                }
 
                 curves.add(lci);
             } catch (Exception ex) {
@@ -879,7 +880,8 @@ public class Channel {
 
     private static XMLGregorianCalendar convertIsoDateToXML(String dateTime)
             throws DatatypeConfigurationException, ParseException {
-        DateFormat format = new SimpleDateFormat("yyyy-MM-ddThh:mm:ss.SSSXXX");
+        //DateFormat format = new SimpleDateFormat("yyyy-MM-ddThh:mm:ss.SSSXXX");
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
         //Date date = format.parse("2014-04-24 11:15:00");
         Date date = format.parse(dateTime);
 

@@ -39,6 +39,8 @@ valve :
         log.channel.depthData.path: ${LOG_DEPTHDATA:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/channels/depthdata}
         log.channel.timeData.path: ${LOG_TIMEDATA:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/channels/timedata}
         log.channelset.search: ${LOG_SEARCH:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/witsml/channelSets}
+        log.channel.depthBoundaryData.path: ${LOG_DEPTH_BOUNDARY_DATA:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/channels/depthdata}
+        log.channel.timeBoundaryData.path: ${LOG_TIME_BOUNDARY_DATA:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/channels/timedata}
 
 wmls:
     version: 1.3.1.1,1.4.1.1
