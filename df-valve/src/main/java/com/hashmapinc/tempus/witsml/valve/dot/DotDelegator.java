@@ -79,6 +79,8 @@ public class DotDelegator {
 	private final String LOG_DEPTH_PATH;
 	private final String LOG_TIME_PATH;
 	private final String LOG_SEARCH_PATH;
+	private final String LOG_DEPTH_BOUNDARY_PATH;
+	private final String LOG_TIME_BOUNDARY_PATH;
 
 
 	private final int CREATE_CS_LOG = 1;
@@ -107,6 +109,8 @@ public class DotDelegator {
 		this.LOG_DEPTH_PATH = config.get("log.channel.depthData.path");
 		this.LOG_TIME_PATH = config.get("log.channel.timeData.path");
 		this.LOG_SEARCH_PATH = config.get("log.channelset.search");
+		this.LOG_DEPTH_BOUNDARY_PATH = config.get("log.channel.depthBoundaryData.path");
+		this.LOG_TIME_BOUNDARY_PATH = config.get("log.channel.timeBoundaryData.path");
 	}
 
 	/**
@@ -164,6 +168,12 @@ public class DotDelegator {
 				break;
 		case "logTimePath":
 				endpoint = this.LOG_TIME_PATH;
+				break;
+		case "logDepthBoundaryPath":
+				endpoint = this.LOG_DEPTH_BOUNDARY_PATH;
+				break;
+		case "logTimeBoundaryPath":
+				endpoint = this.LOG_TIME_BOUNDARY_PATH;
 				break;
 		case "logSearch":
 			endpoint = this.LOG_SEARCH_PATH;
@@ -1124,9 +1134,16 @@ public class DotDelegator {
 		HttpResponse<String> channelsDepthResponse;
 		ObjLog finalResponse = null;
 		String data ="";
-		String payload="";
 		String indexType="";
-		String channelPayload="";
+
+		// get object as payload string
+		String payload;
+		if ("1.4.1.1".equals(witsmlObject.getVersion())) {
+			payload = witsmlObject.getJSONString("1.4.1.1");
+		} else {
+			payload = witsmlObject.getJSONString("1.3.1.1");
+		}
+		payload = JsonUtil.removeEmpties(new JSONObject(payload));
 
 		// Build Request for Get ChannelSet Metadata
 		channelsetmetadataEndpoint = this.getEndpoint("channelsetmetadata");
@@ -1142,9 +1159,7 @@ public class DotDelegator {
 		channelsetuuidRequest.queryString("containerId", uuid);
 		// get response
 		allChannelSet = client.makeRequest(channelsetuuidRequest, username, password);
-
 		List<ChannelSet> cs = ChannelSet.jsonToChannelSetList(allChannelSet.getBody());
-
 		for (ChannelSet channelSet : cs) {
 			try{
 				if (channelSet.getTimeDepth().toLowerCase().contains("depth")) {
@@ -1156,7 +1171,6 @@ public class DotDelegator {
 				continue;
 			}
 		}
-
 		// Build Request for Get Channels
 		channelsEndPoint = this.getEndpoint("channels");
 		channelsRequest = Unirest.get(channelsEndPoint);
@@ -1164,12 +1178,9 @@ public class DotDelegator {
 		channelsRequest.queryString("channelSetUuid", uuid);
 		// get response
 		channelsResponse = client.makeRequest(channelsRequest, username, password);
-
 		List<Channel> channels = Channel.jsonToChannelList(channelsResponse.getBody());
-
 		if (!getAllChannels)
 			channels = filterChannelsBasedOnRequest(channels, witsmlObject);
-
 		// Build Request for Get Channels Depth
 		String channelData = null;
 		if (getData) {
@@ -1205,25 +1216,53 @@ public class DotDelegator {
 			}
 
 			if (indexType.equals("depth")) {
-				String sortDesc = "true";
-				data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
-				// create with POST
-				channelsDepthEndPoint = this.getEndpoint("logDepthPath");
-				channelsDepthRequest = Unirest.post(channelsDepthEndPoint);
-				channelsDepthRequest.header("Content-Type", "application/json");
-				channelsDepthRequest.body(data);
-				// get the request response.
-				channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
+				JSONObject payloadJSON = new JSONObject(payload);
+				if (payloadJSON.has("logCurveInfo")) {
+					String sortDesc = "true";
+					data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
+					// create with POST
+					channelsDepthEndPoint = this.getEndpoint("logDepthPath");
+					channelsDepthRequest = Unirest.post(channelsDepthEndPoint);
+					channelsDepthRequest.header("Content-Type", "application/json");
+					channelsDepthRequest.body(data);
+					// get the request response.
+					channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
+				}else{
+					String sortDesc = "true";
+					data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
+					// create with POST
+					channelsDepthEndPoint = this.getEndpoint("logDepthBoundaryPath");
+					channelsDepthRequest = Unirest.post(channelsDepthEndPoint);
+					channelsDepthRequest.header("Content-Type", "application/json");
+					channelsDepthRequest.body(data);
+					// get the request response.
+					channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
+				}
 			} else {
-				String sortDesc = "true";
-				data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
-				// create with POST
-				channelsDepthEndPoint = this.getEndpoint("logTimePath");
-				channelsDepthRequest = Unirest.post(channelsDepthEndPoint);
-				channelsDepthRequest.header("Content-Type", "application/json");
-				channelsDepthRequest.body(data);
-				// get the request response.
-				channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
+				JSONObject payloadJSON = new JSONObject(payload);
+				if (payloadJSON.has("logCurveInfo")) {
+					String sortDesc = "true";
+					data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
+					// create with POST
+					channelsDepthEndPoint = this.getEndpoint("logTimeBoundaryPath");
+					channelsDepthRequest = Unirest.post(channelsDepthEndPoint);
+					channelsDepthRequest.header("Content-Type", "application/json");
+					channelsDepthRequest.body(data);
+					// get the request response.
+					channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
+				}{
+					String sortDesc = "true";
+					data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
+					// create with POST
+					channelsDepthEndPoint = this.getEndpoint("logTimePath");
+					channelsDepthRequest = Unirest.post(channelsDepthEndPoint);
+					channelsDepthRequest.header("Content-Type", "application/json");
+					channelsDepthRequest.body(data);
+					// get the request response.
+					channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
+				}
+
+
 			}
 			channelData = channelsDepthResponse.getBody();
 		}

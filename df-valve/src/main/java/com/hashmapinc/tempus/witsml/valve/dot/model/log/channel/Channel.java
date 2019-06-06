@@ -880,7 +880,8 @@ public class Channel {
 
     private static XMLGregorianCalendar convertIsoDateToXML(String dateTime)
             throws DatatypeConfigurationException, ParseException {
-        DateFormat format = new SimpleDateFormat("yyyy-MM-ddThh:mm:ss.SSSXXX");
+        //DateFormat format = new SimpleDateFormat("yyyy-MM-ddThh:mm:ss.SSSXXX");
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
         //Date date = format.parse("2014-04-24 11:15:00");
         Date date = format.parse(dateTime);
 
