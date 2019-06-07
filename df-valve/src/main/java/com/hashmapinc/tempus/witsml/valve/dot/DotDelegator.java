@@ -1311,6 +1311,11 @@ public class DotDelegator {
 		if ("1.3.1.1".equals(requestObject.getVersion())) {
 			List<CsLogCurveInfo> infos =
 					((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) requestObject).getLogCurveInfo();
+
+			//if nothing was requested
+			if (infos.size() == 0)
+				return null;
+
 			if (infos.size() == 1 && infos.get(0).getMnemonic().isEmpty()){
 				return allChannels;
 			} else {
@@ -1332,6 +1337,11 @@ public class DotDelegator {
 		} else if ("1.4.1.1".equals(requestObject.getVersion())){
 			List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> infos =
 					((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) requestObject).getLogCurveInfo();
+
+			//if nothing was requested
+			if (infos.size() == 0)
+				return null;
+
 			if (infos.size() == 1 && infos.get(0).getMnemonic().getValue().isEmpty()){
 				return allChannels;
 			}else {
