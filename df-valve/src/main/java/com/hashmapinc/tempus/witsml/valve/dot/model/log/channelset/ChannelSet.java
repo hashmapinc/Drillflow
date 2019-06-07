@@ -682,6 +682,7 @@ public class ChannelSet {
         wmlLog.setNullValue(channelSet.getNullValue());
         wmlLog.setObjectGrowing(channelSet.getObjectGrowing());
         wmlLog.setLogParam(LogParam.to1411(channelSet.getLogParam()));
+       // TODO set commonData
 
         if (channelSet.getTimeDepth().toLowerCase().contains("depth")) {
             if (channelSet.getStartIndex() != null){
