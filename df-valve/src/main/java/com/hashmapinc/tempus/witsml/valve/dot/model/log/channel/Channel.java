@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.GenericMeasure;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ShortNameStruct;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.*;
 
@@ -757,7 +758,7 @@ public class Channel {
                 lci.setSensorOffset(SensorOffset.to1411(c.getSensorOffset()));
                 lci.setWellDatum(WellDatum.to1411(c.getWellDatum()));
                 lci.setClassIndex(c.getClassIndex());
-/*                if (c.getTimeDepth().toLowerCase().contains("depth")){
+                if (c.getTimeDepth().toLowerCase().contains("depth")){
                     if (c.getStartIndex() != null)
                         lci.setMinDateTimeIndex(convertIsoDateToXML(c.getStartIndex()));
                     if (c.getEndIndex() != null)
@@ -777,7 +778,7 @@ public class Channel {
                         maxMeasure.setValue(Double.parseDouble(c.getEndIndex()));
                         lci.setMaxIndex(maxMeasure);
                     }
-                }*/
+                }
                 //Need to address this in wol...does not exist
                 //lci.getExtensionNameValue()
                 curves.add(lci);
@@ -807,7 +808,8 @@ public class Channel {
                 // within the mnemonicList
                 OptionalInt indexOpt = IntStream.range(0, mnemonicList.length)
                         .filter(i -> lci.getMnemonic().equals(mnemonicList[i]))
-                        // TODO is findfirst() necessary?
+                        // There should be no duplicates, so on the first match,
+                        // stop the search process
                         .findFirst();
                 if (indexOpt.isPresent()) {
                     lci.setColumnIndex((short)indexOpt.getAsInt());
@@ -828,7 +830,7 @@ public class Channel {
                 lci.setSensorOffset(SensorOffset.to1311(c.getSensorOffset()));
                 lci.setWellDatum(WellDatum.to1311(c.getWellDatum()));
 
-/*                if (c.getTimeDepth().toLowerCase().contains("depth")){
+                if (c.getTimeDepth().toLowerCase().contains("depth")){
                     lci.setMinDateTimeIndex(convertIsoDateToXML(c.getStartIndex()));
                     lci.setMaxDateTimeIndex(convertIsoDateToXML(c.getEndIndex()));
                 } else {
@@ -840,7 +842,7 @@ public class Channel {
                     maxMeasure.setUom("m");
                     maxMeasure.setValue(Double.parseDouble(c.getEndIndex()));
                     lci.setMaxIndex(maxMeasure);
-                }*/
+                }
 
                 curves.add(lci);
             } catch (Exception ex){

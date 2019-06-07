@@ -15,19 +15,13 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot.model.log;
 
-import java.util.Arrays;
-import java.util.List;
+import com.hashmapinc.tempus.WitsmlObjects.Util.log.LogDataHelper;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData;
+import com.hashmapinc.tempus.witsml.valve.dot.model.log.channel.Channel;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.hashmapinc.tempus.WitsmlObjects.Util.log.LogDataHelper;
-import com.hashmapinc.tempus.witsml.valve.dot.model.log.channel.Channel;
-import com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 
 
@@ -160,49 +154,74 @@ public class DotLogDataHelper extends LogDataHelper {
         return data;
     }
 
-    public static com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogData convertTo1311FromDot(JSONObject object){
-        JSONArray jsonValues = (JSONArray)object.get("value");
+    public static com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogData convertTo1311FromDot(JSONObject object) {
+        JSONArray jsonValues = (JSONArray) object.get("value");
         String[] mnems = new String[jsonValues.length()];
         String[] units = new String[jsonValues.length()];
-        Arrays.fill(units,"unitless");
+        Arrays.fill(units, "unitless");
         SortedMap<String, String[]> values = new TreeMap<>();
 
         //Iterate through and get values
-        for (int i = 0; i < jsonValues.length(); i++){
+        for (int i = 0; i < jsonValues.length(); i++) {
             if (i == 0) {
-                JSONObject index = (JSONObject)jsonValues.get(i);
+                JSONObject index = (JSONObject) jsonValues.get(i);
                 mnems[i] = (index.get("name").toString());
                 units[i] = (index.get("unit").toString());
             } else {
-                JSONObject currentValue = (JSONObject)jsonValues.get(i);
+                JSONObject currentValue = (JSONObject) jsonValues.get(i);
                 mnems[i] = (currentValue.get("name").toString());
                 units[i] = (currentValue.get("unit").toString());
                 JSONArray dataPoints = currentValue.getJSONArray("values");
-                for (int j = 0; j < dataPoints.length(); j++){
-                    JSONObject dataPoint = (JSONObject)dataPoints.get(j);
+                for (int j = 0; j < dataPoints.length(); j++) {
+                    JSONObject dataPoint = (JSONObject) dataPoints.get(j);
                     String index = dataPoint.keys().next().toString();
                     String value = dataPoint.get(index).toString();
                     if (!values.containsKey(index))
-                        values.put(index, new String[jsonValues.length()-1]);
-                    values.get(index)[i-1] = value;
+                        values.put(index, new String[jsonValues.length() - 1]);
+                    values.get(index)[i - 1] = value;
                 }
             }
         }
 
         //Build the Log Data
-        com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogData data = new com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogData();
+        com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogData data =
+                new com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogData();
         List<String> dataRows = new ArrayList<>();
         Iterator valueIterator = values.entrySet().iterator();
         while (valueIterator.hasNext()) {
-            Map.Entry pair = (Map.Entry)valueIterator.next();
+            Map.Entry pair = (Map.Entry) valueIterator.next();
             StringBuilder logDataRow = new StringBuilder();
             logDataRow.append(pair.getKey());
             logDataRow.append(',');
-            logDataRow.append(String.join(",", (String[])pair.getValue()));
+            logDataRow.append(String.join(",", (String[]) pair.getValue()));
             dataRows.add(logDataRow.toString());
             valueIterator.remove(); // avoids a ConcurrentModificationException
         }
         data.setData(dataRows);
         return data;
+    }
+
+    /**
+        DoT returns the mnemonicList within the data because it utilizes v2.0-ish
+        syntax. The v1.3.1.1 Client requires 1.3.1.1 syntax that is, in part,
+        derived from this mnemonicList; however, the v1.3.1.1 Client is unaware of
+        the concept of a mnemonicList.
+
+        @param unMergedDataObject as a JSONObject
+
+        @return String[] contains the MnemonicList
+     */
+    public static String[] returnMnemonicList1311FromDot(JSONObject unMergedDataObject){
+
+        JSONArray jsonValues = (JSONArray) unMergedDataObject.get("value");
+        String[] mnems = new String[jsonValues.length()];
+
+        //Iterate through and get all mnemonics placed into the array
+        for (int i = 0; i < jsonValues.length(); i++) {
+            JSONObject currentValue = (JSONObject) jsonValues.get(i);
+            mnems[i] = (currentValue.get("name").toString());
+        }
+
+        return mnems;
     }
 }

@@ -39,7 +39,6 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -61,12 +60,12 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
      * @throws DatatypeConfigurationException
      */
 
-    public static ObjLog convertDotResponseToWitsml1411(String wellSearchEndpoint,
-                                                    String wellBoreSearchEndpoint,
-                                                    DotClient client,
-                                                    String username,
-                                                    String password,
-                                                    String exchangeID,
+    public static ObjLog convertDotResponseToWitsml1411( String wellSearchEndpoint,
+                                                         String wellBoreSearchEndpoint,
+                                                         DotClient client,
+                                                         String username,
+                                                         String password,
+                                                         String exchangeID,
                                                     AbstractWitsmlObject witsmlObject,
                                                     String channelSet,
                                                     String channels,
@@ -98,16 +97,17 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
         return log;
     }
 
-    public static ObjLog convertDotResponseToWitsml1311(String wellSearchEndpoint,
-                                                        String wellBoreSearchEndpoint,
-                                                        DotClient client,
-                                                        String username,
-                                                        String password,
-                                                        String exchangeID,
-                                                        AbstractWitsmlObject witsmlObject,
-                                                        String channelSet,
-                                                        String channels,
-                                                        String data)
+    public static com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog
+                                convertDotResponseToWitsml1311(String wellSearchEndpoint,
+                                                               String wellBoreSearchEndpoint,
+                                                               DotClient client,
+                                                               String username,
+                                                               String password,
+                                                               String exchangeID,
+                                                               AbstractWitsmlObject witsmlObject,
+                                                               String channelSet,
+                                                               String channels,
+                                                               String nonMergedJSONStringdata)
                                                                  throws DatatypeConfigurationException,
                                                                         ParseException,
                                                                         ValveException,
@@ -116,38 +116,36 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
     {
 
         // Everything from DoT is in 2.0-ish syntax; however, the response is to a 1.3.1.1 Client.
-        List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData> curves1411 = new ArrayList<>();
-        //new ArrayList<String>(data);
+
+        // First, convert ChannelSet to 1.3.1.1 for response to the Client....
 
         List<ChannelSet> cs = ChannelSet.jsonToChannelSetList(channelSet);
-
-        // First, convert ChannelSet....
         com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog log = ChannelSet.to1311(cs.get(0));
-        log.setNameWell(getWellName( wellSearchEndpoint,client,  username,password,  exchangeID,witsmlObject));
-        log.setNameWellbore(getWelBorelName( wellBoreSearchEndpoint,client,  username, password,  exchangeID,witsmlObject));
-        List<Channel> chans = Channel.jsonToChannelList(channels);
+        log.setNameWell(
+                getWellName( wellSearchEndpoint, client, username, password, exchangeID, witsmlObject)
+        );
+        log.setNameWellbore(
+                getWelBorelName( wellBoreSearchEndpoint, client, username, password, exchangeID,witsmlObject)
+        );
 
         // Second, convert Channels...
-        // 1.3.1.1 does not have a mnemonicList; DoT sent us one because they operate as 2.0-ish
-        // get the mnemonicList provided by DoT to derive columnIndex & successfully convert the
-        // channel to 1.3.1.1
-        String mnemonicList = curves1411.get(0).getMnemonicList();
-        // convert csv String to an Array
-        List<String> items = Arrays.asList(mnemonicList.split("\\s*,\\s*"));
-        List<com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogCurveInfo> lcis = Channel.to1311(
-                    chans, (String[])items.toArray());
-        //String unitList = curves1411.get(0).getUnitList();
+
+        // ...since channels require columnIndex, these indices must be derived from the
+        //    returned 2.0-ish DoT unmerged data object;
+        // TODO Should this be v2.0?
+        List<Channel> chans = Channel.jsonToChannelList(channels);
+        JSONObject dataAsJson = new JSONObject(nonMergedJSONStringdata);
+        String[] mnemonicList = DotLogDataHelper.returnMnemonicList1311FromDot(dataAsJson);
+        // pass in the mnemonicList in order to calculate columnIndex
+        List<com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogCurveInfo> lcis =
+                Channel.to1311( chans, mnemonicList);
         log.setLogCurveInfo(lcis);
 
-        // build log data response
-        List<String> dataOnly = curves1411.get(0).getData();
-        JSONObject logDataJsonObject = new JSONObject(dataOnly);
-        List<com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogData> curves = new ArrayList<>();
-        curves.add(DotLogDataHelper.convertTo1311FromDot(logDataJsonObject));
-        log.setLogData(curves.get(0));
+        // Finally, build log data response (because a mnemonicList needs to be created from the
+        // non-merged JSON data passed in to construct columnIndex for channels)...
+        log.setLogData(DotLogDataHelper.convertTo1311FromDot(dataAsJson));
 
-        //return log;
-        return null;
+        return log;
     }
 
 
@@ -198,8 +196,15 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
         return wellName;
     }
 
-    private static String getWelBorelName(String wellBoreSearchEndpoint,DotClient client, String username,
-                                          String password, String exchangeID,AbstractWitsmlObject witsmlObject) throws ValveException, ValveAuthException, UnirestException {
+    private static String getWelBorelName(String wellBoreSearchEndpoint,
+                                          DotClient client,
+                                          String username,
+                                          String password,
+                                          String exchangeID,
+                                          AbstractWitsmlObject witsmlObject)
+                                                throws ValveException,
+                                                       ValveAuthException,
+                                                       UnirestException {
         // REST call
         String wellboreName=null;
         String query;

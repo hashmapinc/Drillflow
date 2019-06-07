@@ -1129,9 +1129,16 @@ public class DotDelegator {
 	 * @param client       - DotClient to execute requests with
 	 */
 
-	private String getFromStoreRestCalls(AbstractWitsmlObject witsmlObject, DotClient client, String uuid, String username,
-										 String password, String exchangeID)
-			throws ValveException, ValveAuthException, UnirestException, JAXBException {
+	private String getFromStoreRestCalls( AbstractWitsmlObject witsmlObject,
+                                          DotClient client,
+                                          String uuid,
+                                          String username,
+										  String password,
+                                          String exchangeID)
+			                                    throws ValveException,
+                                                       ValveAuthException,
+                                                       UnirestException
+    {
 
 		String channelsetmetadataEndpoint;
 		HttpResponse<String> channelsetmetadataResponse;
@@ -1145,11 +1152,10 @@ public class DotDelegator {
 		String channelsDepthEndPoint;
 		HttpRequestWithBody channelsDepthRequest;
 		HttpResponse<String> channelsDepthResponse;
-		ObjLog finalResponse = null;
-		String data ="";
-		String payload="";
-		String indexType="";
-		String channelPayload="";
+		ObjLog finalResponse1411 = null;
+        com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog finalResponse1311 = null;
+		String data;
+		String indexType = "";
 		String version = witsmlObject.getVersion();
 
 		// Build Request for Get ChannelSet Metadata
@@ -1222,22 +1228,23 @@ public class DotDelegator {
 				String wellBoreSearchEndpoint = this.getEndpoint("wellboresearch");
 
 				if ("1.4.1.1".equals(version)) {
-					finalResponse = LogConverterExtended.convertDotResponseToWitsml1411(
+					finalResponse1411 = LogConverterExtended.convertDotResponseToWitsml1411(
 							wellSearchEndpoint, wellBoreSearchEndpoint, client, username,
 							password, exchangeID, witsmlObject, allChannelSet.getBody(),
 							channelsResponse.getBody(), channelsDepthResponse.getBody());
 				} else {
-					finalResponse = LogConverterExtended.convertDotResponseToWitsml1311(
-							wellSearchEndpoint,
-							wellBoreSearchEndpoint,
-							client,
-							username,
-							password,
-							exchangeID,
-							witsmlObject,
-							allChannelSet.getBody(),
-							channelsResponse.getBody(),
-							channelsDepthResponse.getBody());
+					finalResponse1311 = LogConverterExtended
+                                        .convertDotResponseToWitsml1311(
+							               wellSearchEndpoint,
+							               wellBoreSearchEndpoint,
+							               client,
+							               username,
+							               password,
+                                           exchangeID,
+							               witsmlObject,
+							               allChannelSet.getBody(),
+							               channelsResponse.getBody(),
+							               channelsDepthResponse.getBody());
 				}
 			} catch (Exception e) {
 				LOG.info(ValveLogging.getLogMsg(
@@ -1258,11 +1265,12 @@ public class DotDelegator {
 			));
 			throw new ValveException(channelsResponse.getBody());
 		}
-		if (finalResponse != null)
-			// TODO This is a problem because you do not know which version the response is for (it could be 1.3.1.1)
-			return ("1.4.1.1".equals(version) ?
-					finalResponse.getJSONString("1.4.1.1") : finalResponse.getJSONString("1.3.1.1"));
-		else
+
+		if ( finalResponse1411 != null )
+			return finalResponse1411.getJSONString("1.4.1.1");
+		else if ( finalResponse1311 != null )
+		    return finalResponse1311.getJSONString("1.3.1.1");
+        else
 			return null;
 	}
 
