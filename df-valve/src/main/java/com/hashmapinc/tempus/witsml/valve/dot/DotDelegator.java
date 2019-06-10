@@ -71,14 +71,12 @@ public class DotDelegator {
 	private final String TRAJECTORY_GQL_PATH;
 	private final String LOG_PATH;
 	private final String LOG_CHANNEL_PATH;
-	private final String LOG_CHANNELSET_METADATA;
 	private final String LOG_CHANNELSET_UUID;
 	private final String LOG_CHANNELS;
 	private final String LOG_CHANNEL_DATA;
 	private final String LOG_MNEMONIC_PATH;
 	private final String LOG_DEPTH_PATH;
 	private final String LOG_TIME_PATH;
-	private final String LOG_SEARCH_PATH;
 	private final String LOG_DEPTH_BOUNDARY_PATH;
 	private final String LOG_TIME_BOUNDARY_PATH;
 
@@ -101,14 +99,12 @@ public class DotDelegator {
 		this.TRAJECTORY_GQL_PATH = config.get("trajectory.gql.path");
 		this.LOG_PATH = config.get("log.channelset.path");
 		this.LOG_CHANNEL_PATH = config.get("log.channel.path");
-		this.LOG_CHANNELSET_METADATA = config.get("log.channelset.metadata.path");
 		this.LOG_CHANNELSET_UUID = config.get("log.channelset.uuid.path");
 		this.LOG_CHANNELS = config.get("log.channels.path");
 		this.LOG_CHANNEL_DATA = config.get("log.channels.data.path");
 		this.LOG_MNEMONIC_PATH = config.get("log.mnemonic.data.path");
 		this.LOG_DEPTH_PATH = config.get("log.channel.depthData.path");
 		this.LOG_TIME_PATH = config.get("log.channel.timeData.path");
-		this.LOG_SEARCH_PATH = config.get("log.channelset.search");
 		this.LOG_DEPTH_BOUNDARY_PATH = config.get("log.channel.depthBoundaryData.path");
 		this.LOG_TIME_BOUNDARY_PATH = config.get("log.channel.timeBoundaryData.path");
 	}
@@ -148,9 +144,6 @@ public class DotDelegator {
 		case "logChannel":
 			endpoint = this.LOG_CHANNEL_PATH;
 			break;
-		case "channelsetmetadata":
-			endpoint = this.LOG_CHANNELSET_METADATA;
-			break;
 		case CHANNELSET_UUID:
 			endpoint = this.LOG_CHANNELSET_UUID;
 			break;
@@ -175,9 +168,6 @@ public class DotDelegator {
 		case "logTimeBoundaryPath":
 				endpoint = this.LOG_TIME_BOUNDARY_PATH;
 				break;
-		case "logSearch":
-			endpoint = this.LOG_SEARCH_PATH;
-			break;
 		default:
 			throw new ValveException("Unsupported object type<" + objectType + ">");
 		}
@@ -282,7 +272,7 @@ public class DotDelegator {
 				if (uuid == null){
 					throw new ValveException("Not Found", (short)-433);
 				}
-				String logDeletEndpoint = this.getEndpoint("channelsetmetadata");
+				String logDeletEndpoint = this.getEndpoint(LOG_OBJECT);
 				logDeletEndpoint = logDeletEndpoint + "/" + uuid;
 				HttpRequest logDeleteRequest = Unirest.delete(logDeletEndpoint).header("Content-Type",
 						"application/json");
@@ -347,7 +337,7 @@ public class DotDelegator {
 				if (uuid == null){
 					throw new ValveException("Not Found", (short)-433);
 				}
-				String logElementDeletEndpoint = this.getEndpoint("channelsetmetadata");
+				String logElementDeletEndpoint = this.getEndpoint(LOG_OBJECT);
 				logElementDeletEndpoint = logElementDeletEndpoint + "/" + uuid;
 				request = Unirest.patch(logElementDeletEndpoint).header("Content-Type", "application/json");
 				payload = JsonUtil.removeEmptyArrays(new JSONObject(payload));
@@ -1146,7 +1136,7 @@ public class DotDelegator {
 		payload = JsonUtil.removeEmpties(new JSONObject(payload));
 
 		// Build Request for Get ChannelSet Metadata
-		channelsetmetadataEndpoint = this.getEndpoint("channelsetmetadata");
+		channelsetmetadataEndpoint = this.getEndpoint(LOG_OBJECT);
 		channelsetmetadataEndpoint = channelsetmetadataEndpoint + "/" + uuid;
 		channelsetmetadataRequest = Unirest.get(channelsetmetadataEndpoint);
 		channelsetmetadataRequest.header("accept", "application/json");
@@ -1534,7 +1524,7 @@ public class DotDelegator {
 		if (containerID == null){
 			return null;
 		}
-		String logSearchEndpoint = this.getEndpoint("logSearch");
+		String logSearchEndpoint = this.getEndpoint(LOG_OBJECT);
 		HttpRequest logSearchRequest = Unirest.get(logSearchEndpoint);
 		logSearchRequest.queryString("containerId", containerID);
 		HttpResponse<String> logSearchResponse = client.makeRequest(logSearchRequest, username, password);
