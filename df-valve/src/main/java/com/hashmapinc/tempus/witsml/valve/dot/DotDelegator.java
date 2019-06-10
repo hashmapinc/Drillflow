@@ -1204,7 +1204,8 @@ public class DotDelegator {
 					endIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getEndIndex().getValue().toString();
 				}
 			}
-
+			// TODO  To work for logData Filter
+			
 			if (indexType.equals("depth")) {
 				JSONObject payloadJSON = new JSONObject(payload);
 /*				if (payloadJSON.has("logData")) {
