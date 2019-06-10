@@ -1217,17 +1217,7 @@ public class DotDelegator {
 
 			if (indexType.equals("depth")) {
 				JSONObject payloadJSON = new JSONObject(payload);
-				if (payloadJSON.has("logCurveInfo")) {
-					String sortDesc = "true";
-					data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
-					// create with POST
-					channelsDepthEndPoint = this.getEndpoint("logDepthPath");
-					channelsDepthRequest = Unirest.post(channelsDepthEndPoint);
-					channelsDepthRequest.header("Content-Type", "application/json");
-					channelsDepthRequest.body(data);
-					// get the request response.
-					channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
-				}else{
+				if (payloadJSON.has("logData")) {
 					String sortDesc = "true";
 					data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
 					// create with POST
@@ -1237,14 +1227,24 @@ public class DotDelegator {
 					channelsDepthRequest.body(data);
 					// get the request response.
 					channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
-				}
-			} else {
-				JSONObject payloadJSON = new JSONObject(payload);
-				if (payloadJSON.has("logCurveInfo")) {
+				}else{
 					String sortDesc = "true";
 					data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
 					// create with POST
-					channelsDepthEndPoint = this.getEndpoint("logTimeBoundaryPath");
+					channelsDepthEndPoint = this.getEndpoint("logDepthPath");
+					channelsDepthRequest = Unirest.post(channelsDepthEndPoint);
+					channelsDepthRequest.header("Content-Type", "application/json");
+					channelsDepthRequest.body(data);
+					// get the request response.
+					channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
+				}
+			} else {
+				JSONObject payloadJSON = new JSONObject(payload);
+				if (payloadJSON.has("logData")) {
+					String sortDesc = "true";
+					data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
+					// create with POST
+					channelsDepthEndPoint = this.getEndpoint("logTimePath");
 					channelsDepthRequest = Unirest.post(channelsDepthEndPoint);
 					channelsDepthRequest.header("Content-Type", "application/json");
 					channelsDepthRequest.body(data);
@@ -1254,7 +1254,7 @@ public class DotDelegator {
 					String sortDesc = "true";
 					data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
 					// create with POST
-					channelsDepthEndPoint = this.getEndpoint("logTimePath");
+					channelsDepthEndPoint = this.getEndpoint("logTimeBoundaryPath");
 					channelsDepthRequest = Unirest.post(channelsDepthEndPoint);
 					channelsDepthRequest.header("Content-Type", "application/json");
 					channelsDepthRequest.body(data);
