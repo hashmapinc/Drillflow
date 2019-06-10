@@ -1207,7 +1207,7 @@ public class DotDelegator {
 
 			if (indexType.equals("depth")) {
 				JSONObject payloadJSON = new JSONObject(payload);
-				if (payloadJSON.has("logData")) {
+/*				if (payloadJSON.has("logData")) {
 					String sortDesc = "true";
 					data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
 					// create with POST
@@ -1217,7 +1217,7 @@ public class DotDelegator {
 					channelsDepthRequest.body(data);
 					// get the request response.
 					channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
-				}else{
+				}else{*/
 					String sortDesc = "true";
 					data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
 					// create with POST
@@ -1227,10 +1227,10 @@ public class DotDelegator {
 					channelsDepthRequest.body(data);
 					// get the request response.
 					channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
-				}
+				//}
 			} else {
 				JSONObject payloadJSON = new JSONObject(payload);
-				if (payloadJSON.has("logData")) {
+				//if (payloadJSON.has("logData")) {
 					String sortDesc = "true";
 					data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
 					// create with POST
@@ -1240,7 +1240,7 @@ public class DotDelegator {
 					channelsDepthRequest.body(data);
 					// get the request response.
 					channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
-				}{
+				/*}{
 					String sortDesc = "true";
 					data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
 					// create with POST
@@ -1250,7 +1250,7 @@ public class DotDelegator {
 					channelsDepthRequest.body(data);
 					// get the request response.
 					channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
-				}
+				}*/
 
 
 			}
@@ -1263,7 +1263,8 @@ public class DotDelegator {
 			try {
 				String wellSearchEndpoint = this.getEndpoint("wellsearch");
 				String wellBoreSearchEndpoint = this.getEndpoint("wellboresearch");
-				finalResponse = LogConverterExtended.convertDotResponseToWitsml(wellSearchEndpoint,wellBoreSearchEndpoint,client,username,password,exchangeID, witsmlObject,allChannelSet.getBody(),
+				finalResponse = LogConverterExtended.convertDotResponseToWitsml
+						(wellSearchEndpoint,wellBoreSearchEndpoint,client,username,password,exchangeID, witsmlObject,allChannelSet.getBody(),
 						channels,channelData);
 			} catch (Exception e) {
 				LOG.info(ValveLogging.getLogMsg(
