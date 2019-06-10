@@ -62,8 +62,11 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
      */
 
     public static ObjLog convertDotResponseToWitsml(String wellSearchEndpoint,String wellBoreSearchEndpoint,DotClient client, String username,
-                                                    String password, String exchangeID,AbstractWitsmlObject witsmlObject,String channelSet, List<Channel> channels,String channelsDepthResponse) throws JsonParseException,
-            JsonMappingException, IOException, DatatypeConfigurationException, ParseException,ValveException, ValveAuthException, UnirestException {
+                                                    String password, String exchangeID,AbstractWitsmlObject witsmlObject,String channelSet,
+                                                    List<Channel> channels,String channelsDepthResponse,JSONObject payloadJSON)
+                                                    throws JsonParseException, JsonMappingException, IOException,
+                                                    DatatypeConfigurationException, ParseException,ValveException, ValveAuthException,
+                                                    UnirestException {
         List<ChannelSet> cs = ChannelSet.jsonToChannelSetList(channelSet);
         ObjLog log = ChannelSet.to1411(cs.get(0));
         log.setNameWell(getWellName( wellSearchEndpoint,client,  username,password,  exchangeID,witsmlObject));
@@ -72,9 +75,7 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
         List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> lcis = Channel.to1411(channels);
         log.setLogCurveInfo(lcis);
         // Code added to build log data response
-        //Todo construct LogData from response
-
-        if (channelsDepthResponse != null) {
+        if (channelsDepthResponse != null && payloadJSON.has("logData")) {
             JSONObject logDataJsonObject = new JSONObject(channelsDepthResponse);
             List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData> curves = new ArrayList<>();
 
