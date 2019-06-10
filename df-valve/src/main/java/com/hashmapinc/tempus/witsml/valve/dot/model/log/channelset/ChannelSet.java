@@ -682,7 +682,7 @@ public class ChannelSet {
         wmlLog.setNullValue(channelSet.getNullValue());
         wmlLog.setObjectGrowing(channelSet.getObjectGrowing());
         wmlLog.setLogParam(LogParam.to1411(channelSet.getLogParam()));
-       // TODO set commonData
+       // TODO set commonData to make sure its to come with GetFromStore
 
         if (channelSet.getTimeDepth().toLowerCase().contains("depth")) {
             if (channelSet.getStartIndex() != null){
