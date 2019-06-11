@@ -20,14 +20,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
-import com.hashmapinc.tempus.WitsmlObjects.v1311.GenericMeasure;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ShortNameStruct;
+import com.hashmapinc.tempus.witsml.valve.ValveException;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.*;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -252,12 +251,16 @@ public class Channel {
     }
 
     @JsonProperty("classIndex")
+    //@JsonDeserialize(using = ClassIndexDeserializer.class)
     public Short getClassIndex() {
         return classIndex;
     }
 
     @JsonProperty("classIndex")
-    public void setClassIndex(Short classIndex) { this.classIndex = classIndex; }
+    //@JsonDeserialize(using = ClassIndexDeserializer.class)
+    public void setClassIndex(Short classIndex) {
+        this.classIndex = classIndex;
+    }
 
     @JsonProperty("mnemAlias")
     public MnemAlias getMnemAlias() {
@@ -628,9 +631,6 @@ public class Channel {
             try {
                 Channel channel = new Channel();
 
-                //channel.setMinIndex(lci.getMinIndex());
-                //channel.setMaxIndex(lci.getMaxIndex());
-
                 Citation c = new Citation();
                 c.setTitle(lci.getMnemonic().getValue());
 
@@ -638,6 +638,16 @@ public class Channel {
                 channel.setUid(lci.getUid());
                 channel.setNamingSystem(lci.getMnemonic().getNamingSystem());
                 channel.setMnemonic(lci.getMnemonic().getValue());
+
+                if (witsmlObj.getIndexType() != null) {
+                    if (witsmlObj.getIndexType().toLowerCase().contains("depth")) {
+                        channel.setTimeDepth("Depth");
+                    } else {
+                        if (witsmlObj.getIndexType().toLowerCase().contains("time"))
+                            channel.setTimeDepth("Time");
+                    }
+                }
+
 
                 channel.setClassIndex(lci.getClassIndex());
 
@@ -740,9 +750,6 @@ public class Channel {
                 lci.setMnemonic(name);
                 lci.setAlternateIndex(c.getAlternateIndex());
                 lci.setClassWitsml(c.getClassWitsml());
-                //NOTE: WE WILL ALWAYS SET THE INDEX TO THE FIRST COLUMN
-                // Card #460 -- needs the right value,
-                //              not just zero for the index to the first column
                 lci.setClassIndex(c.getClassIndex());
                 lci.setCurveDescription(c.getCitation().getDescription());
                 lci.setDataSource(c.getSource());
@@ -758,7 +765,7 @@ public class Channel {
                 lci.setSensorOffset(SensorOffset.to1411(c.getSensorOffset()));
                 lci.setWellDatum(WellDatum.to1411(c.getWellDatum()));
                 lci.setClassIndex(c.getClassIndex());
-                if (c.getTimeDepth().toLowerCase().contains("depth")){
+                if (c.getTimeDepth().toLowerCase().contains("time")){
                     if (c.getStartIndex() != null)
                         lci.setMinDateTimeIndex(convertIsoDateToXML(c.getStartIndex()));
                     if (c.getEndIndex() != null)
@@ -829,7 +836,7 @@ public class Channel {
                 lci.setDensData(DensData.to1311(c.getDensData()));
                 lci.setSensorOffset(SensorOffset.to1311(c.getSensorOffset()));
                 lci.setWellDatum(WellDatum.to1311(c.getWellDatum()));
-
+/*
                 if (c.getTimeDepth().toLowerCase().contains("depth")){
                     lci.setMinDateTimeIndex(convertIsoDateToXML(c.getStartIndex()));
                     lci.setMaxDateTimeIndex(convertIsoDateToXML(c.getEndIndex()));
@@ -843,7 +850,7 @@ public class Channel {
                     maxMeasure.setValue(Double.parseDouble(c.getEndIndex()));
                     lci.setMaxIndex(maxMeasure);
                 }
-
+*/
                 curves.add(lci);
             } catch (Exception ex){
                 continue;
@@ -852,29 +859,32 @@ public class Channel {
         return curves;
     }
 
+
     public static String channelListToJson(List<Channel> channels) throws JsonProcessingException {
         ObjectMapper om = new ObjectMapper();
         om.setDateFormat(new StdDateFormat());
         return om.writerWithDefaultPrettyPrinter().writeValueAsString(channels);
     }
 
-    public static List<Channel> jsonToChannelList(String channelsList){
+    public static List<Channel> jsonToChannelList(String channelsList) throws ValveException {
         return fromJSON(new TypeReference<List<Channel>>() {}, channelsList);
     }
 
-    public static <T> T fromJSON(final TypeReference<T> type, final String jsonPacket) {
+    public static <T> T fromJSON(final TypeReference<T> type, final String jsonPacket) throws ValveException {
         T data = null;
 
         try {
             data = new ObjectMapper().readValue(jsonPacket, type);
         } catch (Exception e) {  // Handle the problem
+            throw new ValveException(e.getMessage());
         }
         return data;
     }
 
     private static XMLGregorianCalendar convertIsoDateToXML(String dateTime)
             throws DatatypeConfigurationException, ParseException {
-        DateFormat format = new SimpleDateFormat("yyyy-MM-ddThh:mm:ss.SSSXXX");
+        //DateFormat format = new SimpleDateFormat("yyyy-MM-ddThh:mm:ss.SSSXXX");
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
         //Date date = format.parse("2014-04-24 11:15:00");
         Date date = format.parse(dateTime);
 
@@ -895,7 +905,7 @@ public class Channel {
                 Objects.equals(uid, channel.uid) &&
                 Objects.equals(wellDatum, channel.wellDatum) &&
                 Objects.equals(nullValue, channel.nullValue) &&
-                // TODO Verify this works for both v1311 & v1411
+                Objects.equals(channelState, channel.channelState) &&
                 Objects.equals(classIndex, channel.classIndex) &&
                 Objects.equals(mnemAlias, channel.mnemAlias) &&
                 Objects.equals(alternateIndex, channel.alternateIndex) &&

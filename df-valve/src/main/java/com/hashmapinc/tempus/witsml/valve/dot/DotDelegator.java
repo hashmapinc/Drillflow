@@ -17,8 +17,10 @@ package com.hashmapinc.tempus.witsml.valve.dot;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogCurveInfo;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.ShortNameStruct;
 import com.hashmapinc.tempus.witsml.ValveLogging;
 import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
@@ -39,7 +41,6 @@ import com.mashape.unirest.request.HttpRequestWithBody;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -69,13 +70,14 @@ public class DotDelegator {
 	private final String TRAJECTORY_GQL_PATH;
 	private final String LOG_PATH;
 	private final String LOG_CHANNEL_PATH;
-	private final String LOG_CHANNELSET_METADATA;
 	private final String LOG_CHANNELSET_UUID;
 	private final String LOG_CHANNELS;
 	private final String LOG_CHANNEL_DATA;
 	private final String LOG_MNEMONIC_PATH;
 	private final String LOG_DEPTH_PATH;
 	private final String LOG_TIME_PATH;
+	private final String LOG_DEPTH_BOUNDARY_PATH;
+	private final String LOG_TIME_BOUNDARY_PATH;
 
 
 	private final int CREATE_CS_LOG = 1;
@@ -96,14 +98,14 @@ public class DotDelegator {
 		this.TRAJECTORY_GQL_PATH = config.get("trajectory.gql.path");
 		this.LOG_PATH = config.get("log.channelset.path");
 		this.LOG_CHANNEL_PATH = config.get("log.channel.path");
-		this.LOG_CHANNELSET_METADATA = config.get("log.channelset.metadata.path");
 		this.LOG_CHANNELSET_UUID = config.get("log.channelset.uuid.path");
 		this.LOG_CHANNELS = config.get("log.channels.path");
 		this.LOG_CHANNEL_DATA = config.get("log.channels.data.path");
 		this.LOG_MNEMONIC_PATH = config.get("log.mnemonic.data.path");
 		this.LOG_DEPTH_PATH = config.get("log.channel.depthData.path");
-		this.LOG_TIME_PATH = config.get("log.channel.depthData.path");
-
+		this.LOG_TIME_PATH = config.get("log.channel.timeData.path");
+		this.LOG_DEPTH_BOUNDARY_PATH = config.get("log.channel.depthBoundaryData.path");
+		this.LOG_TIME_BOUNDARY_PATH = config.get("log.channel.timeBoundaryData.path");
 	}
 
 	/**
@@ -114,6 +116,7 @@ public class DotDelegator {
 	 * @throws ValveException
 	 */
 	private String getEndpoint(String objectType) throws ValveException {
+
 		// get endpoint
 		String endpoint;
 		switch (objectType) {
@@ -141,9 +144,6 @@ public class DotDelegator {
 		case "logChannel":
 			endpoint = this.LOG_CHANNEL_PATH;
 			break;
-		case "channelsetmetadata":
-			endpoint = this.LOG_CHANNELSET_METADATA;
-			break;
 		case CHANNELSET_UUID:
 			endpoint = this.LOG_CHANNELSET_UUID;
 			break;
@@ -161,6 +161,12 @@ public class DotDelegator {
 				break;
 		case "logTimePath":
 				endpoint = this.LOG_TIME_PATH;
+				break;
+		case "logDepthBoundaryPath":
+				endpoint = this.LOG_DEPTH_BOUNDARY_PATH;
+				break;
+		case "logTimeBoundaryPath":
+				endpoint = this.LOG_TIME_BOUNDARY_PATH;
 				break;
 		default:
 			throw new ValveException("Unsupported object type<" + objectType + ">");
@@ -224,6 +230,9 @@ public class DotDelegator {
 			if (logCurveInfosize != 0) {
 				logCurveInfoUid = ((ObjLog) witsmlObj).getLogCurveInfo().get(0).getUid();
 				uuid = getUUID(uid,witsmlObj,client,username,password);
+				if (uuid == null){
+					throw new ValveException("", (short)-433);
+				}
 				// Build Request for Get Channels
 				channelsEndPoint = this.getEndpoint("channels");
 				channelsRequest = Unirest.get(channelsEndPoint);
@@ -260,7 +269,10 @@ public class DotDelegator {
 				}
 			}else{
 				uuid = getUUID(uid,witsmlObj,client,username,password);
-				String logDeletEndpoint = this.getEndpoint("channelsetmetadata");
+				if (uuid == null){
+					throw new ValveException("Not Found", (short)-433);
+				}
+				String logDeletEndpoint = this.getEndpoint(LOG_OBJECT);
 				logDeletEndpoint = logDeletEndpoint + "/" + uuid;
 				HttpRequest logDeleteRequest = Unirest.delete(logDeletEndpoint).header("Content-Type",
 						"application/json");
@@ -322,7 +334,10 @@ public class DotDelegator {
 		}
 		if ("log".equals(objectType)) {
 				uuid = getUUID(uid,witsmlObj,client,username,password);
-				String logElementDeletEndpoint = this.getEndpoint("channelsetmetadata");
+				if (uuid == null){
+					throw new ValveException("Not Found", (short)-433);
+				}
+				String logElementDeletEndpoint = this.getEndpoint(LOG_OBJECT);
 				logElementDeletEndpoint = logElementDeletEndpoint + "/" + uuid;
 				request = Unirest.patch(logElementDeletEndpoint).header("Content-Type", "application/json");
 				payload = JsonUtil.removeEmptyArrays(new JSONObject(payload));
@@ -398,6 +413,9 @@ public class DotDelegator {
 			// TODO Redis -- caching Wrapper for Traj -- to prepare for caching
 			//               went looking, but couldn't find this -- where is it?
 			uuid = getUuid(witsmlObj, uid, client, username, password);
+			if (uuid == null){
+				throw new ValveException("Not Found", (short)-433);
+			}
 
 			// TODO check if there is anything to update with Redis cache
 			//		for the payload object with cache object
@@ -559,6 +577,8 @@ public class DotDelegator {
 		} else {
 			// make the call to get uuid, and put it in cache for next time
 			uuid = getUUID(uid, witsmlObj, client, username, password);
+			if (uuid == null)
+				return null;
 			UidUuidCache.putInCache( uuid,
 									 uid,
 									 witsmlObj.getParentUid(),
@@ -705,7 +725,6 @@ public class DotDelegator {
 																   ValveAuthException,
 											   					   UnirestException
 	{
-		HttpResponse<String> response;
 		String objectType = witsmlObj.getObjectType();
 		String uid = witsmlObj.getUid();
 		String version = witsmlObj.getVersion();
@@ -725,45 +744,59 @@ public class DotDelegator {
 												witsmlObj );
 
 		// set-up for channel set creation
-		// endpoint: .../channelSets
+		// endpoint url: /channelSets
 		endpoint = this.getEndpoint(objectType);
-		// parameters for url
+		// ... parameters for url
 		requestParams = new HashMap<>();
 		requestParams.put("uid", uid);
 		requestParams.put("uidWellbore", witsmlObj.getParentUid());
 		requestParams.put("uidWell", witsmlObj.getGrandParentUid());
 
+		/*
 		// call a central method to finish the REST set-up
 		// and execute the rest call for ChannelSet
-		response = performRestCall( // everything below is what has been created
-									// by this method
-									CREATE_CS_LOG,
-								    allPayloads[CS_IDX_4_PAYLOADS],
-									endpoint,
-									requestParams,
-									// everything below is what was passed into
-									// this method
-									client,
-									username,
-									password,
-									witsmlObj,
-									exchangeID );
+
+		HttpRequestWithBody requestCS=null;
+		responseCS = performRestCall( requestCS,
+									  allPayloads[CS_IDX_4_PAYLOADS],
+									  endpoint,
+									  requestParams,
+									  client,
+									  username,
+									  password,
+									  witsmlObj,
+									  exchangeID );
+		*/
+
+		HttpRequestWithBody requestCS = Unirest.post(endpoint);
+		requestCS.header("Content-Type", "application/json");
+		requestCS.body(payload);
+		// place the request parameters, if any, into the request
+		if (!requestParams.isEmpty()) {
+			requestParams.forEach(
+					(key, value) -> { requestCS.queryString(key, value); }
+			);
+		}
+
+		LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(requestCS), witsmlObj));
+
+		HttpResponse<String> responseCS = client.makeRequest(requestCS, username, password);
 
 		// check response status
-		int status = response.getStatus();
+		int status = responseCS.getStatus();
 		if (409 == status) {
 			LOG.info( ValveLogging.getLogMsg( exchangeID,
-										      logResponse( response,
+										      logResponse( responseCS,
 													      "Log already in store" ),
 											  witsmlObj) );
 			throw new ValveException("Log already in store", (short) -405);
 		}
 
-		// actually a 201 per API is success...
+		// actually a 201 per API is success
 		if (201 == status) {
 			LOG.info(ValveLogging.getLogMsg(
 					exchangeID,
-					logResponse(response,
+					logResponse(responseCS,
 								"Received successful "
 									+ "status code from DoT create call"),
 					witsmlObj));
@@ -788,16 +821,18 @@ public class DotDelegator {
 				endpoint = this.getEndpoint(objectType + "Channel");
 				endpoint = endpoint + "/metadata";
 				// get the uuid for the channelSet just created from the response
-				String uuid4CS = new JsonNode(response.getBody())
-															.getObject()
+				String uuid4CS = new JsonNode(responseCS.getBody())
+																 .getObject()
 																 .getString("uuid");
 
 				requestParams = new HashMap<>();
 				requestParams.put("channelSetUuid", uuid4CS);
+
+				/*
 				// call a central method to finish the REST set-up
-				// and execute the rest call for ChannelSet
-				response = performRestCall( CREATE_CHANNELS_LOG,
-											allPayloads[CHANNELS_IDX_4_PAYLOADS],
+				// and execute the rest call for Channels
+				HttpResponse<String> responseCHs;
+				responseCHs = performRestCall( allPayloads[CHANNELS_IDX_4_PAYLOADS],
 											endpoint,
 											requestParams,
 											client,
@@ -805,24 +840,37 @@ public class DotDelegator {
 											password,
 											witsmlObj,
 											exchangeID );
+				*/
+
+				HttpRequestWithBody requestCHs = Unirest.post(endpoint);
+				requestCHs.header("Content-Type", "application/json");
+				requestCHs.body(payload);
+				// place the request parameters, if any, into the request
+				if (!requestParams.isEmpty()) {
+					requestParams.forEach(
+							(key, value) -> { requestCHs.queryString(key, value); }
+					);
+				}
+
+				LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(requestCHs), witsmlObj));
+
+				HttpResponse<String> responseCHs = client.makeRequest(requestCHs, username, password);
 
 				// check response status
-				status = response.getStatus();
+				status = responseCHs.getStatus();
 				if (200 == status) {
 					LOG.info(ValveLogging.getLogMsg( exchangeID,
-														logResponse(response,
-																   "Received successful " +
+													 logResponse(responseCHs,
+															    "Received successful " +
 																		   "status code from DoT create call"),
-																    witsmlObj));
+																 witsmlObj));
 					// TODO: cache the channels
 
 					// .../channels/data?channelSetUuid={channelSetUuid}
 					endpoint = this.getEndpoint("channelData");
-					// Use same requestParams as for the previous call (channelSetUuid={channelSetUuid})
-					// call a central method to finish the REST set-up
-					// and execute the rest call for ChannelSet
-					response = performRestCall( CREATE_DATA_LOG,
-											    allPayloads[DATA_IDX_4_PAYLOADS],
+					/*
+					HttpResponse<String> responseData;
+					responseData = performRestCall( allPayloads[DATA_IDX_4_PAYLOADS],
 												endpoint,
 												requestParams,
 												client,
@@ -830,83 +878,54 @@ public class DotDelegator {
 												password,
 												witsmlObj,
 												exchangeID );
+					*/
+
+					HttpRequestWithBody requestData = Unirest.post(endpoint);
+					requestData.header("Content-Type", "application/json");
+					requestData.body(payload);
+					// Use same requestParams as for the previous call
+					// (channelSetUuid={channelSetUuid})
+					// place the request parameters, if any, into the request
+					if (!requestParams.isEmpty()) {
+						requestParams.forEach(
+								(key, value) -> { requestData.queryString(key, value); }
+						);
+					}
+
+					LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(requestData), witsmlObj));
+
+					HttpResponse<String> responseData = client.makeRequest(requestCS, username, password);
+
+
 					// check response status
-					status = response.getStatus();
+					status = responseData.getStatus();
 					// actually this requires a 200...
 					if (200 == status) {
 						LOG.info(ValveLogging.getLogMsg( exchangeID,
-														 logResponse(response,
+														 logResponse(responseData,
 											   						"Received successful "
 																			+ "status code from DoT add data call"),
 																	 witsmlObj));
-						// TODO Remove data check once code confidence increases
-						// perform a data check
-						String indexType="";
-						JSONObject payloadAsJsonObj = new JSONObject(payload);
-						if (payloadAsJsonObj.has("indexType")) {
-							indexType = payloadAsJsonObj.getString("indexType");
-
-							JSONObject payloadForDataFetch = new JSONObject();
-							payloadForDataFetch.put("containerId", uuid4CS);
-							JSONArray channelsArray = new JSONArray();
-							JSONObject channelObj = new JSONObject();
-							channelObj.put("name", "ECD");
-							channelsArray.put(channelObj);
-							payloadForDataFetch.put("channels", channelsArray);
-							if (payloadAsJsonObj.has("indexUnit")) {
-								payloadForDataFetch.put("indexUnit",
-										payloadAsJsonObj.get("indexUnit"));
-							}
-							payloadForDataFetch.put("sortDesc", "true");
-							if (indexType.equals("date time")) {
-								// endpoint: https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/channels/timedata
-								endpoint = this.getEndpoint(objectType + "Channel");
-								endpoint = endpoint.substring(0, endpoint.indexOf("witsml")) + "channels";
-								endpoint = endpoint + "/timedata";
-								HttpRequestWithBody request = Unirest.post(endpoint);
-								request = Unirest.post(endpoint);
-								request.header("Content-Type", "application/json");
-								request.body(payloadForDataFetch);
-								// get the channelSetRequest response
-								response = client.makeRequest(request, username, password);
-							} else {
-								if (indexType.equals("depth")) {
-									// endpoint: https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/channels/depthdata
-									endpoint = this.getEndpoint(objectType + "Channel");
-									endpoint = endpoint.substring(0, endpoint.indexOf("witsml")) + "channels";
-									endpoint = endpoint + "/depthdata";
-									HttpRequestWithBody request = Unirest.post(endpoint);
-									request = Unirest.post(endpoint);
-									request.header("Content-Type", "application/json");
-									request.body(payloadForDataFetch);
-									// get the channelSetRequest response
-									response = client.makeRequest(request, username, password);
-								}
-							}
-							// check response status
-							status = response.getStatus();
-							// actually this requires a 200...
-							if (200 == status) {
-								System.out.println(response.getBody());
-							}
-						}
 					} else {
 						LOG.warning(ValveLogging.getLogMsg(exchangeID,
-								logResponse(response, "Received " + status + " from DoT POST" + response.getBody()), witsmlObj));
-						throw new ValveException(response.getBody());
+								logResponse(responseData,
+										   "Received " + status + " from DoT POST"
+												   + responseData.getBody()),
+										   witsmlObj));
+						throw new ValveException(responseData.getBody());
 					}
 				}
 
 			}
-			return (null == uid || uid.isEmpty()) ? new JsonNode(response.getBody()).getObject().getString("uid") :
+			return (null == uid || uid.isEmpty()) ? new JsonNode(responseCS.getBody()).getObject().getString("uid") :
 												    uid;
 		} else {
 			LOG.warning(ValveLogging.getLogMsg(exchangeID,
-					logResponse( response,
+					logResponse( responseCS,
 							 	"Received " + status +
-										" from DoT POST" + response.getBody()),
+										" from DoT POST" + responseCS.getBody()),
 								 witsmlObj));
-			throw new ValveException(response.getBody());
+			throw new ValveException(responseCS.getBody());
 		}
 	}
 
@@ -924,7 +943,8 @@ public class DotDelegator {
 	 * @throws UnirestException
 	 * @throws ValveException
 	 */
-	public HttpResponse<String> performRestCall( int createWhichPartOfLog,
+	/*
+	public HttpResponse<String> performRestCall( HttpRequestWithBody request,
 												 String payload,
 												 String endpoint,
 												 HashMap<String,String> requestParams,
@@ -941,7 +961,7 @@ public class DotDelegator {
 		// CS endpoint:    .../channelSets?uid={uid}&uidWellbore={uidWellbore}&uidWell={uidWell}
 		// Channels endpt: .../channels/metadata?channelSetUuid={channelSetUuid}
 		// Data endpoint:  .../channels/data?channelSetUuid={channelSetUuid}
-		HttpRequestWithBody request = Unirest.post(endpoint);
+		request = Unirest.post(endpoint);
 		request.header("Content-Type", "application/json");
 		request.body(payload);
 		// place the request parameters, if any, into the request
@@ -953,11 +973,11 @@ public class DotDelegator {
 
 		LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(request), witsmlObj));
 
-		// return the response
 		HttpResponse<String> response = client.makeRequest(request, username, password);
 		return response;
 
 	}
+	*/
 
 	/**
 	 * creates an array of payloads:
@@ -1046,16 +1066,15 @@ public class DotDelegator {
 	}
 
 	/**
-	 * Submits the query to the DoT rest APIs for object GETing
+	 * Submits the query to the DoT rest API for object GETing
 	 *
-	 * @param witsmlObject - AbstractWitsmlObject with GET request
-	 * @param username     - username for authentication
-	 * @param password     - password for authentication
-	 * @param exchangeID   - unique string for tracking which exchange
-	 *                       called this method
-	 * @param client       - DotClient for request execution
-	 *
-	 * @return AbstractWitsmlObject - containing GET response from DoT
+	 * @param witsmlObject - AbstractWitsmlObject to get
+	 * @param username     - auth username
+	 * @param password     - auth password
+	 * @param exchangeID   - unique string for tracking which exchange called this
+	 *                     method
+	 * @param client       - DotClient to execute requests with
+	 * @return get results AbstractWitsmlObject
 	 */
 	public AbstractWitsmlObject getObject(AbstractWitsmlObject witsmlObject,
 										  String username,
@@ -1065,13 +1084,13 @@ public class DotDelegator {
 										  Map<String, String> optionsIn)
 												throws ValveException,
 													   ValveAuthException,
-													   UnirestException,
-													   JAXBException {
+													   UnirestException
+	{
 		String uid = witsmlObject.getUid();
 		String objectType = witsmlObject.getObjectType();
-		String endpoint;
-		String uuid;
-		String finalResponse;
+		String endpoint = "";
+		String uuid = "";
+		String finalResponse = null;
 
 		// ************************************* ChannelSet ************************************* //
 		// endpoint url: /channelSets{uid}
@@ -1097,8 +1116,30 @@ public class DotDelegator {
 
 
 		if ("log".equals(objectType)) {
+			boolean shouldGetData = false;
+			boolean getAllChannels = false;
+			if (optionsIn.containsKey("returnElements") && optionsIn.get("returnElements").equals("all")){
+				shouldGetData = true;
+				getAllChannels = true;
+			} else {
+				if (witsmlObject.getVersion().equals("1.3.1.1")) {
+					com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog log = (com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObject;
+					if (log.getLogData() != null) {
+						shouldGetData = true;
+					}
+				} else {
+					com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog log = (com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) witsmlObject;
+					if (log.getLogData() != null) {
+						shouldGetData = true;
+					}
+				}
+			}
+
 			uuid = getUUID(uid,witsmlObject,client,username,password);
-			finalResponse =  getFromStoreRestCalls(witsmlObject,client,uuid,username,password,exchangeID);
+			if (uuid == null)
+				return null;
+
+			finalResponse =  getFromStoreRestCalls(witsmlObject,client,uuid,username,password,exchangeID,shouldGetData, getAllChannels);
 			return DotTranslator.translateQueryResponse(witsmlObject, finalResponse, optionsIn);
 
 		}else{
@@ -1134,7 +1175,9 @@ public class DotDelegator {
                                           String uuid,
                                           String username,
 										  String password,
-                                          String exchangeID)
+                                          String exchangeID,
+										  boolean getData,
+										  boolean getAllChannels)
 			                                    throws ValveException,
                                                        ValveAuthException,
                                                        UnirestException
@@ -1151,21 +1194,29 @@ public class DotDelegator {
 		HttpResponse<String> channelsResponse;
 		String channelsDepthEndPoint;
 		HttpRequestWithBody channelsDepthRequest;
-		HttpResponse<String> channelsDepthResponse;
+		HttpResponse<String> channelsDepthResponse = null;
 		ObjLog finalResponse1411 = null;
-        com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog finalResponse1311 = null;
+		com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog finalResponse1311 = null;
 		String data;
-		String indexType = "";
+		String indexType="";
 		String version = witsmlObject.getVersion();
 
+		// get object as payload string
+		String payload;
+		if ("1.4.1.1".equals(version)) {
+			payload = witsmlObject.getJSONString("1.4.1.1");
+		} else {
+			payload = witsmlObject.getJSONString("1.3.1.1");
+		}
+		payload = JsonUtil.removeEmpties(new JSONObject(payload));
+
 		// Build Request for Get ChannelSet Metadata
-		channelsetmetadataEndpoint = this.getEndpoint("channelsetmetadata");
+		channelsetmetadataEndpoint = this.getEndpoint(LOG_OBJECT);
 		channelsetmetadataEndpoint = channelsetmetadataEndpoint + "/" + uuid;
 		channelsetmetadataRequest = Unirest.get(channelsetmetadataEndpoint);
 		channelsetmetadataRequest.header("accept", "application/json");
 		// get response
 		channelsetmetadataResponse = client.makeRequest(channelsetmetadataRequest, username, password);
-
 		// Build Request for Get All ChannelSet
 		channelsetuuidEndpoint = this.getEndpoint("log");
 		channelsetuuidRequest = Unirest.get(channelsetuuidEndpoint);
@@ -1173,9 +1224,7 @@ public class DotDelegator {
 		channelsetuuidRequest.queryString("containerId", uuid);
 		// get response
 		allChannelSet = client.makeRequest(channelsetuuidRequest, username, password);
-
 		List<ChannelSet> cs = ChannelSet.jsonToChannelSetList(allChannelSet.getBody());
-
 		for (ChannelSet channelSet : cs) {
 			try{
 				if (channelSet.getTimeDepth().toLowerCase().contains("depth")) {
@@ -1187,7 +1236,6 @@ public class DotDelegator {
 				continue;
 			}
 		}
-
 		// Build Request for Get Channels
 		channelsEndPoint = this.getEndpoint("channels");
 		channelsRequest = Unirest.get(channelsEndPoint);
@@ -1195,29 +1243,94 @@ public class DotDelegator {
 		channelsRequest.queryString("channelSetUuid", uuid);
 		// get response
 		channelsResponse = client.makeRequest(channelsRequest, username, password);
-
 		List<Channel> channels = Channel.jsonToChannelList(channelsResponse.getBody());
+		if (!getAllChannels)
+			channels = filterChannelsBasedOnRequest(channels, witsmlObject);
 		// Build Request for Get Channels Depth
-		if(indexType.equals("depth")){
-			String sortDesc = "true";
-			data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels,uuid,sortDesc);
-			// create with POST
-			channelsDepthEndPoint = this.getEndpoint("logDepthPath");
-			channelsDepthRequest = Unirest.post(channelsDepthEndPoint);
-			channelsDepthRequest.header("Content-Type", "application/json");
-			channelsDepthRequest.body(data);
-			// get the request response.
-			channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
-		}else{
-			String sortDesc = "true";
-			data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels,uuid,sortDesc);
-			// create with POST
-			channelsDepthEndPoint = this.getEndpoint("logTimePath");
-			channelsDepthRequest = Unirest.post(channelsDepthEndPoint);
-			channelsDepthRequest.header("Content-Type", "application/json");
-			channelsDepthRequest.body(data);
-			// get the request response.
-			channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
+		String channelData = null;
+		if (getData) {
+			String startIndex = null;
+			String endIndex = null;
+
+			if ("1.3.1.1".equals(witsmlObject.getVersion())){
+				if (((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getStartDateTimeIndex() != null){
+					startIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getStartDateTimeIndex().toXMLFormat();
+				} else if (((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getStartIndex() != null &&
+						((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getStartIndex().getValue() != null){
+					startIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getStartIndex().getValue().toString();
+				}
+				if (((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getEndDateTimeIndex() != null){
+					endIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getEndDateTimeIndex().toXMLFormat();
+				} else if (((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getEndIndex() != null&&
+						((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getEndIndex().getValue() != null){
+					endIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getEndIndex().getValue().toString();
+				}
+			} else if ("1.4.1.1".equals(witsmlObject.getVersion())) {
+				if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getStartDateTimeIndex() != null){
+					startIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getStartDateTimeIndex().toXMLFormat();
+				} else if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getStartIndex() != null &&
+						((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getStartIndex().getValue() != null){
+					startIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getStartIndex().getValue().toString();
+				}
+				if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getEndDateTimeIndex() != null){
+					endIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getEndDateTimeIndex().toXMLFormat();
+				} else if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getEndIndex() != null &&
+						((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getEndIndex().getValue() != null){
+					endIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getEndIndex().getValue().toString();
+				}
+			}
+			// TODO  To work for logData Filter
+
+			if (indexType.equals("depth")) {
+				JSONObject payloadJSON = new JSONObject(payload);
+/*				if (payloadJSON.has("logData")) {
+					String sortDesc = "true";
+					data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
+					// create with POST
+					channelsDepthEndPoint = this.getEndpoint("logDepthBoundaryPath");
+					channelsDepthRequest = Unirest.post(channelsDepthEndPoint);
+					channelsDepthRequest.header("Content-Type", "application/json");
+					channelsDepthRequest.body(data);
+					// get the request response.
+					channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
+				}else{*/
+					String sortDesc = "true";
+					data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
+					// create with POST
+					channelsDepthEndPoint = this.getEndpoint("logDepthPath");
+					channelsDepthRequest = Unirest.post(channelsDepthEndPoint);
+					channelsDepthRequest.header("Content-Type", "application/json");
+					channelsDepthRequest.body(data);
+					// get the request response.
+					channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
+				//}
+			} else {
+				JSONObject payloadJSON = new JSONObject(payload);
+				//if (payloadJSON.has("logData")) {
+					String sortDesc = "true";
+					data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
+					// create with POST
+					channelsDepthEndPoint = this.getEndpoint("logTimePath");
+					channelsDepthRequest = Unirest.post(channelsDepthEndPoint);
+					channelsDepthRequest.header("Content-Type", "application/json");
+					channelsDepthRequest.body(data);
+					// get the request response.
+					channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
+				/*}{
+					String sortDesc = "true";
+					data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
+					// create with POST
+					channelsDepthEndPoint = this.getEndpoint("logTimeBoundaryPath");
+					channelsDepthRequest = Unirest.post(channelsDepthEndPoint);
+					channelsDepthRequest.header("Content-Type", "application/json");
+					channelsDepthRequest.body(data);
+					// get the request response.
+					channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
+				}*/
+
+
+			}
+			channelData = channelsDepthResponse.getBody();
 		}
 
 		if (201 == channelsetmetadataResponse.getStatus() || 200 == channelsetmetadataResponse.getStatus()
@@ -1274,6 +1387,134 @@ public class DotDelegator {
 			return null;
 	}
 
+
+	private List<Channel> filterChannelsBasedOnRequest(List<Channel> allChannels, AbstractWitsmlObject requestObject) throws ValveException{
+		List<Channel> requestedChannels = new ArrayList<>();
+
+		if (allChannels.size() == 0){
+			LOG.info("No channels returned for request");
+			return null;
+		}
+
+		if ("1.3.1.1".equals(requestObject.getVersion())) {
+			List<CsLogCurveInfo> infos =
+					((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) requestObject).getLogCurveInfo();
+
+			//if nothing was requested
+			if (infos.size() == 0)
+				return null;
+
+			if (infos.size() == 1 && infos.get(0).getMnemonic().isEmpty()){
+				return allChannels;
+			} else {
+				//extract index
+				String indexMnem = allChannels.get(0).getIndex().get(0).getMnemonic();
+				boolean alreadyRequested = false;
+				for (CsLogCurveInfo lci : infos){
+					if (lci.getMnemonic().equals(indexMnem)){
+						alreadyRequested = true;
+					}
+				}
+				if (!alreadyRequested){
+					//create index request
+					CsLogCurveInfo lci = new CsLogCurveInfo();
+					lci.setMnemonic(indexMnem);
+					infos.add(lci);
+				}
+			}
+		} else if ("1.4.1.1".equals(requestObject.getVersion())){
+			List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> infos =
+					((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) requestObject).getLogCurveInfo();
+
+			//if nothing was requested
+			if (infos.size() == 0)
+				return null;
+
+			if (infos.size() == 1 && infos.get(0).getMnemonic().getValue().isEmpty()){
+				return allChannels;
+			}else {
+				//extract index
+				String indexMnem = allChannels.get(0).getIndex().get(0).getMnemonic();
+				boolean alreadyRequested = false;
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo lci : infos){
+					if (lci.getMnemonic().getValue().equals(indexMnem)){
+						alreadyRequested = true;
+					}
+				}
+				if (!alreadyRequested){
+					//create index request
+					com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo lci
+							= new com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo();
+					ShortNameStruct sns = new ShortNameStruct();
+					sns.setValue(indexMnem);
+					lci.setMnemonic(sns);
+					infos.add(lci);
+				}
+			}
+		} else {
+			throw new ValveException("Unsupported WITSML version for Log");
+		}
+
+		for (Channel currentChannel : allChannels){
+			if ("1.3.1.1".equals(requestObject.getVersion())){
+				for (CsLogCurveInfo lci : ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) requestObject).getLogCurveInfo()){
+					if (lci.getMnemonic().equals(currentChannel.getMnemonic())){
+						if (currentChannel.getIndex().get(0).getIndexType().toLowerCase().contains("time")){
+							if (lci.getMaxDateTimeIndex() != null)
+								currentChannel.setEndIndex(lci.getMaxDateTimeIndex().toXMLFormat());
+							else
+								currentChannel.setEndIndex(null);
+							if (lci.getMinDateTimeIndex() != null)
+								currentChannel.setStartIndex(lci.getMaxDateTimeIndex().toXMLFormat());
+							else
+								currentChannel.setStartIndex(null);
+						} else {
+							if (lci.getMaxIndex() != null)
+								currentChannel.setEndIndex(lci.getMaxIndex().getValue().toString());
+							else
+								currentChannel.setEndIndex(null);
+							if (lci.getMinIndex() != null)
+								currentChannel.setStartIndex(lci.getMinIndex().getValue().toString());
+							else
+								currentChannel.setEndIndex(null);
+						}
+						requestedChannels.add(currentChannel);
+
+					}
+				}
+
+			} else if ("1.4.1.1".equals(requestObject.getVersion())){
+				for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo lci : ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) requestObject).getLogCurveInfo()){
+					if (lci.getMnemonic().getValue().equals(currentChannel.getMnemonic())){
+						if (currentChannel.getIndex().get(0).getIndexType().toLowerCase().contains("time")){
+							if (lci.getMaxDateTimeIndex() != null)
+								currentChannel.setEndIndex(lci.getMaxDateTimeIndex().toXMLFormat());
+							else
+								currentChannel.setEndIndex(null);
+							if (lci.getMinDateTimeIndex() != null)
+								currentChannel.setStartIndex(lci.getMinDateTimeIndex().toXMLFormat());
+							else
+								currentChannel.setStartIndex(null);
+						} else {
+							if (lci.getMaxIndex() != null)
+								currentChannel.setEndIndex(lci.getMaxIndex().getValue().toString());
+							else
+								currentChannel.setEndIndex(null);
+							if (lci.getMinIndex() != null)
+								currentChannel.setStartIndex(lci.getMinIndex().getValue().toString());
+							else
+								currentChannel.setStartIndex(null);
+						}
+						requestedChannels.add(currentChannel);
+					}
+				}
+			} else{
+				throw new ValveException("Unknown WITSML version for log");
+			}
+		}
+		return requestedChannels;
+	}
+
 	/**
 	 * Submits a search query to the DoT rest API for object GETing
 	 *
@@ -1293,6 +1534,10 @@ public class DotDelegator {
 			Map<String, String> optionsIn
 	) throws ValveException, ValveAuthException, UnirestException, IOException, DatatypeConfigurationException {
 		String objectType = witsmlObject.getObjectType();
+
+		if (objectType.equals("log"))
+			return performLogSearch(witsmlObject, username, password, exchangeID, client, optionsIn);
+
 		String endpoint = this.getEndpoint(objectType + "search");
 
 		String query;
@@ -1300,6 +1545,9 @@ public class DotDelegator {
 			//TODO: Shift to does not = well || wellbore
 			if ("trajectory".equals(objectType)) {
 				String wellboreUuid = getParentWellboreUUID(witsmlObject, exchangeID, client, username, password);
+				if (wellboreUuid == null){
+					return null;
+				}
 				query = GraphQLQueryConverter.getQuery(witsmlObject, wellboreUuid);
 			} else {
 				query = GraphQLQueryConverter.getQuery(witsmlObject);
@@ -1364,6 +1612,53 @@ public class DotDelegator {
 		}
 	}
 
+	private ArrayList<AbstractWitsmlObject> performLogSearch(AbstractWitsmlObject witsmlObject,
+															 String username,
+															 String password,
+															 String exchangeID,
+															 DotClient client,
+															 Map<String, String> optionsIn) throws ValveAuthException, UnirestException, ValveException {
+		String containerID = getParentWellboreUUID(witsmlObject, exchangeID, client, username, password);
+		if (containerID == null){
+			return null;
+		}
+		String logSearchEndpoint = this.getEndpoint(LOG_OBJECT);
+		HttpRequest logSearchRequest = Unirest.get(logSearchEndpoint);
+		logSearchRequest.queryString("containerId", containerID);
+		HttpResponse<String> logSearchResponse = client.makeRequest(logSearchRequest, username, password);
+
+		if (logSearchResponse.getStatus() != 200)
+			throw new ValveException("Error searching for logs in container " + containerID);
+
+		JSONArray foundChannelSets = new JSONArray(logSearchResponse.getBody());
+
+		if (foundChannelSets.length() == 0)
+			return null;
+
+		List<String> foundUuids = new ArrayList<>();
+		for (int i = 0; i < foundChannelSets.length(); i++){
+			JSONObject currentCS = (JSONObject)foundChannelSets.get(i);
+			foundUuids.add(currentCS.get("uuid").toString());
+		}
+
+		boolean getAllChannels = false;
+		if (optionsIn.containsKey("returnElements") && optionsIn.get("returnElements").equals("all")) {
+			getAllChannels = true;
+		}
+
+		ArrayList<AbstractWitsmlObject> logs = new ArrayList<>();
+		for (String uuid : foundUuids){
+			// Note never get data for a log search
+			String fullLog =  getFromStoreRestCalls(witsmlObject,client,uuid,username,password,exchangeID, false, getAllChannels);
+			DotTranslator.translateQueryResponse(witsmlObject, fullLog, optionsIn);
+			logs.add(DotTranslator.translateQueryResponse(witsmlObject, fullLog, optionsIn));
+		}
+		return logs;
+
+	}
+
+
+
 	/**
 	 *
 	 * @param wmlObject - trajectory or log child of the wellbore in question
@@ -1427,7 +1722,8 @@ public class DotDelegator {
 
 			// get the UUID of the first wellbore in the response
 			String wellboreUUID = GraphQLRespConverter.getWellboreUuidFromGraphqlResponse(new JSONObject(response.getBody()));
-
+			if (wellboreUUID == null)
+				return null;
 			// cache the wellbore uuid/uid
 			UidUuidCache.putInCache(wellboreUUID, wmlObject.getParentUid(), wmlObject.getGrandParentUid());
 
@@ -1523,6 +1819,8 @@ public class DotDelegator {
 			throw new ValveException("No log found for delete.");
 		}
 		JSONObject responseJson = new JSONObject(response.getBody());
+		if (!responseJson.has("uuid"))
+			return null;
 		uuid = responseJson.getString("uuid");
 		return uuid;
 	}
