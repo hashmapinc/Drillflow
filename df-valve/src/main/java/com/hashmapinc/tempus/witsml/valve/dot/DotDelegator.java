@@ -69,16 +69,16 @@ public class DotDelegator {
 	private final String WELL_GQL_PATH;
 	private final String WELLBORE_GQL_PATH;
 	private final String TRAJECTORY_GQL_PATH;
-	private final String LOG_PATH;
+	private final String LOG_CHANNELSET_PATH;
 	private final String LOG_CHANNEL_PATH;
-	private final String LOG_CHANNELSET_UUID;
-	private final String LOG_CHANNELS;
-	private final String LOG_CHANNEL_DATA;
+	private final String LOG_CHANNELSET_UUID_PATH;
+	private final String LOG_CHANNELS_PATH;
+	private final String LOG_CHANNELS_DATA_PATH;
 	private final String LOG_MNEMONIC_PATH;
-	private final String LOG_DEPTH_PATH;
-	private final String LOG_TIME_PATH;
-	private final String LOG_DEPTH_BOUNDARY_PATH;
-	private final String LOG_TIME_BOUNDARY_PATH;
+	private final String LOG_DEPTHDATA_PATH;
+	private final String LOG_TIMEDATA_PATH;
+	private final String LOG_DEPTH_BOUNDARY_DATA_PATH;
+	private final String LOG_TIME_BOUNDARY_DATA_PATH;
 
 
 	private final int CREATE_CS_LOG = 1;
@@ -97,16 +97,16 @@ public class DotDelegator {
 		this.WELL_GQL_PATH = config.get("well.gql.path");
 		this.WELLBORE_GQL_PATH = config.get("wellbore.gql.path");
 		this.TRAJECTORY_GQL_PATH = config.get("trajectory.gql.path");
-		this.LOG_PATH = config.get("log.channelset.path");
+		this.LOG_CHANNELSET_PATH = config.get("log.channelset.path");
 		this.LOG_CHANNEL_PATH = config.get("log.channel.path");
-		this.LOG_CHANNELSET_UUID = config.get("log.channelset.uuid.path");
-		this.LOG_CHANNELS = config.get("log.channels.path");
-		this.LOG_CHANNEL_DATA = config.get("log.channels.data.path");
+		this.LOG_CHANNELSET_UUID_PATH = config.get("log.channelset.uuid.path");
+		this.LOG_CHANNELS_PATH = config.get("log.channels.path");
+		this.LOG_CHANNELS_DATA_PATH = config.get("log.channels.data.path");
 		this.LOG_MNEMONIC_PATH = config.get("log.mnemonic.data.path");
-		this.LOG_DEPTH_PATH = config.get("log.channel.depthData.path");
-		this.LOG_TIME_PATH = config.get("log.channel.timeData.path");
-		this.LOG_DEPTH_BOUNDARY_PATH = config.get("log.channel.depthBoundaryData.path");
-		this.LOG_TIME_BOUNDARY_PATH = config.get("log.channel.timeBoundaryData.path");
+		this.LOG_DEPTHDATA_PATH = config.get("log.channel.depthData.path");
+		this.LOG_TIMEDATA_PATH = config.get("log.channel.timeData.path");
+		this.LOG_DEPTH_BOUNDARY_DATA_PATH = config.get("log.channel.depthBoundaryData.path");
+		this.LOG_TIME_BOUNDARY_DATA_PATH = config.get("log.channel.timeBoundaryData.path");
 	}
 
 	/**
@@ -138,36 +138,36 @@ public class DotDelegator {
 		case "trajectorysearch":
 			endpoint = this.TRAJECTORY_GQL_PATH;
 			break;
-		case LOG_OBJECT:
-			endpoint = this.LOG_PATH;
+		case "log":
+			endpoint = this.LOG_CHANNELSET_PATH;
 			break;
 		case "logChannel":
 			endpoint = this.LOG_CHANNEL_PATH;
 			break;
-		case CHANNELSET_UUID:
-			endpoint = this.LOG_CHANNELSET_UUID;
+		case "channelsetuuid":
+			endpoint = this.LOG_CHANNELSET_UUID_PATH;
 			break;
 		case "channels":
-			endpoint = this.LOG_CHANNELS;
+			endpoint = this.LOG_CHANNELS_PATH;
 			break;
 		case "channelData":
-			endpoint = this.LOG_CHANNEL_DATA;
+			endpoint = this.LOG_CHANNELS_DATA_PATH;
 			break;
 		case "logMenmonicPath":
 			endpoint = this.LOG_MNEMONIC_PATH;
 			break;
 		case "logDepthPath":
-				endpoint = this.LOG_DEPTH_PATH;
-				break;
+			endpoint = this.LOG_DEPTHDATA_PATH;
+			break;
 		case "logTimePath":
-				endpoint = this.LOG_TIME_PATH;
-				break;
+			endpoint = this.LOG_TIMEDATA_PATH;
+			break;
 		case "logDepthBoundaryPath":
-				endpoint = this.LOG_DEPTH_BOUNDARY_PATH;
-				break;
+			endpoint = this.LOG_DEPTH_BOUNDARY_DATA_PATH;
+			break;
 		case "logTimeBoundaryPath":
-				endpoint = this.LOG_TIME_BOUNDARY_PATH;
-				break;
+			endpoint = this.LOG_TIME_BOUNDARY_DATA_PATH;
+			break;
 		default:
 			throw new ValveException("Unsupported object type<" + objectType + ">");
 		}

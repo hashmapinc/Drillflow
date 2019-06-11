@@ -29,16 +29,16 @@ valve :
         wellbore.gql.path: ${WB_GQL_PATH:https://api-demo.nam.drillops.slb.com/democore/wellbore/v1/graphql/}
         trajectory.path: ${TRAJ_PATH:https://api-demo.nam.drillops.slb.com/democore/trajectoryreader/v1/witsml/trajectories/}
         trajectory.gql.path: ${TRAJ_GQL_PATH:https://api-demo.nam.drillops.slb.com/democore/trajectoryreader/v1/graphql/}
-        log.channelset.path: ${LOG_PATH:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/witsml/channelSets}
-        log.channel.path: ${LOG_PATH:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/witsml/channels}
-        log.channelset.uuid.path: ${LOG_CHANNELSET_UUID:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/identities}
-        log.channels.path: ${LOG_CHANNELS:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/witsml/channels/metadata}
-        log.channels.data.path: ${LOG_CHANNELS:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/witsml/channels/data}
-        log.mnemonic.data.path: ${LOG_MNEMONIC:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/witsml/channels/:mnemonic}
-        log.channel.depthData.path: ${LOG_DEPTHDATA:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/channels/depthdata}
-        log.channel.timeData.path: ${LOG_TIMEDATA:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/channels/timedata}
-        log.channel.depthBoundaryData.path: ${LOG_DEPTH_BOUNDARY_DATA:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/channels/depthboundary}
-        log.channel.timeBoundaryData.path: ${LOG_TIME_BOUNDARY_DATA:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/channels/timeboundary}
+        log.channelset.path: ${LOG_CHANNELSET_PATH:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/witsml/channelSets}
+        log.channel.path: ${LOG_CHANNEL_PATH:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/witsml/channels}
+        log.channelset.uuid.path: ${LOG_CHANNELSET_UUID_PATH:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/identities}
+        log.channels.path: ${LOG_CHANNELS_PATH:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/witsml/channels/metadata}
+        log.channels.data.path: ${LOG_CHANNELS_DATA_PATH:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/witsml/channels/data}
+        log.mnemonic.data.path: ${LOG_MNEMONIC_PATH:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/witsml/channels/:mnemonic}
+        log.channel.depthData.path: ${LOG_DEPTHDATA_PATH:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/channels/depthdata}
+        log.channel.timeData.path: ${LOG_TIMEDATA_PATH:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/channels/timedata}
+        log.channel.depthBoundaryData.path: ${LOG_DEPTH_BOUNDARY_DATA_PATH:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/channels/depthboundary}
+        log.channel.timeBoundaryData.path: ${LOG_TIME_BOUNDARY_DATA_PATH:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/channels/timeboundary}
 
 wmls:
     version: 1.3.1.1,1.4.1.1
