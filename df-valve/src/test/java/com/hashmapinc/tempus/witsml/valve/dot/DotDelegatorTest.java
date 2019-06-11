@@ -23,10 +23,10 @@ import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells;
 import com.hashmapinc.tempus.witsml.valve.dot.client.DotClient;
 import com.hashmapinc.tempus.witsml.valve.dot.graphql.GraphQLQueryConverter;
+import com.hashmapinc.tempus.witsml.valve.dot.model.log.DotLogDataHelper;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channel.Channel;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.ChannelSet;
 import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.request.HttpRequestWithBody;
@@ -151,7 +151,7 @@ public class DotDelegatorTest {
     }
 
     @Test
-    public void shouldCreateChannelSetForLog1411() throws Exception {
+    public void shouldCreateLog1411() throws Exception {
 
         // get the raw WITSML XML request from resource file
         String rawXML = TestUtilities.getResourceAsString("log1411.xml");
@@ -165,169 +165,117 @@ public class DotDelegatorTest {
         // for testing, there is only 1 log under test, so obtain that one
         com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog log = logs.getLog().get(0);
 
+        // ********************************* ChannelSet ********************************* //
         ChannelSet channelSet = ChannelSet.from1411(log);
-        // remove empties
-        String jsonChannelSet = channelSet.toJson();
-        // create the Channel Set payload
-        String csPayload = JsonUtil.removeEmpties(new JSONObject(jsonChannelSet));
+        String csPayload = channelSet.toJson();
 
-        // build first http request that creates a channelSet
-        // endpoint: .../channelSets
+        // build first http request that creates a ChannelSet
+        // endpoint:
+        // .../channelSets?uid={uid}&uidWellbore={uidWellbore}&uidWell={uidWell}
         String endpoint = this.url + this.logChannelsetPath;
         HttpRequestWithBody requestCS = Unirest.put(endpoint);
-        requestCS.header("Content-Type", "application/json");
-
-        // create the payload for create ChannelSet
-        requestCS.body(csPayload);
-        // add query string params for channel set creation:
+        // add query string params for ChannelSet creation:
         //      uid, uidWellbore, and uidWell
-        // endpoint:
-        //  .../channelSets?uid={uid}&uidWellbore={uidWellBore}&uidWell={uidWell}
-        HashMap<String,String> requestCSParams = new HashMap<>();
-        /*
-        requestCS.queryString("uid", log.getUid());
-        requestCS.queryString("uidWellbore", log.getUidWellbore());
-        requestCS.queryString("uidWell", log.getUidWell());
-        */
-        requestCSParams.put("uid", log.getUid());
-        requestCSParams.put("uidWellBore", log.getUidWellbore());
-        requestCSParams.put("uidWell", log.getUidWell());
-
-
-        // build http response mock
-        HttpResponse<String> respCS = mock(HttpResponse.class);
-        when(respCS.getBody()).thenReturn(  "{\"uid\": \""  + log.getUid() + "\","
-                                          + "\"uuid\": \"testUUID\"}" );
-        when(respCS.getStatus()).thenReturn(201);
-
-        // mock mockClient behavior
-        when(this.mockClient.makeRequest(argThat(someReq -> (
-                // TODO why does it fail on the next line?
-                //someReq.getHttpMethod().name().equals(requestCS.getHttpMethod().name()) &&
-                someReq.getUrl().equals(requestCS.getUrl()) &&
-                        someReq.getHeaders().containsKey("Content-Type")
-        )), eq("goodUsername"), eq("goodPassword"))).thenReturn(respCS);
-
-/*
-        MockRestServiceServer.MockRestServiceServerBuilder builder =
-                MockRestServiceServer.bindTo(restTemplate);
-        builder.ignoreExpectOrder(true);
-        MockRestServiceServer server = builder.build();
-*/
-
-
-
-
-
-        /*
-        String actualUid = this.delegator.createObject( log,
-                                                        "goodUsername",
-                                                        "goodPassword",
-                                                        "exchangeID",
-                                                        this.mockClient );
-        */
-        respCS = this.delegator.performRestCall(
-                        CREATE_CS_LOG, csPayload, endpoint, requestCSParams, this.mockClient,
-                       "goodUserName", "goodPassword", log, "test Exchange ID");
-
-        // TODO Null pointer
-        String actualUid = new JsonNode(respCS.getBody()).getObject().getString("uid");
-        if (respCS.getBody().contains("uid")) {
-            System.out.println("success");
-        }
-
-        //String expectedUid = log.getUid();
-        //assertEquals(expectedUid, actualUid);
-    }
-
-
-    @Test
-    public void shouldCreateChannelsForLog1411() throws Exception {
-
-        // get the raw WITSML XML request from resource file
-        String rawXML = TestUtilities.getResourceAsString("log1411.xml");
-
-        // handle version 1.4.1.1 (in real production code, version is a parameter;
-        // but for testing purposes, this method will handle 1411 & another test
-        // will be created for 1311)
-        com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLogs logs = WitsmlMarshal.deserialize(
-                rawXML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLogs.class);
-
-        // for testing, there is only 1 log under test, so obtain that one
-        com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog log = logs.getLog().get(0);
-
-        // *********************** ChannelSet *********************** //
-        ChannelSet channelSet = ChannelSet.from1411(log);
-        // remove empties
-        String jsonChannelSet = channelSet.toJson();
-        // create the Channel Set payload
-        String csPayload = JsonUtil.removeEmpties(new JSONObject(jsonChannelSet));
-
-        // build first http request that creates a channelSet
-        // endpoint: /channelSets
-        String endpoint = this.url + this.logChannelsetPath;
-        HttpRequestWithBody requestCS = Unirest.put(endpoint);
-        requestCS.header("Content-Type", "application/json");
-
-        // create the payload for create ChannelSet
-        requestCS.body(csPayload);
-        // add query string params for channel set creation:
-        //      uid, uidWellbore, and uidWell
-        // endpoint:
-        //  .../channelSets?uid={uid}&uidWellbore={uidWellBore}&uidWell={uidWell}
         requestCS.queryString("uid", log.getUid());
         requestCS.queryString("uidWellbore", log.getUidWellbore());
         requestCS.queryString("uidWell", log.getUidWell());
 
-        // build http response mock
+        // create the header for create ChannelSet
+        requestCS.header("Content-Type", "application/json");
+
+        // create the payload for create ChannelSet
+        requestCS.body(csPayload);
+
+        // build http response mock for ChannelSet
         HttpResponse<String> respCS = mock(HttpResponse.class);
+        // only requires the uid and uuid from ChannelSet
         when(respCS.getBody()).thenReturn(  "{\"uid\": \""  + log.getUid() + "\","
                 + "\"uuid\": \"testUUID\"}" );
         when(respCS.getStatus()).thenReturn(201);
 
-        // mock mockClient behavior
-        when(this.mockClient.makeRequest(argThat(someReq -> (
-                // TODO why does it fail on the next line?
-                //someReq.getHttpMethod().name().equals(requestCS.getHttpMethod().name()) &&
-                someReq.getUrl().equals(requestCS.getUrl()) &&
-                        someReq.getHeaders().containsKey("Content-Type")
-        )), eq("goodUsername"), eq("goodPassword"))).thenReturn(respCS);
-
-        // ************************ Channels ************************ //
+        // ********************************** Channels ********************************** //
         String channelsPayload  = Channel.channelListToJson(Channel.from1411(log));
 
-        // build second http request that creates channels for the channel set
-        // endpoint: .../channels/metadata?channelSetUuid={channelSetUuid}
-        endpoint = this.url + this.logChannelPath + "/metadata";
+        // build second http request that creates Channels for the ChannelSet
+        // endpoint:
+        // .../channels/metadata?channelSetUuid={channelSetUuid}
+        endpoint = this.url + this.logChannelPath + "metadata";
         HttpRequestWithBody requestCHs = Unirest.put(endpoint);
-        requestCHs.header("Content-Type", "application/json");
-
-        // create the payload for create channels
-        requestCHs.body(channelsPayload);
-        // add query string params for log: channelSetUuid={channelSetUuid}
+        // add query string params for Channels creation:
+        //      channelSetUuid
         requestCHs.queryString("channelSetUuid", "testUUID");
 
-        // build http response mock
-        HttpResponse<String> respCHs = mock(HttpResponse.class);
-        when(respCHs.getBody()).thenReturn(  "{\"uid\": \""  + log.getUid() + "\","
-                + "\"uuid\": \"testUUID\"}" );
-        when(respCHs.getStatus()).thenReturn(200);
+        // create the header for create Channels
+        requestCHs.header("Content-Type", "application/json");
 
-        // mock mockClient behavior
+        // create the payload for create Channels
+        requestCHs.body(channelsPayload);
+
+        // build http response mock for Channels
+        HttpResponse<String> respCHs = mock(HttpResponse.class);
+        // WHERE I AM AT: I get 201 and responseCHs null...still with the other HttpResponse
+        // Check that the new request is taken, and see how to connect requests to responses
+        when(respCHs.getStatus()).thenReturn(200);
+        when(respCHs.getBody()).thenReturn("{\"uid\": \""  + log.getUid() + "\","
+                + "\"uuid\": \"testUUID\"}");
+
+        // mock Client behavior
         /*
         when(this.mockClient.makeRequest(argThat(someReq -> (
                         // TODO why does it fail on the next line?
-                        someReq.getHttpMethod().name().equals(requestCHs.getHttpMethod().name()) &&
+                        // someReq.getHttpMethod().name().equals(requestCHs.getHttpMethod().name()) &&
                         someReq.getUrl().equals(requestCHs.getUrl()) &&
                         someReq.getHeaders().containsKey("Content-Type")
         )), eq("goodUsername"), eq("goodPassword"))).thenReturn(respCHs);
         */
 
+        // ************************************ Data ************************************ //
+        String dataPayload  = DotLogDataHelper.convertDataToDotFrom1411(log);
+
+        // build third http request that creates data for the channel set
+        // endpoint: .../channels/data?channelSetUuid={channelSetUuid}
+        endpoint = this.url + this.logChannelPath + "/data";
+        HttpRequestWithBody requestData = Unirest.put(endpoint);
+        // add query string params for data creation:
+        //      channelSetUuid
+        requestData.queryString("channelSetUuid", "testUUID");
+
+        // create the header for Data creation:
+        requestData.header("Content-Type", "application/json");
+
+        // create the payload for create data
+        requestData.body(dataPayload);
+
+        // build http response mock for Data
+        HttpResponse<String> respData = mock(HttpResponse.class);
+        when(respData.getStatus()).thenReturn(200);
+        when(respData.getBody()).thenReturn("{\"uid\": \""  + log.getUid() + "\","
+                + "\"uuid\": \"testUUID\"}");
+
+        // mock Client behavior
+        /*
+        when(this.mockClient.makeRequest(argThat(someReq -> (
+                        // TODO why does it fail on the next line?
+                        // someReq.getHttpMethod().name().equals(requestData.getHttpMethod().name()) &&
+                        someReq.getUrl().equals(requestData.getUrl()) &&
+                        someReq.getHeaders().containsKey("Content-Type")
+        )), eq("goodUsername"), eq("goodPassword"))).thenReturn(respData);
+        */
+
+        // mock Client behavior
+        when(this.mockClient.makeRequest(argThat(someReq -> (
+                        // TODO why does it fail on the next line?
+                        // someReq.getHttpMethod().name().equals(requestCS.getHttpMethod().name()) &&
+                        someReq.getUrl().equals(requestCS.getUrl()) &&
+                        someReq.getHeaders().containsKey("Content-Type")
+        )), eq("goodUsername"), eq("goodPassword"))).thenReturn(respCS);
+
+        // ********************************* Validation ********************************* //
         String actualUid = this.delegator.createObject( log,
-                "goodUsername",
-                "goodPassword",
-                "exchangeID",
-                this.mockClient );
+                                                        "goodUsername",
+                                                        "goodPassword",
+                                                        "exchangeID",
+                                                        this.mockClient );
         String expectedUid = log.getUid();
         assertEquals(expectedUid, actualUid);
     }
