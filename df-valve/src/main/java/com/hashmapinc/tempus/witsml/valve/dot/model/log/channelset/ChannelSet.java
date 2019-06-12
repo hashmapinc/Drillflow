@@ -674,9 +674,10 @@ public class ChannelSet {
         wmlLog.setBhaRunNumber(channelSet.getBhaRunNumber());
         wmlLog.setPass(channelSet.getPassNumber());
         wmlLog.setDescription(channelSet.getCitation().getDescription());
-        wmlLog.setIndexType(channelSet.getTimeDepth());
+        //wmlLog.setIndexType(channelSet.getTimeDepth());
         wmlLog.setStepIncrement(StepIncrement.to1411(channelSet.getStepIncrement()));
         if (channelSet.getIndex() != null && channelSet.getIndex().size() > 0) {
+            wmlLog.setIndexType(channelSet.getIndex().get(0).getIndexType());
             wmlLog.setIndexCurve(channelSet.getIndex().get(0).getMnemonic());
         }
         wmlLog.setNullValue(channelSet.getNullValue());
@@ -718,13 +719,14 @@ public class ChannelSet {
         wmlLog.setBhaRunNumber(channelSet.getBhaRunNumber());
         wmlLog.setPass(channelSet.getPassNumber());
         wmlLog.setDescription(channelSet.getCitation().getDescription());
-        wmlLog.setIndexType(channelSet.getTimeDepth());
+        //wmlLog.setIndexType(channelSet.getTimeDepth());
         wmlLog.setStepIncrement(StepIncrement.to1311(channelSet.getStepIncrement()));
         if (channelSet.getIndex() != null && channelSet.getIndex().size() > 0) {
             IndexCurve curve = new IndexCurve();
             curve.setColumnIndex((short) 1);
             curve.setValue(channelSet.getIndex().get(0).getMnemonic());
             wmlLog.setIndexCurve(curve);
+            wmlLog.setIndexType(channelSet.getIndex().get(0).getIndexType());
         }
         wmlLog.setNullValue(channelSet.getNullValue());
         wmlLog.setObjectGrowing(channelSet.getObjectGrowing());
