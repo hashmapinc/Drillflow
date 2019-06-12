@@ -106,7 +106,7 @@ public class Index {
         if (log == null){
             return null;
         }
-
+/*
         String indexType = null;
         if (log.getIndexType() != null) {
             if (log.getIndexType().contains("time")) {
@@ -115,12 +115,16 @@ public class Index {
                 indexType = "Depth";
             }
         }
+*/
 
         Index index = new Index();
         index.setDirection(log.getDirection());
         index.setMnemonic(log.getIndexCurve());
+        index.setIndexType(log.getIndexType());
+/*
         if (indexType != null)
             index.setIndexType(indexType);
+*/
         Optional<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> matchingObject = log
                 .getLogCurveInfo()
                 .stream()
@@ -140,15 +144,20 @@ public class Index {
             return null;
         }
 
+        /*
         String indexType = "Depth";
         if (log.getIndexType().contains("time"))
             indexType = "Time";
+        */
 
         Index index = new Index();
         index.setDirection(log.getDirection());
         index.setMnemonic(log.getIndexCurve().getValue());
+        index.setIndexType(log.getIndexType());
+        /*
         if (indexType!=null)
             index.setIndexType(indexType);
+        */
         Optional<com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogCurveInfo> matchingObject = log
                 .getLogCurveInfo()
                 .stream()
