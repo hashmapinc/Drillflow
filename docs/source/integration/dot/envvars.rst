@@ -11,18 +11,6 @@ Introduction
 There are several environment variables that are used in configuring the DrillFlow DoT Valve.
 
 :Variable:
-    VALVE_BASE_URL
-:Description:
-    The base URL of the service. This is the protocol and URL without the path. For example: 
-    https://xxx.dot.slb.com/
-:Default:
-    NO Default
-:Required:
-    YES
-:Example Environmental Switch in Docker:
-    To set to https://xxx.dot.slb.com : -e VALVE_BASE_URL='https://xxx.dot.slb.com/'
-
-:Variable:
     VALVE_API_KEY
 :Description:
     The API key to be used to authenticate against the API gateway.
@@ -69,10 +57,11 @@ where {path} is one of the variables below.
     The path to use to get to the Wells GraphQL API
 :Default:
     democore/well/v2/graphql/
+    https://test.com/democore/well/v2/graphql/
 :Required:
     NO (default will be used)
 :Example Environmental Switch in Docker:
-    To set to /v3/wellsgql : -e WELL_PATH='/v3/wellsgql'
+    To set to /v3/wellsgql : -e WELL_GQL_PATH='https://baseurl.com/democore/well/v3/wellsgql'
 
 :Variable:
     WB_PATH

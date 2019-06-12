@@ -24,7 +24,11 @@ valve :
         apikey: ${VALVE_API_KEY}
         token.path: ${TOKEN_PATH:https://api-demo.nam.drillops.slb.com/democore/BasicAuth/v1/token/}
         well.path: ${WELL_PATH:https://api-demo.nam.drillops.slb.com/democore/well/v2/witsml/wells/}
+
+
         well.gql.path: ${WELL_GQL_PATH:https://api-demo.nam.drillops.slb.com/democore/well/v2/graphql/}
+
+
         wellbore.path: ${WB_PATH:https://api-demo.nam.drillops.slb.com/democore/wellbore/v1/witsml/wellbores/}
         wellbore.gql.path: ${WB_GQL_PATH:https://api-demo.nam.drillops.slb.com/democore/wellbore/v1/graphql/}
         trajectory.path: ${TRAJ_PATH:https://api-demo.nam.drillops.slb.com/democore/trajectoryreader/v1/witsml/trajectories/}
