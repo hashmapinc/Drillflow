@@ -191,8 +191,7 @@ need to be provided.
 :Variable:
     LOG_CHANNELSET_PATH
 :Description:
-    The path to use to create, delete (by UUID), query (by UUID OR as a list),
-    replace whole (by UUID), or patch (by UUID) a ChannelSet.
+    The path to use to create, delete (by UUID), query (by UUID OR as a list) a ChannelSet.
 :Default:
     https://demo.slb.com/democore/channelreader/v4/witsml/channelSets
 :Required:
