@@ -740,8 +740,8 @@ public class Channel {
         return channels;
     }
 
-/*    public static List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> to1411(
-            List<Channel> channels) {
+    public static List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> to1411LogData(
+            List<Channel> channels,ChannelSet channelSet) {
         List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> curves = new ArrayList<>();
 
         if (channels == null || channels.isEmpty())
@@ -801,7 +801,7 @@ public class Channel {
             }
         }
         return curves;
-    }*/
+    }
 
     public static List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> to1411(
             List<Channel> channels,ChannelSet channelSet) {

@@ -70,16 +70,13 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
         log.setNameWellbore(getWelBorelName( wellBoreSearchEndpoint,client,  username, password,  exchangeID,witsmlObject));
 
 
-        List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> lcis = Channel.to1411(channels,cs.get(0));
-        log.setLogCurveInfo(lcis);
-
-/*        if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getLogData() != null){
-            List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> lcis = Channel.to1411(channels);
+        if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getLogData() != null){
+            List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> lcis = Channel.to1411LogData(channels,cs.get(0));
             log.setLogCurveInfo(lcis);
         }else{
-            List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> lcis = Channel.to1411NoLogData(channels,cs.get(0));
+            List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> lcis = Channel.to1411(channels,cs.get(0));
             log.setLogCurveInfo(lcis);
-        }*/
+        }
 
         // Code added to build log data response
         //Todo construct LogData from response
