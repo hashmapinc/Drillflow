@@ -64,20 +64,29 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
     public static ObjLog convertDotResponseToWitsml(String wellSearchEndpoint,String wellBoreSearchEndpoint,DotClient client, String username,
                                                     String password, String exchangeID,AbstractWitsmlObject witsmlObject,String channelSet, List<Channel> channels,String channelsDepthResponse) throws JsonParseException,
             JsonMappingException, IOException, DatatypeConfigurationException, ParseException,ValveException, ValveAuthException, UnirestException {
+
+        ObjLog log =null;
+
         List<ChannelSet> cs = ChannelSet.jsonToChannelSetList(channelSet);
-        ObjLog log = ChannelSet.to1411(cs.get(0));
+
+        if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getLogData() != null){
+            log = ChannelSet.to1411LogData(cs.get(0),channels);
+        }else{
+            log = ChannelSet.to1411(cs.get(0));
+        }
+
+
         log.setNameWell(getWellName( wellSearchEndpoint,client,  username,password,  exchangeID,witsmlObject));
         log.setNameWellbore(getWelBorelName( wellBoreSearchEndpoint,client,  username, password,  exchangeID,witsmlObject));
-
 
         List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> lcis = Channel.to1411(channels,cs.get(0));
         log.setLogCurveInfo(lcis);
 
 /*        if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getLogData() != null){
-            List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> lcis = Channel.to1411(channels);
+            List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> lcis = Channel.to1411LogData(channels,cs.get(0));
             log.setLogCurveInfo(lcis);
         }else{
-            List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> lcis = Channel.to1411NoLogData(channels,cs.get(0));
+            List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> lcis = Channel.to1411(channels,cs.get(0));
             log.setLogCurveInfo(lcis);
         }*/
 

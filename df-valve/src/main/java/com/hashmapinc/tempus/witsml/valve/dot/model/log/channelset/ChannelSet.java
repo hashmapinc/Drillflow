@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.GenericMeasure;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.IndexCurve;
+import com.hashmapinc.tempus.witsml.valve.dot.model.log.channel.Channel;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -657,6 +658,57 @@ public class ChannelSet {
         cs.setLogParam(LogParam.from1311(witsmlObj.getLogParam()));
         cs.setCommonData(CommonData.getCommonDataFrom1311(witsmlObj.getCommonData()));
         return cs;
+    }
+
+    public static com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog to1411LogData(ChannelSet channelSet, List<Channel> channels)
+            throws DatatypeConfigurationException, ParseException {
+        com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog wmlLog =
+                new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog();
+        // get max startIndex from channels
+
+        String maxStartIndex = channels.stream().filter(emp -> emp.getStartIndex() != null).map(Channel::getStartIndex).max(String::compareTo).get();
+
+        wmlLog.setUid(channelSet.getUid());
+        wmlLog.setCurveSensorsAligned(channelSet.getCurveSensorsAligned());
+        wmlLog.setDataGroup(channelSet.getDataGroup());
+        wmlLog.setDataDelimiter(channelSet.getDataDelimiter());
+        wmlLog.setName(channelSet.getCitation().getTitle());
+        wmlLog.setServiceCompany(channelSet.getLoggingCompanyName());
+        wmlLog.setRunNumber(channelSet.getRunNumber());
+        wmlLog.setBhaRunNumber(channelSet.getBhaRunNumber());
+        wmlLog.setPass(channelSet.getPassNumber());
+        wmlLog.setDescription(channelSet.getCitation().getDescription());
+        //wmlLog.setIndexType(channelSet.getTimeDepth());
+        wmlLog.setStepIncrement(StepIncrement.to1411(channelSet.getStepIncrement()));
+        if (channelSet.getIndex() != null && channelSet.getIndex().size() > 0) {
+            wmlLog.setIndexType(channelSet.getIndex().get(0).getIndexType());
+            wmlLog.setIndexCurve(channelSet.getIndex().get(0).getMnemonic());
+        }
+        wmlLog.setNullValue(channelSet.getNullValue());
+        wmlLog.setObjectGrowing(channelSet.getObjectGrowing());
+        wmlLog.setLogParam(LogParam.to1411(channelSet.getLogParam()));
+        // TODO set commonData to make sure its to come with GetFromStore
+
+        if (channelSet.getTimeDepth().toLowerCase().contains("depth")) {
+            if (channelSet.getStartIndex() != null){
+                com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure startMeasure =
+                        new com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure();
+                startMeasure.setUom("m");
+                startMeasure.setValue(Double.parseDouble(channelSet.getStartIndex()));
+                wmlLog.setStartIndex(startMeasure);
+                com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure endMeasure =
+                        new com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure();
+                endMeasure.setUom("m");
+                endMeasure.setValue(Double.parseDouble(channelSet.getEndIndex()));
+                wmlLog.setEndIndex(endMeasure);
+            }
+        } else {
+            if (channelSet.getEndIndex() != null){
+                wmlLog.setStartDateTimeIndex(convertIsoDateToXML(channelSet.getStartIndex()));
+                wmlLog.setEndDateTimeIndex(convertIsoDateToXML(channelSet.getEndIndex()));
+            }
+        }
+        return wmlLog;
     }
 
     public static com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog to1411(ChannelSet channelSet)
