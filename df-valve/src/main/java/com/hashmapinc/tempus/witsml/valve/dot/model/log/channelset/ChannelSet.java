@@ -687,7 +687,13 @@ public class ChannelSet {
         wmlLog.setNullValue(channelSet.getNullValue());
         wmlLog.setObjectGrowing(channelSet.getObjectGrowing());
         wmlLog.setLogParam(LogParam.to1411(channelSet.getLogParam()));
-        // TODO set commonData to make sure its to come with GetFromStore
+
+        // Set commonData
+        com.hashmapinc.tempus.WitsmlObjects.v1411.CsCommonData commonData = new com.hashmapinc.tempus.WitsmlObjects.v1411.CsCommonData();
+        commonData.setDTimCreation(convertIsoDateToXML(channelSet.getCitation().getCreation()));
+        commonData.setItemState(channelSet.getCommonData().getItemState());
+        commonData.setComments(channelSet.getCommonData().getComments());
+        wmlLog.setCommonData(commonData);
 
         if (channelSet.getTimeDepth().toLowerCase().contains("depth")) {
             if (channelSet.getStartIndex() != null){
@@ -735,7 +741,13 @@ public class ChannelSet {
         wmlLog.setNullValue(channelSet.getNullValue());
         wmlLog.setObjectGrowing(channelSet.getObjectGrowing());
         wmlLog.setLogParam(LogParam.to1411(channelSet.getLogParam()));
-       // TODO set commonData to make sure its to come with GetFromStore
+
+       // Set commonData
+        com.hashmapinc.tempus.WitsmlObjects.v1411.CsCommonData commonData = new com.hashmapinc.tempus.WitsmlObjects.v1411.CsCommonData();
+        commonData.setDTimCreation(convertIsoDateToXML(channelSet.getCitation().getCreation()));
+        commonData.setItemState(channelSet.getCommonData().getItemState());
+        commonData.setComments(channelSet.getCommonData().getComments());
+        wmlLog.setCommonData(commonData);
 
         if (channelSet.getTimeDepth().toLowerCase().contains("depth")) {
             if (channelSet.getStartIndex() != null){
