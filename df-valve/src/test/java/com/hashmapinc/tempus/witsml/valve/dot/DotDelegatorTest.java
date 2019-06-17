@@ -189,9 +189,21 @@ public class DotDelegatorTest {
         // build http response mock for ChannelSet
         HttpResponse<String> respCS = mock(HttpResponse.class);
         // only requires the uid and uuid from ChannelSet
-        when(respCS.getBody()).thenReturn(  "{\"uid\": \""  + log.getUid() + "\","
-                + "\"uuid\": \"testUUID\"}" );
+        when(respCS.getBody()).thenReturn(  "{\"uid\": \""  + log.getUid() + "\"," + "\"uuid\": \"testUUID\"}" );
         when(respCS.getStatus()).thenReturn(201);
+
+        // mock Client behavior for ChannelSet Http Request
+        when(this.mockClient.makeRequest(
+                argThat(someRequest -> (
+                            // TODO why does it fail on the next line?
+                            someRequest.getHttpMethod().name().equals(requestCS.getHttpMethod().name()) &&
+                            someRequest.getUrl().equals(requestCS.getUrl()) &&
+                            someRequest.getHeaders().containsKey("Content-Type")
+                                             )
+                       ),
+                eq("goodUsername"),
+                eq("goodPassword")))
+        .thenReturn(respCS);
 
         // ********************************** Channels ********************************** //
         String channelsPayload  = Channel.channelListToJson(Channel.from1411(log));
@@ -213,21 +225,20 @@ public class DotDelegatorTest {
 
         // build http response mock for Channels
         HttpResponse<String> respCHs = mock(HttpResponse.class);
-        // WHERE I AM AT: I get 201 and responseCHs null...still with the other HttpResponse
-        // Check that the new request is taken, and see how to connect requests to responses
         when(respCHs.getStatus()).thenReturn(200);
-        when(respCHs.getBody()).thenReturn("{\"uid\": \""  + log.getUid() + "\","
-                + "\"uuid\": \"testUUID\"}");
 
-        // mock Client behavior
-        /*
-        when(this.mockClient.makeRequest(argThat(someReq -> (
-                        // TODO why does it fail on the next line?
-                        // someReq.getHttpMethod().name().equals(requestCHs.getHttpMethod().name()) &&
-                        someReq.getUrl().equals(requestCHs.getUrl()) &&
-                        someReq.getHeaders().containsKey("Content-Type")
-        )), eq("goodUsername"), eq("goodPassword"))).thenReturn(respCHs);
-        */
+        // mock Client behavior for Channels Http Request
+        when(this.mockClient.makeRequest(
+                argThat(someRequest -> (
+                            // TODO why does it fail on the next line?
+                            someRequest.getHttpMethod().name().equals(requestCHs.getHttpMethod().name()) &&
+                            someRequest.getUrl().equals(requestCHs.getUrl()) &&
+                            someRequest.getHeaders().containsKey("Content-Type")
+                                       )
+                       ),
+                eq("goodUsername"),
+                eq("goodPassword")))
+        .thenReturn(respCHs);
 
         // ************************************ Data ************************************ //
         String dataPayload  = DotLogDataHelper.convertDataToDotFrom1411(log);
@@ -249,26 +260,19 @@ public class DotDelegatorTest {
         // build http response mock for Data
         HttpResponse<String> respData = mock(HttpResponse.class);
         when(respData.getStatus()).thenReturn(200);
-        when(respData.getBody()).thenReturn("{\"uid\": \""  + log.getUid() + "\","
-                + "\"uuid\": \"testUUID\"}");
 
-        // mock Client behavior
-        /*
-        when(this.mockClient.makeRequest(argThat(someReq -> (
-                        // TODO why does it fail on the next line?
-                        // someReq.getHttpMethod().name().equals(requestData.getHttpMethod().name()) &&
-                        someReq.getUrl().equals(requestData.getUrl()) &&
-                        someReq.getHeaders().containsKey("Content-Type")
-        )), eq("goodUsername"), eq("goodPassword"))).thenReturn(respData);
-        */
-
-        // mock Client behavior
-        when(this.mockClient.makeRequest(argThat(someReq -> (
-                        // TODO why does it fail on the next line?
-                        // someReq.getHttpMethod().name().equals(requestCS.getHttpMethod().name()) &&
-                        someReq.getUrl().equals(requestCS.getUrl()) &&
-                        someReq.getHeaders().containsKey("Content-Type")
-        )), eq("goodUsername"), eq("goodPassword"))).thenReturn(respCS);
+        // mock Client behavior for Data Http Request
+        when(this.mockClient.makeRequest(
+                argThat(someRequest -> (
+                            // TODO why does it fail on the next line?
+                            someRequest.getHttpMethod().name().equals(requestData.getHttpMethod().name()) &&
+                            someRequest.getUrl().equals(requestData.getUrl()) &&
+                            someRequest.getHeaders().containsKey("Content-Type")
+                                        )
+                        ),
+                eq("goodUsername"),
+                eq("goodPassword")))
+        .thenReturn(respData);
 
         // ********************************* Validation ********************************* //
         String actualUid = this.delegator.createObject( log,
@@ -279,6 +283,8 @@ public class DotDelegatorTest {
         String expectedUid = log.getUid();
         assertEquals(expectedUid, actualUid);
     }
+
+
 
 
     @Test

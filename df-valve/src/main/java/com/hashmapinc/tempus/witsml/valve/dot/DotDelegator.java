@@ -752,36 +752,16 @@ public class DotDelegator {
 		requestParams.put("uidWellbore", witsmlObj.getParentUid());
 		requestParams.put("uidWell", witsmlObj.getGrandParentUid());
 
-		/*
 		// call a central method to finish the REST set-up
 		// and execute the rest call for ChannelSet
-
-		HttpRequestWithBody requestCS=null;
-		responseCS = performRestCall( requestCS,
-									  allPayloads[CS_IDX_4_PAYLOADS],
-									  endpoint,
-									  requestParams,
-									  client,
-									  username,
-									  password,
-									  witsmlObj,
-									  exchangeID );
-		*/
-
-		HttpRequestWithBody requestCS = Unirest.post(endpoint);
-		requestCS.header("Content-Type", "application/json");
-		requestCS.body(payload);
-		// place the request parameters, if any, into the request
-		if (!requestParams.isEmpty()) {
-			requestParams.forEach(
-					(key, value) -> { requestCS.queryString(key, value); }
-			);
-		}
-
-		LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(requestCS), witsmlObj));
-
-		HttpResponse<String> responseCS = client.makeRequest(requestCS, username, password);
-
+		HttpResponse<String> responseCS = performRestCall( allPayloads[CS_IDX_4_PAYLOADS],
+									  					   endpoint,
+									  					   requestParams,
+									  					   client,
+									  					   username,
+									  					   password,
+									  					   witsmlObj,
+									  					   exchangeID );
 		// check response status
 		int status = responseCS.getStatus();
 		if (409 == status) {
@@ -828,33 +808,17 @@ public class DotDelegator {
 				requestParams = new HashMap<>();
 				requestParams.put("channelSetUuid", uuid4CS);
 
-				/*
 				// call a central method to finish the REST set-up
 				// and execute the rest call for Channels
 				HttpResponse<String> responseCHs;
 				responseCHs = performRestCall( allPayloads[CHANNELS_IDX_4_PAYLOADS],
-											endpoint,
-											requestParams,
-											client,
-											username,
-											password,
-											witsmlObj,
-											exchangeID );
-				*/
-
-				HttpRequestWithBody requestCHs = Unirest.post(endpoint);
-				requestCHs.header("Content-Type", "application/json");
-				requestCHs.body(payload);
-				// place the request parameters, if any, into the request
-				if (!requestParams.isEmpty()) {
-					requestParams.forEach(
-							(key, value) -> { requestCHs.queryString(key, value); }
-					);
-				}
-
-				LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(requestCHs), witsmlObj));
-
-				HttpResponse<String> responseCHs = client.makeRequest(requestCHs, username, password);
+											   endpoint,
+											   requestParams,
+											   client,
+											   username,
+											   password,
+											   witsmlObj,
+											   exchangeID );
 
 				// check response status
 				status = responseCHs.getStatus();
@@ -868,34 +832,18 @@ public class DotDelegator {
 
 					// .../channels/data?channelSetUuid={channelSetUuid}
 					endpoint = this.getEndpoint("channelData");
-					/*
+
+					// call a central method to finish the REST set-up
+					// and execute the rest call for Channels
 					HttpResponse<String> responseData;
 					responseData = performRestCall( allPayloads[DATA_IDX_4_PAYLOADS],
-												endpoint,
-												requestParams,
-												client,
-												username,
-												password,
-												witsmlObj,
-												exchangeID );
-					*/
-
-					HttpRequestWithBody requestData = Unirest.post(endpoint);
-					requestData.header("Content-Type", "application/json");
-					requestData.body(payload);
-					// Use same requestParams as for the previous call
-					// (channelSetUuid={channelSetUuid})
-					// place the request parameters, if any, into the request
-					if (!requestParams.isEmpty()) {
-						requestParams.forEach(
-								(key, value) -> { requestData.queryString(key, value); }
-						);
-					}
-
-					LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(requestData), witsmlObj));
-
-					HttpResponse<String> responseData = client.makeRequest(requestCS, username, password);
-
+													endpoint,
+													requestParams,
+													client,
+													username,
+													password,
+													witsmlObj,
+													exchangeID );
 
 					// check response status
 					status = responseData.getStatus();
@@ -943,9 +891,7 @@ public class DotDelegator {
 	 * @throws UnirestException
 	 * @throws ValveException
 	 */
-	/*
-	public HttpResponse<String> performRestCall( HttpRequestWithBody request,
-												 String payload,
+	public HttpResponse<String> performRestCall( String payload,
 												 String endpoint,
 												 HashMap<String,String> requestParams,
 												 DotClient client,
@@ -961,7 +907,7 @@ public class DotDelegator {
 		// CS endpoint:    .../channelSets?uid={uid}&uidWellbore={uidWellbore}&uidWell={uidWell}
 		// Channels endpt: .../channels/metadata?channelSetUuid={channelSetUuid}
 		// Data endpoint:  .../channels/data?channelSetUuid={channelSetUuid}
-		request = Unirest.post(endpoint);
+		HttpRequestWithBody request = Unirest.post(endpoint);
 		request.header("Content-Type", "application/json");
 		request.body(payload);
 		// place the request parameters, if any, into the request
@@ -977,7 +923,6 @@ public class DotDelegator {
 		return response;
 
 	}
-	*/
 
 	/**
 	 * creates an array of payloads:
