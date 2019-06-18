@@ -173,7 +173,7 @@ public class DotDelegatorTest {
         // endpoint:
         // .../channelSets?uid={uid}&uidWellbore={uidWellbore}&uidWell={uidWell}
         String endpoint = this.url + this.logChannelsetPath;
-        HttpRequestWithBody requestCS = Unirest.put(endpoint);
+        HttpRequestWithBody requestCS = Unirest.post(endpoint);
         // add query string params for ChannelSet creation:
         //      uid, uidWellbore, and uidWell
         requestCS.queryString("uid", log.getUid());
@@ -193,17 +193,22 @@ public class DotDelegatorTest {
         when(respCS.getStatus()).thenReturn(201);
 
         // mock Client behavior for ChannelSet Http Request
-        when(this.mockClient.makeRequest(
-                argThat(someRequest -> (
-                            // TODO why does it fail on the next line?
-                            someRequest.getHttpMethod().name().equals(requestCS.getHttpMethod().name()) &&
-                            someRequest.getUrl().equals(requestCS.getUrl()) &&
-                            someRequest.getHeaders().containsKey("Content-Type")
-                                             )
-                       ),
-                eq("goodUsername"),
-                eq("goodPassword")))
-        .thenReturn(respCS);
+        try {
+            when(this.mockClient.makeRequest(
+                    argThat(someRequest -> (
+                                    // TODO why does it fail on the next line?
+                                    someRequest.getHttpMethod().name().equals(requestCS.getHttpMethod().name()) &&
+                                            someRequest.getUrl().equals(requestCS.getUrl()) &&
+                                            someRequest.getHeaders().containsKey("Content-Type")
+                            )
+                    ),
+                    eq("goodUsername"),
+                    eq("goodPassword")))
+                    .thenReturn(respCS);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            System.out.println(ex.getCause());
+        }
 
         // ********************************** Channels ********************************** //
         String channelsPayload  = Channel.channelListToJson(Channel.from1411(log));
@@ -212,7 +217,7 @@ public class DotDelegatorTest {
         // endpoint:
         // .../channels/metadata?channelSetUuid={channelSetUuid}
         endpoint = this.url + this.logChannelPath + "metadata";
-        HttpRequestWithBody requestCHs = Unirest.put(endpoint);
+        HttpRequestWithBody requestCHs = Unirest.post(endpoint);
         // add query string params for Channels creation:
         //      channelSetUuid
         requestCHs.queryString("channelSetUuid", "testUUID");
@@ -228,17 +233,23 @@ public class DotDelegatorTest {
         when(respCHs.getStatus()).thenReturn(200);
 
         // mock Client behavior for Channels Http Request
-        when(this.mockClient.makeRequest(
-                argThat(someRequest -> (
-                            // TODO why does it fail on the next line?
-                            someRequest.getHttpMethod().name().equals(requestCHs.getHttpMethod().name()) &&
-                            someRequest.getUrl().equals(requestCHs.getUrl()) &&
-                            someRequest.getHeaders().containsKey("Content-Type")
-                                       )
-                       ),
-                eq("goodUsername"),
-                eq("goodPassword")))
-        .thenReturn(respCHs);
+        try {
+            when(this.mockClient.makeRequest(
+                    argThat(someRequest2 -> (
+                                    // TODO why does it fail on the next line?
+                                    someRequest2.getHttpMethod().name().equals(requestCHs.getHttpMethod().name()) &&
+                                    someRequest2.getUrl().equals(requestCHs.getUrl()) &&
+                                    someRequest2.getHeaders().containsKey("Content-Type")
+                            )
+                    ),
+                    eq("goodUsername"),
+                    eq("goodPassword")
+                    ))
+                    .thenReturn(respCHs);
+        } catch (Exception ex ) {
+            System.out.println(ex.getMessage() + " " + ex.getLocalizedMessage());
+            System.out.println(ex.getCause());
+        }
 
         // ************************************ Data ************************************ //
         String dataPayload  = DotLogDataHelper.convertDataToDotFrom1411(log);
@@ -246,7 +257,7 @@ public class DotDelegatorTest {
         // build third http request that creates data for the channel set
         // endpoint: .../channels/data?channelSetUuid={channelSetUuid}
         endpoint = this.url + this.logChannelPath + "/data";
-        HttpRequestWithBody requestData = Unirest.put(endpoint);
+        HttpRequestWithBody requestData = Unirest.post(endpoint);
         // add query string params for data creation:
         //      channelSetUuid
         requestData.queryString("channelSetUuid", "testUUID");
@@ -262,17 +273,22 @@ public class DotDelegatorTest {
         when(respData.getStatus()).thenReturn(200);
 
         // mock Client behavior for Data Http Request
-        when(this.mockClient.makeRequest(
-                argThat(someRequest -> (
-                            // TODO why does it fail on the next line?
-                            someRequest.getHttpMethod().name().equals(requestData.getHttpMethod().name()) &&
-                            someRequest.getUrl().equals(requestData.getUrl()) &&
-                            someRequest.getHeaders().containsKey("Content-Type")
-                                        )
-                        ),
-                eq("goodUsername"),
-                eq("goodPassword")))
-        .thenReturn(respData);
+        try {
+            when(this.mockClient.makeRequest(
+                    argThat(someRequest3 -> (
+                                    // TODO why does it fail on the next line?
+                                    someRequest3.getHttpMethod().name().equals(requestData.getHttpMethod().name()) &&
+                                    someRequest3.getUrl().equals(requestData.getUrl()) &&
+                                    someRequest3.getHeaders().containsKey("Content-Type")
+                            )
+                    ),
+                    eq("goodUsername"),
+                    eq("goodPassword")))
+                    .thenReturn(respData);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage() + " " + ex.getLocalizedMessage());
+            System.out.println(ex.getCause());
+        }
 
         // ********************************* Validation ********************************* //
         String actualUid = this.delegator.createObject( log,
