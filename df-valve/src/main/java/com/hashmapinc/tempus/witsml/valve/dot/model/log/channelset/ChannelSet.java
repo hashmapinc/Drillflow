@@ -744,7 +744,9 @@ public class ChannelSet {
 
        // Set commonData
         com.hashmapinc.tempus.WitsmlObjects.v1411.CsCommonData commonData = new com.hashmapinc.tempus.WitsmlObjects.v1411.CsCommonData();
-        commonData.setDTimCreation(convertIsoDateToXML(channelSet.getCitation().getCreation()));
+        if(channelSet.getCitation().getCreation() != null){
+            commonData.setDTimCreation(convertIsoDateToXML(channelSet.getCitation().getCreation()));
+        }
         commonData.setItemState(channelSet.getCommonData().getItemState());
         commonData.setComments(channelSet.getCommonData().getComments());
         wmlLog.setCommonData(commonData);
