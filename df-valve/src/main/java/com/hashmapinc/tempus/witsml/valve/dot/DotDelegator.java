@@ -767,6 +767,10 @@ public class DotDelegator {
 									exchangeID );
 
 		// check response status; nullpointer during mocking....why?
+		if(response == null){
+			//TODO send correct error code
+			throw new ValveException("Log is missing in channel set", (short) -405);
+		}
 		int status = response.getStatus();
 		if (409 == status) {
 			LOG.info( ValveLogging.getLogMsg( exchangeID,
@@ -838,6 +842,7 @@ public class DotDelegator {
 					// Use same requestParams as for the previous call (channelSetUuid={channelSetUuid})
 					// call a central method to finish the REST set-up
 					// and execute the rest call for ChannelSet
+
 					response = performRestCall( CREATE_DATA_LOG,
 											    allPayloads[DATA_IDX_4_PAYLOADS],
 												endpoint,
@@ -848,7 +853,24 @@ public class DotDelegator {
 												witsmlObj,
 												exchangeID );
 					// check response status
-					status = response.getStatus();
+					if(response == null){
+						//TODO return log message no data
+					}else{
+						status = response.getStatus();
+						// actually this requires a 200...
+						if (200 == status) {
+							LOG.info(ValveLogging.getLogMsg( exchangeID,
+									logResponse(response,
+											"Received successful "
+													+ "status code from DoT add data call"),
+									witsmlObj));
+						} else {
+							LOG.warning(ValveLogging.getLogMsg(exchangeID,
+									logResponse(response, "Received " + status + " from DoT POST" + response.getBody()), witsmlObj));
+							throw new ValveException(response.getBody());
+						}
+					}
+/*					status = response.getStatus();
 					// actually this requires a 200...
 					if (200 == status) {
 						LOG.info(ValveLogging.getLogMsg( exchangeID,
@@ -860,7 +882,7 @@ public class DotDelegator {
 						LOG.warning(ValveLogging.getLogMsg(exchangeID,
 								logResponse(response, "Received " + status + " from DoT POST" + response.getBody()), witsmlObj));
 						throw new ValveException(response.getBody());
-					}
+					}*/
 				}
 
 			}
@@ -903,6 +925,12 @@ public class DotDelegator {
 															   UnirestException,
 															   ValveException {
 
+		if(payload.equals("")){
+			//TODO create a log message
+			//LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(request), witsmlObj));
+			return null;
+		}
+
 		// create with POST and generate uid
 		// CS endpoint:    .../channelSets?uid={uid}&uidWellbore={uidWellbore}&uidWell={uidWell}
 		// Channels endpt: .../channels/metadata?channelSetUuid={channelSetUuid}
@@ -927,30 +955,33 @@ public class DotDelegator {
 
 	/**
 	 * creates an array of payloads:
-	 * 		(1) creates the POJOs for channelSet & channels and then uses them to return
-	 * 		    array entries for their respective payloads based on the POJOs
-	 * 		(2) for the data payload, it simply converts it accordingly for the version
-	 * 	    	and then also returns that payload in the array
+	 *        (1) creates the POJOs for channelSet & channels and then uses them to return
+	 *            array entries for their respective payloads based on the POJOs
+	 *        (2) for the data payload, it simply converts it accordingly for the version
+	 *            and then also returns that payload in the array
 	 *
-	 * @param version	either 1.4.1.1 or 1.3.1.1
-	 * @param payload	JSON String with empties removed (important since witsmlObj
+	 * @param version  either 1.4.1.1 or 1.3.1.1
+	 * @param payload  JSON String with empties removed (important since witsmlObj
 	 *                      may contain null) & correct for the version
 	 * @param witsmlObj WITSML XML in JSON format
 	 *
-	 * @return String 	array representing the payloads (channelSet, channels, & data)
+	 * @return String  array representing the payloads (channelSet, channels, & data);
+	 *                 if no channelSet, throws a ValveException;
+	 *                 if no channels or data, returns an empty String
 	 *
 	 * @throws ValveException
 	 */
 	public String[] getPayloads4Log(String version,
 									String payload,
 									AbstractWitsmlObject witsmlObj)
-												throws ValveException {
+			throws ValveException {
 		String[] payloads = new String[3];
 		JSONObject payloadJSON = new JSONObject(payload);
 
 		try {
 			// ****************************************** CHANNEL SET ******************************************
-			if (payload.contains("name")) {
+			// if (payload.contains("name")) {
+			if ( payloadJSON.has("name") ) {
 				switch (version) {
 					case "1.3.1.1":
 						payloads[CS_IDX_4_PAYLOADS] = ChannelSet.from1311(
@@ -961,15 +992,16 @@ public class DotDelegator {
 								(ObjLog) witsmlObj).toJson();
 						break;
 					default:
-						payloads[CS_IDX_4_PAYLOADS] = "";
-						break;
+						throw new ValveException("Error converting Log to ChannelSet/Channels/Data: no channelSet");
 				}
 			} else {
-				payloads[CS_IDX_4_PAYLOADS] = "";
+				throw new ValveException("Error converting Log to ChannelSet/Channels/Data: no channelSet");
 			}
 
 			// ******************************************* CHANNELS ********************************************
-			if (payloadJSON.has("logCurveInfo")) {
+			if ( payloadJSON.has("logCurveInfo") &&
+					( payloadJSON.getJSONArray("logCurveInfo") != null) &&
+					( payloadJSON.getJSONArray("logCurveInfo").length() > 0 ) ) {
 				switch (version) {
 					case "1.3.1.1":
 						payloads[CHANNELS_IDX_4_PAYLOADS] = Channel.channelListToJson(
@@ -988,7 +1020,10 @@ public class DotDelegator {
 			}
 
 			// ********************************************* DATA **********************************************
-			if (payload.contains("logData")) {
+			//if (payload.contains("logData")&&
+			if ( payloadJSON.has("logData") &&
+					( payloadJSON.getJSONArray("logData") != null) &&
+					( payloadJSON.getJSONArray("logData").length() > 0 ) ) {
 				switch (version) {
 					case "1.3.1.1":
 						payloads[DATA_IDX_4_PAYLOADS] = DotLogDataHelper.convertDataToDotFrom1311(
@@ -1005,8 +1040,9 @@ public class DotDelegator {
 			} else {
 				payloads[DATA_IDX_4_PAYLOADS] = "";
 			}
-		} catch (JsonProcessingException e) {
-			throw new ValveException("Error converting Log to ChannelSet/Channels/Data");
+		} catch ( JsonProcessingException e ) {
+			throw new ValveException("Error converting Log to ChannelSet/Channels/Data: " +
+					e.getMessage() );
 		}
 		return payloads;
 	}
