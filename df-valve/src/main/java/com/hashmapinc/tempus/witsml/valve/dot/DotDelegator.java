@@ -929,8 +929,7 @@ public class DotDelegator {
 															   ValveException {
 
 		HttpRequestWithBody request = Unirest.post(endpoint);
-		if(payload.equals("")){
-			if ("".equals(payload))
+		if ("".equals(payload)){
 			LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(request), witsmlObj));
 			return null;
 		}
