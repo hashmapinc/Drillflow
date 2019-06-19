@@ -854,7 +854,10 @@ public class DotDelegator {
 												exchangeID );
 					// check response status
 					if(response == null){
-						//TODO return log message no data
+						LOG.info(ValveLogging.getLogMsg( exchangeID,
+								logResponse(response,
+										"No Log Data Present"),
+								witsmlObj));
 					}else{
 						status = response.getStatus();
 						// actually this requires a 200...
@@ -925,9 +928,9 @@ public class DotDelegator {
 															   UnirestException,
 															   ValveException {
 
+		HttpRequestWithBody request = Unirest.post(endpoint);
 		if(payload.equals("")){
-			//TODO create a log message
-			//LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(request), witsmlObj));
+			LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(request), witsmlObj));
 			return null;
 		}
 
@@ -935,7 +938,7 @@ public class DotDelegator {
 		// CS endpoint:    .../channelSets?uid={uid}&uidWellbore={uidWellbore}&uidWell={uidWell}
 		// Channels endpt: .../channels/metadata?channelSetUuid={channelSetUuid}
 		// Data endpoint:  .../channels/data?channelSetUuid={channelSetUuid}
-		HttpRequestWithBody request = Unirest.post(endpoint);
+
 		request.header("Content-Type", "application/json");
 		request.body(payload);
 		// place the request parameters, if any, into the request
