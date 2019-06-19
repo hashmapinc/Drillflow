@@ -930,6 +930,7 @@ public class DotDelegator {
 
 		HttpRequestWithBody request = Unirest.post(endpoint);
 		if(payload.equals("")){
+			if ("".equals(payload))
 			LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(request), witsmlObj));
 			return null;
 		}
@@ -1249,7 +1250,7 @@ public class DotDelegator {
 				JSONObject payloadJSON = new JSONObject(payload);
 /*				if (payloadJSON.has("logData")) {
 					String sortDesc = "true";
-					data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
+					data = DotLogDataHelper.(channels, uuid, sortDesc, startIndex, endIndex);
 					// create with POST
 					channelsDepthEndPoint = this.getEndpoint("logDepthBoundaryPath");
 					channelsDepthRequest = Unirest.post(channelsDepthEndPoint);
