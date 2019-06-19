@@ -1442,29 +1442,6 @@ public class DotDelegator {
 							currentChannel.setMnemonic(lci.getMnemonic().getValue());
 						}else
 							currentChannel.setStartIndex(null);
-
-
-/*						if (currentChannel.getIndex().get(0).getIndexType().toLowerCase().contains("time")){
-							if (lci.getMaxDateTimeIndex() != null)
-								currentChannel.setEndIndex(lci.getMaxDateTimeIndex().toXMLFormat());
-							else
-								currentChannel.setEndIndex(null);
-							if (lci.getMinDateTimeIndex() != null)
-								currentChannel.setStartIndex(lci.getMinDateTimeIndex().toXMLFormat());
-							else
-								currentChannel.setStartIndex(null);
-						} else {
-							if (endIndex != null) {
-								currentChannel.setEndIndex(endIndex);
-								currentChannel.setMnemonic(lci.getMnemonic().getValue());
-							}else
-								currentChannel.setEndIndex(null);
-							if (startIndex != null) {
-								currentChannel.setStartIndex(startIndex);
-								currentChannel.setMnemonic(lci.getMnemonic().getValue());
-							}else
-								currentChannel.setStartIndex(null);
-						}*/
 						requestedChannels.add(currentChannel);
 					}
 				}
