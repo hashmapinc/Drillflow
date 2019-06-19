@@ -641,7 +641,8 @@ public class Channel {
 
                 Citation c = new Citation();
                 c.setTitle(lci.getMnemonic().getValue());
-
+                c.setDescription(lci.getCurveDescription());
+                channel.setClassWitsml(lci.getClassWitsml());
                 channel.setCitation(c);
                 channel.setUid(lci.getUid());
                 channel.setNamingSystem(lci.getMnemonic().getNamingSystem());

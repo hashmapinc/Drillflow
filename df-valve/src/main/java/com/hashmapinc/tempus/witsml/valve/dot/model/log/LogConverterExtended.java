@@ -69,11 +69,13 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
 
         List<ChannelSet> cs = ChannelSet.jsonToChannelSetList(channelSet);
 
-        if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getLogData() != null){
+/*        if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getLogData() != null){
             log = ChannelSet.to1411LogData(cs.get(0),channels);
         }else{
             log = ChannelSet.to1411(cs.get(0));
-        }
+        }*/
+
+        log = ChannelSet.to1411(cs.get(0));
 
         log.setNameWell(getWellName( wellSearchEndpoint,client,  username,password,  exchangeID,witsmlObject));
         log.setNameWellbore(getWelBorelName( wellBoreSearchEndpoint,client,  username, password,  exchangeID,witsmlObject));

@@ -96,7 +96,7 @@ public class DotLogDataHelper extends LogDataHelper {
         dotDataObject.put("sortDesc", true);
         JSONArray requestedChannels = new JSONArray();
         String indexUnit = "";
-        for (Channel wmlCurrentChannel : channels){
+/*        for (Channel wmlCurrentChannel : channels){
             JSONObject dotCurrentChannel = new JSONObject();
 
             dotCurrentChannel.put("name", wmlCurrentChannel.getMnemonic());
@@ -113,6 +113,20 @@ public class DotLogDataHelper extends LogDataHelper {
                 if (endIndex != null)
                     dotCurrentChannel.put("endIndex", endIndex);
             }
+            requestedChannels.put(dotCurrentChannel);
+        }*/
+
+        for (Channel wmlCurrentChannel : channels){
+            JSONObject dotCurrentChannel = new JSONObject();
+
+            dotCurrentChannel.put("name", wmlCurrentChannel.getMnemonic());
+            indexUnit = wmlCurrentChannel.getIndex().get(0).getUom();
+                if (startIndex != null)
+                    dotCurrentChannel.put("startIndex", startIndex);
+
+                if (endIndex != null)
+                    dotCurrentChannel.put("endIndex", endIndex);
+
             requestedChannels.put(dotCurrentChannel);
         }
 
