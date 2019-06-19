@@ -1208,41 +1208,43 @@ public class DotDelegator {
 		// get response
 		channelsResponse = client.makeRequest(channelsRequest, username, password);
 		List<Channel> channels = Channel.jsonToChannelList(channelsResponse.getBody());
+
+		String startIndex = null;
+		String endIndex = null;
+
+		if ("1.3.1.1".equals(witsmlObject.getVersion())){
+			if (((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getStartDateTimeIndex() != null){
+				startIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getStartDateTimeIndex().toXMLFormat();
+			} else if (((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getStartIndex() != null &&
+					((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getStartIndex().getValue() != null){
+				startIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getStartIndex().getValue().toString();
+			}
+			if (((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getEndDateTimeIndex() != null){
+				endIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getEndDateTimeIndex().toXMLFormat();
+			} else if (((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getEndIndex() != null&&
+					((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getEndIndex().getValue() != null){
+				endIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getEndIndex().getValue().toString();
+			}
+		} else if ("1.4.1.1".equals(witsmlObject.getVersion())) {
+			if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getStartDateTimeIndex() != null){
+				startIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getStartDateTimeIndex().toXMLFormat();
+			} else if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getStartIndex() != null &&
+					((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getStartIndex().getValue() != null){
+				startIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getStartIndex().getValue().toString();
+			}
+			if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getEndDateTimeIndex() != null){
+				endIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getEndDateTimeIndex().toXMLFormat();
+			} else if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getEndIndex() != null &&
+					((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getEndIndex().getValue() != null){
+				endIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getEndIndex().getValue().toString();
+			}
+		}
+
 		if (!getAllChannels)
-			channels = filterChannelsBasedOnRequest(channels, witsmlObject);
+			channels = filterChannelsBasedOnRequest(channels, witsmlObject,startIndex,endIndex);
 		// Build Request for Get Channels Depth
 		String channelData = null;
 		if (getData) {
-			String startIndex = null;
-			String endIndex = null;
-
-			if ("1.3.1.1".equals(witsmlObject.getVersion())){
-				if (((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getStartDateTimeIndex() != null){
-					startIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getStartDateTimeIndex().toXMLFormat();
-				} else if (((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getStartIndex() != null &&
-						((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getStartIndex().getValue() != null){
-					startIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getStartIndex().getValue().toString();
-				}
-				if (((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getEndDateTimeIndex() != null){
-					endIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getEndDateTimeIndex().toXMLFormat();
-				} else if (((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getEndIndex() != null&&
-						((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getEndIndex().getValue() != null){
-					endIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getEndIndex().getValue().toString();
-				}
-			} else if ("1.4.1.1".equals(witsmlObject.getVersion())) {
-				if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getStartDateTimeIndex() != null){
-					startIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getStartDateTimeIndex().toXMLFormat();
-				} else if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getStartIndex() != null &&
-						((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getStartIndex().getValue() != null){
-					startIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getStartIndex().getValue().toString();
-				}
-				if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getEndDateTimeIndex() != null){
-					endIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getEndDateTimeIndex().toXMLFormat();
-				} else if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getEndIndex() != null &&
-						((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getEndIndex().getValue() != null){
-					endIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getEndIndex().getValue().toString();
-				}
-			}
 			// TODO  To work for logData Filter
 			
 			if (indexType.equals("depth")) {
@@ -1331,7 +1333,7 @@ public class DotDelegator {
 			return null;
 	}
 
-	private List<Channel> filterChannelsBasedOnRequest(List<Channel> allChannels, AbstractWitsmlObject requestObject) throws ValveException{
+	private List<Channel> filterChannelsBasedOnRequest(List<Channel> allChannels, AbstractWitsmlObject requestObject,String startIndex, String endIndex) throws ValveException{
 		List<Channel> requestedChannels = new ArrayList<>();
 
 		if (allChannels.size() == 0){
@@ -1429,25 +1431,17 @@ public class DotDelegator {
 			} else if ("1.4.1.1".equals(requestObject.getVersion())){
 				for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo lci : ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) requestObject).getLogCurveInfo()){
 					if (lci.getMnemonic().getValue().equals(currentChannel.getMnemonic())){
-						if (currentChannel.getIndex().get(0).getIndexType().toLowerCase().contains("time")){
-							if (lci.getMaxDateTimeIndex() != null)
-								currentChannel.setEndIndex(lci.getMaxDateTimeIndex().toXMLFormat());
-							else
-								currentChannel.setEndIndex(null);
-							if (lci.getMinDateTimeIndex() != null)
-								currentChannel.setStartIndex(lci.getMinDateTimeIndex().toXMLFormat());
-							else
-								currentChannel.setStartIndex(null);
-						} else {
-							if (lci.getMaxIndex() != null)
-								currentChannel.setEndIndex(lci.getMaxIndex().getValue().toString());
-							else
-								currentChannel.setEndIndex(null);
-							if (lci.getMinIndex() != null)
-								currentChannel.setStartIndex(lci.getMinIndex().getValue().toString());
-							else
-								currentChannel.setStartIndex(null);
-						}
+
+						if (endIndex != null) {
+							currentChannel.setEndIndex(endIndex);
+							currentChannel.setMnemonic(lci.getMnemonic().getValue());
+						}else
+							currentChannel.setEndIndex(null);
+						if (startIndex != null) {
+							currentChannel.setStartIndex(startIndex);
+							currentChannel.setMnemonic(lci.getMnemonic().getValue());
+						}else
+							currentChannel.setStartIndex(null);
 						requestedChannels.add(currentChannel);
 					}
 				}
