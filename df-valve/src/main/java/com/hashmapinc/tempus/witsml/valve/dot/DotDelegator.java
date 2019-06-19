@@ -1241,7 +1241,6 @@ public class DotDelegator {
 		}
 
 		if (!getAllChannels)
-
 			channels = filterChannelsBasedOnRequest(channels, witsmlObject,startIndex,endIndex);
 		// Build Request for Get Channels Depth
 		String channelData = null;
@@ -1432,7 +1431,20 @@ public class DotDelegator {
 			} else if ("1.4.1.1".equals(requestObject.getVersion())){
 				for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo lci : ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) requestObject).getLogCurveInfo()){
 					if (lci.getMnemonic().getValue().equals(currentChannel.getMnemonic())){
-						if (currentChannel.getIndex().get(0).getIndexType().toLowerCase().contains("time")){
+
+						if (endIndex != null) {
+							currentChannel.setEndIndex(endIndex);
+							currentChannel.setMnemonic(lci.getMnemonic().getValue());
+						}else
+							currentChannel.setEndIndex(null);
+						if (startIndex != null) {
+							currentChannel.setStartIndex(startIndex);
+							currentChannel.setMnemonic(lci.getMnemonic().getValue());
+						}else
+							currentChannel.setStartIndex(null);
+
+
+/*						if (currentChannel.getIndex().get(0).getIndexType().toLowerCase().contains("time")){
 							if (lci.getMaxDateTimeIndex() != null)
 								currentChannel.setEndIndex(lci.getMaxDateTimeIndex().toXMLFormat());
 							else
@@ -1452,7 +1464,7 @@ public class DotDelegator {
 								currentChannel.setMnemonic(lci.getMnemonic().getValue());
 							}else
 								currentChannel.setStartIndex(null);
-						}
+						}*/
 						requestedChannels.add(currentChannel);
 					}
 				}
