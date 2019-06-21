@@ -774,10 +774,10 @@ public class Channel {
                 lci.setWellDatum(WellDatum.to1411(c.getWellDatum()));
                 lci.setClassIndex(c.getClassIndex());
                 if (c.getTimeDepth().toLowerCase().contains("time")){
-                    if (c.getStartIndex() != null)
-                        lci.setMinDateTimeIndex(convertIsoDateToXML(c.getStartIndex()));
-                    if (c.getEndIndex() != null)
-                        lci.setMaxDateTimeIndex(convertIsoDateToXML(c.getEndIndex()));
+                    if (channelSet.getStartIndex() != null)
+                        lci.setMinDateTimeIndex(convertIsoDateToXML(channelSet.getStartIndex()));
+                    if (channelSet.getEndIndex() != null)
+                        lci.setMaxDateTimeIndex(convertIsoDateToXML(channelSet.getEndIndex()));
                 } else {
                     if (channelSet.getStartIndex() != null){
                         com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure minMeasure =
