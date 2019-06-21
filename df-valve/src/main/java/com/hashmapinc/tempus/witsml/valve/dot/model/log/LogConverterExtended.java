@@ -76,7 +76,9 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
         }*/
 
         log = ChannelSet.to1411(cs.get(0));
-
+        
+        log.setUidWell(witsmlObject.getGrandParentUid());
+        log.setUidWellbore(witsmlObject.getParentUid());
         log.setNameWell(getWellName( wellSearchEndpoint,client,  username,password,  exchangeID,witsmlObject));
         log.setNameWellbore(getWelBorelName( wellBoreSearchEndpoint,client,  username, password,  exchangeID,witsmlObject));
 
