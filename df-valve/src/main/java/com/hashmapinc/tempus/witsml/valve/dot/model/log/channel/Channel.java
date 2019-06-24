@@ -742,7 +742,7 @@ public class Channel {
     }
 
     public static List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> to1411(
-            List<Channel> channels,ChannelSet channelSet) {
+            List<Channel> channels) {
         List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> curves = new ArrayList<>();
 
         if (channels == null || channels.isEmpty())
@@ -774,23 +774,23 @@ public class Channel {
                 lci.setWellDatum(WellDatum.to1411(c.getWellDatum()));
                 lci.setClassIndex(c.getClassIndex());
                 if (c.getTimeDepth().toLowerCase().contains("time")){
-                    if (channelSet.getStartIndex() != null)
-                        lci.setMinDateTimeIndex(convertIsoDateToXML(channelSet.getStartIndex()));
-                    if (channelSet.getEndIndex() != null)
-                        lci.setMaxDateTimeIndex(convertIsoDateToXML(channelSet.getEndIndex()));
+                    if (c.getStartIndex() != null)
+                        lci.setMinDateTimeIndex(convertIsoDateToXML(c.getStartIndex()));
+                    if (c.getEndIndex() != null)
+                        lci.setMaxDateTimeIndex(convertIsoDateToXML(c.getEndIndex()));
                 } else {
-                    if (channelSet.getStartIndex() != null){
+                    if (c.getStartIndex() != null){
                         com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure minMeasure =
                                 new com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure();
                         minMeasure.setUom("m");
-                        minMeasure.setValue(Double.parseDouble(channelSet.getStartIndex()));
+                        minMeasure.setValue(Double.parseDouble(c.getStartIndex()));
                         lci.setMinIndex(minMeasure);
                     }
-                    if (channelSet.getEndIndex() != null){
+                    if (c.getEndIndex() != null){
                         com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure maxMeasure =
                                 new com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure();
                         maxMeasure.setUom("m");
-                        maxMeasure.setValue(Double.parseDouble(channelSet.getEndIndex()));
+                        maxMeasure.setValue(Double.parseDouble(c.getEndIndex()));
                         lci.setMaxIndex(maxMeasure);
                     }
                 }
