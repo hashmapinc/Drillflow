@@ -1012,7 +1012,8 @@ public class DotDelegator {
 			// ****************************************** CHANNEL SET ******************************************
 			// even if there is no "name" element provided by the Client, Drillflow provides a "name" equal to
 			// the String "null"
-			if ((payloadJSON.get("name") != "null") && (payloadJSON.get("name") != "")) {
+			//if ((payloadJSON.get("name") != "null") && (payloadJSON.get("name") != "")) {
+			if ( !(payloadJSON.get("name").equals("null")) &&!(payloadJSON.get("name").equals("")) ) {
 				switch (version) {
 					case "1.3.1.1":
 						payloads[CS_IDX_4_PAYLOADS] = ChannelSet.from1311(
@@ -1197,7 +1198,7 @@ public class DotDelegator {
 		HttpResponse<String> channelsResponse;
 		String channelsDepthEndPoint;
 		HttpRequestWithBody channelsDepthRequest;
-		HttpResponse<String> channelsDepthResponse;
+		HttpResponse<String> channelsDepthResponse=null;
 		ObjLog finalResponse = null;
 		String data ="";
 		String indexType="";
@@ -1282,21 +1283,10 @@ public class DotDelegator {
 		// Build Request for Get Channels Depth
 		String channelData = null;
 		if (getData) {
-			// TODO  To work for logData Filter
-			
 			if (indexType.equals("depth")) {
 				JSONObject payloadJSON = new JSONObject(payload);
-/*				if (payloadJSON.has("logData")) {
-					String sortDesc = "true";
-					data = DotLogDataHelper.(channels, uuid, sortDesc, startIndex, endIndex);
-					// create with POST
-					channelsDepthEndPoint = this.getEndpoint("logDepthBoundaryPath");
-					channelsDepthRequest = Unirest.post(channelsDepthEndPoint);
-					channelsDepthRequest.header("Content-Type", "application/json");
-					channelsDepthRequest.body(data);
-					// get the request response.
-					channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
-				}else{*/
+				//if (payloadJSON.has("logData")) {
+					if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getLogData() != null){
 					String sortDesc = "true";
 					data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
 					// create with POST
@@ -1306,10 +1296,21 @@ public class DotDelegator {
 					channelsDepthRequest.body(data);
 					// get the request response.
 					channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
-				//}
+					channelData = channelsDepthResponse.getBody();
+				}/*else{
+					String sortDesc = "true";
+					data = DotLogDataHelper.(channels, uuid, sortDesc, startIndex, endIndex);
+					// create with POST
+					channelsDepthEndPoint = this.getEndpoint("logDepthBoundaryPath");
+					channelsDepthRequest = Unirest.post(channelsDepthEndPoint);
+					channelsDepthRequest.header("Content-Type", "application/json");
+					channelsDepthRequest.body(data);
+					// get the request response.
+					channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
+				}*/
 			} else {
 				JSONObject payloadJSON = new JSONObject(payload);
-				//if (payloadJSON.has("logData")) {
+				if (payloadJSON.has("logData")) {
 					String sortDesc = "true";
 					data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
 					// create with POST
@@ -1319,7 +1320,8 @@ public class DotDelegator {
 					channelsDepthRequest.body(data);
 					// get the request response.
 					channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
-				/*}{
+					channelData = channelsDepthResponse.getBody();
+				}/*else {
 					String sortDesc = "true";
 					data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
 					// create with POST
@@ -1330,10 +1332,8 @@ public class DotDelegator {
 					// get the request response.
 					channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
 				}*/
-
-
 			}
-			channelData = channelsDepthResponse.getBody();
+
 		}
 
 		if (201 == channelsetmetadataResponse.getStatus() || 200 == channelsetmetadataResponse.getStatus()
@@ -1344,7 +1344,7 @@ public class DotDelegator {
 				String wellBoreSearchEndpoint = this.getEndpoint("wellboresearch");
 				finalResponse = LogConverterExtended.convertDotResponseToWitsml
 						(wellSearchEndpoint,wellBoreSearchEndpoint,client,username,password,exchangeID, witsmlObject,allChannelSet.getBody(),
-						channels,channelData);
+						channels,channelData,payload );
 			} catch (Exception e) {
 				LOG.info(ValveLogging.getLogMsg(
 						exchangeID,

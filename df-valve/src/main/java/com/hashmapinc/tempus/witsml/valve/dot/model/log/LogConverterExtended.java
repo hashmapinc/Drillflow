@@ -62,7 +62,7 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
      */
 
     public static ObjLog convertDotResponseToWitsml(String wellSearchEndpoint,String wellBoreSearchEndpoint,DotClient client, String username,
-                                                    String password, String exchangeID,AbstractWitsmlObject witsmlObject,String channelSet, List<Channel> channels,String channelsDepthResponse) throws JsonParseException,
+                                                    String password, String exchangeID,AbstractWitsmlObject witsmlObject,String channelSet, List<Channel> channels,String channelsDepthResponse,String payload) throws JsonParseException,
             JsonMappingException, IOException, DatatypeConfigurationException, ParseException,ValveException, ValveAuthException, UnirestException {
 
         ObjLog log =null;
@@ -74,19 +74,38 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
         log.setNameWell(getWellName( wellSearchEndpoint,client,  username,password,  exchangeID,witsmlObject));
         log.setNameWellbore(getWelBorelName( wellBoreSearchEndpoint,client,  username, password,  exchangeID,witsmlObject));
 
-        List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> lcis = Channel.to1411(channels);
-        log.setLogCurveInfo(lcis);
+        //Todo logData requested or not
+        JSONObject payloadJSON = new JSONObject(payload);
+        //if (payloadJSON.has("logData")) {
+            if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getLogData() != null){
+            // Code added to build log data response
+            //Todo construct LogData from response
+            if (channelsDepthResponse != null) {
+                JSONObject logDataJsonObject = new JSONObject(channelsDepthResponse);
+                List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData> curves = new ArrayList<>();
+                curves.add(DotLogDataHelper.convertTo1411FromDot(logDataJsonObject));
+                log.setLogData(curves);
+                //List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> lcis = Channel.to1411WithLogData(channels,DotLogDataHelper.convertTo1411FromDot(logDataJsonObject));
+                List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> lcis = Channel.to1411WithLogData(channels,logDataJsonObject);
+                log.setLogCurveInfo(lcis);
+            }
+        }else{
+            List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> lcis = Channel.to1411(channels,cs.get(0));
+            log.setLogCurveInfo(lcis);
+        }
 
+/*        List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> lcis = Channel.to1411(channels,cs.get(0));
+        log.setLogCurveInfo(lcis);
         // Code added to build log data response
         //Todo construct LogData from response
-
         if (channelsDepthResponse != null) {
             JSONObject logDataJsonObject = new JSONObject(channelsDepthResponse);
             List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData> curves = new ArrayList<>();
 
             curves.add(DotLogDataHelper.convertTo1411FromDot(logDataJsonObject));
             log.setLogData(curves);
-        }
+        }*/
+
         return log;
     }
 

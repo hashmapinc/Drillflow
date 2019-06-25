@@ -41,10 +41,10 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-import com.hashmapinc.tempus.witsml.valve.dot.model.log.DotLogDataHelper;
+/*import com.hashmapinc.tempus.witsml.valve.dot.model.log.DotLogDataHelper;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channel.Channel;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.ChannelSet;
-import org.mockito.exceptions.misusing.InvalidUseOfMatchersException;
+import org.mockito.exceptions.misusing.InvalidUseOfMatchersException;*/
 
 //import java.security.SecureRandom;
 

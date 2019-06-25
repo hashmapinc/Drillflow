@@ -22,9 +22,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.GenericMeasure;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ShortNameStruct;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.*;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -736,7 +739,7 @@ public class Channel {
     }
 
     public static List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> to1411(
-            List<Channel> channels) {
+            List<Channel> channels,ChannelSet channelSet) {
         List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> curves = new ArrayList<>();
 
         if (channels == null || channels.isEmpty())
@@ -768,10 +771,17 @@ public class Channel {
                 lci.setWellDatum(WellDatum.to1411(c.getWellDatum()));
                 lci.setClassIndex(c.getClassIndex());
                 if (c.getTimeDepth().toLowerCase().contains("time")){
-                    if (c.getStartIndex() != null)
+                    if (c.getStartIndex() != null){
                         lci.setMinDateTimeIndex(convertIsoDateToXML(c.getStartIndex()));
-                    if (c.getEndIndex() != null)
+                    }else{
+                        lci.setMinDateTimeIndex(convertIsoDateToXML(channelSet.getStartIndex()));
+                    }
+
+                    if (c.getEndIndex() != null){
                         lci.setMaxDateTimeIndex(convertIsoDateToXML(c.getEndIndex()));
+                    }else{
+                        lci.setMaxDateTimeIndex(convertIsoDateToXML(channelSet.getEndIndex()));
+                    }
                 } else {
                     if (c.getStartIndex() != null){
                         com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure minMeasure =
@@ -779,8 +789,113 @@ public class Channel {
                         minMeasure.setUom("m");
                         minMeasure.setValue(Double.parseDouble(c.getStartIndex()));
                         lci.setMinIndex(minMeasure);
+                    }else{
+                        com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure minMeasure =
+                                new com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure();
+                        minMeasure.setUom("m");
+                        minMeasure.setValue(Double.parseDouble(channelSet.getStartIndex()));
+                        lci.setMinIndex(minMeasure);
                     }
                     if (c.getEndIndex() != null){
+                        com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure maxMeasure =
+                                new com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure();
+                        maxMeasure.setUom("m");
+                        maxMeasure.setValue(Double.parseDouble(c.getEndIndex()));
+                        lci.setMaxIndex(maxMeasure);
+                    }else{
+                        com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure maxMeasure =
+                                new com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure();
+                        maxMeasure.setUom("m");
+                        maxMeasure.setValue(Double.parseDouble(channelSet.getEndIndex()));
+                        lci.setMaxIndex(maxMeasure);
+                    }
+                }
+                //Need to address this in wol...does not exist
+                //lci.getExtensionNameValue()
+                curves.add(lci);
+            } catch (Exception ex){
+                continue;
+            }
+        }
+        return curves;
+    }
+
+    public static List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> to1411WithLogData(
+            List<Channel> channels, JSONObject object) {
+        JSONArray jsonValues = (JSONArray)object.get("value");
+        String[] mnems = new String[jsonValues.length()];
+        //String[] units = new String[jsonValues.length()];
+        //Arrays.fill(units,"unitless");
+        SortedMap<String, String[]> values = new TreeMap<>();
+
+
+        List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> curves = new ArrayList<>();
+        if (channels == null || channels.isEmpty())
+            return null;
+
+        for (Channel c : channels) {
+            try{
+                com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo lci =
+                        new com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo();
+                ShortNameStruct name = new ShortNameStruct();
+                name.setValue(c.getMnemonic());
+                name.setNamingSystem(c.getNamingSystem());
+                lci.setMnemonic(name);
+                lci.setAlternateIndex(c.getAlternateIndex());
+                lci.setClassWitsml(c.getClassWitsml());
+                //NOTE: WE WILL ALWAYS SET THE INDEX TO THE FIRST COLUMN
+                lci.setCurveDescription(c.getCitation().getDescription());
+                lci.setDataSource(c.getSource());
+                lci.setTraceOrigin(c.getTraceOrigin());
+                lci.setTraceState(c.getTraceState());
+                lci.setTypeLogData(c.getDataType());
+                lci.setUid(c.getUid());
+                lci.setUnit(c.getUom());
+                lci.setNullValue(c.getNullValue());
+                lci.setMnemAlias(MnemAlias.to1411(c.mnemAlias));
+                lci.setAxisDefinition(AxisDefinition.to1411(c.getAxisDefinition()));
+                lci.setDensData(DensData.to1411(c.getDensData()));
+                lci.setSensorOffset(SensorOffset.to1411(c.getSensorOffset()));
+                lci.setWellDatum(WellDatum.to1411(c.getWellDatum()));
+                lci.setClassIndex(c.getClassIndex());
+                if (c.getTimeDepth().toLowerCase().contains("time")){
+                    //Todo logic to implement startIndex and endIndex from logData
+
+
+                    if (c.getStartIndex() != null){
+                        lci.setMinDateTimeIndex(convertIsoDateToXML(c.getStartIndex()));
+                    }else{
+                        lci.setMinDateTimeIndex(convertIsoDateToXML(c.getStartIndex()));
+                    }
+
+                    if (c.getEndIndex() != null){
+                        lci.setMaxDateTimeIndex(convertIsoDateToXML(c.getEndIndex()));
+                    }else{
+                        lci.setMaxDateTimeIndex(convertIsoDateToXML(c.getEndIndex()));
+                    }
+                } else {
+                    //Todo logic to implement startIndex and endIndex from logData
+
+                    if (c.getStartIndex() != null){
+                        com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure minMeasure =
+                                new com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure();
+                        minMeasure.setUom("m");
+                        minMeasure.setValue(Double.parseDouble(c.getStartIndex()));
+                        lci.setMinIndex(minMeasure);
+                    }else{
+                        com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure minMeasure =
+                                new com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure();
+                        minMeasure.setUom("m");
+                        minMeasure.setValue(Double.parseDouble(c.getStartIndex()));
+                        lci.setMinIndex(minMeasure);
+                    }
+                    if (c.getEndIndex() != null){
+                        com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure maxMeasure =
+                                new com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure();
+                        maxMeasure.setUom("m");
+                        maxMeasure.setValue(Double.parseDouble(c.getEndIndex()));
+                        lci.setMaxIndex(maxMeasure);
+                    }else{
                         com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure maxMeasure =
                                 new com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure();
                         maxMeasure.setUom("m");
