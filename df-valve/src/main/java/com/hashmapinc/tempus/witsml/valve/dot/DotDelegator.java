@@ -1286,7 +1286,7 @@ public class DotDelegator {
 			if (indexType.equals("depth")) {
 				JSONObject payloadJSON = new JSONObject(payload);
 				//if (payloadJSON.has("logData")) {
-					if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getLogData() != null){
+					if (((ObjLog)witsmlObject).getLogData() != null){
 					String sortDesc = "true";
 					data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
 					// create with POST

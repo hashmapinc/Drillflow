@@ -822,11 +822,11 @@ public class Channel {
 
     public static List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> to1411WithLogData(
             List<Channel> channels, JSONObject object) {
-        JSONArray jsonValues = (JSONArray)object.get("value");
+/*        JSONArray jsonValues = (JSONArray)object.get("value");
         String[] mnems = new String[jsonValues.length()];
         //String[] units = new String[jsonValues.length()];
         //Arrays.fill(units,"unitless");
-        SortedMap<String, String[]> values = new TreeMap<>();
+        SortedMap<String, String[]> values = new TreeMap<>();*/
 
 
         List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> curves = new ArrayList<>();

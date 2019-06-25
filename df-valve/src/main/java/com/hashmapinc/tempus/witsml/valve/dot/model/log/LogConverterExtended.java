@@ -75,9 +75,8 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
         log.setNameWellbore(getWelBorelName( wellBoreSearchEndpoint,client,  username, password,  exchangeID,witsmlObject));
 
         //Todo logData requested or not
-        JSONObject payloadJSON = new JSONObject(payload);
         //if (payloadJSON.has("logData")) {
-            if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getLogData() != null){
+            if (((ObjLog)witsmlObject).getLogData() != null){
             // Code added to build log data response
             //Todo construct LogData from response
             if (channelsDepthResponse != null) {
