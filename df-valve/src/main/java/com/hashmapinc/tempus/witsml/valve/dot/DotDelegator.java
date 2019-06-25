@@ -1267,7 +1267,7 @@ public class DotDelegator {
 			if (indexType.equals("depth")) {
 				JSONObject payloadJSON = new JSONObject(payload);
 				//if (payloadJSON.has("logData")) {
-					if (((ObjLog)witsmlObject).getLogData() != null){
+				if (((ObjLog)witsmlObject).getLogData() != null || getAllChannels){
 					String sortDesc = "true";
 					data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
 					// create with POST
@@ -1291,7 +1291,7 @@ public class DotDelegator {
 				}*/
 			} else {
 				JSONObject payloadJSON = new JSONObject(payload);
-				if (payloadJSON.has("logData")) {
+				//if (payloadJSON.has("logData")) {
 					String sortDesc = "true";
 					data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
 					// create with POST
@@ -1302,7 +1302,7 @@ public class DotDelegator {
 					// get the request response.
 					channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
 					channelData = channelsDepthResponse.getBody();
-				}/*else {
+				/*else {
 					String sortDesc = "true";
 					data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
 					// create with POST
@@ -1325,7 +1325,7 @@ public class DotDelegator {
 				String wellBoreSearchEndpoint = this.getEndpoint("wellboresearch");
 				finalResponse = LogConverterExtended.convertDotResponseToWitsml
 						(wellSearchEndpoint,wellBoreSearchEndpoint,client,username,password,exchangeID, witsmlObject,allChannelSet.getBody(),
-						channels,channelData,payload );
+								channels,channelData,getAllChannels);
 			} catch (Exception e) {
 				LOG.info(ValveLogging.getLogMsg(
 						exchangeID,
