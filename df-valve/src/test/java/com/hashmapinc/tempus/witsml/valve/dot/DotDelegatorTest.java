@@ -23,6 +23,9 @@ import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells;
 import com.hashmapinc.tempus.witsml.valve.dot.client.DotClient;
 import com.hashmapinc.tempus.witsml.valve.dot.graphql.GraphQLQueryConverter;
+import com.hashmapinc.tempus.witsml.valve.dot.model.log.DotLogDataHelper;
+import com.hashmapinc.tempus.witsml.valve.dot.model.log.channel.Channel;
+import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.ChannelSet;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.request.HttpRequest;
@@ -30,6 +33,7 @@ import com.mashape.unirest.request.HttpRequestWithBody;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.exceptions.misusing.InvalidUseOfMatchersException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,35 +62,8 @@ public class DotDelegatorTest {
     private String graphQlWellPath;
 
     private String logChannelsetPath;
-    private String logChannelPath;
-
-/*
-    private static List<IndexedObject> generateLogParmFor1411() {
-
-        List<com.hashmapinc.tempus.WitsmlObjects.v1411.IndexedObject> params = new ArrayList<>();
-
-        // generate two <logParam> test items
-        com.hashmapinc.tempus.WitsmlObjects.v1411.IndexedObject param1 =
-                    new com.hashmapinc.tempus.WitsmlObjects.v1411.IndexedObject();
-        param1.setName("MRES");
-        param1.setDescription("Mud Resistivity");
-        param1.setUom("ohm.m");
-        param1.setValue("1.25");
-        param1.setUid("lp-1");
-        params.add(param1);
-
-        com.hashmapinc.tempus.WitsmlObjects.v1411.IndexedObject param2 =
-                new com.hashmapinc.tempus.WitsmlObjects.v1411.IndexedObject();
-        param2.setName("BDIA");
-        param1.setDescription("Bit Diameter");
-        param1.setUom("in");
-        param1.setValue("12.25");
-        param1.setUid("lp-2");
-        params.add(param2);
-
-        return params;
-    }
-*/
+    private String logChannelsPath;
+    private String logDataPath;
 
 
     @Before
@@ -98,7 +75,8 @@ public class DotDelegatorTest {
         //this.graphQlWellborePath = "/wellbore/graphql/";
         //this.graphQlTrajectoryPath = "/trajectory/graphql";
         this.logChannelsetPath = "/channelSets";
-        this.logChannelPath = "/channels";
+        this.logChannelsPath = "/channels/metadata";
+        this.logDataPath = "/channels/data";
 
         // build config
         HashMap<String, String> config = new HashMap<>();
@@ -109,8 +87,14 @@ public class DotDelegatorTest {
         config.put("well.gql.path", this.url + "/well/graphql/");
         config.put("wellbore.gql.path", this.url + "/wellbore/graphql/");
         config.put("trajectory.gql.path", this.url + "/trajectory/graphql");
+        // these names must match the names in DotDelegator
+        // for example, in DotDelegator, you will find the following:
+        //      this.LOG_CHANNELSET_PATH = config.get("log.channelset.path");
+        //      this.LOG_CHANNEL_PATH = config.get("log.channel.path");
+        //      this.LOG_CHANNELS_DATA_PATH = config.get("log.channels.data.path");
         config.put("log.channelset.path", this.url + logChannelsetPath);
-        config.put("log.channel.path", this.url + logChannelPath);
+        config.put("log.channels.path", this.url + logChannelsPath);
+        config.put("log.channels.data.path", this.url + logDataPath);
 
         // instantiate delegator
         this.delegator = new DotDelegator(config);
@@ -180,15 +164,14 @@ public class DotDelegatorTest {
         assertEquals(expectedUid, actualUid);
     }
 
-    /*@Test
+
+    @Test
     public void shouldCreateLog1411() throws Exception {
 
         // get the raw WITSML XML request from resource file
         String rawXML = TestUtilities.getResourceAsString("log1411.xml");
 
-        // handle version 1.4.1.1 (in real production code, version is a parameter;
-        // but for testing purposes, this method will handle 1411 & another test
-        // will be created for 1311)
+        // handle version 1.4.1.1; it is not necessary to test 1.3.1.1
         com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLogs logs = WitsmlMarshal.deserialize(
                 rawXML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLogs.class);
 
@@ -202,7 +185,9 @@ public class DotDelegatorTest {
         // build first http request that creates a ChannelSet
         // endpoint:
         // .../channelSets?uid={uid}&uidWellbore={uidWellbore}&uidWell={uidWell}
-        String endpointCS = this.url + this.logChannelsetPath;
+        String endpointCS = this.url + this.logChannelsetPath;  // endpoint must match with
+        // the one used in DotDelegator
+        // (logChannelsetPath)
         HttpRequestWithBody requestCS = Unirest.post(endpointCS);
         // add query string params for ChannelSet creation:
         //      uid, uidWellbore, and uidWell
@@ -219,15 +204,19 @@ public class DotDelegatorTest {
         // build http response mock for ChannelSet
         HttpResponse<String> respCS = mock(HttpResponse.class);
         // only requires the uid and uuid from ChannelSet
-        when(respCS.getBody()).thenReturn(  "{\"uid\": \""  + log.getUid() + "\"," + "\"uuid\": \"testUUID\"}" );
+        when(respCS.getBody()).thenReturn(  "{\"uid\": \""
+                + log.getUid() + "\"," + "\"uuid\": \"testUUID\"}" );
         when(respCS.getStatus()).thenReturn(201);
+
         // ********************************** Channels ********************************** //
         String channelsPayload  = Channel.channelListToJson(Channel.from1411(log));
 
         // build second http request that creates Channels for the ChannelSet
         // endpoint:
         // .../channels/metadata?channelSetUuid={channelSetUuid}
-        String endpointCH = this.url + this.logChannelPath + "/metadata";
+        String endpointCH = this.url + this.logChannelsPath;    // endpoint must match with
+        // the one used in DotDelegator
+        // (logChannelsPath)
         HttpRequestWithBody requestCHs = Unirest.post(endpointCH);
         // add query string params for Channels creation:
         //      channelSetUuid
@@ -242,12 +231,15 @@ public class DotDelegatorTest {
         // build http response mock for Channels
         HttpResponse<String> respCHs = mock(HttpResponse.class);
         when(respCHs.getStatus()).thenReturn(200);
+
         // ************************************ Data ************************************ //
         String dataPayload  = DotLogDataHelper.convertDataToDotFrom1411(log);
 
         // build third http request that creates data for the channel set
         // endpoint: .../channels/data?channelSetUuid={channelSetUuid}
-        String endpointData = this.url + this.logChannelPath + "/data";
+        String endpointData =  this.url + this.logDataPath;     // endpoint must match with
+        // the one used in DotDelegator
+        // (logDataPath)
         HttpRequestWithBody requestData = Unirest.post(endpointData);
         // add query string params for data creation:
         //      channelSetUuid
@@ -261,40 +253,41 @@ public class DotDelegatorTest {
 
         // build http response mock for Data
         HttpResponse<String> respData = mock(HttpResponse.class);
-        when(respData.getBody()).thenReturn(  "{\"uid\": \""  + log.getUid() + "\"," + "\"uuid\": \"testUUID\"}" );
+        when(respData.getBody()).thenReturn(  "{\"uid\": \""
+                + log.getUid() + "\"," + "\"uuid\": \"testUUID\"}" );
         when(respData.getStatus()).thenReturn(200);
 
         // *********************************** Mocking ********************************** //
-        when(this.mockClient.makeRequest(any(HttpRequest.class), anyString(), anyString())).thenAnswer(
-                invocation -> {
-                    HttpRequest req = invocation.getArgument(0);
-                    String userName = invocation.getArgument(1);
-                    String pass = invocation.getArgument(2);
+        when(this.mockClient.makeRequest(any(HttpRequest.class), anyString(), anyString()))
+                .thenAnswer(
+                        invocation -> {
+                            HttpRequest req = invocation.getArgument(0);
+                            String userName = invocation.getArgument(1);
+                            String pass = invocation.getArgument(2);
 
-                    if (req.getHttpMethod().name().equals(requestCS.getHttpMethod().name()) &&
-                            req.getUrl().equals(requestCS.getUrl()) &&
-                            req.getHeaders().containsKey("Content-Type") &&
-                            userName.equals("goodUsername") &&
-                            pass.equals("goodPassword")) {
-                        return respCS;
-                    } else if (req.getHttpMethod().name().equals(requestCHs.getHttpMethod().name()) &&
-                            req.getUrl().equals(requestCHs.getUrl()) &&
-                            req.getHeaders().containsKey("Content-Type") &&
-                            userName.equals("goodUsername") &&
-                            pass.equals("goodPassword")) {
-                        return respCHs;
-                    } else if (req.getHttpMethod().name().equals(requestData.getHttpMethod().name()) &&
-                            req.getUrl().equals(requestData.getUrl()) &&
-                            req.getHeaders().containsKey("Content-Type") &&
-                            userName.equals("goodUsername") &&
-                            pass.equals("goodPassword")) {
-                        return respData;
-                    } else {
-                        throw new InvalidUseOfMatchersException(
-                                String.format("Argument %s does not match", req.getUrl())
-                        );
-                    }
-                });
+                            if (req.getHttpMethod().name().equals(requestCS.getHttpMethod().name()) &&
+                                    req.getUrl().equals(requestCS.getUrl()) &&
+                                    req.getHeaders().containsKey("Content-Type") &&
+                                    userName.equals("goodUsername") &&
+                                    pass.equals("goodPassword")) {
+                                return respCS;
+                            } else if (req.getHttpMethod().name().equals(requestCHs.getHttpMethod().name()) &&
+                                    req.getUrl().equals(requestCHs.getUrl()) &&
+                                    req.getHeaders().containsKey("Content-Type") &&
+                                    userName.equals("goodUsername") &&
+                                    pass.equals("goodPassword")) {
+                                return respCHs;
+                            } else if (req.getHttpMethod().name().equals(requestData.getHttpMethod().name()) &&
+                                    req.getUrl().equals(requestData.getUrl()) &&
+                                    req.getHeaders().containsKey("Content-Type") &&
+                                    userName.equals("goodUsername") &&
+                                    pass.equals("goodPassword")) {
+                                return respData;
+                            } else {
+                                throw new InvalidUseOfMatchersException(
+                                        String.format("Argument %s does not match", req.getUrl()));
+                            }
+                        });
 
         // ********************************* Validation ********************************* //
         String actualUid = this.delegator.createObject( log,
@@ -304,7 +297,7 @@ public class DotDelegatorTest {
                 this.mockClient );
         String expectedUid = log.getUid();
         assertEquals(expectedUid, actualUid);
-    }*/
+    }
 
     @Test
     public void shouldCreateTrajectoryWithoutUid() throws Exception {
