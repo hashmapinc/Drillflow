@@ -868,7 +868,7 @@ public class Channel {
                                     JSONObject dataPoint = (JSONObject)dataPoints.get(j);
                                     String maxIndex = dataPoint.keys().next().toString();
                                     String maxValue = dataPoint.get(maxIndex).toString();
-                                    if (!maxValue.equalsIgnoreCase("null") || !maxValue.equalsIgnoreCase("")){
+                                    if (!maxValue.equalsIgnoreCase("null") && !maxValue.equalsIgnoreCase("")){
                                         lci.setMaxDateTimeIndex(convertIsoDateToXML(maxIndex));
                                         j = dataPoints.length();
                                         JSONArray toReturn = new JSONArray();
@@ -880,7 +880,7 @@ public class Channel {
                                             JSONObject minDataPoint = (JSONObject)toReturn.get(l);
                                             String minIndex = minDataPoint.keys().next().toString();
                                             String minValue = minDataPoint.get(minIndex).toString();
-                                            if (!minValue.equalsIgnoreCase("null") || !minValue.equalsIgnoreCase("")) {
+                                            if (!minValue.equalsIgnoreCase("null") && !minValue.equalsIgnoreCase("")) {
                                                 lci.setMinDateTimeIndex(convertIsoDateToXML(minIndex));
                                                 l = toReturn.length();
                                             }
@@ -904,7 +904,7 @@ public class Channel {
                                     JSONObject dataPoint = (JSONObject)dataPoints.get(j);
                                     String maxIndex = dataPoint.keys().next().toString();
                                     String maxValue = dataPoint.get(maxIndex).toString();
-                                    if (!maxValue.equalsIgnoreCase("null") || !maxValue.equalsIgnoreCase("")){
+                                    if (!maxValue.equalsIgnoreCase("null") && !maxValue.equalsIgnoreCase("")){
                                         com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure maxMeasure =
                                                 new com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure();
                                         maxMeasure.setUom("m");
@@ -921,7 +921,7 @@ public class Channel {
                                             JSONObject minDataPoint = (JSONObject)toReturn.get(l);
                                             String minIndex = minDataPoint.keys().next().toString();
                                             String minValue = minDataPoint.get(minIndex).toString();
-                                            if (!minValue.equalsIgnoreCase("null") || !minValue.equalsIgnoreCase("")) {
+                                            if (!minValue.equalsIgnoreCase("null") && !minValue.equalsIgnoreCase("")) {
                                                 com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure minMeasure =
                                                         new com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure();
                                                 minMeasure.setUom("m");
