@@ -865,7 +865,7 @@ public class DotDelegator {
 						} else {
 							LOG.warning(ValveLogging.getLogMsg(exchangeID,
 									logResponse(response, "Received " + status + " from DoT POST" + response.getBody()), witsmlObj));
-							throw new ValveException(response.getBody());
+							//throw new ValveException(response.getBody());
 						}
 					}
 				}
