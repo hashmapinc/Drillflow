@@ -1266,8 +1266,8 @@ public class DotDelegator {
 		if (getData) {
 			if (indexType.equals("depth")) {
 				JSONObject payloadJSON = new JSONObject(payload);
-				//if (payloadJSON.has("logData")) {
 				if (((ObjLog)witsmlObject).getLogData() != null || getAllChannels){
+					//if (((ObjLog)witsmlObject).getLogData().size() > 0 || getAllChannels) {
 					String sortDesc = "true";
 					data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
 					// create with POST
@@ -1291,7 +1291,8 @@ public class DotDelegator {
 				}*/
 			} else {
 				JSONObject payloadJSON = new JSONObject(payload);
-				//if (payloadJSON.has("logData")) {
+				if (((ObjLog)witsmlObject).getLogData() != null || getAllChannels) {
+				//if (((ObjLog)witsmlObject).getLogData().size() > 0 || getAllChannels) {
 					String sortDesc = "true";
 					data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
 					// create with POST
@@ -1302,7 +1303,7 @@ public class DotDelegator {
 					// get the request response.
 					channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
 					channelData = channelsDepthResponse.getBody();
-				/*else {
+				}/*else {
 					String sortDesc = "true";
 					data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
 					// create with POST
