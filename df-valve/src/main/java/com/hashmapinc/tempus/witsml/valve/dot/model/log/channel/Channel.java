@@ -774,13 +774,13 @@ public class Channel {
                 lci.setClassIndex(c.getClassIndex());
                 if (c.getTimeDepth().toLowerCase().contains("time")){
                     if (c.getStartIndex() != null){
-                        lci.setMinDateTimeIndex(convertIsoDateToXML(c.getStartIndex()));
+                        lci.setMinDateTimeIndex(convertChannelSetIsoDateToXML(c.getStartIndex()));
                     }else{
                         lci.setMinDateTimeIndex(convertChannelSetIsoDateToXML(channelSet.getStartIndex()));
                     }
 
                     if (c.getEndIndex() != null){
-                        lci.setMaxDateTimeIndex(convertIsoDateToXML(c.getEndIndex()));
+                        lci.setMaxDateTimeIndex(convertChannelSetIsoDateToXML(c.getEndIndex()));
                     }else{
                         lci.setMaxDateTimeIndex(convertChannelSetIsoDateToXML(channelSet.getEndIndex()));
                     }
