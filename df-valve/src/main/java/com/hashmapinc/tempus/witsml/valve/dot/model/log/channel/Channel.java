@@ -33,6 +33,9 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.*;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -773,13 +776,13 @@ public class Channel {
                     if (c.getStartIndex() != null){
                         lci.setMinDateTimeIndex(convertIsoDateToXML(c.getStartIndex()));
                     }else{
-                        lci.setMinDateTimeIndex(convertIsoDateToXML(channelSet.getStartIndex()));
+                        lci.setMinDateTimeIndex(convertChannelSetIsoDateToXML(channelSet.getStartIndex()));
                     }
 
                     if (c.getEndIndex() != null){
                         lci.setMaxDateTimeIndex(convertIsoDateToXML(c.getEndIndex()));
                     }else{
-                        lci.setMaxDateTimeIndex(convertIsoDateToXML(channelSet.getEndIndex()));
+                        lci.setMaxDateTimeIndex(convertChannelSetIsoDateToXML(channelSet.getEndIndex()));
                     }
                 } else {
                     if (c.getStartIndex() != null){
@@ -822,11 +825,6 @@ public class Channel {
     public static List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> to1411WithLogData(
             List<Channel> channels, JSONObject object,ChannelSet channelSet) {
         JSONArray jsonValues = (JSONArray)object.get("value");
-        String[] mnems = new String[jsonValues.length()];
-        //String[] units = new String[jsonValues.length()];
-        //Arrays.fill(units,"unitless");
-        SortedMap<String, String[]> values = new TreeMap<>();
-
 
         List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> curves = new ArrayList<>();
         if (channels == null || channels.isEmpty())
@@ -888,8 +886,8 @@ public class Channel {
                                     }
                                 }
                             }else{
-                                lci.setMaxDateTimeIndex(convertIsoDateToXML(channelSet.getEndIndex()));
-                                lci.setMinDateTimeIndex(convertIsoDateToXML(channelSet.getStartIndex()));
+                                lci.setMaxDateTimeIndex(convertChannelSetIsoDateToXML(channelSet.getEndIndex()));
+                                lci.setMinDateTimeIndex(convertChannelSetIsoDateToXML(channelSet.getStartIndex()));
                             }
                         }
                     }
@@ -1045,6 +1043,22 @@ public class Channel {
         XMLGregorianCalendar xmlGregCal =  DatatypeFactory.newInstance().newXMLGregorianCalendar(cal);
 
         return xmlGregCal;
+    }
+
+    private static XMLGregorianCalendar convertChannelSetIsoDateToXML(String dateTime)
+            throws DatatypeConfigurationException, ParseException {
+        //DateFormat format = new SimpleDateFormat("yyyy-MM-ddThh:mm:ss.SSSXXX");
+        // Date date = format.parse("2014-04-24 11:15:00");
+        //Date date = format.parse(dateTime);
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ISO_DATE_TIME;
+        TemporalAccessor accessor = timeFormatter.parse(dateTime);
+
+        Date date = Date.from(Instant.from(accessor));
+
+        GregorianCalendar cal = new GregorianCalendar();
+        cal.setTime(date);
+
+        return DatatypeFactory.newInstance().newXMLGregorianCalendar(cal);
     }
 
     @Override
