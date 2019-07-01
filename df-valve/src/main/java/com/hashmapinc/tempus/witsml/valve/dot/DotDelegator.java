@@ -44,11 +44,9 @@ import org.json.JSONObject;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class DotDelegator {
 	private static final Logger LOG = Logger.getLogger(DotDelegator.class.getName());
@@ -716,9 +714,9 @@ public class DotDelegator {
 									String password,
 									String exchangeID,
 									DotClient client )
-			throws ValveException,
-			ValveAuthException,
-			UnirestException
+											throws ValveException,
+												   ValveAuthException,
+												   UnirestException
 	{
 		HttpResponse<String> response;
 		String objectType = witsmlObj.getObjectType();
@@ -737,12 +735,34 @@ public class DotDelegator {
 		//        Channels (CHANNELS_IDX_4_PAYLOADS),
 		//        and Data (DATA_IDX_4_PAYLOADS)
 		String[] allPayloads = getPayloads4Log( version,
-				payload,
-				witsmlObj );
+												payload,
+												witsmlObj );
+
+		// for performing mnemonic check, I need the data payload that
+		// contains the index log curve mnemonic
+		String dataPayloadWithIndexCurveMnemonic = "";
+		if ( !"".equals(allPayloads[DATA_IDX_4_PAYLOADS]) ) {
+			switch (version) {
+				// TODO Do analogous for 1.3.1.1
+				case "1.3.1.1":
+					dataPayloadWithIndexCurveMnemonic =
+						DotLogDataHelper.convertDataToDotFrom1311(
+							(com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj);
+					break;
+				case "1.4.1.1":
+					dataPayloadWithIndexCurveMnemonic =
+						DotLogDataHelper.convertDataToDotFrom1411RetainingIndexCurveMnemonic(
+							(ObjLog) witsmlObj);
+					break;
+			}
+		}
 
 		// all "Client should ..." checks will be performed in this method
 		// this method will throw the correct valve exception if the payload is non-conforming
-		payloadCheck(allPayloads);
+		payloadCheck( allPayloads[CS_IDX_4_PAYLOADS],
+					  allPayloads[CHANNELS_IDX_4_PAYLOADS],
+					  dataPayloadWithIndexCurveMnemonic,
+					  version );
 
 		// ********************************* ChannelSet ********************************* //
 		// endpoint:
@@ -757,24 +777,25 @@ public class DotDelegator {
 		// call a central method to finish the REST set-up
 		// and execute the rest call for ChannelSet
 		response = performRestCall( allPayloads[CS_IDX_4_PAYLOADS],
-				endpoint,
-				requestParams,
-				client,
-				username,
-				password,
-				witsmlObj,
-				exchangeID );
+									endpoint,
+									requestParams,
+									client,
+									username,
+									password,
+									witsmlObj,
+									exchangeID );
 
 		// check response status
 		if(response == null){
-			throw new ValveException("Missing mandatory channel set", (short) -405);
+			throw new ValveException( "Missing mandatory channel set",
+									  (short) -405);
 		}
 		int status = response.getStatus();
 		if (409 == status) {
 			LOG.info( ValveLogging.getLogMsg( exchangeID,
-					logResponse( response,
-							"Log already in store" ),
-					witsmlObj) );
+											  logResponse( response,
+														  "Log already in store" ),
+														   witsmlObj) );
 			throw new ValveException("Log already in store", (short) -405);
 		}
 
@@ -818,22 +839,22 @@ public class DotDelegator {
 				// call a central method to finish the REST set-up
 				// and execute the rest call for ChannelSet
 				response = performRestCall( allPayloads[CHANNELS_IDX_4_PAYLOADS],
-						endpoint,
-						requestParams,
-						client,
-						username,
-						password,
-						witsmlObj,
-						exchangeID );
+											endpoint,
+											requestParams,
+											client,
+											username,
+											password,
+											witsmlObj,
+											exchangeID );
 
 				// check response status
 				status = response.getStatus();
 				if (200 == status) {
 					LOG.info(ValveLogging.getLogMsg( exchangeID,
-							logResponse(response,
-									"Received successful " +
-											"status code from DoT create call: channels"),
-							witsmlObj));
+												     logResponse( response,
+																 "Received successful " +
+																		"status code from DoT create call: channels"),
+													 witsmlObj));
 					// TODO: cache the channels
 
 					// ************************************ Data ************************************ //
@@ -843,13 +864,13 @@ public class DotDelegator {
 					requestParams.put("channelSetUuid", uuid4CS);
 
 					response = performRestCall( allPayloads[DATA_IDX_4_PAYLOADS],
-							endpoint,
-							requestParams,
-							client,
-							username,
-							password,
-							witsmlObj,
-							exchangeID );
+												endpoint,
+												requestParams,
+												client,
+												username,
+												password,
+												witsmlObj,
+												exchangeID );
 					// check response status
 					if(response == null){
 						LOG.info("No Log Data Present");
@@ -863,45 +884,64 @@ public class DotDelegator {
 													+ "status code from DoT create call: data"),
 									witsmlObj));
 						} else {
-							LOG.warning(ValveLogging.getLogMsg(exchangeID,
-									logResponse(response, "Received " + status + " from DoT POST" + response.getBody()), witsmlObj));
+							LOG.warning(ValveLogging.getLogMsg(	exchangeID,
+															    logResponse(response,
+																			"Received "
+																					+ status
+																					+ " from DoT POST"
+																					+ response.getBody()),
+																			witsmlObj));
 							throw new ValveException(response.getBody());
 						}
 					}
+				} else {
+					LOG.warning(ValveLogging.getLogMsg(	exchangeID,
+							logResponse( response,
+										"Received "
+											+ status
+											+ " from DoT POST"
+											+ response.getBody()),
+										 witsmlObj));
+					throw new ValveException(response.getBody());
 				}
 
 			}
 			return (null == uid || uid.isEmpty()) ? new JsonNode(response.getBody()).getObject().getString("uid") :
 					uid;
 		} else {
-			LOG.warning(ValveLogging.getLogMsg(    exchangeID,
-					logResponse( response,
-							"Received " + status +
-									" from DoT POST" + response.getBody()),
-					witsmlObj));
+			LOG.warning(ValveLogging.getLogMsg( exchangeID,
+												logResponse( response,
+															"Received " + status +
+																	" from DoT POST" + response.getBody()),
+												witsmlObj));
 			throw new ValveException(response.getBody());
 		}
 	}
 
 	/**
 	 * Before any REST calls are performed, validate that the payloads provided
-	 * by the Client are valid.
+	 * by the Client are valid. Server-side
 	 *
-	 * This method supports the DoT business rules for payloads.
-	 *
-	 * @param allPayloads
+	 * @param  channelPayload JSON Java String; mapped from WITSML
+	 * @param  version (1.3.1.1 or 1.4.1.1)
+	 * @return void
 	 */
-	private void payloadCheck( String[] allPayloads )
-			throws ValveException
+	private void payloadCheck( String channelSetPayload,
+							   String channelPayload,
+							   String dataPayload,
+							   String version )
+										throws ValveException
 	{
 
 		String CSErrorMsg = "Client must provide valid payload: " +
 				"channel set (log header with name) is missing.";
 		String CHErrorMsg = "Client must provide valid payload: " +
 				"channels is missing (so unit of measure cannot be obtained).";
+		String LOGErrorMsg = "Client must provide valid payload: " +
+				"mnemonics must be correctly provided (no duplicates, etc.).";
 
 		// if there is no channel set payload, fail this request
-		if ( allPayloads[CS_IDX_4_PAYLOADS].equals("") ) {
+		if ( "".equals(channelSetPayload) ) {
 			LOG.warning( CSErrorMsg );
 			// A mandatory write schema item is missing.
 			throw new ValveException( CSErrorMsg, (short)-484 );
@@ -909,11 +949,87 @@ public class DotDelegator {
 		}
 		// if there are no channels, then there is no unit of measure (UOM)
 		// so fail this request
-		if (  allPayloads[CHANNELS_IDX_4_PAYLOADS].equals("") ) {
+		if (  "".equals(channelPayload) ) {
 			LOG.warning(CHErrorMsg);
 			// Client must always specify the unit for all measure data
 			throw new ValveException(CSErrorMsg, (short) -453);
 		}
+		// perform mnemonics checks
+		short errorCode = mnemonicsChecks( channelPayload, dataPayload, version );
+		if ( errorCode != 1 ) {
+			LOG.warning(LOGErrorMsg);
+			// Client must specify unique column-identifiers &
+			// they must be correct (channels & data are consistent)
+			throw new ValveException(LOGErrorMsg, errorCode);
+		}
+	}
+
+	/**
+	 *  checks that mnemonics as provided within the Client request
+	 *  correctly conforms to the WITSML specification
+	 *
+	 * @param  channelPayload JSON channel set payload
+	 * @param  dataPayload    JSON data payload
+	 * @param  version	  	  1.3.1.1 or 1.4.1.1
+	 *
+	 * @return short	  	  1 = all OK
+	 * 						  not 1 = failure
+	 */
+	// TODO Create a JUnit test
+	public static short mnemonicsChecks( String channelPayload,
+										 String dataPayload,
+										 String version )
+	{
+		if ( "1.4.1.1".equals(version) ) {
+			// create a mnemonicList from the lci's:
+			JSONArray channelJSONarray = new JSONArray(channelPayload);
+			String[] channelMnemonicList = new String[channelJSONarray.length()];
+			for (int n = 0; n < channelJSONarray.length(); n++) {
+				JSONObject channelObject = channelJSONarray.getJSONObject(n);
+				channelMnemonicList[n] = channelObject.getString("mnemonic");
+			}
+			// FIRST: are there any duplicates within this mnemonicList?
+			if (duplicates(channelMnemonicList)) {
+				// When adding or updating curves, a client MUST specify
+				// unique column-identifiers.
+				return (short)-447;
+			}
+			// obtain the mnemonicList from the data payload
+			JSONObject dataObject = new JSONObject(dataPayload);
+			String[] dataMnemonicList = dataObject.getString("mnemonicList")
+					.split(",");
+			// SECOND: are there any duplicates within this mnemonicList?
+			if (duplicates(dataMnemonicList)) {
+				// When adding or updating curves, a client MUST specify
+				// unique column-identifiers.
+				return (short)-447;
+			}
+			// FINALLY: is there a 1-1 correlation between the two arrays?
+			if (channelMnemonicList.length == dataMnemonicList.length) {
+				for (int i = 0; i < channelMnemonicList.length - 1; i++) {
+					if (!channelMnemonicList[i].equals(dataMnemonicList[i])) {
+						return (short)-460;
+					}
+				}
+			} else {
+				//
+				return (short)-460;
+			}
+		}
+		// TODO 1.3.1.1
+		return (short)1;
+	}
+
+	private static boolean duplicates(String[] inputArray) {
+		Set<String> uniqueElements = new HashSet<>();
+
+		Set<String> duplicateElements =  Arrays.stream(inputArray)
+												.filter(i -> !uniqueElements.add(i))
+												//.boxed()
+												.collect(Collectors.toSet());
+		if ( duplicateElements.isEmpty() )
+			return false;
+		return true;
 	}
 
 	/**
@@ -938,9 +1054,10 @@ public class DotDelegator {
 												 String password,
 												 AbstractWitsmlObject witsmlObj,
 												 String exchangeID )
-			throws ValveAuthException,
-			UnirestException,
-			ValveException {
+															throws ValveAuthException,
+																   UnirestException,
+																   ValveException
+	{
 
 		HttpRequestWithBody request = Unirest.post(endpoint);
 		if ("".equals(payload)){
@@ -1267,7 +1384,7 @@ public class DotDelegator {
 			if (indexType.equals("depth")) {
 				JSONObject payloadJSON = new JSONObject(payload);
 				//if (payloadJSON.has("logData")) {
-					if (((ObjLog)witsmlObject).getLogData() != null){
+				if (((ObjLog)witsmlObject).getLogData() != null || getAllChannels){
 					String sortDesc = "true";
 					data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
 					// create with POST
@@ -1291,7 +1408,7 @@ public class DotDelegator {
 				}*/
 			} else {
 				JSONObject payloadJSON = new JSONObject(payload);
-				if (payloadJSON.has("logData")) {
+				//if (payloadJSON.has("logData")) {
 					String sortDesc = "true";
 					data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
 					// create with POST
@@ -1302,7 +1419,7 @@ public class DotDelegator {
 					// get the request response.
 					channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
 					channelData = channelsDepthResponse.getBody();
-				}/*else {
+				/*else {
 					String sortDesc = "true";
 					data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
 					// create with POST
@@ -1325,7 +1442,7 @@ public class DotDelegator {
 				String wellBoreSearchEndpoint = this.getEndpoint("wellboresearch");
 				finalResponse = LogConverterExtended.convertDotResponseToWitsml
 						(wellSearchEndpoint,wellBoreSearchEndpoint,client,username,password,exchangeID, witsmlObject,allChannelSet.getBody(),
-						channels,channelData,payload );
+								channels,channelData,getAllChannels);
 			} catch (Exception e) {
 				LOG.info(ValveLogging.getLogMsg(
 						exchangeID,

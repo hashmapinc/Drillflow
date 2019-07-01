@@ -140,6 +140,19 @@ public class StoreImpl implements IStore {
             }
             String version = WitsmlUtil.getVersionFromXML(XMLin);
             witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, XMLin, version);
+
+            // every witsmlObject must contain all parentage-pointers and
+            // lower level (child) uid values must be defined in the XMLin file
+            for ( AbstractWitsmlObject witsmlObject : witsmlObjects ) {
+                // TODO MUST EXIST BEFORE YOU CAN GET IT!!!
+                if ( witsmlObject.getUid().isEmpty() ||
+                     witsmlObject.getParentUid().isEmpty() ||
+                     witsmlObject.getGrandParentUid().isEmpty() ) {
+                    response.setResult((short)-406);
+                    return response;
+                }
+            }
+
             ValveUser user = (ValveUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             QueryContext qc = new QueryContext(
                 version,

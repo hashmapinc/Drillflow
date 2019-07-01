@@ -75,6 +75,16 @@ public class DotLogDataHelper extends LogDataHelper {
         return result;
     }
 
+    public static String convertDataToDotFrom1411RetainingIndexCurveMnemonic(
+            com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog log){
+        String result = "{";
+        String wml20MnemonicList = log.getLogData().get(0).getMnemonicList();
+        String curveMnemonics = wml20MnemonicList.substring(wml20MnemonicList.indexOf(",")+1);
+        result = result + "\"mnemonicList\":" + "\"" + wml20MnemonicList + "\"" + ",";
+        result = result + "\"data\":" + "\"" + convertDataToWitsml20From1411(log) + "\"}";
+        return result;
+    }
+
     public static String convertDataToDotFrom1311(com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog log){
         String result = "{";
         StringBuilder mnemList= new StringBuilder();

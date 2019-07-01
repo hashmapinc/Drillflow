@@ -24,7 +24,6 @@ import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
 import com.hashmapinc.tempus.witsml.valve.dot.DotDelegator;
 import com.hashmapinc.tempus.witsml.valve.dot.client.DotClient;
-import com.hashmapinc.tempus.witsml.valve.dot.client.UidUuidCache;
 import com.hashmapinc.tempus.witsml.valve.dot.graphql.GraphQLQueryConverter;
 import com.hashmapinc.tempus.witsml.valve.dot.graphql.GraphQLRespConverter;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channel.Channel;
@@ -62,7 +61,7 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
      */
 
     public static ObjLog convertDotResponseToWitsml(String wellSearchEndpoint,String wellBoreSearchEndpoint,DotClient client, String username,
-                                                    String password, String exchangeID,AbstractWitsmlObject witsmlObject,String channelSet, List<Channel> channels,String channelsDepthResponse,String payload) throws JsonParseException,
+                                                    String password, String exchangeID,AbstractWitsmlObject witsmlObject,String channelSet, List<Channel> channels,String channelsDepthResponse,Boolean getAllChannels) throws JsonParseException,
             JsonMappingException, IOException, DatatypeConfigurationException, ParseException,ValveException, ValveAuthException, UnirestException {
 
         ObjLog log =null;
@@ -76,7 +75,8 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
 
         //Todo logData requested or not
         //if (payloadJSON.has("logData")) {
-            if (((ObjLog)witsmlObject).getLogData() != null){
+        if (((ObjLog)witsmlObject).getLogData() != null || getAllChannels){
+            //if (((ObjLog)witsmlObject).getLogData().size() >0 || getAllChannels){
             // Code added to build log data response
             //Todo construct LogData from response
             if (channelsDepthResponse != null) {
@@ -84,27 +84,13 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
                 List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData> curves = new ArrayList<>();
                 curves.add(DotLogDataHelper.convertTo1411FromDot(logDataJsonObject));
                 log.setLogData(curves);
-                //List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> lcis = Channel.to1411WithLogData(channels,DotLogDataHelper.convertTo1411FromDot(logDataJsonObject));
-                List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> lcis = Channel.to1411WithLogData(channels,logDataJsonObject);
+                List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> lcis = Channel.to1411WithLogData(channels,logDataJsonObject,cs.get(0));
                 log.setLogCurveInfo(lcis);
             }
         }else{
             List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> lcis = Channel.to1411(channels,cs.get(0));
             log.setLogCurveInfo(lcis);
         }
-
-/*        List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> lcis = Channel.to1411(channels,cs.get(0));
-        log.setLogCurveInfo(lcis);
-        // Code added to build log data response
-        //Todo construct LogData from response
-        if (channelsDepthResponse != null) {
-            JSONObject logDataJsonObject = new JSONObject(channelsDepthResponse);
-            List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData> curves = new ArrayList<>();
-
-            curves.add(DotLogDataHelper.convertTo1411FromDot(logDataJsonObject));
-            log.setLogData(curves);
-        }*/
-
         return log;
     }
 
