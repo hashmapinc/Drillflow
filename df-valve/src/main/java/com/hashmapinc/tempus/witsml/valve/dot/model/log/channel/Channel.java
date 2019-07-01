@@ -867,7 +867,7 @@ public class Channel {
                                     String maxIndex = dataPoint.keys().next().toString();
                                     String maxValue = dataPoint.get(maxIndex).toString();
                                     if (!maxValue.equalsIgnoreCase("null") && !maxValue.equalsIgnoreCase("")){
-                                        lci.setMaxDateTimeIndex(convertIsoDateToXML(maxIndex));
+                                        lci.setMaxDateTimeIndex(convertChannelSetIsoDateToXML(maxIndex));
                                         j = dataPoints.length();
                                         JSONArray toReturn = new JSONArray();
                                         int length = dataPoints.length()-1;
@@ -879,7 +879,7 @@ public class Channel {
                                             String minIndex = minDataPoint.keys().next().toString();
                                             String minValue = minDataPoint.get(minIndex).toString();
                                             if (!minValue.equalsIgnoreCase("null") && !minValue.equalsIgnoreCase("")) {
-                                                lci.setMinDateTimeIndex(convertIsoDateToXML(minIndex));
+                                                lci.setMinDateTimeIndex(convertChannelSetIsoDateToXML(minIndex));
                                                 l = toReturn.length();
                                             }
                                         }
