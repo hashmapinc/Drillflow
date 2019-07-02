@@ -62,7 +62,8 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
      */
 
     public static ObjLog convertDotResponseToWitsml(String wellSearchEndpoint,String wellBoreSearchEndpoint,DotClient client, String username,
-                                                    String password, String exchangeID,AbstractWitsmlObject witsmlObject,String channelSet, List<Channel> channels,String channelsDepthResponse,Boolean getAllChannels) throws JsonParseException,
+                                                    String password, String exchangeID,AbstractWitsmlObject witsmlObject,String channelSet,
+                                                    List<Channel> channels,String channelsDepthResponse,Boolean getAllChannels,String indexType) throws JsonParseException,
             JsonMappingException, IOException, DatatypeConfigurationException, ParseException,ValveException, ValveAuthException, UnirestException {
 
         ObjLog log =null;
@@ -76,12 +77,12 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
 
         //LogData requested or not
         if (((ObjLog)witsmlObject).getLogData() != null || getAllChannels){
-        //if (((ObjLog)witsmlObject).getLogData().size() >0 || getAllChannels){
+            //if (((ObjLog)witsmlObject).getLogData().size() >0 || getAllChannels){
             // Code added to build log data response
             if (channelsDepthResponse != null) {
                 JSONObject logDataJsonObject = new JSONObject(channelsDepthResponse);
                 List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData> curves = new ArrayList<>();
-                curves.add(DotLogDataHelper.convertTo1411FromDot(logDataJsonObject));
+                curves.add(DotLogDataHelper.convertTo1411FromDot(logDataJsonObject,indexType));
                 log.setLogData(curves);
                 List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> lcis = Channel.to1411WithLogData(channels,logDataJsonObject,cs.get(0));
                 log.setLogCurveInfo(lcis);

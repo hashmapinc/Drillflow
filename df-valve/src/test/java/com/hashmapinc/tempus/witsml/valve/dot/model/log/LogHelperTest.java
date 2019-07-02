@@ -88,7 +88,8 @@ public class LogHelperTest {
     public void shouldConvertDotTo1411() throws IOException {
         String dotLogData = TestUtilities.getResourceAsString("dotConversion/dotLogData.json");
         String csvLogData = TestUtilities.getResourceAsString("dotConversion/sourceLogCsv.csv");
-        CsLogData data = DotLogDataHelper.convertTo1411FromDot(new JSONObject(dotLogData));
+        String indexType = "depth";
+        CsLogData data = DotLogDataHelper.convertTo1411FromDot(new JSONObject(dotLogData),indexType);
         assertNotNull(data);
     }
 
@@ -107,3 +108,4 @@ public class LogHelperTest {
     }
 
 }
+
