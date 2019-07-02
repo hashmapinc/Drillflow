@@ -1104,7 +1104,8 @@ public class DotDelegator {
 		JSONObject payloadJSON = new JSONObject(payload);
 
 		try {
-
+			// TODO The presence or absence of "name" dictates whether there is a viable Channel Set to work with...
+			//		Is this true????
 			// ****************************************** CHANNEL SET ******************************************
 			// even if there is no "name" element provided by the Client, Drillflow provides a "name" equal to
 			// the String "null"

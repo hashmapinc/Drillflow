@@ -32,6 +32,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.IOException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
@@ -572,6 +573,8 @@ public class ChannelSet {
     }
 
     public static ChannelSet from1411(com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog witsmlObj) {
+        // DoT accepts this date/time format ONLY.
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
         ChannelSet cs = new ChannelSet();
         Citation citation = new Citation();
@@ -604,7 +607,8 @@ public class ChannelSet {
                 indexType = "time";
                 cs.setTimeDepth(indexType);
                 if (witsmlObj.getStartDateTimeIndex() != null)
-                    cs.setStartIndex(witsmlObj.getStartDateTimeIndex().toXMLFormat());
+                        cs.setStartIndex(witsmlObj.getStartDateTimeIndex()
+                                    .toXMLFormat());
                 if (witsmlObj.getEndDateTimeIndex() != null)
                     cs.setEndIndex(witsmlObj.getEndDateTimeIndex().toXMLFormat());
             }
@@ -834,10 +838,8 @@ public class ChannelSet {
         return objectMapper.readValue(channelSet, ChannelSet.class);  
     }
     private static XMLGregorianCalendar convertIsoDateToXML(String dateTime)
-        throws DatatypeConfigurationException, ParseException {
-        //DateFormat format = new SimpleDateFormat("yyyy-MM-ddThh:mm:ss.SSSXXX");
-        // Date date = format.parse("2014-04-24 11:15:00");
-        //Date date = format.parse(dateTime);
+                                            throws DatatypeConfigurationException
+    {
         DateTimeFormatter timeFormatter = DateTimeFormatter.ISO_DATE_TIME;
         TemporalAccessor accessor = timeFormatter.parse(dateTime);
 
