@@ -121,11 +121,11 @@ public class DotLogDataHelper extends LogDataHelper {
 
             dotCurrentChannel.put("name", wmlCurrentChannel.getMnemonic());
             indexUnit = wmlCurrentChannel.getIndex().get(0).getUom();
-                if (startIndex != null)
-                    dotCurrentChannel.put("startIndex", startIndex);
+            if (startIndex != null)
+                dotCurrentChannel.put("startIndex", startIndex);
 
-                if (endIndex != null)
-                    dotCurrentChannel.put("endIndex", endIndex);
+            if (endIndex != null)
+                dotCurrentChannel.put("endIndex", endIndex);
 
             requestedChannels.put(dotCurrentChannel);
         }
@@ -143,7 +143,7 @@ public class DotLogDataHelper extends LogDataHelper {
 
     //code added for logData Transformation
 
-    public static CsLogData convertTo1411FromDot(JSONObject object){
+    public static CsLogData convertTo1411FromDot(JSONObject object,String indexType){
         JSONArray jsonValues = (JSONArray)object.get("value");
         String[] mnems = new String[jsonValues.length()];
         String[] units = new String[jsonValues.length()];
@@ -173,24 +173,43 @@ public class DotLogDataHelper extends LogDataHelper {
         }
 
         //sorting
-        Map<Double, String[]> newMap = values.entrySet().stream()
-                .collect(Collectors.toMap(entry -> Double.parseDouble(entry.getKey()), Map.Entry::getValue));
-        Map<Double, String[]> sortedMap = new TreeMap<Double, String[]>(newMap);
-
-        //Build the Log Data
         CsLogData data = new CsLogData();
-        data.setMnemonicList(String.join(",", mnems));
-        data.setUnitList(String.join(",", units));
         List<String> dataRows = new ArrayList<>();
-        Iterator valueIterator = sortedMap.entrySet().iterator();
-        while (valueIterator.hasNext()) {
-            Map.Entry pair = (Map.Entry)valueIterator.next();
-            StringBuilder logDataRow = new StringBuilder();
-            logDataRow.append(pair.getKey());
-            logDataRow.append(',');
-            logDataRow.append(String.join(",", (String[])pair.getValue()));
-            dataRows.add(logDataRow.toString());
-            valueIterator.remove(); // avoids a ConcurrentModificationException
+        if (indexType.equals("depth")) {
+            Map<Double, String[]> newMap = values.entrySet().stream()
+                    .collect(Collectors.toMap(entry -> Double.parseDouble(entry.getKey()), Map.Entry::getValue));
+            Map<Double, String[]> sortedMap = new TreeMap<Double, String[]>(newMap);
+
+            //Build the Log Data
+
+            data.setMnemonicList(String.join(",", mnems));
+            data.setUnitList(String.join(",", units));
+            Iterator valueIterator = sortedMap.entrySet().iterator();
+            while (valueIterator.hasNext()) {
+                Map.Entry pair = (Map.Entry)valueIterator.next();
+                StringBuilder logDataRow = new StringBuilder();
+                logDataRow.append(pair.getKey());
+                logDataRow.append(',');
+                logDataRow.append(String.join(",", (String[])pair.getValue()));
+                dataRows.add(logDataRow.toString());
+                valueIterator.remove(); // avoids a ConcurrentModificationException
+            }
+
+        }else{
+            //Build the Log Data
+            data.setMnemonicList(String.join(",", mnems));
+            data.setUnitList(String.join(",", units));
+            Iterator valueIterator = values.entrySet().iterator();
+            while (valueIterator.hasNext()) {
+                Map.Entry pair = (Map.Entry)valueIterator.next();
+                StringBuilder logDataRow = new StringBuilder();
+                logDataRow.append(pair.getKey());
+                logDataRow.append(',');
+                logDataRow.append(String.join(",", (String[])pair.getValue()));
+                dataRows.add(logDataRow.toString());
+                valueIterator.remove(); // avoids a ConcurrentModificationException
+            }
+
         }
         data.setData(dataRows);
         return data;
