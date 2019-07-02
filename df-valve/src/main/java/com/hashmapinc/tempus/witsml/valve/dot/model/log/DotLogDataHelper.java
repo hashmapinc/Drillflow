@@ -22,7 +22,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.*;
-
+import java.util.stream.Collectors;
 
 
 public class DotLogDataHelper extends LogDataHelper {
@@ -182,12 +182,17 @@ public class DotLogDataHelper extends LogDataHelper {
             }
         }
 
+        //sorting
+        Map<Double, String[]> newMap = values.entrySet().stream()
+                .collect(Collectors.toMap(entry -> Double.parseDouble(entry.getKey()), Map.Entry::getValue));
+        Map<Double, String[]> sortedMap = new TreeMap<Double, String[]>(newMap);
+
         //Build the Log Data
         CsLogData data = new CsLogData();
         data.setMnemonicList(String.join(",", mnems));
         data.setUnitList(String.join(",", units));
         List<String> dataRows = new ArrayList<>();
-        Iterator valueIterator = values.entrySet().iterator();
+        Iterator valueIterator = sortedMap.entrySet().iterator();
         while (valueIterator.hasNext()) {
             Map.Entry pair = (Map.Entry)valueIterator.next();
             StringBuilder logDataRow = new StringBuilder();

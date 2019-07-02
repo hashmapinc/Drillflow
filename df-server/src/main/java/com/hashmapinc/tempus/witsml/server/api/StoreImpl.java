@@ -120,11 +120,11 @@ public class StoreImpl implements IStore {
 
     @Override
     public WMLS_AddToStoreResponse addToStore(
-        String WMLtypeIn,
-        String XMLin,
-        String OptionsIn,
-        String CapabilitiesIn
-    ) {
+                                                String WMLtypeIn,
+                                                String XMLin,
+                                                String OptionsIn,
+                                                String CapabilitiesIn)
+    {
         LOG.info("Executing addToStore for query <" + getExchangeId() + ">");
         // try to add to store
         List<AbstractWitsmlObject> witsmlObjects;
