@@ -504,6 +504,13 @@ public class DotDelegator {
 
 		// all other (non-log) types
 		} else {
+			// endpoints for all non-log types:
+			// WELL:		...well/v2/witsml/wells/
+			//				(refer to democore/Slb.Prism.Core.Service.Well-2 for SLB API:
+			//				 PUT: Create a well object with uid specified or
+			//					  Update a well object in 1.4.1.1 format)
+			// WELLBORE:	...wellbore/v1/witsml/wellbores/
+			// TRAJECTORY:	...trajectoryreader/v1/witsml/trajectories/
 			String endpoint = this.getEndpoint(objectType) + uid;
 			HttpRequestWithBody request = Unirest.put(endpoint);
 			HttpResponse<String> response;
