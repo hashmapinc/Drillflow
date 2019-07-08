@@ -65,11 +65,11 @@ public class ChannelSet {
     @JsonProperty("index")
     private List<Index> index = null;
     @JsonProperty("objectGrowing")
-    private Boolean objectGrowing;
+    private String objectGrowing;
     @JsonProperty("dataUpateRate")
     private Integer dataUpateRate;
     @JsonProperty("curveSensorsAligned")
-    private Boolean curveSensorsAligned;
+    private String curveSensorsAligned;
     @JsonProperty("dataGroup")
     private String dataGroup;
     @JsonProperty("stepIncrement")
@@ -216,12 +216,12 @@ public class ChannelSet {
     }
 
     @JsonProperty("objectGrowing")
-    public Boolean getObjectGrowing() {
+    public String getObjectGrowing() {
         return objectGrowing;
     }
 
     @JsonProperty("objectGrowing")
-    public void setObjectGrowing(Boolean objectGrowing) {
+    public void setObjectGrowing(String objectGrowing) {
         this.objectGrowing = objectGrowing;
     }
 
@@ -236,12 +236,12 @@ public class ChannelSet {
     }
 
     @JsonProperty("curveSensorsAligned")
-    public Boolean getCurveSensorsAligned() {
+    public String getCurveSensorsAligned() {
         return curveSensorsAligned;
     }
 
     @JsonProperty("curveSensorsAligned")
-    public void setCurveSensorsAligned(Boolean curveSensorsAligned) {
+    public void setCurveSensorsAligned(String curveSensorsAligned) {
         this.curveSensorsAligned = curveSensorsAligned;
     }
 
@@ -578,7 +578,7 @@ public class ChannelSet {
         citation.setTitle(witsmlObj.getName());
         citation.setDescription(witsmlObj.getDescription());
         if (witsmlObj.getCreationDate() != null)
-            citation.setCreation(witsmlObj.getCreationDate().toXMLFormat());
+            citation.setCreation(witsmlObj.getCreationDate());
         cs.setCitation(citation);
         cs.setBhaRunNumber(witsmlObj.getBhaRunNumber());
         cs.setDataGroup(witsmlObj.getDataGroup());
@@ -604,9 +604,9 @@ public class ChannelSet {
                 indexType = "time";
                 cs.setTimeDepth(indexType);
                 if (witsmlObj.getStartDateTimeIndex() != null)
-                    cs.setStartIndex(witsmlObj.getStartDateTimeIndex().toXMLFormat());
+                    cs.setStartIndex(witsmlObj.getStartDateTimeIndex());
                 if (witsmlObj.getEndDateTimeIndex() != null)
-                    cs.setEndIndex(witsmlObj.getEndDateTimeIndex().toXMLFormat());
+                    cs.setEndIndex(witsmlObj.getEndDateTimeIndex());
             }
         }
 
@@ -645,9 +645,9 @@ public class ChannelSet {
                 indexType = "time";
                 cs.setTimeDepth(indexType);
                 if (witsmlObj.getStartIndex() != null)
-                    cs.setStartIndex(witsmlObj.getStartDateTimeIndex().toXMLFormat());
+                    cs.setStartIndex(witsmlObj.getStartDateTimeIndex());
                 if (witsmlObj.getEndIndex() != null)
-                    cs.setEndIndex(witsmlObj.getEndDateTimeIndex().toXMLFormat());
+                    cs.setEndIndex(witsmlObj.getEndDateTimeIndex());
             }
         }
         cs.setNullValue(witsmlObj.getNullValue());
@@ -710,8 +710,8 @@ public class ChannelSet {
             }
         } else {
             if (channelSet.getEndIndex() != null){
-                wmlLog.setStartDateTimeIndex(convertIsoDateToXML(channelSet.getStartIndex()));
-                wmlLog.setEndDateTimeIndex(convertIsoDateToXML(channelSet.getEndIndex()));
+                wmlLog.setStartDateTimeIndex(channelSet.getStartIndex());
+                wmlLog.setEndDateTimeIndex(channelSet.getEndIndex());
             }
         }
         return wmlLog;
@@ -741,6 +741,7 @@ public class ChannelSet {
         wmlLog.setNullValue(channelSet.getNullValue());
         wmlLog.setObjectGrowing(channelSet.getObjectGrowing());
         wmlLog.setLogParam(LogParam.to1411(channelSet.getLogParam()));
+        wmlLog.setCreationDate(channelSet.getCitation().getCreation());
 
        // Set commonData
         com.hashmapinc.tempus.WitsmlObjects.v1411.CsCommonData commonData = new com.hashmapinc.tempus.WitsmlObjects.v1411.CsCommonData();
@@ -766,8 +767,8 @@ public class ChannelSet {
             }
         } else {
             if (channelSet.getEndIndex() != null){
-                wmlLog.setStartDateTimeIndex(convertIsoDateToXML(channelSet.getStartIndex()));
-                wmlLog.setEndDateTimeIndex(convertIsoDateToXML(channelSet.getEndIndex()));
+                wmlLog.setStartDateTimeIndex(channelSet.getStartIndex());
+                wmlLog.setEndDateTimeIndex(channelSet.getEndIndex());
             }
         }
         return wmlLog;
@@ -797,6 +798,7 @@ public class ChannelSet {
         wmlLog.setNullValue(channelSet.getNullValue());
         wmlLog.setObjectGrowing(channelSet.getObjectGrowing());
         wmlLog.setLogParam(LogParam.to1311(channelSet.getLogParam()));
+        wmlLog.setCreationDate(channelSet.getCitation().getCreation());
 
         if (channelSet.getTimeDepth().toLowerCase().contains("depth")) {
             GenericMeasure startMeasure = new GenericMeasure();
@@ -808,8 +810,8 @@ public class ChannelSet {
             endMeasure.setValue(Double.parseDouble(channelSet.getEndIndex()));
             wmlLog.setEndIndex(endMeasure);
         } else {
-            wmlLog.setStartDateTimeIndex(convertIsoDateToXML(channelSet.getStartIndex()));
-            wmlLog.setEndDateTimeIndex(convertIsoDateToXML(channelSet.getEndIndex()));
+            wmlLog.setStartDateTimeIndex(channelSet.getStartIndex());
+            wmlLog.setEndDateTimeIndex(channelSet.getEndIndex());
         }
         return wmlLog;
     }

@@ -1233,26 +1233,26 @@ public class DotDelegator {
 
 		if ("1.3.1.1".equals(witsmlObject.getVersion())){
 			if (((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getStartDateTimeIndex() != null){
-				startIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getStartDateTimeIndex().toXMLFormat();
+				startIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getStartDateTimeIndex();
 			} else if (((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getStartIndex() != null &&
 					((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getStartIndex().getValue() != null){
 				startIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getStartIndex().getValue().toString();
 			}
 			if (((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getEndDateTimeIndex() != null){
-				endIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getEndDateTimeIndex().toXMLFormat();
+				endIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getEndDateTimeIndex();
 			} else if (((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getEndIndex() != null&&
 					((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getEndIndex().getValue() != null){
 				endIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getEndIndex().getValue().toString();
 			}
 		} else if ("1.4.1.1".equals(witsmlObject.getVersion())) {
 			if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getStartDateTimeIndex() != null){
-				startIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getStartDateTimeIndex().toXMLFormat();
+				startIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getStartDateTimeIndex();
 			} else if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getStartIndex() != null &&
 					((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getStartIndex().getValue() != null){
 				startIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getStartIndex().getValue().toString();
 			}
 			if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getEndDateTimeIndex() != null){
-				endIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getEndDateTimeIndex().toXMLFormat();
+				endIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getEndDateTimeIndex();
 			} else if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getEndIndex() != null &&
 					((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getEndIndex().getValue() != null){
 				endIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getEndIndex().getValue().toString();
@@ -1427,11 +1427,11 @@ public class DotDelegator {
 					if (lci.getMnemonic().equals(currentChannel.getMnemonic())){
 						if (currentChannel.getIndex().get(0).getIndexType().toLowerCase().contains("time")){
 							if (lci.getMaxDateTimeIndex() != null)
-								currentChannel.setEndIndex(lci.getMaxDateTimeIndex().toXMLFormat());
+								currentChannel.setEndIndex(lci.getMaxDateTimeIndex());
 							else
 								currentChannel.setEndIndex(null);
 							if (lci.getMinDateTimeIndex() != null)
-								currentChannel.setStartIndex(lci.getMaxDateTimeIndex().toXMLFormat());
+								currentChannel.setStartIndex(lci.getMaxDateTimeIndex());
 							else
 								currentChannel.setStartIndex(null);
 						} else {
