@@ -109,7 +109,7 @@ public class Channel {
     @JsonProperty("mnemAlias")
     private MnemAlias mnemAlias;
     @JsonProperty("alternateIndex")
-    private Boolean alternateIndex;
+    private String alternateIndex;
     @JsonProperty("sensorOffset")
     private SensorOffset sensorOffset;
     @JsonProperty("densData")
@@ -280,12 +280,12 @@ public class Channel {
     }
 
     @JsonProperty("alternateIndex")
-    public Boolean getAlternateIndex() {
+    public String getAlternateIndex() {
         return alternateIndex;
     }
 
     @JsonProperty("alternateIndex")
-    public void setAlternateIndex(Boolean alternateIndex) {
+    public void setAlternateIndex(String alternateIndex) {
         this.alternateIndex = alternateIndex;
     }
 
@@ -774,15 +774,15 @@ public class Channel {
                 lci.setClassIndex(c.getClassIndex());
                 if (c.getTimeDepth().toLowerCase().contains("time")){
                     if (c.getStartIndex() != null){
-                        lci.setMinDateTimeIndex(convertChannelSetIsoDateToXML(c.getStartIndex()));
+                        lci.setMinDateTimeIndex(c.getStartIndex());
                     }else{
-                        lci.setMinDateTimeIndex(convertChannelSetIsoDateToXML(channelSet.getStartIndex()));
+                        lci.setMinDateTimeIndex(channelSet.getStartIndex());
                     }
 
                     if (c.getEndIndex() != null){
-                        lci.setMaxDateTimeIndex(convertChannelSetIsoDateToXML(c.getEndIndex()));
+                        lci.setMaxDateTimeIndex(c.getEndIndex());
                     }else{
-                        lci.setMaxDateTimeIndex(convertChannelSetIsoDateToXML(channelSet.getEndIndex()));
+                        lci.setMaxDateTimeIndex(channelSet.getEndIndex());
                     }
                 } else {
                     if (c.getStartIndex() != null){
@@ -867,7 +867,7 @@ public class Channel {
                                     String maxIndex = dataPoint.keys().next().toString();
                                     String maxValue = dataPoint.get(maxIndex).toString();
                                     if (!maxValue.equalsIgnoreCase("null") && !maxValue.equalsIgnoreCase("")){
-                                        lci.setMaxDateTimeIndex(convertChannelSetIsoDateToXML(maxIndex));
+                                        lci.setMaxDateTimeIndex(maxIndex);
                                         j = dataPoints.length();
                                         JSONArray toReturn = new JSONArray();
                                         int length = dataPoints.length()-1;
@@ -879,15 +879,15 @@ public class Channel {
                                             String minIndex = minDataPoint.keys().next().toString();
                                             String minValue = minDataPoint.get(minIndex).toString();
                                             if (!minValue.equalsIgnoreCase("null") && !minValue.equalsIgnoreCase("")) {
-                                                lci.setMinDateTimeIndex(convertChannelSetIsoDateToXML(minIndex));
+                                                lci.setMinDateTimeIndex(minIndex);
                                                 l = toReturn.length();
                                             }
                                         }
                                     }
                                 }
                             }else{
-                                lci.setMaxDateTimeIndex(convertChannelSetIsoDateToXML(channelSet.getEndIndex()));
-                                lci.setMinDateTimeIndex(convertChannelSetIsoDateToXML(channelSet.getStartIndex()));
+                                lci.setMaxDateTimeIndex(channelSet.getEndIndex());
+                                lci.setMinDateTimeIndex(channelSet.getStartIndex());
                             }
                         }
                     }
@@ -987,8 +987,8 @@ public class Channel {
                 lci.setColumnIndex(c.classIndex);
 
                 if (c.getTimeDepth().toLowerCase().contains("time")){
-                    lci.setMinDateTimeIndex(convertIsoDateToXML(c.getStartIndex()));
-                    lci.setMaxDateTimeIndex(convertIsoDateToXML(c.getEndIndex()));
+                    lci.setMinDateTimeIndex(c.getStartIndex());
+                    lci.setMaxDateTimeIndex(c.getEndIndex());
                 } else {
                     GenericMeasure minMeasure = new GenericMeasure();
                     minMeasure.setUom("m");
