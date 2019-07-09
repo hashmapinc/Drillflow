@@ -2,8 +2,6 @@ package com.hashmapinc.tempus.witsml.server.api.interceptors;
 
 import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.ext.logging.event.LogEventSender;
-import org.apache.cxf.ext.logging.slf4j.Slf4jEventSender;
-import org.apache.cxf.ext.logging.slf4j.Slf4jVerboseEventSender;
 
 public class PrettyLoggingFeature extends LoggingFeature {
 
