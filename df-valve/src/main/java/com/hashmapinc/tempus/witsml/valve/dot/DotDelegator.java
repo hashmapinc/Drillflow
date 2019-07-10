@@ -1012,7 +1012,9 @@ public class DotDelegator {
 			}
 
 			// ******************************************* CHANNELS ********************************************
-			if (payloadJSON.getJSONArray("logCurveInfo") != null &&
+
+			if (payloadJSON.has("logCurveInfo") &&
+					payloadJSON.getJSONArray("logCurveInfo") != null &&
 					payloadJSON.getJSONArray("logCurveInfo").length() > 0) {
 				switch (version) {
 					case "1.3.1.1":
