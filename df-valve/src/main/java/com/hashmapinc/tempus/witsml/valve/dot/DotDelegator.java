@@ -1262,7 +1262,7 @@ public class DotDelegator {
 		}
 
 		if (!getAllChannels)
-			channels = filterChannelsBasedOnRequest(channels, witsmlObject,startIndex,endIndex);
+			channels = filterChannelsBasedOnRequest(channels, witsmlObject,cs.get(0));
 		// Build Request for Get Channels Depth
 		String channelData = null;
 		if (getData) {
@@ -1356,7 +1356,7 @@ public class DotDelegator {
 			return null;
 	}
 
-	private List<Channel> filterChannelsBasedOnRequest(List<Channel> allChannels, AbstractWitsmlObject requestObject,String startIndex, String endIndex) throws ValveException{
+	private List<Channel> filterChannelsBasedOnRequest(List<Channel> allChannels, AbstractWitsmlObject requestObject,ChannelSet channelSet) throws ValveException{
 		List<Channel> requestedChannels = new ArrayList<>();
 
 		if (allChannels.size() == 0){
@@ -1455,16 +1455,22 @@ public class DotDelegator {
 				for (com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo lci : ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) requestObject).getLogCurveInfo()){
 					if (lci.getMnemonic().getValue().equals(currentChannel.getMnemonic())){
 
-						if (endIndex != null) {
-							currentChannel.setEndIndex(endIndex);
+						if (currentChannel.getStartIndex() != null){
+							currentChannel.setStartIndex(currentChannel.getStartIndex());
 							currentChannel.setMnemonic(lci.getMnemonic().getValue());
-						}else
-							currentChannel.setEndIndex(null);
-						if (startIndex != null) {
-							currentChannel.setStartIndex(startIndex);
+						}else{
+							currentChannel.setStartIndex(channelSet.getStartIndex());
 							currentChannel.setMnemonic(lci.getMnemonic().getValue());
-						}else
-							currentChannel.setStartIndex(null);
+						}
+
+						if (currentChannel.getEndIndex() != null){
+							currentChannel.setEndIndex(currentChannel.getEndIndex());
+							currentChannel.setMnemonic(lci.getMnemonic().getValue());
+						}else{
+							currentChannel.setEndIndex(channelSet.getEndIndex());
+							currentChannel.setMnemonic(lci.getMnemonic().getValue());
+						}
+
 						requestedChannels.add(currentChannel);
 					}
 				}
