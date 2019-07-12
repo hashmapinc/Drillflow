@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
 
 @Service
 @WebService(serviceName = "WMLS", portName = "StoreSoapPort", targetNamespace = "http://www.witsml.org/wsdl/120", endpointInterface = "com.hashmapinc.tempus.witsml.server.api.IStore")
-@Features(features = "org.apache.cxf.ext.logging.LoggingFeature")
+@Features(features = "com.hashmapinc.tempus.witsml.server.api.interceptors.PrettyLoggingFeature")
 public class StoreImpl implements IStore {
     private static final Logger LOG = Logger.getLogger(StoreImpl.class.getName());
 
@@ -303,6 +303,7 @@ public class StoreImpl implements IStore {
             resp.setSuppMsgOut(e.getMessage());
             if (e.getErrorCode() != null){
                 resp.setResult(e.getErrorCode());
+                resp.setSuppMsgOut(witsmlApiConfigUtil.getProperty("basemessages." + e.getErrorCode()));
             }
             return resp;
         } catch (Exception ex){

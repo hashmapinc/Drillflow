@@ -102,30 +102,24 @@ public class Index {
         this.additionalProperties.put(name, value);
     }
 
+
     public static List<Index> from1411(com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog log){
+
         if (log == null){
             return null;
-        }
-
-        String indexType = null;
-        if (log.getIndexType() != null) {
-            if (log.getIndexType().contains("time")) {
-                indexType = "Time";
-            } else {
-                indexType = "Depth";
-            }
         }
 
         Index index = new Index();
         index.setDirection(log.getDirection());
         index.setMnemonic(log.getIndexCurve());
-        if (indexType != null)
-            index.setIndexType(indexType);
+        index.setIndexType(log.getIndexType());
+
         Optional<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> matchingObject = log
                 .getLogCurveInfo()
                 .stream()
-                .filter(p -> p.getMnemonic().getValue().equals(log.getIndexCurve()))
+                .filter(p -> p.getMnemonic()!=null && p.getMnemonic().getValue().equals(log.getIndexCurve()))
                 .findFirst();
+
         if (!matchingObject.isEmpty()) {
             index.setUom(matchingObject.get().getUnit());
         }
@@ -140,15 +134,20 @@ public class Index {
             return null;
         }
 
+        /*
         String indexType = "Depth";
         if (log.getIndexType().contains("time"))
             indexType = "Time";
+        */
 
         Index index = new Index();
         index.setDirection(log.getDirection());
         index.setMnemonic(log.getIndexCurve().getValue());
+        index.setIndexType(log.getIndexType());
+        /*
         if (indexType!=null)
             index.setIndexType(indexType);
+        */
         Optional<com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogCurveInfo> matchingObject = log
                 .getLogCurveInfo()
                 .stream()

@@ -19,16 +19,23 @@ import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.GenericMeasure;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ShortNameStruct;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channelset.*;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.*;
 import java.util.stream.IntStream;
 
@@ -98,11 +105,12 @@ public class Channel {
     @JsonProperty("channelState")
     private String channelState;
     @JsonProperty("classIndex")
+    @JsonDeserialize(using = ClassIndexDeserializer.class)
     private Short classIndex;
     @JsonProperty("mnemAlias")
     private MnemAlias mnemAlias;
     @JsonProperty("alternateIndex")
-    private Boolean alternateIndex;
+    private String alternateIndex;
     @JsonProperty("sensorOffset")
     private SensorOffset sensorOffset;
     @JsonProperty("densData")
@@ -251,13 +259,13 @@ public class Channel {
     }
 
     @JsonProperty("classIndex")
-    //@JsonDeserialize(using = ClassIndexDeserializer.class)
+    @JsonDeserialize(using = ClassIndexDeserializer.class)
     public Short getClassIndex() {
         return classIndex;
     }
 
     @JsonProperty("classIndex")
-    //@JsonDeserialize(using = ClassIndexDeserializer.class)
+    @JsonDeserialize(using = ClassIndexDeserializer.class)
     public void setClassIndex(Short classIndex) {
         this.classIndex = classIndex;
     }
@@ -273,12 +281,12 @@ public class Channel {
     }
 
     @JsonProperty("alternateIndex")
-    public Boolean getAlternateIndex() {
+    public String getAlternateIndex() {
         return alternateIndex;
     }
 
     @JsonProperty("alternateIndex")
-    public void setAlternateIndex(Boolean alternateIndex) {
+    public void setAlternateIndex(String alternateIndex) {
         this.alternateIndex = alternateIndex;
     }
 
@@ -618,8 +626,16 @@ public class Channel {
         return om.writerWithDefaultPrettyPrinter().writeValueAsString(this);
     }
 
+    /**
+     * Maps an incoming WITSML XML Object from a v1.4.1.1 Client in order to send to DoT (2.0-ish
+     * REST API).
+     *
+     * @param witsmlObj XML Request from a v1.4.1.1 Client
+     *
+     * @return List<Channel> Channels converted to format consumable by DoT (2.0-ish)
+     *         null Object   No Channels were provided by the Client
+     */
     public static List<Channel> from1411(com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog witsmlObj) {
-
         if (witsmlObj.getLogCurveInfo() == null)
             return null;
 
@@ -633,8 +649,10 @@ public class Channel {
 
                 Citation c = new Citation();
                 c.setTitle(lci.getMnemonic().getValue());
-
+                c.setDescription(lci.getCurveDescription());
                 channel.setCitation(c);
+
+                channel.setClassWitsml(lci.getClassWitsml());
                 channel.setUid(lci.getUid());
                 channel.setNamingSystem(lci.getMnemonic().getNamingSystem());
                 channel.setMnemonic(lci.getMnemonic().getValue());
@@ -647,8 +665,9 @@ public class Channel {
                             channel.setTimeDepth("Time");
                     }
                 }
-
-
+                // Card #460
+                // <classIndex/> is part of the log curve metadata;
+                // set it appropriately
                 channel.setClassIndex(lci.getClassIndex());
 
                 if (lci.getUnit() == null) {
@@ -679,6 +698,15 @@ public class Channel {
         return channels;
     }
 
+    /**
+     * Maps an incoming WITSML XML Object from a v1.3.1.1 Client in order to send to DoT (2.0-ish
+     * REST API).
+     *
+     * @param witsmlObj XML Request from a v1.3.1.1 Client
+     *
+     * @return List<Channel> Channels converted to format consumable by DoT (2.0-ish)
+     *         null Object   No Channels were provided by the Client
+     */
     public static List<Channel> from1311(com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog witsmlObj) {
         if (witsmlObj.getLogCurveInfo() == null)
             return null;
@@ -710,7 +738,14 @@ public class Channel {
                     channel.setUom(lci.getUnit());
                 }
                 // Card #454
+                // v1.3.1.1 has <columnIndex/>, not <classIndex/>
+                // <columnIndex/> is not <classIndex/>, but this is
+                // the server-side attribute specifying the
+                // order of the log curve in the data table by
+                // column count; so putting in column index at this
+                // point is correct
                 channel.setClassIndex(lci.getColumnIndex());
+
                 channel.setIndex(indicies);
                 channel.setNullValue(lci.getNullValue());
                 channel.setAlternateIndex(lci.isAlternateIndex());
@@ -733,8 +768,21 @@ public class Channel {
         return channels;
     }
 
+    /**
+     * Maps a list of Channels from DoT (2.0-ish REST API) to a list of Channels for a
+     * v1.4.1.1 Client.
+     *
+     * @param channels      List of Channels from DoT (2.0-ish REST API)
+     *        channelSet    Channel Set with StartIndex and EndIndex values
+     *
+     * @return List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo>
+     *                      List of Channels for a v1.4.1.1 Client
+     *         null Object   No Channels were provided by DoT
+     */
     public static List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> to1411(
-            List<Channel> channels) {
+                                        List<Channel> channels,
+                                        ChannelSet channelSet)
+    {
         List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> curves = new ArrayList<>();
 
         if (channels == null || channels.isEmpty())
@@ -750,6 +798,8 @@ public class Channel {
                 lci.setMnemonic(name);
                 lci.setAlternateIndex(c.getAlternateIndex());
                 lci.setClassWitsml(c.getClassWitsml());
+                // Card #460
+                //
                 lci.setClassIndex(c.getClassIndex());
                 lci.setCurveDescription(c.getCitation().getDescription());
                 lci.setDataSource(c.getSource());
@@ -766,10 +816,17 @@ public class Channel {
                 lci.setWellDatum(WellDatum.to1411(c.getWellDatum()));
                 lci.setClassIndex(c.getClassIndex());
                 if (c.getTimeDepth().toLowerCase().contains("time")){
-                    if (c.getStartIndex() != null)
-                        lci.setMinDateTimeIndex(convertIsoDateToXML(c.getStartIndex()));
-                    if (c.getEndIndex() != null)
-                        lci.setMaxDateTimeIndex(convertIsoDateToXML(c.getEndIndex()));
+                    if (c.getStartIndex() != null){
+                        lci.setMinDateTimeIndex(c.getStartIndex());
+                    }else{
+                        lci.setMinDateTimeIndex(channelSet.getStartIndex());
+                    }
+
+                    if (c.getEndIndex() != null){
+                        lci.setMaxDateTimeIndex(c.getEndIndex());
+                    }else{
+                        lci.setMaxDateTimeIndex(channelSet.getEndIndex());
+                    }
                 } else {
                     if (c.getStartIndex() != null){
                         com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure minMeasure =
@@ -777,12 +834,24 @@ public class Channel {
                         minMeasure.setUom("m");
                         minMeasure.setValue(Double.parseDouble(c.getStartIndex()));
                         lci.setMinIndex(minMeasure);
+                    }else{
+                        com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure minMeasure =
+                                new com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure();
+                        minMeasure.setUom("m");
+                        minMeasure.setValue(Double.parseDouble(channelSet.getStartIndex()));
+                        lci.setMinIndex(minMeasure);
                     }
                     if (c.getEndIndex() != null){
                         com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure maxMeasure =
                                 new com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure();
                         maxMeasure.setUom("m");
                         maxMeasure.setValue(Double.parseDouble(c.getEndIndex()));
+                        lci.setMaxIndex(maxMeasure);
+                    }else{
+                        com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure maxMeasure =
+                                new com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure();
+                        maxMeasure.setUom("m");
+                        maxMeasure.setValue(Double.parseDouble(channelSet.getEndIndex()));
                         lci.setMaxIndex(maxMeasure);
                     }
                 }
@@ -805,12 +874,13 @@ public class Channel {
             return null;
 
         for (Channel c : channels) {
-            try{
+            try {
                 com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogCurveInfo lci =
                         new com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogCurveInfo();
                 lci.setMnemonic(c.getCitation().getTitle());
                 lci.setAlternateIndex(c.getAlternateIndex());
                 lci.setClassWitsml(c.getClassWitsml());
+                // Card #454
                 // find the index of the mnemonic from the current lci
                 // within the mnemonicList
                 OptionalInt indexOpt = IntStream.range(0, mnemonicList.length)
@@ -836,10 +906,11 @@ public class Channel {
                 lci.setDensData(DensData.to1311(c.getDensData()));
                 lci.setSensorOffset(SensorOffset.to1311(c.getSensorOffset()));
                 lci.setWellDatum(WellDatum.to1311(c.getWellDatum()));
-/*
-                if (c.getTimeDepth().toLowerCase().contains("depth")){
-                    lci.setMinDateTimeIndex(convertIsoDateToXML(c.getStartIndex()));
-                    lci.setMaxDateTimeIndex(convertIsoDateToXML(c.getEndIndex()));
+                lci.setColumnIndex(c.classIndex);
+
+                if (c.getTimeDepth().toLowerCase().contains("time")){
+                    lci.setMinDateTimeIndex(c.getStartIndex());
+                    lci.setMaxDateTimeIndex(c.getEndIndex());
                 } else {
                     GenericMeasure minMeasure = new GenericMeasure();
                     minMeasure.setUom("m");
@@ -850,9 +921,9 @@ public class Channel {
                     maxMeasure.setValue(Double.parseDouble(c.getEndIndex()));
                     lci.setMaxIndex(maxMeasure);
                 }
-*/
+
                 curves.add(lci);
-            } catch (Exception ex){
+            } catch (Exception ex) {
                 continue;
             }
         }
@@ -866,8 +937,9 @@ public class Channel {
         return om.writerWithDefaultPrettyPrinter().writeValueAsString(channels);
     }
 
-    public static List<Channel> jsonToChannelList(String channelsList) throws ValveException {
-        return fromJSON(new TypeReference<List<Channel>>() {}, channelsList);
+    public static List<Channel> jsonToChannelList(String channelsList) throws ValveException{
+        // TypeReference<List<Channel>() {}, channelsList);
+        return fromJSON(new TypeReference<>() {}, channelsList);
     }
 
     public static <T> T fromJSON(final TypeReference<T> type, final String jsonPacket) throws ValveException {
@@ -894,6 +966,22 @@ public class Channel {
         XMLGregorianCalendar xmlGregCal =  DatatypeFactory.newInstance().newXMLGregorianCalendar(cal);
 
         return xmlGregCal;
+    }
+
+    private static XMLGregorianCalendar convertChannelSetIsoDateToXML(String dateTime)
+            throws DatatypeConfigurationException, ParseException {
+        //DateFormat format = new SimpleDateFormat("yyyy-MM-ddThh:mm:ss.SSSXXX");
+        // Date date = format.parse("2014-04-24 11:15:00");
+        //Date date = format.parse(dateTime);
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ISO_DATE_TIME;
+        TemporalAccessor accessor = timeFormatter.parse(dateTime);
+
+        Date date = Date.from(Instant.from(accessor));
+
+        GregorianCalendar cal = new GregorianCalendar();
+        cal.setTime(date);
+
+        return DatatypeFactory.newInstance().newXMLGregorianCalendar(cal);
     }
 
     @Override
@@ -942,7 +1030,6 @@ public class Channel {
 
     @Override
     public int hashCode() {
-        // TODO Verify this works for both v1311 & v1411
         return Objects.hash(uuid, uid, wellDatum, nullValue, channelState, classIndex, mnemAlias, alternateIndex, sensorOffset, densData, traceOrigin, traceState, namingSystem, mnemonic, dataType, description, uom, source, axisDefinition, timeDepth, channelClass, classWitsml, runNumber, passNumber, loggingCompanyName, loggingCompanyCode, toolName, toolClass, derivation, loggingMethod, nominalHoleSize, index, aliases, citation, customData, objectVersion, existenceKind);
     }
 }

@@ -87,7 +87,7 @@ public class JsonUtil {
                 req.put(key, reqObj); // update req with the updated value for this key
 
             } else if (reqObj instanceof JSONArray && respObj instanceof JSONArray ) {
-                if (isEmpty(reqObj) && !isEmpty(respObj)) {
+                if (!isEmpty(respObj)) {
                     req.put(key, respObj);
                 }
             } else { // handle all basic values (non array, non nested objects)

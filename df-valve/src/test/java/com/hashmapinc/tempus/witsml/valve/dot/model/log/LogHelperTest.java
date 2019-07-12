@@ -63,6 +63,17 @@ public class LogHelperTest {
     }
 
     @Test
+    public void shouldConvertLegal1411TimeLogToDot() throws IOException, JAXBException {
+        String logXml = TestUtilities.getResourceAsString("dotConversion/log1411Time.xml");
+        com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLogs logs =
+                WitsmlMarshal.deserialize(logXml, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLogs.class);
+
+        com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog log = logs.getLog().get(0);
+        String result = DotLogDataHelper.convertDataToDotFrom1411(log);
+        assertEquals("{\"mnemonicList\":\"DVER,DBTM,DTOR_RT,TQLS,ROP,SWOB,HKLD,RPM,TRPM,TQA,TQX,TQBX,TQMX,MFOP,SPPA,BEDC,MTOA,IMSA,DXC,ECD_RT\",\"data\":\"[[[2001-06-18T13:20:00Z],[498.99, 1.25, 0, 1.45, 3.67, 11.02, 187.66, 0.29, 116.24, 0.01, 0.05, 0.01, 0, 886.03, 1089.99, 1.11, 14.67, 0.29, 1.12, 1.11]],[[2001-06-18T13:30:00.01Z],[500, 1.9, 0.01, 1.42, 9.94, 11.32, 185.7, 0.29, 116.24, 0.01, 0.01, 0.01, 0, 795.19, 973.48, 1.11, 14.67, 0.29, 0.95, 1.11]],[[2001-06-18T13:40:00.03Z],[501.02, 2.92, 0.02, 1.41, 20.46, 11.62, 184.23, 0.29, 120, 0.01, 0.01, 0.01, 0, 796.68, 956.25, 1.11, 14.67, 0.29, 0.83, 1.11]],[[2001-06-18T13:50:00.01Z],[502, 3.9, 0.06, 1.44, 21.73, 10.37, 185.49, 0.29, 120, 0.01, 0.01, 0.01, 0, 802.96, 1005.68, 1.1, 14.66, 0.3, 0.8, 1.11]],[[2001-06-18T14:00:00.01Z],[503, 4.9, 0.11, 1.48, 17.65, 10.31, 185.55, 0.29, 118.09, 0.01, 0.01, 0.01, 0, 801.19, 1007.77, 1.11, 14.66, 0.3, 0.83, 1.11]],[[2001-06-18T14:10:00.05Z],[504.04, 5.94, 0.18, 1.55, 15.58, 10.4, 185.43, 0.29, 120, 0.01, 0.01, 0.01, 0, 800.83, 1015.89, 1.1, 14.67, 0.29, 0.86, 1.11]],[[2001-06-18T14:20:00.03Z],[505.00, 612.03, 1.83, 3.32, 37.11, 18.5, 243.38, 91.93, 0, 8.07, 8.35, 7.68, 0.19, 900.07, 3205, 1.26, 29.67, 93.74, 0.75, 1.31]]]\"}",result);
+    }
+
+    @Test
     public void shouldConvertLegal1311LogToDot() throws IOException, JAXBException {
         String logXml = TestUtilities.getResourceAsString("log1311.xml");
         com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLogs logs =
@@ -77,7 +88,8 @@ public class LogHelperTest {
     public void shouldConvertDotTo1411() throws IOException {
         String dotLogData = TestUtilities.getResourceAsString("dotConversion/dotLogData.json");
         String csvLogData = TestUtilities.getResourceAsString("dotConversion/sourceLogCsv.csv");
-        CsLogData data = DotLogDataHelper.convertTo1411FromDot(new JSONObject(dotLogData));
+        String indexType = "depth";
+        CsLogData data = DotLogDataHelper.convertTo1411FromDot(new JSONObject(dotLogData),indexType);
         assertNotNull(data);
     }
 
@@ -89,4 +101,11 @@ public class LogHelperTest {
         assertNotNull(data);
     }
 
+    @Test
+    public void shouldCreateDotTimeDataRequestObject() throws IOException {
+        String dotLogData = TestUtilities.getResourceAsString("dotConversion/log1411Time.xml");
+
+    }
+
 }
+

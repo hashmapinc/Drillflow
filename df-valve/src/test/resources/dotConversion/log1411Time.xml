@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<logs xmlns="http://www.witsml.org/schemas/1series"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.witsml.org/schemas/1series  ../xsd_schemas/obj_log.xsd"
+      version="1.4.1.1">
+    <log uidWell="W-xxxx" uidWellbore="B-xxxx" uid="TL-xxxx">
+        <nameWell>Well xxxx</nameWell>
+        <nameWellbore>Wellbore xxxx</nameWellbore>
+        <name>Time Log xxxx</name>
+        <serviceCompany>Baker Hughes INTEQ</serviceCompany>
+        <runNumber>12.3</runNumber>
+        <creationDate>2001-06-18T13:20:00.000Z</creationDate>
+        <description>Drilling Data Log</description>
+        <indexType>date time</indexType>
+        <stepIncrement uom="s">0</stepIncrement>
+        <startDateTimeIndex>2001-06-18T13:20:00Z</startDateTimeIndex>
+        <endDateTimeIndex>2001-06-18T14:20:00Z</endDateTimeIndex>
+        <direction>increasing</direction>
+        <indexCurve>Time</indexCurve>
+        <nullValue>-999.25</nullValue>
+        <logParam index="1" name="MRES" uom="ohm.m" description="Mud Resistivity" uid="lp-1">1.25</logParam>
+        <logParam index="2" name="BDIA" uom="in" description="Bit Diameter" uid="lp-2">12.25 </logParam>
+        <logCurveInfo uid="lci-1">
+            <mnemonic>Time</mnemonic>
+            <classWitsml>time</classWitsml>
+            <unit>m</unit>
+            <mnemAlias>md</mnemAlias>
+            <nullValue>-999.25</nullValue>
+            <minDateTimeIndex>2001-06-18T13:20:00Z</minDateTimeIndex>
+            <maxDateTimeIndex>2001-06-18T14:20:00Z</maxDateTimeIndex>
+            <curveDescription>time stamp</curveDescription>
+            <sensorOffset uom="ft">0</sensorOffset>
+            <traceState>raw</traceState>
+            <typeLogData>double</typeLogData>
+        </logCurveInfo>
+        <logCurveInfo uid="lci-2">
+            <mnemonic>DVER</mnemonic>
+            <classWitsml>TVD of hole</classWitsml>
+            <unit>m</unit>
+            <mnemAlias>tvd</mnemAlias>
+            <nullValue>-999.25</nullValue>
+            <minDateTimeIndex>2001-06-18T13:20:00Z</minDateTimeIndex>
+            <maxDateTimeIndex>2001-06-18T14:20:00Z</maxDateTimeIndex>
+            <curveDescription>Vertical depth</curveDescription>
+            <sensorOffset uom="ft">0</sensorOffset>
+            <traceState>raw</traceState>
+            <typeLogData>double</typeLogData>
+        </logCurveInfo>
+        <logCurveInfo uid="lci-3">
+            <mnemonic>DBTM</mnemonic>
+            <classWitsml>measured depth of DST bottom</classWitsml>
+            <unit>m</unit>
+            <mnemAlias>distBit</mnemAlias>
+            <nullValue>-999.25</nullValue>
+            <minDateTimeIndex>2001-06-18T13:20:00Z</minDateTimeIndex>
+            <maxDateTimeIndex>2001-06-18T14:20:00Z</maxDateTimeIndex>
+            <curveDescription>Distance drilled by bit</curveDescription>
+            <sensorOffset uom="ft">0</sensorOffset>
+            <traceState>raw</traceState>
+            <typeLogData>double</typeLogData>
+        </logCurveInfo>
+        <logCurveInfo uid="lci-4">
+            <mnemonic>DTOR_RT</mnemonic>
+            <classWitsml>torque (average)</classWitsml>
+            <unit>kft.lbf</unit>
+            <mnemAlias>tqOnBot</mnemAlias>
+            <nullValue>-999.25</nullValue>
+            <minDateTimeIndex>2001-06-18T13:20:00Z</minDateTimeIndex>
+            <maxDateTimeIndex>2001-06-18T14:20:00Z</maxDateTimeIndex>
+            <curveDescription>On bottom torque</curveDescription>
+            <sensorOffset uom="ft">0</sensorOffset>
+            <traceState>raw</traceState>
+            <typeLogData>double</typeLogData>
+        </logCurveInfo>
+        <logCurveInfo uid="lci-5">
+            <mnemonic>TQLS</mnemonic>
+            <classWitsml>torque (average)</classWitsml>
+            <unit>kft.lbf</unit>
+            <mnemAlias>toOffBot</mnemAlias>
+            <nullValue>-999.25</nullValue>
+            <minDateTimeIndex>2001-06-18T13:20:00Z</minDateTimeIndex>
+            <maxDateTimeIndex>2001-06-18T14:20:00Z</maxDateTimeIndex>
+            <curveDescription>Off bottom torque</curveDescription>
+            <sensorOffset uom="ft">0</sensorOffset>
+            <traceState>raw</traceState>
+            <typeLogData>double</typeLogData>
+        </logCurveInfo>
+        <logCurveInfo uid="lci-6">
+            <mnemonic>ROP</mnemonic>
+            <classWitsml>rate of penetration (average)</classWitsml>
+            <unit>m/h</unit>
+            <mnemAlias>ropAv</mnemAlias>
+            <nullValue>-999.25</nullValue>
+            <minDateTimeIndex>2001-06-18T13:20:00Z</minDateTimeIndex>
+            <maxDateTimeIndex>2001-06-18T14:20:00Z</maxDateTimeIndex>
+            <curveDescription>Drill rate</curveDescription>
+            <sensorOffset uom="ft">0</sensorOffset>
+            <traceState>raw</traceState>
+            <typeLogData>double</typeLogData>
+        </logCurveInfo>
+        <logCurveInfo uid="lci-7">
+            <mnemonic>SWOB</mnemonic>
+            <classWitsml>weight on bit (average)</classWitsml>
+            <unit>klbf</unit>
+            <mnemAlias>wobAv</mnemAlias>
+            <nullValue>-999.25</nullValue>
+            <minDateTimeIndex>2001-06-18T13:20:00Z</minDateTimeIndex>
+            <maxDateTimeIndex>2001-06-18T14:20:00Z</maxDateTimeIndex>
+            <curveDescription>Weight on bit</curveDescription>
+            <sensorOffset uom="ft">0</sensorOffset>
+            <traceState>raw</traceState>
+            <typeLogData>double</typeLogData>
+        </logCurveInfo>
+        <logCurveInfo uid="lci-8">
+            <mnemonic>HKLD</mnemonic>
+            <classWitsml>hookload (average)</classWitsml>
+            <unit>klbf</unit>
+            <mnemAlias>hkldAv</mnemAlias>
+            <nullValue>-999.25</nullValue>
+            <minDateTimeIndex>2001-06-18T13:20:00Z</minDateTimeIndex>
+            <maxDateTimeIndex>2001-06-18T14:20:00Z</maxDateTimeIndex>
+            <curveDescription>Hookload</curveDescription>
+            <sensorOffset uom="ft">0</sensorOffset>
+            <traceState>raw</traceState>
+            <typeLogData>double</typeLogData>
+        </logCurveInfo>
+        <logCurveInfo uid="lci-9">
+            <mnemonic>RPM</mnemonic>
+            <classWitsml>rotary speed (average)</classWitsml>
+            <unit>rpm</unit>
+            <mnemAlias>rpmAv</mnemAlias>
+            <nullValue>-999.25</nullValue>
+            <minDateTimeIndex>2001-06-18T13:20:00Z</minDateTimeIndex>
+            <maxDateTimeIndex>2001-06-18T14:20:00Z</maxDateTimeIndex>
+            <curveDescription>RPM measured at surface</curveDescription>
+            <sensorOffset uom="ft">0</sensorOffset>
+            <traceState>raw</traceState>
+            <typeLogData>double</typeLogData>
+        </logCurveInfo>
+        <logCurveInfo uid="lci-10">
+            <mnemonic>TRPM</mnemonic>
+            <classWitsml>measured motor speed</classWitsml>
+            <unit>rpm</unit>
+            <mnemAlias>mmrpm</mnemAlias>
+            <nullValue>-999.25</nullValue>
+            <minDateTimeIndex>2001-06-18T13:20:00Z</minDateTimeIndex>
+            <maxDateTimeIndex>2001-06-18T14:20:00Z</maxDateTimeIndex>
+            <curveDescription>Calculated motor RPM</curveDescription>
+            <sensorOffset uom="ft">0</sensorOffset>
+            <traceState>raw</traceState>
+            <typeLogData>double</typeLogData>
+        </logCurveInfo>
+        <logCurveInfo uid="lci-11">
+            <mnemonic>TQA</mnemonic>
+            <classWitsml>torque (average)</classWitsml>
+            <unit>kft.lbf</unit>
+            <mnemAlias>tqAv</mnemAlias>
+            <nullValue>-999.25</nullValue>
+            <minDateTimeIndex>2001-06-18T13:20:00Z</minDateTimeIndex>
+            <maxDateTimeIndex>2001-06-18T14:20:00Z</maxDateTimeIndex>
+            <curveDescription>Average drilling torque</curveDescription>
+            <sensorOffset uom="ft">0</sensorOffset>
+            <traceState>raw</traceState>
+            <typeLogData>double</typeLogData>
+        </logCurveInfo>
+        <logCurveInfo uid="lci-12">
+            <mnemonic>TQX</mnemonic>
+            <classWitsml>torque (maximum)</classWitsml>
+            <unit>kft.lbf</unit>
+            <mnemAlias>torque (maximum)</mnemAlias>
+            <nullValue>-999.25</nullValue>
+            <minDateTimeIndex>2001-06-18T13:20:00Z</minDateTimeIndex>
+            <maxDateTimeIndex>2001-06-18T14:20:00Z</maxDateTimeIndex>
+            <curveDescription>Maximum drilling torque</curveDescription>
+            <sensorOffset uom="ft">0</sensorOffset>
+            <traceState>raw</traceState>
+            <typeLogData>double</typeLogData>
+        </logCurveInfo>
+        <logCurveInfo uid="lci-13">
+            <mnemonic>TQBX</mnemonic>
+            <classWitsml>torque (average)</classWitsml>
+            <unit>kft.lbf</unit>
+            <mnemAlias>tqMn</mnemAlias>
+            <nullValue>-999.25</nullValue>
+            <minDateTimeIndex>2001-06-18T13:20:00Z</minDateTimeIndex>
+            <maxDateTimeIndex>2001-06-18T14:20:00Z</maxDateTimeIndex>
+            <curveDescription>Minimum drilling torque</curveDescription>
+            <sensorOffset uom="ft">0</sensorOffset>
+            <traceState>raw</traceState>
+            <typeLogData>double</typeLogData>
+        </logCurveInfo>
+        <logCurveInfo uid="lci-14">
+            <mnemonic>TQMX</mnemonic>
+            <classWitsml>torque (maximum)</classWitsml>
+            <unit>kft.lbf</unit>
+            <mnemAlias>tqMx-Mn</mnemAlias>
+            <nullValue>-999.25</nullValue>
+            <minDateTimeIndex>2001-06-18T13:20:00Z</minDateTimeIndex>
+            <maxDateTimeIndex>2001-06-18T14:20:00Z</maxDateTimeIndex>
+            <curveDescription>Maximum - minimum drilling torque</curveDescription>
+            <sensorOffset uom="ft">0</sensorOffset>
+            <traceState>raw</traceState>
+            <typeLogData>double</typeLogData>
+        </logCurveInfo>
+        <logCurveInfo uid="lci-15">
+            <mnemonic>MFOP</mnemonic>
+            <classWitsml>flow rate in (average)</classWitsml>
+            <unit>galUS/min</unit>
+            <mnemAlias>flowInAv</mnemAlias>
+            <nullValue>-999.25</nullValue>
+            <minDateTimeIndex>2001-06-18T13:20:00Z</minDateTimeIndex>
+            <maxDateTimeIndex>2001-06-18T14:20:00Z</maxDateTimeIndex>
+            <curveDescription>Average mud flow in</curveDescription>
+            <sensorOffset uom="ft">0</sensorOffset>
+            <traceState>raw</traceState>
+            <typeLogData>double</typeLogData>
+        </logCurveInfo>
+        <logCurveInfo uid="lci-16">
+            <mnemonic>SPPA</mnemonic>
+            <classWitsml>pressure at pump (average)</classWitsml>
+            <unit>galUS/min</unit>
+            <mnemAlias>presPumpAv</mnemAlias>
+            <nullValue>-999.25</nullValue>
+            <minDateTimeIndex>2001-06-18T13:20:00Z</minDateTimeIndex>
+            <maxDateTimeIndex>2001-06-18T14:20:00Z</maxDateTimeIndex>
+            <curveDescription>Average pump pressure</curveDescription>
+            <sensorOffset uom="ft">0</sensorOffset>
+            <traceState>raw</traceState>
+            <typeLogData>double</typeLogData>
+        </logCurveInfo>
+        <logCurveInfo uid="lci-17">
+            <mnemonic>BEDC</mnemonic>
+            <classWitsml>mud density in (average)</classWitsml>
+            <unit>g/cm3</unit>
+            <mnemAlias>wtMudInAv</mnemAlias>
+            <nullValue>-999.25</nullValue>
+            <minDateTimeIndex>2001-06-18T13:20:00Z</minDateTimeIndex>
+            <maxDateTimeIndex>2001-06-18T14:20:00Z</maxDateTimeIndex>
+            <curveDescription>Average mud density</curveDescription>
+            <sensorOffset uom="ft">0</sensorOffset>
+            <traceState>raw</traceState>
+            <typeLogData>double</typeLogData>
+        </logCurveInfo>
+        <logCurveInfo uid="lci-18">
+            <mnemonic>MTOA</mnemonic>
+            <classWitsml>mud temperature in (average)</classWitsml>
+            <unit>degC</unit>
+            <mnemAlias>tempMudInAv</mnemAlias>
+            <nullValue>-999.25</nullValue>
+            <minDateTimeIndex>2001-06-18T13:20:00Z</minDateTimeIndex>
+            <maxDateTimeIndex>2001-06-18T14:20:00Z</maxDateTimeIndex>
+            <curveDescription>Average mud temperature</curveDescription>
+            <sensorOffset uom="ft">0</sensorOffset>
+            <traceState>raw</traceState>
+            <typeLogData>double</typeLogData>
+        </logCurveInfo>
+        <logCurveInfo uid="lci-19">
+            <mnemonic>IMSA</mnemonic>
+            <classWitsml>rotary speed (average)</classWitsml>
+            <unit>rpm</unit>
+            <mnemAlias>rpmBitAv</mnemAlias>
+            <nullValue>-999.25</nullValue>
+            <minDateTimeIndex>2001-06-18T13:20:00Z</minDateTimeIndex>
+            <maxDateTimeIndex>2001-06-18T14:20:00Z</maxDateTimeIndex>
+            <curveDescription>Bit RPM</curveDescription>
+            <sensorOffset uom="ft">0</sensorOffset>
+            <traceState>raw</traceState>
+            <typeLogData>double</typeLogData>
+        </logCurveInfo>
+        <logCurveInfo uid="lci-20">
+            <mnemonic>DXC</mnemonic>
+            <classWitsml>drilling exponent (corrected)</classWitsml>
+            <unit>unitless</unit>
+            <mnemAlias>dxc</mnemAlias>
+            <nullValue>-999.25</nullValue>
+            <minDateTimeIndex>2001-06-18T13:20:00Z</minDateTimeIndex>
+            <maxDateTimeIndex>2001-06-18T14:20:00Z</maxDateTimeIndex>
+            <curveDescription>d exponent</curveDescription>
+            <sensorOffset uom="ft">0</sensorOffset>
+            <traceState>raw</traceState>
+            <typeLogData>double</typeLogData>
+        </logCurveInfo>
+        <logCurveInfo uid="lci-21">
+            <mnemonic>ECD_RT</mnemonic>
+            <classWitsml>ecdTd ???????????</classWitsml>
+            <unit>g/cm3</unit>
+            <mnemAlias>ecdTd</mnemAlias>
+            <nullValue>-999.25</nullValue>
+            <minDateTimeIndex>2001-06-18T13:20:00Z</minDateTimeIndex>
+            <maxDateTimeIndex>2001-06-18T14:20:00Z</maxDateTimeIndex>
+            <curveDescription>equivalent circulating density</curveDescription>
+            <sensorOffset uom="ft">0</sensorOffset>
+            <traceState>raw</traceState>
+            <typeLogData>double</typeLogData>
+        </logCurveInfo>
+        <logData>
+            <mnemonicList>Time,DVER,DBTM,DTOR_RT,TQLS,ROP,SWOB,HKLD,RPM,TRPM,TQA,TQX,TQBX,TQMX,MFOP,SPPA,BEDC,MTOA,IMSA,DXC,ECD_RT</mnemonicList>
+            <unitList>m,m,m,kft.lbf,kft.lbf,m/h,klbf,klbf,rpm,rpm,kft.lbf,kft.lbf,kft.lbf,kft.lbf,galUS/min,galUS/min,g/cm3,degC,rpm,unitless,g/cm3</unitList>
+            <data>2001-06-18T13:20:00Z,498.99,1.25,0,1.45,3.67,11.02,187.66,0.29,116.24,0.01,0.05,0.01,0,886.03,1089.99,1.11,14.67,0.29,1.12,1.11</data>
+            <data>2001-06-18T13:30:00.01Z,500,1.9,0.01,1.42,9.94,11.32,185.7,0.29,116.24,0.01,0.01,0.01,0,795.19,973.48,1.11,14.67,0.29,0.95,1.11</data>
+            <data>2001-06-18T13:40:00.03Z,501.02,2.92,0.02,1.41,20.46,11.62,184.23,0.29,120,0.01,0.01,0.01,0,796.68,956.25,1.11,14.67,0.29,0.83,1.11</data>
+            <data>2001-06-18T13:50:00.01Z,502,3.9,0.06,1.44,21.73,10.37,185.49,0.29,120,0.01,0.01,0.01,0,802.96,1005.68,1.1,14.66,0.3,0.8,1.11</data>
+            <data>2001-06-18T14:00:00.01Z,503,4.9,0.11,1.48,17.65,10.31,185.55,0.29,118.09,0.01,0.01,0.01,0,801.19,1007.77,1.11,14.66,0.3,0.83,1.11</data>
+            <data>2001-06-18T14:10:00.05Z,504.04,5.94,0.18,1.55,15.58,10.4,185.43,0.29,120,0.01,0.01,0.01,0,800.83,1015.89,1.1,14.67,0.29,0.86,1.11</data>
+            <data>2001-06-18T14:20:00.03Z,505.00,612.03,1.83,3.32,37.11,18.5,243.38,91.93,0,8.07,8.35,7.68,0.19,900.07,3205,1.26,29.67,93.74,0.75,1.31</data>
+        </logData>
+        <commonData>
+            <dTimCreation>2003-11-24T08:15:00.000Z</dTimCreation>
+            <dTimLastChange>2003-11-24T08:15:00.000Z</dTimLastChange>
+            <itemState>plan</itemState>
+            <comments>These are the comments associated with the log object.</comments>
+        </commonData>
+    </log>
+</logs>

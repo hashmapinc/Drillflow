@@ -19,6 +19,7 @@ import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBus;
+import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.feature.transform.XSLTOutInterceptor;
 import org.apache.cxf.interceptor.StaxOutInterceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
@@ -73,6 +74,9 @@ public class WitsmlApiConfig {
         endpoint.getOutInterceptors().add(returnRemoval);
         endpoint.setWsdlLocation(wsdl.toString());
         endpoint.publish("/WMLS");
+        LoggingFeature dumbFeature = new LoggingFeature();
+        dumbFeature.setPrettyLogging(false);
+        endpoint.getFeatures().add(dumbFeature);
         return endpoint;
     }
 

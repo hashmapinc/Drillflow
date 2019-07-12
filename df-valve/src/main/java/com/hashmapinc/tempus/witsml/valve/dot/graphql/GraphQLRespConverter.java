@@ -144,6 +144,9 @@ public class GraphQLRespConverter {
             return null;
 
         // return the uuid of the first wellbore in the response.
+        if (data.getJSONArray("wellbores").length() == 0)
+            return null;
+
         return data.getJSONArray("wellbores").getJSONObject(0).getString("uuid");
     }
 

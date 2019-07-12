@@ -22,7 +22,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.*;
-
+import java.util.stream.Collectors;
 
 
 public class DotLogDataHelper extends LogDataHelper {
@@ -96,7 +96,7 @@ public class DotLogDataHelper extends LogDataHelper {
         dotDataObject.put("sortDesc", true);
         JSONArray requestedChannels = new JSONArray();
         String indexUnit = "";
-        for (Channel wmlCurrentChannel : channels){
+/*        for (Channel wmlCurrentChannel : channels){
             JSONObject dotCurrentChannel = new JSONObject();
 
             dotCurrentChannel.put("name", wmlCurrentChannel.getMnemonic());
@@ -114,6 +114,20 @@ public class DotLogDataHelper extends LogDataHelper {
                     dotCurrentChannel.put("endIndex", endIndex);
             }
             requestedChannels.put(dotCurrentChannel);
+        }*/
+
+        for (Channel wmlCurrentChannel : channels){
+            JSONObject dotCurrentChannel = new JSONObject();
+
+            dotCurrentChannel.put("name", wmlCurrentChannel.getMnemonic());
+            indexUnit = wmlCurrentChannel.getIndex().get(0).getUom();
+            if (startIndex != null)
+                dotCurrentChannel.put("startIndex", startIndex);
+
+            if (endIndex != null)
+                dotCurrentChannel.put("endIndex", endIndex);
+
+            requestedChannels.put(dotCurrentChannel);
         }
 
         dotDataObject.put("channels", requestedChannels);
@@ -125,56 +139,6 @@ public class DotLogDataHelper extends LogDataHelper {
     public static String convertChannelDepthDataToDotFrom(List<Channel> channels , String containerId, String sortDesc){
 
         return convertChannelDepthDataToDotFrom(channels, containerId, sortDesc, null, null);
-    }
-
-    //code added for logData Transformation
-
-    public static CsLogData convertTo1411FromDot(JSONObject object){
-        JSONArray jsonValues = (JSONArray)object.get("value");
-        String[] mnems = new String[jsonValues.length()];
-        String[] units = new String[jsonValues.length()];
-        Arrays.fill(units,"unitless");
-        SortedMap<String, String[]> values = new TreeMap<>();
-
-        //Iterate through and get values
-        for (int i = 0; i < jsonValues.length(); i++){
-            if (i == 0) {
-                JSONObject index = (JSONObject)jsonValues.get(i);
-                mnems[i] = (index.get("name").toString());
-                units[i] = (index.get("unit").toString());
-            } else {
-                JSONObject currentValue = (JSONObject)jsonValues.get(i);
-                mnems[i] = (currentValue.get("name").toString());
-                units[i] = (currentValue.get("unit").toString());
-                JSONArray dataPoints = currentValue.getJSONArray("values");
-                for (int j = 0; j < dataPoints.length(); j++){
-                    JSONObject dataPoint = (JSONObject)dataPoints.get(j);
-                    String index = dataPoint.keys().next().toString();
-                    String value = dataPoint.get(index).toString();
-                    if (!values.containsKey(index))
-                        values.put(index, new String[jsonValues.length()-1]);
-                    values.get(index)[i-1] = value;
-                }
-            }
-        }
-
-        //Build the Log Data
-        CsLogData data = new CsLogData();
-        data.setMnemonicList(String.join(",", mnems));
-        data.setUnitList(String.join(",", units));
-        List<String> dataRows = new ArrayList<>();
-        Iterator valueIterator = values.entrySet().iterator();
-        while (valueIterator.hasNext()) {
-            Map.Entry pair = (Map.Entry)valueIterator.next();
-            StringBuilder logDataRow = new StringBuilder();
-            logDataRow.append(pair.getKey());
-            logDataRow.append(',');
-            logDataRow.append(String.join(",", (String[])pair.getValue()));
-            dataRows.add(logDataRow.toString());
-            valueIterator.remove(); // avoids a ConcurrentModificationException
-        }
-        data.setData(dataRows);
-        return data;
     }
 
     public static com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogData convertTo1311FromDot(JSONObject object){
@@ -218,6 +182,78 @@ public class DotLogDataHelper extends LogDataHelper {
             logDataRow.append(String.join(",", (String[])pair.getValue()));
             dataRows.add(logDataRow.toString());
             valueIterator.remove(); // avoids a ConcurrentModificationException
+        }
+        data.setData(dataRows);
+        return data;
+    }
+
+    public static CsLogData convertTo1411FromDot(JSONObject object, String indexType){
+        JSONArray jsonValues = (JSONArray)object.get("value");
+        String[] mnems = new String[jsonValues.length()];
+        String[] units = new String[jsonValues.length()];
+        Arrays.fill(units,"unitless");
+        SortedMap<String, String[]> values = new TreeMap<>();
+
+        //Iterate through and get values
+        for (int i = 0; i < jsonValues.length(); i++){
+            if (i == 0) {
+                JSONObject index = (JSONObject)jsonValues.get(i);
+                mnems[i] = (index.get("name").toString());
+                units[i] = (index.get("unit").toString());
+            } else {
+                JSONObject currentValue = (JSONObject)jsonValues.get(i);
+                mnems[i] = (currentValue.get("name").toString());
+                units[i] = (currentValue.get("unit").toString());
+                JSONArray dataPoints = currentValue.getJSONArray("values");
+                for (int j = 0; j < dataPoints.length(); j++){
+                    JSONObject dataPoint = (JSONObject)dataPoints.get(j);
+                    String index = dataPoint.keys().next().toString();
+                    String value = dataPoint.get(index).toString();
+                    if (!values.containsKey(index))
+                        values.put(index, new String[jsonValues.length()-1]);
+                    values.get(index)[i-1] = value;
+                }
+            }
+        }
+
+        //sorting
+        CsLogData data = new CsLogData();
+        List<String> dataRows = new ArrayList<>();
+        if (indexType.equals("depth")) {
+            Map<Double, String[]> newMap = values.entrySet().stream()
+                    .collect(Collectors.toMap(entry -> Double.parseDouble(entry.getKey()), Map.Entry::getValue));
+            Map<Double, String[]> sortedMap = new TreeMap<Double, String[]>(newMap);
+
+            //Build the Log Data
+
+            data.setMnemonicList(String.join(",", mnems));
+            data.setUnitList(String.join(",", units));
+            Iterator valueIterator = sortedMap.entrySet().iterator();
+            while (valueIterator.hasNext()) {
+                Map.Entry pair = (Map.Entry)valueIterator.next();
+                StringBuilder logDataRow = new StringBuilder();
+                logDataRow.append(pair.getKey());
+                logDataRow.append(',');
+                logDataRow.append(String.join(",", (String[])pair.getValue()));
+                dataRows.add(logDataRow.toString());
+                valueIterator.remove(); // avoids a ConcurrentModificationException
+            }
+
+        }else{
+            //Build the Log Data
+            data.setMnemonicList(String.join(",", mnems));
+            data.setUnitList(String.join(",", units));
+            Iterator valueIterator = values.entrySet().iterator();
+            while (valueIterator.hasNext()) {
+                Map.Entry pair = (Map.Entry)valueIterator.next();
+                StringBuilder logDataRow = new StringBuilder();
+                logDataRow.append(pair.getKey());
+                logDataRow.append(',');
+                logDataRow.append(String.join(",", (String[])pair.getValue()));
+                dataRows.add(logDataRow.toString());
+                valueIterator.remove(); // avoids a ConcurrentModificationException
+            }
+
         }
         data.setData(dataRows);
         return data;
