@@ -914,7 +914,7 @@ public class DotValveTest {
 	@Test
 	public void shouldSucceedAuthenticate() throws Exception {
 		// mock behavior
-		when(this.mockClient.getJWT("goodUsername", "goodPassword"))
+		when(this.mockClient.getJWT(eq("goodUsername"), eq("goodPassword"), anyString()))
 			.thenReturn(JWT.decode( // using dummy token string from https://jwt.io/
 				"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiR29vZCBUb2tlbiJ9.II4bNgtahHhV4jl7dgGn8CGjVxZWwBMZht-4LXeqB_Y"
 			)
@@ -924,14 +924,14 @@ public class DotValveTest {
 		this.valve.authenticate("goodUsername", "goodPassword");
 
 		// verify
-		verify(this.mockClient).getJWT("goodUsername", "goodPassword");
+		verify(this.mockClient).getJWT(eq("goodUsername"), eq("goodPassword"), anyString());
 		verifyNoMoreInteractions(this.mockClient);
 	}
 
 	@Test(expected = ValveAuthException.class)
 	public void shouldFailAuthenticate() throws ValveAuthException {
 		// add mock behavior
-		when(this.mockClient.getJWT("badUsername", "badPassword"))
+		when(this.mockClient.getJWT(eq("badUsername"), eq("badPassword"), eq("n/a")))
 			.thenThrow(new ValveAuthException(""));
 
 		// test

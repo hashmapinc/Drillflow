@@ -45,3 +45,6 @@ wmls:
     compression: true
 logging:
     config: ${LOGBACK_CONFIG_FILE:classpath:logback-spring.xml}
+spring:
+    devtools:
+        add-properties: false

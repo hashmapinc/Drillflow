@@ -51,8 +51,6 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
      * client-side from SOAP WITSML XML & translates as necessary to adhere to DoT's
      * "Create a new ChannelSet" API.
      *
-     * @param witsmlObj Represents the client's WITSML object (complete) It is a
-     *                  JSON String created from the ObjLog1311
      * @return JSON String representing the conversion
      * @throws IOException
      * @throws JsonMappingException
@@ -120,7 +118,7 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
         //LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(request), witsmlObject));
 
         // get response
-        HttpResponse<String> response = client.makeRequest(request, username, password);
+        HttpResponse<String> response = client.makeRequest(request, username, password, exchangeID);
 
         // check response status
         int status = response.getStatus();
@@ -159,7 +157,7 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
         //LOG.info(ValveLogging.getLogMsg(exchangeID, logRequest(request), witsmlObject));
 
         // get response
-        HttpResponse<String> response = client.makeRequest(request, username, password);
+        HttpResponse<String> response = client.makeRequest(request, username, password, exchangeID);
 
         // check response status
         int status = response.getStatus();

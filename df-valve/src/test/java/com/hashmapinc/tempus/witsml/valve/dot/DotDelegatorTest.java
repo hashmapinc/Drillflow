@@ -152,7 +152,7 @@ public class DotDelegatorTest {
             someReq.getHttpMethod().name().equals(req.getHttpMethod().name()) &&
             someReq.getUrl().equals(req.getUrl()) &&
             someReq.getHeaders().containsKey("Content-Type")
-        )), eq("goodUsername"), eq("goodPassword"))).thenReturn(resp);
+        )), eq("goodUsername"), eq("goodPassword"), anyString())).thenReturn(resp);
 
         // test
         String actualUid = this.delegator.createObject( traj,
@@ -258,7 +258,7 @@ public class DotDelegatorTest {
         when(respData.getStatus()).thenReturn(200);
 
         // *********************************** Mocking ********************************** //
-        when(this.mockClient.makeRequest(any(HttpRequest.class), anyString(), anyString()))
+        when(this.mockClient.makeRequest(any(HttpRequest.class), anyString(), anyString(), anyString()))
                 .thenAnswer(
                         invocation -> {
                             HttpRequest req = invocation.getArgument(0);
@@ -329,7 +329,7 @@ public class DotDelegatorTest {
             someReq.getHttpMethod().name().equals(req.getHttpMethod().name()) &&
             someReq.getUrl().equals(req.getUrl()) &&
             someReq.getHeaders().containsKey("Content-Type")
-        )), eq("goodUsername"), eq("goodPassword"))).thenReturn(resp);
+        )), eq("goodUsername"), eq("goodPassword"), anyString())).thenReturn(resp);
 
         // test
         String actualUid = this.delegator.createObject(traj, "goodUsername", "goodPassword", "exchangeID", this.mockClient);
@@ -360,7 +360,7 @@ public class DotDelegatorTest {
                 someReq.getHttpMethod().name().equals(req.getHttpMethod().name()) &&
                         someReq.getUrl().equals(req.getUrl()) &&
                         someReq.getHeaders().containsKey("Content-Type")
-        )), eq("goodUsername"), eq("goodPassword"))).thenReturn(resp);
+        )), eq("goodUsername"), eq("goodPassword"), anyString())).thenReturn(resp);
 
         ArrayList<AbstractWitsmlObject> foundObjects = this.delegator.search(singleWell, "goodUsername", "goodPassword", "exchangeID", this.mockClient, new HashMap<>());
         assertEquals(3, foundObjects.size());
@@ -390,7 +390,7 @@ public class DotDelegatorTest {
             someReq.getHttpMethod().name().equals(req.getHttpMethod().name()) &&
                 someReq.getUrl().equals(req.getUrl()) &&
                 someReq.getHeaders().containsKey("Content-Type")
-        )), eq("goodUsername"), eq("goodPassword"))).thenReturn(resp);
+        )), eq("goodUsername"), eq("goodPassword"), anyString())).thenReturn(resp);
 
         // test
         this.delegator.deleteObject(traj, "goodUsername", "goodPassword", "exchangeID", this.mockClient);
@@ -400,7 +400,7 @@ public class DotDelegatorTest {
             someReq.getHttpMethod().name().equals(req.getHttpMethod().name()) &&
                 someReq.getUrl().equals(req.getUrl()) &&
                 someReq.getHeaders().containsKey("Content-Type")
-        )), eq("goodUsername"), eq("goodPassword"));
+        )), eq("goodUsername"), eq("goodPassword"), anyString());
     }
 
     @Test
@@ -431,7 +431,7 @@ public class DotDelegatorTest {
             someReq.getHttpMethod().name().equals(req1311.getHttpMethod().name()) &&
             someReq.getUrl().equals(req1311.getUrl()) &&
             someReq.getHeaders().containsKey("Content-Type")
-        )), eq("goodUsername"), eq("goodPassword"))).thenReturn(resp);
+        )), eq("goodUsername"), eq("goodPassword"), anyString())).thenReturn(resp);
 
         // test
         this.delegator.updateObject(traj1311, "goodUsername", "goodPassword", "exchangeID", this.mockClient);
@@ -441,7 +441,7 @@ public class DotDelegatorTest {
             someReq.getHttpMethod().name().equals(req1311.getHttpMethod().name()) &&
             someReq.getUrl().equals(req1311.getUrl()) &&
             someReq.getHeaders().containsKey("Content-Type")
-        )), eq("goodUsername"), eq("goodPassword"));
+        )), eq("goodUsername"), eq("goodPassword"), anyString());
         //=====================================================================
     }
 
@@ -473,7 +473,7 @@ public class DotDelegatorTest {
             someReq.getHttpMethod().name().equals(req1411.getHttpMethod().name()) &&
             someReq.getUrl().equals(req1411.getUrl()) &&
             someReq.getHeaders().containsKey("Content-Type")
-        )), eq("goodUsername"), eq("goodPassword"))).thenReturn(resp);
+        )), eq("goodUsername"), eq("goodPassword"), anyString())).thenReturn(resp);
 
         // test
         this.delegator.updateObject(traj1411, "goodUsername", "goodPassword", "exchangeID", this.mockClient);
@@ -483,7 +483,7 @@ public class DotDelegatorTest {
             someReq.getHttpMethod().name().equals(req1411.getHttpMethod().name()) &&
             someReq.getUrl().equals(req1411.getUrl()) &&
             someReq.getHeaders().containsKey("Content-Type")
-        )), eq("goodUsername"), eq("goodPassword"));
+        )), eq("goodUsername"), eq("goodPassword"), anyString());
         //=====================================================================
     }
 }
