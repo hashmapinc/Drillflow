@@ -61,8 +61,7 @@ public class ValveLogging {
 		try {
 			String req = "";
 			try {
-				if (request != null)
-					if (request.getBody() != null)
+				if (request != null && request.getBody() != null)
 						req = convert(request.getBody().getEntity().getContent(), Charset.defaultCharset());
 			} catch (IOException e) {
 				req = "Could not parse request";
