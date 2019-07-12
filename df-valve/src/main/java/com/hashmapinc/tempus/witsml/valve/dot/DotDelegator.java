@@ -700,6 +700,8 @@ public class DotDelegator {
 		//        ChannelSet (CS_IDX_4_PAYLOADS),
 		//        Channels (CHANNELS_IDX_4_PAYLOADS),
 		//        and Data (DATA_IDX_4_PAYLOADS)
+		// the payloads are converted (either v1.3.1.1 or 1.4.1.1)
+		// and mapped (see individual POJOs for mapping details)
 		String[] allPayloads = getPayloads4Log( version,
 				payload,
 				witsmlObj );
@@ -836,22 +838,38 @@ public class DotDelegator {
 		String CSErrorMsg = "Client must provide valid payload: " +
 				"channel set (log header with name) is missing.";
 		String CHErrorMsg = "Client must provide valid payload: " +
-				"channels is missing (so unit of measure cannot be obtained).";
+				"channel(s) are missing (so unit of measure cannot be mapped" +
+				"for channel set)";
+		String CH_NoIndexChannelErrorMsg = "Client must provide valid payload: " +
+				"an Index Channel must be present";
+		Channel indexChannel = null;
 
-		// if there is no channel set payload, fail this request
+		// If there is no channel set payload, fail this request.
 		if ( allPayloads[CS_IDX_4_PAYLOADS].equals("") ) {
 			LOG.warning( CSErrorMsg );
 			// A mandatory write schema item is missing.
 			throw new ValveException( CSErrorMsg, (short)-484 );
-
 		}
-		// if there are no channels, then there is no unit of measure (UOM)
-		// so fail this request
+		// If there are no channels, then there is no unit of measure (UOM).
+		// In order to create a Channel Set (which is required to create a
+		// Log), uom must be present.
 		if (  allPayloads[CHANNELS_IDX_4_PAYLOADS].equals("") ) {
 			LOG.warning(CHErrorMsg);
 			// Client must always specify the unit for all measure data
-			throw new ValveException(CSErrorMsg, (short) -453);
+			throw new ValveException(CHErrorMsg, (short) -453);
 		}
+		// If there is no Index Channel within the list of Channels(as identified by
+		// <indexCurve> in the Channel Set), then fail this log creation attempt.
+		JSONObject cs = new JSONObject( allPayloads[CS_IDX_4_PAYLOADS] );
+		JSONArray  ch = new JSONArray( allPayloads[CHANNELS_IDX_4_PAYLOADS] );
+
+		// Pick up the mnemonic that is used to find the Index Channel.
+		if ( cs.has("indexCurve") && cs.get("indexCurve") != null && ch.length() > 0 ) {
+				// Try to find the Index Channel by searching for the corresponding
+				// mnemonic in the JSONArray of Channels.
+				indexChannel = ch.
+		}
+
 	}
 
 	/**
