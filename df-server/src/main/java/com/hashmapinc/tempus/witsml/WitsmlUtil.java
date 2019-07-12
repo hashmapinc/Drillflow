@@ -37,7 +37,6 @@ public class WitsmlUtil {
     public static String getVersionFromXML(
         String rawXML
     ) throws Exception {
-        LOG.info("trying to parse version from raw xml...");
         
         /**
          * This is lazy, I know. Please blame me (Randy Pitcher).
@@ -57,9 +56,7 @@ public class WitsmlUtil {
         } else {
             throw new IllegalArgumentException("found both witsml version 1.3.1.1 and 1.4.1.1 in raw xml");
         }
-        
-        // successfully parsed version. Return here
-        LOG.info("version parsed from raw xml is " + version);
+
         return version;
     }
 
@@ -74,7 +71,6 @@ public class WitsmlUtil {
         String optionsIn
     ) {
         HashMap<String, String> map = new HashMap<>();
-        LOG.info("trying to parse optionsIn...");
         if (optionsIn.isEmpty()) {
             return map;
         }

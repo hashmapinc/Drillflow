@@ -28,6 +28,7 @@ import javax.net.ssl.SSLSession;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.hashmapinc.tempus.witsml.ValveLogging;
 import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
 import com.mashape.unirest.http.HttpResponse;
@@ -54,7 +55,6 @@ public class DotClient {
     /**
      * DotClient constructor
      *
-     * @param URL
      * @param API_KEY
      * @throws ValveAuthException
      */
@@ -76,7 +76,7 @@ public class DotClient {
      * @param username
      * @param password
      */
-    private void refreshToken(String username, String password) throws ValveAuthException {
+    private void refreshToken(String username, String password, String exchangeId) throws ValveAuthException {
         try {
             // build payload for authentication
             String payload = "{\"account\":\"" + username + "\", \"password\":\"" + password + "\"}";
@@ -93,7 +93,7 @@ public class DotClient {
             int status = response.getStatus();
 
             LOG.fine("refreshToken call for " + username + "returned REST status: " + status); // fine = debug I guess.
-                                                                                               // Stupid JDK 11
+            LOG.info(ValveLogging.getLogMsg(exchangeId, "Refreshing Token"));                                                                                   // Stupid JDK 11
             if (201 == status || 200 == status) {
                 // get JWT from response
                 String tokenString = new JsonNode(response.getBody()).getObject().getString("jwt");
@@ -115,10 +115,10 @@ public class DotClient {
      * @return JWT from auth endpoint
      * @throws ValveAuthException
      */
-    public DecodedJWT getJWT(String username, String password) throws ValveAuthException {
+    public DecodedJWT getJWT(String username, String password, String exchangeId) throws ValveAuthException {
         // refresh token if necessary
         if (!cache.containsKey(username) || isTokenExpired(username))
-            refreshToken(username, password);
+            refreshToken(username, password, exchangeId);
 
         return cache.get(username);
     }
@@ -178,11 +178,12 @@ public class DotClient {
     public HttpResponse<String> makeRequest(
         HttpRequest req,
         String username,
-        String password
+        String password,
+        String exchangeId
     ) throws ValveException, UnirestException, ValveAuthException {
         // default numRetries
         int numRetries = 1;
-        return this.makeRequest(req, username, password, numRetries);
+        return this.makeRequest(req, username, password, exchangeId, numRetries);
     }
 
     /**
@@ -200,11 +201,13 @@ public class DotClient {
         HttpRequest req,
         String username,
         String password,
+        String exchangeId,
         int numRetries
     ) throws UnirestException, ValveAuthException, ValveException {
         // get jwt
-        String tokenString = this.getJWT(username, password).getToken();
+        String tokenString = this.getJWT(username, password, exchangeId).getToken();
 
+        LOG.info(ValveLogging.getLogMsg(exchangeId, "Making call to DOT", req));
         // execute request.
         req.header("Authorization", "Bearer " + tokenString); // add auth header
         HttpResponse<String> response = new DotRestCommand(req).run();
@@ -213,15 +216,19 @@ public class DotClient {
         if (null == response)
             throw new ValveException("Circuit broken for DoT REST requests");
 
+        LOG.info(ValveLogging.getLogRespMsg(exchangeId, "Received response from DoT", response));
+
         // check for auth errors.
         int status = response.getStatus();
         if (401 == status) {
-            LOG.warning("Bad auth token.");
+            LOG.warning(ValveLogging.getLogMsg(exchangeId, "Auth token invalid, remove from cache and request new."));
             this.removeFromCache(username); // uncache the jwt for this user
 
             // if there are retries left, retry.
             if (numRetries > 0) {
-                return this.makeRequest(req, username, password, numRetries-1);
+                HttpResponse<String> resp = this.makeRequest(req, username, password, exchangeId, numRetries-1);
+                LOG.info(ValveLogging.getLogRespMsg(exchangeId, "Received response from DoT", resp));
+                return resp;
             } else {
                 throw new ValveAuthException("Bad JWT");
             }

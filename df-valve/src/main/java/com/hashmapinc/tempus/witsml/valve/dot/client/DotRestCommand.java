@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot.client;
 
+import com.hashmapinc.tempus.witsml.ValveLogging;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.netflix.hystrix.HystrixCommand;
 import com.netflix.hystrix.HystrixCommandGroupKey;
@@ -56,7 +57,7 @@ public class DotRestCommand extends HystrixCommand<HttpResponse<String>> {
      */
     @Override
     protected HttpResponse<String> getFallback() {
-        LOG.warning("DotRestCommand encountered broken circuit. Getting Fallback now...");
+        LOG.warning(ValveLogging.getLogMsg("DotRestCommand encountered broken circuit. Getting Fallback now..."));
         return null; // fail silently
     }
 }

@@ -17,6 +17,7 @@ package com.hashmapinc.tempus.witsml.valve.dot;
 
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.witsml.QueryContext;
+import com.hashmapinc.tempus.witsml.ValveLogging;
 import com.hashmapinc.tempus.witsml.valve.IValve;
 import com.hashmapinc.tempus.witsml.valve.ObjectSelectionConstants;
 import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
@@ -53,7 +54,7 @@ public class DotValve implements IValve {
 		this.CLIENT = new DotClient(apikey, tokenPath);
 		this.DELEGATOR = new DotDelegator(config);
 
-		LOG.info("Creating valve pointing to url: " + tokenPath);
+		LOG.info(ValveLogging.getLogMsg("Creating valve pointing to url: " + tokenPath));
 	}
 
 	/**
@@ -206,7 +207,7 @@ public class DotValve implements IValve {
 					queryResponses.add(response);
 			}
 		} catch (Exception e) {
-			LOG.warning("Exception in DotValve get object: " + e.getMessage());
+			LOG.warning(ValveLogging.getLogMsg(qc.EXCHANGE_ID,"Exception in DotValve getSingularObject: " + e.getMessage()));
 			throw new ValveException(e.getMessage());
 		}
 
@@ -224,7 +225,7 @@ public class DotValve implements IValve {
 	private ArrayList<AbstractWitsmlObject> doSearch(QueryContext qc) throws ValveException {
 		// handle each object
 		if (qc.WITSML_OBJECTS.size() > 1)
-			LOG.info("Query received with more than one singular object, not supported");
+			LOG.info(ValveLogging.getLogMsg(qc.EXCHANGE_ID, "Query received with more than one singular object, not supported"));
 			// TODO: Throw exception here
 		// handle search
 		ArrayList<AbstractWitsmlObject> queryResponses;
@@ -238,7 +239,7 @@ public class DotValve implements IValve {
 				qc.OPTIONS_IN
 			);
 		} catch (Exception e) {
-			LOG.warning("Exception in DotValve get object: " + e.getMessage());
+			LOG.warning(ValveLogging.getLogMsg(qc.EXCHANGE_ID,"Exception in DotValve doSearch: " + e.getMessage()));
 			throw new ValveException(e.getMessage());
 		}
 
@@ -257,7 +258,7 @@ public class DotValve implements IValve {
 	public CompletableFuture<String> createObject(QueryContext qc) throws ValveException {
 		// create each object
 		ArrayList<String> uids = new ArrayList<>();
-		LOG.info("Async create object");
+		LOG.fine(ValveLogging.getLogMsg(qc.EXCHANGE_ID,"Async create object"));
 
 		try {
 			for (AbstractWitsmlObject witsmlObject : qc.WITSML_OBJECTS) {
@@ -266,10 +267,10 @@ public class DotValve implements IValve {
 			}
 
 		} catch (ValveException e) {
-			LOG.warning("Exception in DotValve create object: " + e.getMessage());
+			LOG.warning(ValveLogging.getLogMsg(qc.EXCHANGE_ID,"Exception in DotValve createObject: " + e.getMessage()));
 			throw new ValveException(e.getMessage(), e.getErrorCode());
 		} catch (Exception e){
-			LOG.warning("Exception in DotValve create object: " + e.getMessage());
+			LOG.warning(ValveLogging.getLogMsg(qc.EXCHANGE_ID,"Exception in DotValve createObject: " + e.getMessage()));
 			throw new ValveException(e.getMessage());
 		}
 		// return the uids created
@@ -312,7 +313,7 @@ public class DotValve implements IValve {
 				result = true;
 			}
 		} catch (Exception e) {
-			LOG.warning("Got exception in DotValve delete object: " + e.getMessage());
+			LOG.warning(ValveLogging.getLogMsg(qc.EXCHANGE_ID,"Exception in DotValve deleteObject: " + e.getMessage()));
 			if (e.getClass() == ValveException.class)
 				throw ((ValveException)e);
 			throw new ValveException(e.getMessage());
@@ -350,7 +351,7 @@ public class DotValve implements IValve {
 			}
 			result = true;
 		} catch (Exception e) {
-			LOG.warning("Exception in DotValve update object: " + e.getMessage());
+			LOG.warning(ValveLogging.getLogMsg(qc.EXCHANGE_ID,"Exception in DotValve updateObject: " + e.getMessage()));
 			throw new ValveException(e.getMessage());
 		}
 		return CompletableFuture.completedFuture(result);
@@ -365,7 +366,7 @@ public class DotValve implements IValve {
 	 */
 	@Override
 	public void authenticate(String username, String password) throws ValveAuthException {
-		this.CLIENT.getJWT(username, password);
+		this.CLIENT.getJWT(username, password, "n/a");
 	}
 
 	/**

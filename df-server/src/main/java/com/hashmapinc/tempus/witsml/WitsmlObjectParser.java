@@ -206,7 +206,6 @@ public class WitsmlObjectParser {
         String version
     ) throws Exception {
         //parse the object
-        LOG.info("Parsing witsml object");
         switch(objectType) { 
             case "log": 
                 return parseLogObject(rawXML, version);

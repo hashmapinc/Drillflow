@@ -15,6 +15,7 @@
  */
 package com.hashmapinc.tempus.witsml.server;
 
+import org.springframework.boot.Banner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -27,7 +28,9 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 public class WitsmlServerApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(WitsmlServerApplication.class, args);
+		SpringApplication drillFlow = new SpringApplication(WitsmlServerApplication.class);
+		drillFlow.setBannerMode(Banner.Mode.OFF);
+		drillFlow.run(args);
 	}
 
 	@Bean("asyncCustomTaskExecutor")
