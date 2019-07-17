@@ -413,23 +413,26 @@ public class DotDelegator {
 			// as a property into every other non-index channel within
 			// the Item element as "uom".
 			if (idxChannel != null) {
-				JSONArray channelPayloadAsJSON = new JSONArray(channelPayload);
-				for (int n = 0; n < channelPayloadAsJSON.length(); n++) {
-					JSONObject nonIdxChannel = channelPayloadAsJSON.getJSONObject(n);
-					// TODO This assumes that Index exists; is this valid to assume?
-					JSONArray indices = nonIdxChannel.getJSONArray("index");
-					for (int i = 0; i<indices.length(); i++ ) {
-						indices.getJSONObject(i).put("uom", idxChannel.getUom());
+				if (!"".equals(channelPayload)) {
+					JSONArray channelPayloadAsJSON = new JSONArray(channelPayload);
+					for (int n = 0; n < channelPayloadAsJSON.length(); n++) {
+						JSONObject nonIdxChannel = channelPayloadAsJSON.getJSONObject(n);
+						// TODO This assumes that Index exists; is this valid to assume?
+						JSONArray indices = nonIdxChannel.getJSONArray("index");
+						for (int i = 0; i < indices.length(); i++) {
+							indices.getJSONObject(i).put("uom", idxChannel.getUom());
+						}
 					}
+					channelPayload = channelPayloadAsJSON.toString();
 				}
-				channelPayload = channelPayloadAsJSON.toString();
 			}
 
 			// TODO Did I handle Channel Sets correctly
 			//      (do NOT update CS if there are no Channels)
 			//		(what if I injected the Index Channel in payloadCheck -- is
 			//		the injection wrong?)
-			if (channelSetPayload!=null && !channelSetPayload.isEmpty()) {
+			// TODO channelSetPayload will never be null or empty due to payload checking!!!
+			if (channelSetPayload!=null && channelSetPayload.length() > 0) {
 				// ************************* CHANNELSET *************************
 				// check if channelSet is in cache (not a granular search, but
 				// against the channelSet in its entirely)
@@ -473,7 +476,6 @@ public class DotDelegator {
 						client );
 			}
 
-			// TODO need to catch channelPayload = "[]"
 			if (channelPayload!=null && !channelPayload.isEmpty()) {
 				// ************************** CHANNELS **************************
 				// .../witsml/channels/metadata?channelSetUuid={channelSetUuid}
@@ -941,15 +943,18 @@ public class DotDelegator {
 
 		// first check the query's channels list for the index channel
 		Channel idxChannel = null;
-		// TODO Make sure this works for no channels... (UpdateInStore)
-		List<Channel> channelsList =
-				Channel.jsonToChannelList(allPayloads[CHANNELS_IDX_4_PAYLOADS]);
-		Iterator iterator = channelsList.iterator();
-		while (iterator.hasNext()) {
-			Channel currentCH = (Channel) iterator.next();
-			if ( currentCH.getMnemonic().equals(mnemonicForIdxChannel) ) {
-				idxChannel = currentCH;
-				break;
+		Iterator iterator;
+
+		if ( !"".equals(allPayloads[CHANNELS_IDX_4_PAYLOADS]) ) {
+			List<Channel> channelsList =
+					Channel.jsonToChannelList(allPayloads[CHANNELS_IDX_4_PAYLOADS]);
+			iterator = channelsList.iterator();
+			while (iterator.hasNext()) {
+				Channel currentCH = (Channel) iterator.next();
+				if (currentCH.getMnemonic().equals(mnemonicForIdxChannel)) {
+					idxChannel = currentCH;
+					break;
+				}
 			}
 		}
 		// if the index channel is not within the query's channel list
