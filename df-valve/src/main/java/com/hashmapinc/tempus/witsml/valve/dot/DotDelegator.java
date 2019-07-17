@@ -1119,16 +1119,19 @@ public class DotDelegator {
 
 			// ********************************************* DATA **********************************************
 			if ( payloadJSON.has("logData") ) {
-				if ( !JsonUtil.isEmpty(payloadJSON.get("logData")) &&
-						(payloadJSON.getJSONArray("logData")).length() > 0 ) {
+				if ( !JsonUtil.isEmpty(payloadJSON.get("logData"))) {
 					switch (version) {
 						case "1.3.1.1":
-							payloads[DATA_IDX_4_PAYLOADS] = DotLogDataHelper.convertDataToDotFrom1311(
-									(com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj);
+							if (payloadJSON.getJSONObject("logData").length() > 0) {
+								payloads[DATA_IDX_4_PAYLOADS] = DotLogDataHelper.convertDataToDotFrom1311(
+										(com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj);
+							}
 							break;
 						case "1.4.1.1":
-							payloads[DATA_IDX_4_PAYLOADS] = DotLogDataHelper.convertDataToDotFrom1411(
-									(ObjLog) witsmlObj);
+							if (payloadJSON.getJSONArray("logData").length() > 0) {
+								payloads[DATA_IDX_4_PAYLOADS] = DotLogDataHelper.convertDataToDotFrom1411(
+										(ObjLog) witsmlObj);
+							}
 							break;
 						default:
 							payloads[DATA_IDX_4_PAYLOADS] = "";
