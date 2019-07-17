@@ -1009,14 +1009,14 @@ public class DotDelegator {
 	 * @throws UnirestException
 	 * @throws ValveException
 	 */
-	public HttpResponse<String> performPost(String payload,
-											String endpoint,
-											HashMap<String,String> requestParams,
-											DotClient client,
-											String username,
-											String password,
-											AbstractWitsmlObject witsmlObj,
-											String exchangeID )
+	public HttpResponse<String> performPost( String payload,
+												 String endpoint,
+												 HashMap<String,String> requestParams,
+												 DotClient client,
+												 String username,
+												 String password,
+												 AbstractWitsmlObject witsmlObj,
+												 String exchangeID )
 			throws ValveAuthException,
 			UnirestException,
 			ValveException {
@@ -1350,7 +1350,8 @@ public class DotDelegator {
 			if(getAllChannels || channels != null) {
 				if (indexType.equals("depth")) {
 					JSONObject payloadJSON = new JSONObject(payload);
-					if (((ObjLog)witsmlObject).getLogData() != null || getAllChannels){
+					if (((witsmlObject.getVersion().equals("1.4.1.1") && ((ObjLog)witsmlObject).getLogData() != null) || getAllChannels) ||
+							(witsmlObject.getVersion().equals("1.3.1.1") && ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getLogData() != null)){
 						//if (((ObjLog) witsmlObject).getLogData().size() > 0 || getAllChannels) {
 						String sortDesc = "true";
 						data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
@@ -1375,7 +1376,8 @@ public class DotDelegator {
 				}*/
 				} else {
 					JSONObject payloadJSON = new JSONObject(payload);
-					if (((ObjLog) witsmlObject).getLogData() != null || getAllChannels) {
+					if (((witsmlObject.getVersion().equals("1.4.1.1") && ((ObjLog)witsmlObject).getLogData() != null) || getAllChannels) ||
+							(witsmlObject.getVersion().equals("1.3.1.1") && ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getLogData() != null)){
 						//if (((ObjLog)witsmlObject).getLogData().size() > 0 || getAllChannels) {
 						String sortDesc = "true";
 						data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
@@ -1504,11 +1506,11 @@ public class DotDelegator {
 							else
 								currentChannel.setStartIndex(null);
 						} else {
-							if (lci.getMaxIndex() != null)
+							if (lci.getMaxIndex() != null && lci.getMaxIndex().getValue() != null)
 								currentChannel.setEndIndex(lci.getMaxIndex().getValue().toString());
 							else
 								currentChannel.setEndIndex(null);
-							if (lci.getMinIndex() != null)
+							if (lci.getMinIndex() != null && lci.getMinIndex().getValue() != null)
 								currentChannel.setStartIndex(lci.getMinIndex().getValue().toString());
 							else
 								currentChannel.setEndIndex(null);
