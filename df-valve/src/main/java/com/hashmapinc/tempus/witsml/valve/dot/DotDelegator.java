@@ -44,10 +44,7 @@ import org.json.JSONObject;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 
 public class DotDelegator {
@@ -402,7 +399,39 @@ public class DotDelegator {
 			channelPayload = payloads[CHANNELS_IDX_4_PAYLOADS];
 			dataPayload = payloads[DATA_IDX_4_PAYLOADS];
 
-			if (channelSetPayload!=null && !channelSetPayload.isEmpty()) {
+			Channel idxChannel = payloadCheck( payloads,
+											  false,
+						  					   client,
+						  					   uuid,
+				  		  					   username,
+											   password,
+						  					   exchangeID );
+
+			// if an index channel needed to be found and was,
+			// now I must take the uom from that channel and stuff it
+			// as a property into every other non-index channel within
+			// the Item element as "uom".
+			if (idxChannel != null && !"".equals(channelPayload)) {
+				//if (!"".equals(channelPayload)) {
+					JSONArray channelPayloadAsJSON = new JSONArray(channelPayload);
+					for (int n = 0; n < channelPayloadAsJSON.length(); n++) {
+						JSONObject nonIdxChannel = channelPayloadAsJSON.getJSONObject(n);
+						// TODO This assumes that Index exists; is this valid to assume?
+						JSONArray indices = nonIdxChannel.getJSONArray("index");
+						for (int i = 0; i < indices.length(); i++) {
+							indices.getJSONObject(i).put("uom", idxChannel.getUom());
+						}
+					}
+					channelPayload = channelPayloadAsJSON.toString();
+				//}
+			}
+
+			// TODO Did I handle Channel Sets correctly
+			//      (do NOT update CS if there are no Channels)
+			//		(what if I injected the Index Channel in payloadCheck -- is
+			//		the injection wrong?)
+			// TODO channelSetPayload will never be null or empty due to payload checking!!!
+			if (channelSetPayload!=null && channelSetPayload.length() > 0) {
 				// ************************* CHANNELSET *************************
 				// check if channelSet is in cache (not a granular search, but
 				// against the channelSet in its entirely)
@@ -446,8 +475,6 @@ public class DotDelegator {
 						client );
 			}
 
-			// TODO need to catch channelPayload = "[]"--check that it does now
-			// TODO what about nulls within the payloads?
 			if (channelPayload!=null && !channelPayload.isEmpty()) {
 				// ************************** CHANNELS **************************
 				// .../witsml/channels/metadata?channelSetUuid={channelSetUuid}
@@ -692,7 +719,8 @@ public class DotDelegator {
 		String endpoint;
 
 		// get WITSML abstract object as JSON string
-		String payload = ("1.4.1.1".equals(version) ? witsmlObj.getJSONString("1.4.1.1") :
+		String payload = ("1.4.1.1".equals(version) ?
+				witsmlObj.getJSONString("1.4.1.1") :
 				witsmlObj.getJSONString("1.3.1.1") );
 		//
 
@@ -701,13 +729,16 @@ public class DotDelegator {
 		//        Channels (CHANNELS_IDX_4_PAYLOADS),
 		//        and Data (DATA_IDX_4_PAYLOADS)
 		String[] allPayloads = getPayloads4Log( version,
-				payload,
-				witsmlObj );
+												payload,
+												witsmlObj );
 
 		// all "Client should ..." checks will be performed in this method
 		// this method will throw the correct valve exception if the payload is non-conforming
-		payloadCheck(allPayloads);
-
+		payloadCheck( allPayloads, true );
+		/*
+		payloadCheck(allPayloads, true,
+				null, null, null, null, null, null);
+		*/
 		// ********************************* ChannelSet ********************************* //
 		// endpoint:
 		//        .../channelSets?uid={uid}&uidWellbore={uidWellbore}&uidWell={uidWell}
@@ -720,7 +751,7 @@ public class DotDelegator {
 
 		// call a central method to finish the REST set-up
 		// and execute the rest call for ChannelSet
-		response = performRestCall( allPayloads[CS_IDX_4_PAYLOADS],
+		response = performPost( allPayloads[CS_IDX_4_PAYLOADS],
 				endpoint,
 				requestParams,
 				client,
@@ -736,7 +767,9 @@ public class DotDelegator {
 		}
 		int status = response.getStatus();
 		if (409 == status) {
-			LOG.info(ValveLogging.getLogRespMsg(exchangeID, "Log with uid " + uid + " already in store, aborting log create", response));
+			LOG.info(ValveLogging.getLogRespMsg(exchangeID,
+					"Log with uid " + uid + " already in store, aborting log create",
+					 response));
 			throw new ValveException("Log already in store", (short) -405);
 		}
 
@@ -773,7 +806,7 @@ public class DotDelegator {
 				requestParams.put("channelSetUuid", uuid4CS);
 				// call a central method to finish the REST set-up
 				// and execute the rest call for ChannelSet
-				response = performRestCall( allPayloads[CHANNELS_IDX_4_PAYLOADS],
+				response = performPost( allPayloads[CHANNELS_IDX_4_PAYLOADS],
 						endpoint,
 						requestParams,
 						client,
@@ -794,7 +827,7 @@ public class DotDelegator {
 					requestParams = new HashMap<>();
 					requestParams.put("channelSetUuid", uuid4CS);
 
-					response = performRestCall( allPayloads[DATA_IDX_4_PAYLOADS],
+					response = performPost( allPayloads[DATA_IDX_4_PAYLOADS],
 							endpoint,
 							requestParams,
 							client,
@@ -828,30 +861,149 @@ public class DotDelegator {
 	 * This method supports the DoT business rules for payloads.
 	 *
 	 * @param allPayloads
+	 * @param thisIsAdd		boolean flag for detecting Add (=true) vs Update (=false)
 	 */
-	private void payloadCheck( String[] allPayloads )
-			throws ValveException
-	{
 
+	private void payloadCheck( String[] allPayloads, boolean thisIsAdd )
+														throws ValveException,
+															   ValveAuthException,
+															   UnirestException
+	{
+		// for AddToStore, I toss the returned Index Channel (it is already present
+		// in the payload)
+		payloadCheck(allPayloads, thisIsAdd,
+				 null, null, null, null, null);
+	}
+
+	// overload this method for Update, that requires more parameters
+	private Channel payloadCheck( String[] allPayloads,
+							   boolean thisIsAdd,
+							   DotClient client,
+							   String uuid,
+							   String username,
+							   String password,
+							   String exchangeID )
+											throws ValveException,
+												   ValveAuthException,
+												   UnirestException
+	{
+		// The rules of the payload (where x = Y or N):
+		// For Add:
+		//      always must have YYx (translation: only optional element is Data)
+		// For Update:
+		//      always must have Yxx (translation: Channels & Data are optional)
+		// Additional rules:
+		// 		Do not update Channel Set if there are no Channels.
 		String CSErrorMsg = "Client must provide valid payload: " +
 				"channel set (log header with name) is missing.";
 		String CHErrorMsg = "Client must provide valid payload: " +
 				"channels is missing (so unit of measure cannot be obtained).";
+		String CH_NoIndexChannelErrorMsg = "Client must provide valid payload: " +
+				"no index channel matching <indexCurve/> was found.";
 
 		// if there is no channel set payload, fail this request
+		// (both Add and Update must specify Channel Set)
 		if ( allPayloads[CS_IDX_4_PAYLOADS].equals("") ) {
 			LOG.warning( CSErrorMsg );
-			// A mandatory write schema item is missing.
+			// Throw a mandatory write schema item is missing
 			throw new ValveException( CSErrorMsg, (short)-484 );
-
 		}
-		// if there are no channels, then there is no unit of measure (UOM)
-		// so fail this request
-		if (  allPayloads[CHANNELS_IDX_4_PAYLOADS].equals("") ) {
+		// if there are no channels...
+		if (  allPayloads[CHANNELS_IDX_4_PAYLOADS].equals("") && thisIsAdd ) {
+			// then there is no unit of measure (UOM), so fail this
+			// request on an Add (ok for an Update)
+			//if ( thisIsAdd ) {
 			LOG.warning(CHErrorMsg);
 			// Client must always specify the unit for all measure data
+			// on an Add
 			throw new ValveException(CSErrorMsg, (short) -453);
+			//}
 		}
+
+		String mnemonicForIdxChannel = findIdxChannelIdentity(allPayloads,
+															  thisIsAdd,
+															  CH_NoIndexChannelErrorMsg);
+
+		// first check the query's channels list for the index channel
+		Channel idxChannel = null;
+		Iterator iterator;
+
+		if ( !"".equals(allPayloads[CHANNELS_IDX_4_PAYLOADS]) ) {
+			List<Channel> channelsList =
+					Channel.jsonToChannelList(allPayloads[CHANNELS_IDX_4_PAYLOADS]);
+			iterator = channelsList.iterator();
+			while (iterator.hasNext()) {
+				Channel currentCH = (Channel) iterator.next();
+				if (currentCH.getMnemonic().equals(mnemonicForIdxChannel)) {
+					idxChannel = currentCH;
+					break;
+				}
+			}
+		}
+		// if the index channel is not within the query's channel list
+		// (or, in the case of UpdateInStore, there is no channel list)
+		if (idxChannel == null) {
+			// ... and this is AddToStore ...
+			if (thisIsAdd) {
+				// if index is not present, there is no way to find the
+				// channel index; this is why it is required; throw the error
+				// that a mandatory write schema is missing
+				LOG.warning(CH_NoIndexChannelErrorMsg);
+				throw new ValveException(CH_NoIndexChannelErrorMsg, (short) -484);
+			} else {
+				// for an update, the final check for channel index will be
+				// after a GET for channel metadata; this is the only way
+				// remaining to add an index LogCurveInfo (LCI) to the LCI list
+
+				// *********************** Channel Metadata *********************** //
+				// endpoint:
+				//        .../channels/metadata?channelSetUuid={channelSetUuid}
+				String endpoint = this.getEndpoint("channels");
+				HttpRequest request = Unirest.get(endpoint);
+				request.header("accept", "application/json");
+				request.queryString("channelSetUuid", uuid);
+				HttpResponse<String> response;
+				response = client.makeRequest(request, username, password, exchangeID);
+				List<Channel> channels = Channel.jsonToChannelList(response.getBody());
+				iterator = channels.iterator();
+				while (iterator.hasNext()) {
+					Channel currentCH = (Channel) iterator.next();
+					if ( currentCH.getMnemonic().equals(mnemonicForIdxChannel) ) {
+						idxChannel = currentCH;
+						break;
+					}
+				}
+			}
+		}
+		return idxChannel;
+	}
+
+	private String findIdxChannelIdentity(String[] allPayloads,
+										  boolean thisIsAdd,
+										  String CH_NoIndexChannelErrorMsg)
+												throws ValveException
+	{
+
+		// first try to find the index channel's identity (mnemonic)
+		// in the query's Channel Set
+		JSONObject channelSet =
+				new JSONObject(allPayloads[CS_IDX_4_PAYLOADS]);
+		JSONArray indexArray;
+		String mnemonicForIdxChannel = "";
+		if (channelSet.has("index") && channelSet.get("index") != null) {
+			indexArray = channelSet.getJSONArray("index");
+			// even though index is an array, always use the 1st element
+			mnemonicForIdxChannel = indexArray
+					.getJSONObject(0).getString("mnemonic");
+		} else {
+			if (thisIsAdd) {
+				// if index is not present in Add, there is no way to find the
+				// channel index; this is why it is required; throw the error
+				// that a mandatory write schema is missing
+				throw new ValveException(CH_NoIndexChannelErrorMsg, (short) -484);
+			}
+		}
+		return mnemonicForIdxChannel;
 	}
 
 	/**
@@ -868,7 +1020,7 @@ public class DotDelegator {
 	 * @throws UnirestException
 	 * @throws ValveException
 	 */
-	public HttpResponse<String> performRestCall( String payload,
+	public HttpResponse<String> performPost( String payload,
 												 String endpoint,
 												 HashMap<String,String> requestParams,
 												 DotClient client,
@@ -1101,10 +1253,17 @@ public class DotDelegator {
 	 *                     method
 	 * @param client       - DotClient to execute requests with
 	 */
-
-	private String getFromStoreRestCalls(AbstractWitsmlObject witsmlObject, DotClient client, String uuid, String username,
-										 String password, String exchangeID, boolean getData, boolean getAllChannels)
-			throws ValveException, ValveAuthException, UnirestException, JAXBException {
+	private String getFromStoreRestCalls( AbstractWitsmlObject witsmlObject,
+										  DotClient client,
+										  String uuid,
+										  String username,
+										  String password,
+										  String exchangeID,
+										  boolean getData,
+										  boolean getAllChannels )
+												throws ValveException,
+													   ValveAuthException,
+													   UnirestException {
 
 		String channelsetmetadataEndpoint;
 		HttpResponse<String> channelsetmetadataResponse;
@@ -1218,17 +1377,7 @@ public class DotDelegator {
 						// get the request response.
 						channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password, exchangeID);
 						channelData = channelsDepthResponse.getBody();
-					}/*else{
-					String sortDesc = "true";
-					data = DotLogDataHelper.(channels, uuid, sortDesc, startIndex, endIndex);
-					// create with POST
-					channelsDepthEndPoint = this.getEndpoint("logDepthBoundaryPath");
-					channelsDepthRequest = Unirest.post(channelsDepthEndPoint);
-					channelsDepthRequest.header("Content-Type", "application/json");
-					channelsDepthRequest.body(data);
-					// get the request response.
-					channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
-				}*/
+					}
 				} else {
 					JSONObject payloadJSON = new JSONObject(payload);
 					if (((witsmlObject.getVersion().equals("1.4.1.1") && ((ObjLog)witsmlObject).getLogData() != null) || getAllChannels) ||
@@ -1244,17 +1393,7 @@ public class DotDelegator {
 						// get the request response.
 						channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password, exchangeID);
 						channelData = channelsDepthResponse.getBody();
-					}/*else {
-					String sortDesc = "true";
-					data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
-					// create with POST
-					channelsDepthEndPoint = this.getEndpoint("logTimeBoundaryPath");
-					channelsDepthRequest = Unirest.post(channelsDepthEndPoint);
-					channelsDepthRequest.header("Content-Type", "application/json");
-					channelsDepthRequest.body(data);
-					// get the request response.
-					channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
-				}*/
+					}
 				}
 			}
 

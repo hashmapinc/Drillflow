@@ -748,6 +748,9 @@ public class ChannelSet {
         if(channelSet.getCitation().getCreation() != null){
             commonData.setDTimCreation(convertIsoDateToXML(channelSet.getCitation().getCreation()));
         }
+        if(channelSet.commonData.getDTimLastChange()!= null){
+            commonData.setDTimLastChange(convertIsoDateToXML(channelSet.getCommonData().getDTimLastChange()));
+        }
         commonData.setItemState(channelSet.getCommonData().getItemState());
         commonData.setComments(channelSet.getCommonData().getComments());
         wmlLog.setCommonData(commonData);

@@ -144,10 +144,7 @@ public class Index {
         index.setDirection(log.getDirection());
         index.setMnemonic(log.getIndexCurve().getValue());
         index.setIndexType(log.getIndexType());
-        /*
-        if (indexType!=null)
-            index.setIndexType(indexType);
-        */
+
         Optional<com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogCurveInfo> matchingObject = log
                 .getLogCurveInfo()
                 .stream()
