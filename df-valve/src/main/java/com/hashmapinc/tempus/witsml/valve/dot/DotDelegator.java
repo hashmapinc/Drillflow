@@ -978,16 +978,19 @@ public class DotDelegator {
 
 			// ********************************************* DATA **********************************************
 			if ( payloadJSON.has("logData") ) {
-				if ( !JsonUtil.isEmpty(payloadJSON.get("logData")) &&
-						(payloadJSON.getJSONArray("logData")).length() > 0 ) {
+				if ( !JsonUtil.isEmpty(payloadJSON.get("logData"))) {
 					switch (version) {
 						case "1.3.1.1":
-							payloads[DATA_IDX_4_PAYLOADS] = DotLogDataHelper.convertDataToDotFrom1311(
-									(com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj);
+							if (payloadJSON.getJSONObject("logData").length() > 0) {
+								payloads[DATA_IDX_4_PAYLOADS] = DotLogDataHelper.convertDataToDotFrom1311(
+										(com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) witsmlObj);
+							}
 							break;
 						case "1.4.1.1":
-							payloads[DATA_IDX_4_PAYLOADS] = DotLogDataHelper.convertDataToDotFrom1411(
-									(ObjLog) witsmlObj);
+							if (payloadJSON.getJSONArray("logData").length() > 0) {
+								payloads[DATA_IDX_4_PAYLOADS] = DotLogDataHelper.convertDataToDotFrom1411(
+										(ObjLog) witsmlObj);
+							}
 							break;
 						default:
 							payloads[DATA_IDX_4_PAYLOADS] = "";
@@ -1202,7 +1205,8 @@ public class DotDelegator {
 			if(getAllChannels || channels != null) {
 				if (indexType.equals("depth")) {
 					JSONObject payloadJSON = new JSONObject(payload);
-					if (((ObjLog)witsmlObject).getLogData() != null || getAllChannels){
+					if (((witsmlObject.getVersion().equals("1.4.1.1") && ((ObjLog)witsmlObject).getLogData() != null) || getAllChannels) ||
+							(witsmlObject.getVersion().equals("1.3.1.1") && ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getLogData() != null)){
 						//if (((ObjLog) witsmlObject).getLogData().size() > 0 || getAllChannels) {
 						String sortDesc = "true";
 						data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
@@ -1227,7 +1231,8 @@ public class DotDelegator {
 				}*/
 				} else {
 					JSONObject payloadJSON = new JSONObject(payload);
-					if (((ObjLog) witsmlObject).getLogData() != null || getAllChannels) {
+					if (((witsmlObject.getVersion().equals("1.4.1.1") && ((ObjLog)witsmlObject).getLogData() != null) || getAllChannels) ||
+							(witsmlObject.getVersion().equals("1.3.1.1") && ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getLogData() != null)){
 						//if (((ObjLog)witsmlObject).getLogData().size() > 0 || getAllChannels) {
 						String sortDesc = "true";
 						data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
@@ -1356,11 +1361,11 @@ public class DotDelegator {
 							else
 								currentChannel.setStartIndex(null);
 						} else {
-							if (lci.getMaxIndex() != null)
+							if (lci.getMaxIndex() != null && lci.getMaxIndex().getValue() != null)
 								currentChannel.setEndIndex(lci.getMaxIndex().getValue().toString());
 							else
 								currentChannel.setEndIndex(null);
-							if (lci.getMinIndex() != null)
+							if (lci.getMinIndex() != null && lci.getMinIndex().getValue() != null)
 								currentChannel.setStartIndex(lci.getMinIndex().getValue().toString());
 							else
 								currentChannel.setEndIndex(null);
