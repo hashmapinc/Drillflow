@@ -401,7 +401,6 @@ public class DotDelegator {
 
 			Channel idxChannel = payloadCheck( payloads,
 											  false,
-											   witsmlObj,
 						  					   client,
 						  					   uuid,
 				  		  					   username,
@@ -412,8 +411,8 @@ public class DotDelegator {
 			// now I must take the uom from that channel and stuff it
 			// as a property into every other non-index channel within
 			// the Item element as "uom".
-			if (idxChannel != null) {
-				if (!"".equals(channelPayload)) {
+			if (idxChannel != null && !"".equals(channelPayload)) {
+				//if (!"".equals(channelPayload)) {
 					JSONArray channelPayloadAsJSON = new JSONArray(channelPayload);
 					for (int n = 0; n < channelPayloadAsJSON.length(); n++) {
 						JSONObject nonIdxChannel = channelPayloadAsJSON.getJSONObject(n);
@@ -424,7 +423,7 @@ public class DotDelegator {
 						}
 					}
 					channelPayload = channelPayloadAsJSON.toString();
-				}
+				//}
 			}
 
 			// TODO Did I handle Channel Sets correctly
@@ -873,13 +872,12 @@ public class DotDelegator {
 		// for AddToStore, I toss the returned Index Channel (it is already present
 		// in the payload)
 		payloadCheck(allPayloads, thisIsAdd,
-				null, null, null, null, null, null);
+				 null, null, null, null, null);
 	}
 
 	// overload this method for Update, that requires more parameters
 	private Channel payloadCheck( String[] allPayloads,
 							   boolean thisIsAdd,
-							   AbstractWitsmlObject witsmlObject,
 							   DotClient client,
 							   String uuid,
 							   String username,
@@ -902,7 +900,6 @@ public class DotDelegator {
 				"channels is missing (so unit of measure cannot be obtained).";
 		String CH_NoIndexChannelErrorMsg = "Client must provide valid payload: " +
 				"no index channel matching <indexCurve/> was found.";
-		String RESTErrorMsg = "REST Call Failure ";
 
 		// if there is no channel set payload, fail this request
 		// (both Add and Update must specify Channel Set)
@@ -912,34 +909,20 @@ public class DotDelegator {
 			throw new ValveException( CSErrorMsg, (short)-484 );
 		}
 		// if there are no channels...
-		if (  allPayloads[CHANNELS_IDX_4_PAYLOADS].equals("") ) {
+		if (  allPayloads[CHANNELS_IDX_4_PAYLOADS].equals("") && thisIsAdd ) {
 			// then there is no unit of measure (UOM), so fail this
 			// request on an Add (ok for an Update)
-			if ( thisIsAdd ) {
-				LOG.warning(CHErrorMsg);
-				// Client must always specify the unit for all measure data
-				// on an Add
-				throw new ValveException(CSErrorMsg, (short) -453);
-			}
+			//if ( thisIsAdd ) {
+			LOG.warning(CHErrorMsg);
+			// Client must always specify the unit for all measure data
+			// on an Add
+			throw new ValveException(CSErrorMsg, (short) -453);
+			//}
 		}
-		// first try to find the index channel's identity (mnemonic) in the query's Channel Set
-		JSONObject channelSet =
-				new JSONObject(allPayloads[CS_IDX_4_PAYLOADS]);
-		JSONArray indexArray;
-		String mnemonicForIdxChannel = "";
-		if (channelSet.has("index") && channelSet.get("index") != null) {
-			indexArray = channelSet.getJSONArray("index");
-			// even though index is an array, always use the 1st element
-			mnemonicForIdxChannel = indexArray
-					.getJSONObject(0).getString("mnemonic");
-		} else {
-			if (thisIsAdd) {
-				// if index is not present in Add, there is no way to find the
-				// channel index; this is why it is required; throw the error
-				// that a mandatory write schema is missing
-				throw new ValveException(CH_NoIndexChannelErrorMsg, (short) -484);
-			}
-		}
+
+		String mnemonicForIdxChannel = findIdxChannelIdentity(allPayloads,
+															  thisIsAdd,
+															  CH_NoIndexChannelErrorMsg);
 
 		// first check the query's channels list for the index channel
 		Channel idxChannel = null;
@@ -993,6 +976,34 @@ public class DotDelegator {
 			}
 		}
 		return idxChannel;
+	}
+
+	private String findIdxChannelIdentity(String[] allPayloads,
+										  boolean thisIsAdd,
+										  String CH_NoIndexChannelErrorMsg)
+												throws ValveException
+	{
+
+		// first try to find the index channel's identity (mnemonic)
+		// in the query's Channel Set
+		JSONObject channelSet =
+				new JSONObject(allPayloads[CS_IDX_4_PAYLOADS]);
+		JSONArray indexArray;
+		String mnemonicForIdxChannel = "";
+		if (channelSet.has("index") && channelSet.get("index") != null) {
+			indexArray = channelSet.getJSONArray("index");
+			// even though index is an array, always use the 1st element
+			mnemonicForIdxChannel = indexArray
+					.getJSONObject(0).getString("mnemonic");
+		} else {
+			if (thisIsAdd) {
+				// if index is not present in Add, there is no way to find the
+				// channel index; this is why it is required; throw the error
+				// that a mandatory write schema is missing
+				throw new ValveException(CH_NoIndexChannelErrorMsg, (short) -484);
+			}
+		}
+		return mnemonicForIdxChannel;
 	}
 
 	/**
@@ -1366,17 +1377,7 @@ public class DotDelegator {
 						// get the request response.
 						channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password, exchangeID);
 						channelData = channelsDepthResponse.getBody();
-					}/*else{
-					String sortDesc = "true";
-					data = DotLogDataHelper.(channels, uuid, sortDesc, startIndex, endIndex);
-					// create with POST
-					channelsDepthEndPoint = this.getEndpoint("logDepthBoundaryPath");
-					channelsDepthRequest = Unirest.post(channelsDepthEndPoint);
-					channelsDepthRequest.header("Content-Type", "application/json");
-					channelsDepthRequest.body(data);
-					// get the request response.
-					channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
-				}*/
+					}
 				} else {
 					JSONObject payloadJSON = new JSONObject(payload);
 					if (((witsmlObject.getVersion().equals("1.4.1.1") && ((ObjLog)witsmlObject).getLogData() != null) || getAllChannels) ||
@@ -1392,17 +1393,7 @@ public class DotDelegator {
 						// get the request response.
 						channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password, exchangeID);
 						channelData = channelsDepthResponse.getBody();
-					}/*else {
-					String sortDesc = "true";
-					data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
-					// create with POST
-					channelsDepthEndPoint = this.getEndpoint("logTimeBoundaryPath");
-					channelsDepthRequest = Unirest.post(channelsDepthEndPoint);
-					channelsDepthRequest.header("Content-Type", "application/json");
-					channelsDepthRequest.body(data);
-					// get the request response.
-					channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password);
-				}*/
+					}
 				}
 			}
 
