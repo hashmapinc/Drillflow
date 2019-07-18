@@ -24,7 +24,6 @@ import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
 import com.hashmapinc.tempus.witsml.valve.dot.DotDelegator;
 import com.hashmapinc.tempus.witsml.valve.dot.client.DotClient;
-import com.hashmapinc.tempus.witsml.valve.dot.client.UidUuidCache;
 import com.hashmapinc.tempus.witsml.valve.dot.graphql.GraphQLQueryConverter;
 import com.hashmapinc.tempus.witsml.valve.dot.graphql.GraphQLRespConverter;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channel.Channel;
@@ -52,19 +51,16 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
      * "Create a new ChannelSet" API.
      *
      * @return JSON String representing the conversion
-     * @throws IOException
-     * @throws JsonMappingException
-     * @throws JsonParseException
-     * @throws ParseException
-     * @throws DatatypeConfigurationException
+     * @throws ParseException if the result cannot be parsed
+     * @throws DatatypeConfigurationException if the result cannot be parsed due to a data type issue
      */
 
     public static ObjLog convertDotResponseToWitsml(String wellSearchEndpoint,String wellBoreSearchEndpoint,DotClient client, String username,
                                                     String password, String exchangeID,AbstractWitsmlObject witsmlObject,String channelSet,
-                                                    List<Channel> channels,String channelsDepthResponse,Boolean getAllChannels,String indexType) throws JsonParseException,
-            JsonMappingException, IOException, DatatypeConfigurationException, ParseException,ValveException, ValveAuthException, UnirestException {
+                                                    List<Channel> channels,String channelsDepthResponse,Boolean getAllChannels,String indexType, boolean getData) throws
+            DatatypeConfigurationException, ParseException,ValveException, ValveAuthException, UnirestException {
 
-        ObjLog log =null;
+        ObjLog log;
 
         List<ChannelSet> cs = ChannelSet.jsonToChannelSetList(channelSet);
         log = ChannelSet.to1411(cs.get(0));
@@ -74,10 +70,7 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
         log.setNameWellbore(getWelBorelName( wellBoreSearchEndpoint,client,  username, password,  exchangeID,witsmlObject));
 
         //LogData requested or not
-        if ((witsmlObject.getVersion().equals("1.4.1.1") && ((ObjLog)witsmlObject).getLogData() != null) ||
-                (witsmlObject.getVersion().equals("1.3.1.1") && ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getLogData() != null) || getAllChannels ||
-                (witsmlObject.getVersion().equals("1.3.1.1") && ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getLogData() != null)){
-            //if (((ObjLog)witsmlObject).getLogData().size() >0 || getAllChannels){
+        if (getData){
             if (channelsDepthResponse != null) {
                 JSONObject logDataJsonObject = new JSONObject(channelsDepthResponse);
                 List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData> curves = new ArrayList<>();
