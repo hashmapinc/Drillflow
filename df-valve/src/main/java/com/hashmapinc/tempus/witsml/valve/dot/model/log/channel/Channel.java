@@ -656,8 +656,8 @@ public class Channel {
                     }
                 }
 
-
-                channel.setClassIndex(lci.getClassIndex());
+                if (lci.getClassIndex() != null)
+                    channel.setClassIndex(Short.valueOf(lci.getClassIndex()));
 
                 if (lci.getUnit() == null) {
                     channel.setUom("unitless");
@@ -771,7 +771,7 @@ public class Channel {
                 lci.setDensData(DensData.to1411(c.getDensData()));
                 lci.setSensorOffset(SensorOffset.to1411(c.getSensorOffset()));
                 lci.setWellDatum(WellDatum.to1411(c.getWellDatum()));
-                lci.setClassIndex(c.getClassIndex());
+                lci.setClassIndex(String.valueOf(c.getClassIndex()));
                 if (c.getTimeDepth().toLowerCase().contains("time")){
                     if (c.getStartIndex() != null){
                         lci.setMinDateTimeIndex(c.getStartIndex());
@@ -854,7 +854,7 @@ public class Channel {
                 lci.setDensData(DensData.to1411(c.getDensData()));
                 lci.setSensorOffset(SensorOffset.to1411(c.getSensorOffset()));
                 lci.setWellDatum(WellDatum.to1411(c.getWellDatum()));
-                lci.setClassIndex(c.getClassIndex());
+                lci.setClassIndex(String.valueOf(c.getClassIndex()));
                 if (c.getTimeDepth().toLowerCase().contains("time")){
                     //logic to implement startIndex and endIndex from logData
                     for (int i = 0; i < jsonValues.length(); i++){
@@ -970,7 +970,7 @@ public class Channel {
                 lci.setAlternateIndex(c.getAlternateIndex());
                 lci.setClassWitsml(c.getClassWitsml());
                 //NOTE: WE WILL ALWAYS SET THE INDEX TO THE FIRST COLUMN
-                lci.setColumnIndex((short) 1);
+                lci.setColumnIndex("1");
                 lci.setCurveDescription(c.getCitation().getDescription());
                 lci.setDataSource(c.getSource());
                 lci.setTraceOrigin(c.getTraceOrigin());
@@ -984,7 +984,7 @@ public class Channel {
                 lci.setDensData(DensData.to1311(c.getDensData()));
                 lci.setSensorOffset(SensorOffset.to1311(c.getSensorOffset()));
                 lci.setWellDatum(WellDatum.to1311(c.getWellDatum()));
-                lci.setColumnIndex(c.classIndex);
+                lci.setColumnIndex(String.valueOf(c.classIndex));
 
                 if (c.getTimeDepth().toLowerCase().contains("time")){
                     lci.setMinDateTimeIndex(c.getStartIndex());

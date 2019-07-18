@@ -1407,7 +1407,7 @@ public class DotDelegator {
 				String wellBoreSearchEndpoint = this.getEndpoint("wellboresearch");
 				finalResponse = LogConverterExtended.convertDotResponseToWitsml
 						(wellSearchEndpoint,wellBoreSearchEndpoint,client,username,password,exchangeID, witsmlObject,allChannelSet.getBody(),
-								channels,channelData,getAllChannels,indexType);
+								channels,channelData,getAllChannels,indexType, getData);
 			} catch (Exception e) {
 				throw new ValveException("Could not convert DOT log response to JSON " + e.getMessage());
 			}
