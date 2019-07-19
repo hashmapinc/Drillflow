@@ -150,6 +150,7 @@ public class Index {
                 .stream()
                 .filter(p -> p.getMnemonic().equals(log.getIndexCurve().getValue()))
                 .findFirst();
+        
         if (!matchingObject.isEmpty()) {
             index.setUom(matchingObject.get().getUnit());
         }
