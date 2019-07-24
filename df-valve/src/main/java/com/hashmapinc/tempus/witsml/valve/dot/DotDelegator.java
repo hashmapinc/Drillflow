@@ -638,7 +638,6 @@ public class DotDelegator {
 	 * 				       for creation
 	 *
 	 * Suggestions:
-	 * -- Rename getrestcalls to something more log specific
 	 * -- make getrestcalls async
 	 */
 	public String createObject( AbstractWitsmlObject witsmlObj,

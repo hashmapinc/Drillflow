@@ -382,7 +382,7 @@ public class DotValve implements IValve {
 		String[] funcs = { "WMLS_AddToStore", "WMLS_GetFromStore", "WMLS_DeleteFromStore", "WMLS_UpdateInStore" };
 
 		// supported objects for each function
-    // choice of 1311 is arbitrary
+    	// choice of 1311 is arbitrary
 		AbstractWitsmlObject well = new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWell();
 		// choice of 1311 is arbitrary
 		AbstractWitsmlObject wellbore = new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore();
@@ -390,12 +390,14 @@ public class DotValve implements IValve {
 		AbstractWitsmlObject trajectory = new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory();
 		// choice of 1311 is arbitrary
 		AbstractWitsmlObject log = new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog();
+		// choice of 1311 is arbitrary
+		AbstractWitsmlObject fluidsReport = new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjFluidsReport();
 
 		AbstractWitsmlObject[][] supportedObjects = {
-				{ well, wellbore, trajectory, log }, // ADD TO STORE OBJECTS
-				{ well, wellbore, trajectory, log }, // GET FROM STORE OBJECTS
-				{ well, wellbore, trajectory, log }, // DELETE FROM STORE OBJECTS
-				{ well, wellbore, trajectory, log},  // UPDATE IN STORE OBJECTS
+				{ well, wellbore, trajectory, log, fluidsReport }, // ADD TO STORE OBJECTS
+				{ well, wellbore, trajectory, log, fluidsReport }, // GET FROM STORE OBJECTS
+				{ well, wellbore, trajectory, log, fluidsReport }, // DELETE FROM STORE OBJECTS
+				{ well, wellbore, trajectory, log, fluidsReport }  // UPDATE IN STORE OBJECTS
 		};
 
 		// populate cap
