@@ -577,7 +577,7 @@ public class DotTranslator {
 
             // consolidate children
             for (AbstractWitsmlObject child : witsmlObjects) {
-                // TODO FIX THIS
+                // TODO FIX THIS for release
                 //parent.addFluidReport(
                 //        (com.hashmapinc.tempus.WitsmlObjects.v1311.ObjFluidsReport) get1311WitsmlObject(child)
                 //);
