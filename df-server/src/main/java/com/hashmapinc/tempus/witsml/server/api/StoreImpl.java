@@ -140,6 +140,7 @@ public class StoreImpl implements IStore {
                 return response;
             }
             String version = WitsmlUtil.getVersionFromXML(XMLin);
+            // create the correct Object model (e.g. ObjFluidsReport) for the version from the raw XML
             witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, XMLin, version);
             ValveUser user = (ValveUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             QueryContext qc = new QueryContext(

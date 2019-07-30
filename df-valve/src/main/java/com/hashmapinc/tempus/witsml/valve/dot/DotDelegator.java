@@ -17,7 +17,9 @@ package com.hashmapinc.tempus.witsml.valve.dot;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
+import com.hashmapinc.tempus.WitsmlObjects.Util.FluidsReportConverter;
 import com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogCurveInfo;
+import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjFluidsReport;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ShortNameStruct;
@@ -53,6 +55,7 @@ public class DotDelegator {
 	private final String WELLBORE_OBJECT = "wellbore";
 	private final String TRAJECTORY_OBJECT = "trajectory";
 	private final String LOG_OBJECT = "log";
+	private final String FLUIDSREPORT_OBJECT = "fluidsreport";
 	private final String WELL_UID = "uidWell";
 	private final String WELLBORE_UID = "uidWellbore";
 	private final String CHANNELSET_UUID = "channelsetuuid";
@@ -76,6 +79,8 @@ public class DotDelegator {
 	private final String LOG_TIMEDATA_PATH;
 	private final String LOG_DEPTH_BOUNDARY_DATA_PATH;
 	private final String LOG_TIME_BOUNDARY_DATA_PATH;
+	private final String FLUIDS_REPORT_PATH;
+	private final String FLUIDS_REPORT_IDENTITIES;
 
 	/**
 	 * Map based constructor
@@ -99,6 +104,11 @@ public class DotDelegator {
 		this.LOG_TIMEDATA_PATH = config.get("log.channel.timeData.path");
 		this.LOG_DEPTH_BOUNDARY_DATA_PATH = config.get("log.channel.depthBoundaryData.path");
 		this.LOG_TIME_BOUNDARY_DATA_PATH = config.get("log.channel.timeBoundaryData.path");
+		this.FLUIDS_REPORT_PATH = config.get("fluids.report.path");
+		this.FLUIDS_REPORT_IDENTITIES = config.get("fluids.report.identities");
+
+
+
 	}
 
 	/**
@@ -159,6 +169,12 @@ public class DotDelegator {
 				break;
 			case "logTimeBoundaryPath":
 				endpoint = this.LOG_TIME_BOUNDARY_DATA_PATH;
+				break;
+			case "fluidsreport":
+				endpoint = this.FLUIDS_REPORT_PATH;
+				break;
+			case "fluidsreportidentities":
+				endpoint = this.FLUIDS_REPORT_IDENTITIES;
 				break;
 			default:
 				throw new ValveException("Unsupported object type<" + objectType + ">");
@@ -270,7 +286,22 @@ public class DotDelegator {
 				}
 			}
 
-		} else {
+		}else if("fluidsreport".equals(objectType)){
+			uuid = getUUIDFR(uid,witsmlObj,client,username,password, exchangeID);
+			if (uuid == null){
+				throw new ValveException("Not Found", (short)-433);
+			}
+			String fluidsReportDeletEndpoint = this.getEndpoint(FLUIDSREPORT_OBJECT);
+			fluidsReportDeletEndpoint = fluidsReportDeletEndpoint + "/" + uuid;
+			HttpRequest fluidsReportDeleteRequest = Unirest.delete(fluidsReportDeletEndpoint).header("Content-Type",
+					"application/json");
+			HttpResponse<String> fluidsReportDeleteResponse = client.makeRequest(fluidsReportDeleteRequest, username, password, exchangeID);
+			int deleteStatus = fluidsReportDeleteResponse.getStatus();
+			if (204 != deleteStatus) {
+				throw new ValveException("DELETE DoT REST call failed with status code: " + deleteStatus);
+			}
+		}
+		else {
 			response = client.makeRequest(request, username, password, exchangeID);
 			int status = response.getStatus();
 			if (201 == status || 200 == status || 204 == status) {
@@ -330,6 +361,21 @@ public class DotDelegator {
 				throw new ValveException("DELETE DoT REST call failed with status code: " + elementDeleteStatus);
 			}
 
+		}else if("fluidsreport".equals(objectType)){
+			uuid = getUUIDFR(uid,witsmlObj,client,username,password, exchangeID);
+			//uuid = "8e1b3429-80d7-450d-8684-ccdb827e4ec6";
+			if (uuid == null){
+				throw new ValveException("Not Found", (short)-433);
+			}
+			String fluidsReportElementDeletEndpoint = this.getEndpoint(FLUIDSREPORT_OBJECT);
+			fluidsReportElementDeletEndpoint = fluidsReportElementDeletEndpoint + "/" + uuid;
+			HttpRequest fluidsReportElementDeleteRequest = Unirest.patch(fluidsReportElementDeletEndpoint).header("Content-Type",
+					"application/json");
+			HttpResponse<String> fluidsReportElementDeleteResponse = client.makeRequest(fluidsReportElementDeleteRequest, username, password, exchangeID);
+			int deleteStatus = fluidsReportElementDeleteResponse.getStatus();
+			if (204 != deleteStatus) {
+				throw new ValveException("DELETE DoT REST call failed with status code: " + deleteStatus);
+			}
 		} else {
 			request = Unirest.patch(endpoint).header("Content-Type", "application/json");
 			payload = JsonUtil.removeEmptyArrays(new JSONObject(payload));
@@ -641,7 +687,7 @@ public class DotDelegator {
 	 * -- Rename getrestcalls to something more log specific
 	 * -- make getrestcalls async
 	 */
-	public String createObject( AbstractWitsmlObject witsmlObj,
+	/*public String createObject( AbstractWitsmlObject witsmlObj,
 								String username,
 								String password,
 								String exchangeID,
@@ -699,82 +745,395 @@ public class DotDelegator {
 		} else {
 			throw new ValveException(response.getBody());
 		}
-	}
+	}*/
 
+    public String createObject( AbstractWitsmlObject witsmlObj,
+                                String username,
+                                String password,
+                                String exchangeID,
+                                DotClient client )
+            throws  ValveException,
+            ValveAuthException,
+            UnirestException
+    {
+        String objectType = witsmlObj.getObjectType();
 
-	public String createLogObject ( AbstractWitsmlObject witsmlObj,
-									String username,
-									String password,
-									String exchangeID,
-									DotClient client )
-			throws ValveException,
-			ValveAuthException,
-			UnirestException
-	{
-		HttpResponse<String> response;
-		String objectType = witsmlObj.getObjectType();
-		String uid = witsmlObj.getUid();
-		String version = witsmlObj.getVersion();
-		HashMap<String,String> requestParams;
-		String endpoint;
+        if ("log".equals(objectType)) {
+            // log's testability is sufficiently complex that it will be handled differently
+            // than the other objects
+            String response = createLogObject( witsmlObj,
+                    username,
+                    password,
+                    exchangeID,
+                    client );
+            return response;
+        }
 
-		// get WITSML abstract object as JSON string
-		String payload = ("1.4.1.1".equals(version) ?
-				witsmlObj.getJSONString("1.4.1.1") :
-				witsmlObj.getJSONString("1.3.1.1") );
-		//
+        if ("fluidsReport".equalsIgnoreCase(objectType)){
+            String response = createFluidsReportObject( witsmlObj,
+                    username,
+                    password,
+                    exchangeID,
+                    client );
+            return response;
+        }
 
-		// separate out from the payload the sub-payloads for
-		//        ChannelSet (CS_IDX_4_PAYLOADS),
-		//        Channels (CHANNELS_IDX_4_PAYLOADS),
-		//        and Data (DATA_IDX_4_PAYLOADS)
-		String[] allPayloads = getPayloads4Log( version,
-												payload,
-												witsmlObj );
+        String uid = witsmlObj.getUid();
+        String endpoint = this.getEndpoint(objectType);
 
-		// all "Client should ..." checks will be performed in this method
-		// this method will throw the correct valve exception if the payload is non-conforming
-		payloadCheck( allPayloads, true );
-		/*
-		payloadCheck(allPayloads, true,
-				null, null, null, null, null, null);
-		*/
-		// ********************************* ChannelSet ********************************* //
-		// endpoint:
-		//        .../channelSets?uid={uid}&uidWellbore={uidWellbore}&uidWell={uidWell}
-		endpoint = this.getEndpoint(objectType);
-		// parameters for url
-		requestParams = new HashMap<>();
-		requestParams.put("uid", uid);
-		requestParams.put("uidWellbore", witsmlObj.getParentUid());
-		requestParams.put("uidWell", witsmlObj.getGrandParentUid());
+        // get object as payload string
+        String payload = witsmlObj.getJSONString("1.4.1.1");
 
-		// call a central method to finish the REST set-up
-		// and execute the rest call for ChannelSet
-		response = performPost( allPayloads[CS_IDX_4_PAYLOADS],
-				endpoint,
-				requestParams,
+        // build the request
+        HttpRequestWithBody request;
+        if (null == uid || uid.isEmpty()) {
+            // create with POST and generate uid
+            request = Unirest.post(endpoint);
+        } else {
+            // create with PUT using existing uid
+            request = Unirest.put(endpoint + uid);
+        }
+
+        // add remaining query string params
+        if ("wellbore".equals(objectType)) {
+            // TODO: error handle this?
+            request.queryString("uidWell", witsmlObj.getParentUid());
+        } else if ("trajectory".equals(objectType)) {
+            request.queryString("uidWellbore", witsmlObj.getParentUid());
+            request.queryString("uidWell", witsmlObj.getGrandParentUid());
+        }
+
+        // add the header and payload
+        request.header("Content-Type", "application/json");
+        request.body(payload);
+
+        // get the request's response
+        HttpResponse<String> response = client.makeRequest( request,
+                username,
+                password,
+                exchangeID );
+        // check response status
+        int status = response.getStatus();
+        if (201 == status || 200 == status) {
+            return (null == uid || uid.isEmpty()) ?
+                    new JsonNode(response.getBody())
+                            .getObject()
+                            .getString("uid") :
+                    uid;
+        } else {
+            throw new ValveException(response.getBody());
+        }
+    }
+
+    /**
+     *
+     * @param witsmlObj       Correct object model for the type (e.g. ObjFluidsReport) and version
+     * @param username
+     * @param password
+     * @param exchangeID
+     * @param client
+     * @return
+     * @throws ValveException
+     * @throws ValveAuthException
+     * @throws UnirestException
+     */
+    public String createFluidsReportObject ( AbstractWitsmlObject witsmlObj,
+                                             String username,
+                                             String password,
+                                             String exchangeID,
+                                             DotClient client )
+            throws  ValveException,
+            ValveAuthException,
+            UnirestException
+    {
+        HttpResponse<String> response;
+        String objectType = witsmlObj.getObjectType();
+        // can create a Fluids Report with or without a uid
+        String uid = witsmlObj.getUid();
+
+        // however, the uuid of parent Wellbore must be present
+		String wellboreUuid = getParentWellboreUUID( witsmlObj,
+				exchangeID,
 				client,
 				username,
-				password,
-				witsmlObj,
-				exchangeID );
+				password );
 
-		// check response status
-		if(response == null){
-			LOG.warning(ValveLogging.getLogMsg(exchangeID, "Received a null channel set, aborting log create"));
-			throw new ValveException("Missing mandatory channel set", (short) -405);
-		}
-		int status = response.getStatus();
-		if (409 == status) {
-			LOG.info(ValveLogging.getLogRespMsg(exchangeID,
-					"Log with uid " + uid + " already in store, aborting log create",
-					 response));
-			throw new ValveException("Log already in store", (short) -405);
-		}
+        HashMap<String,String> requestParams;
+        String endpoint;
+        String payload = witsmlObj.getJSONString("2.0");
 
-		// success for adding channelSet is 201...
-		if (201 == status) {/*
+        // **************************** Payload Rest Call **************************** //
+        // POST is used to request that the origin server accept the entity enclosed   //
+        // in the request as a NEW subordinate of the resource identified by the       //
+        // Request-URI in the Request-Line.                                            //
+        //                                                                             //
+        // endpoint:                                                                   //
+        //        .../lptestcore/fluidsreport/v1/witsml/fluidsReports?                 //
+        //             uuidWellbore={uuidWellbore}[&uid]                               //
+        // *************************************************************************** //
+        endpoint = this.getEndpoint(objectType);
+        // parameters for url
+        requestParams = new HashMap<>();
+        requestParams.put("uuidWellbore", wellboreUuid);
+
+        // uid is an optional request parameter
+        if ( !uid.isBlank() )
+            requestParams.put("uid", uid);
+
+        // call a central method to finish the REST set-up
+        // and execute the REST call for Fluids Report payload
+        response = performPost( payload,
+                endpoint,
+                requestParams,
+                client,
+                username,
+                password,
+                exchangeID );
+
+        // check response status
+        if(response == null){
+            LOG.warning(ValveLogging.getLogMsg(exchangeID, "Received a null fluids report request," +
+                    " aborting fluids report create"));
+            throw new ValveException("Missing mandatory fluids report payload", (short) -405);
+        }
+
+        int status = response.getStatus();
+        // success for creating fluids report
+        if (201 == status) {
+            // TODO Once tested, change my other log code to uid.isBlank() instead of uid.ieEmpty()
+            return (null == uid || uid.isBlank()) ? new JsonNode(response.getBody()).getObject().getString("uid") :
+                    uid;
+        } else {
+            // captures 400 (Bad Request), 401 (Unauthorized), 404 (Not Found) and 500 (Internal Server error)
+            throw new ValveException(response.getBody());
+        }
+    }
+
+//	public String createLogObject ( AbstractWitsmlObject witsmlObj,
+//									String username,
+//									String password,
+//									String exchangeID,
+//									DotClient client )
+//			throws ValveException,
+//			ValveAuthException,
+//			UnirestException
+//	{
+//		HttpResponse<String> response;
+//		String objectType = witsmlObj.getObjectType();
+//		String uid = witsmlObj.getUid();
+//		String version = witsmlObj.getVersion();
+//		HashMap<String,String> requestParams;
+//		String endpoint;
+//
+//		// get WITSML abstract object as JSON string
+//		String payload = ("1.4.1.1".equals(version) ?
+//				witsmlObj.getJSONString("1.4.1.1") :
+//				witsmlObj.getJSONString("1.3.1.1") );
+//		//
+//
+//		// separate out from the payload the sub-payloads for
+//		//        ChannelSet (CS_IDX_4_PAYLOADS),
+//		//        Channels (CHANNELS_IDX_4_PAYLOADS),
+//		//        and Data (DATA_IDX_4_PAYLOADS)
+//		String[] allPayloads = getPayloads4Log( version,
+//												payload,
+//												witsmlObj );
+//
+//		// all "Client should ..." checks will be performed in this method
+//		// this method will throw the correct valve exception if the payload is non-conforming
+//		payloadCheck( allPayloads, true );
+//		/*
+//		payloadCheck(allPayloads, true,
+//				null, null, null, null, null, null);
+//		*/
+//		// ********************************* ChannelSet ********************************* //
+//		// endpoint:
+//		//        .../channelSets?uid={uid}&uidWellbore={uidWellbore}&uidWell={uidWell}
+//		endpoint = this.getEndpoint(objectType);
+//		// parameters for url
+//		requestParams = new HashMap<>();
+//		requestParams.put("uid", uid);
+//		requestParams.put("uidWellbore", witsmlObj.getParentUid());
+//		requestParams.put("uidWell", witsmlObj.getGrandParentUid());
+//
+//		// call a central method to finish the REST set-up
+//		// and execute the rest call for ChannelSet
+//		response = performPost( allPayloads[CS_IDX_4_PAYLOADS],
+//				endpoint,
+//				requestParams,
+//				client,
+//				username,
+//				password,
+//				witsmlObj,
+//				exchangeID );
+//
+//		// check response status
+//		if(response == null){
+//			LOG.warning(ValveLogging.getLogMsg(exchangeID, "Received a null channel set, aborting log create"));
+//			throw new ValveException("Missing mandatory channel set", (short) -405);
+//		}
+//		int status = response.getStatus();
+//		if (409 == status) {
+//			LOG.info(ValveLogging.getLogRespMsg(exchangeID,
+//					"Log with uid " + uid + " already in store, aborting log create",
+//					 response));
+//			throw new ValveException("Log already in store", (short) -405);
+//		}
+//
+//		// success for adding channelSet is 201...
+//		if (201 == status) {/*
+//         // cache the channelSet - null pointer exception now
+//         try {
+//            ChannelSetCache.putInCache(getUuid(witsmlObj, uid, client, username, password),
+//                                 cs);
+//         } catch (JsonProcessingException ex) {
+//            // not being able to cache should not stop the workflow -- log it & continue
+//            LOG.severe(ValveLogging.getLogMsg(exchangeID,
+//                  "JSON Processing Exception trying to cache a ChannelSet "
+//                        + ex.getMessage(),
+//                  witsmlObj));
+//         }
+//*/
+//			// ********************************** Channels ********************************** //
+//			// add channels to an existing ChannelSet
+//			if (!(allPayloads[CHANNELS_IDX_4_PAYLOADS].isEmpty())) {
+//
+//				// build the channels Request...
+//				// endpoint: .../channels/metadata?channelSetUuid={channelSetUuid}
+//
+//				//endpoint = this.getEndpoint(objectType + "Channel");
+//				//endpoint = endpoint + "/metadata";
+//				endpoint = this.getEndpoint("channels");
+//				// get the uuid for the channelSet just created from the response
+//				String uuid4CS = new JsonNode(response.getBody())
+//						.getObject()
+//						.getString("uuid");
+//
+//				requestParams = new HashMap<>();
+//				requestParams.put("channelSetUuid", uuid4CS);
+//				// call a central method to finish the REST set-up
+//				// and execute the rest call for ChannelSet
+//				response = performPost( allPayloads[CHANNELS_IDX_4_PAYLOADS],
+//						endpoint,
+//						requestParams,
+//						client,
+//						username,
+//						password,
+//						witsmlObj,
+//						exchangeID );
+//
+//				// check response status
+//				status = response.getStatus();
+//				if (200 == status) {
+//					//LOG.info(ValveLogging.getLogRespMsg(exchangeID, "Successfully added channel metadata to the ChannelSet in DoT with uuid " + uuid4CS, response));
+//					// TODO: cache the channels
+//
+//					// ************************************ Data ************************************ //
+//					// .../channels/data?channelSetUuid={channelSetUuid}
+//					endpoint = this.getEndpoint("channelData");
+//					requestParams = new HashMap<>();
+//					requestParams.put("channelSetUuid", uuid4CS);
+//
+//					response = performPost( allPayloads[DATA_IDX_4_PAYLOADS],
+//							endpoint,
+//							requestParams,
+//							client,
+//							username,
+//							password,
+//							witsmlObj,
+//							exchangeID );
+//					// check response status
+//					if(response != null){
+//						status = response.getStatus();
+//						// actually this requires a 200...
+//						if (200 != status) {
+//							throw new ValveException("Failed to add channel data to the ChannelSet");
+//						}
+//					}
+//				}
+//
+//			}
+//			return (null == uid || uid.isEmpty()) ? new JsonNode(response.getBody()).getObject().getString("uid") :
+//					uid;
+//		} else {
+//			//LOG.info(ValveLogging.getLogRespMsg(exchangeID, "Failed to add ChannelSet to the DoT", response));
+//			throw new ValveException(response.getBody());
+//		}
+//	}
+
+
+    public String createLogObject ( AbstractWitsmlObject witsmlObj,
+                                    String username,
+                                    String password,
+                                    String exchangeID,
+                                    DotClient client )
+            throws ValveException,
+            ValveAuthException,
+            UnirestException
+    {
+        HttpResponse<String> response;
+        String objectType = witsmlObj.getObjectType();
+        String uid = witsmlObj.getUid();
+        String version = witsmlObj.getVersion();
+        HashMap<String,String> requestParams;
+        String endpoint;
+
+        // get WITSML abstract object as JSON string
+        String payload = ("1.4.1.1".equals(version) ?
+                witsmlObj.getJSONString("1.4.1.1") :
+                witsmlObj.getJSONString("1.3.1.1") );
+        //
+
+        // separate out from the payload the sub-payloads for
+        //        ChannelSet (CS_IDX_4_PAYLOADS),
+        //        Channels (CHANNELS_IDX_4_PAYLOADS),
+        //        and Data (DATA_IDX_4_PAYLOADS)
+        String[] allPayloads = getPayloads4Log( version,
+                payload,
+                witsmlObj );
+
+        // all "Client should ..." checks will be performed in this method
+        // this method will throw the correct valve exception if the payload is non-conforming
+        payloadCheck( allPayloads, true );
+      /*
+      payloadCheck(allPayloads, true,
+            null, null, null, null, null, null);
+      */
+        // ********************************* ChannelSet ********************************* //
+        // endpoint:
+        //        .../channelSets?uid={uid}&uidWellbore={uidWellbore}&uidWell={uidWell}
+        endpoint = this.getEndpoint(objectType.toLowerCase());
+        // parameters for url
+        requestParams = new HashMap<>();
+        requestParams.put("uid", uid);
+        requestParams.put("uidWellbore", witsmlObj.getParentUid());
+        requestParams.put("uidWell", witsmlObj.getGrandParentUid());
+
+        // call a central method to finish the REST set-up
+        // and execute the rest call for ChannelSet
+        response = performPost( allPayloads[CS_IDX_4_PAYLOADS],
+                endpoint,
+                requestParams,
+                client,
+                username,
+                password,
+                exchangeID );
+
+        // check response status
+        if(response == null){
+            LOG.warning(ValveLogging.getLogMsg(exchangeID, "Received a null channel set, aborting log create"));
+            throw new ValveException("Missing mandatory channel set", (short) -405);
+        }
+        int status = response.getStatus();
+        if (409 == status) {
+            LOG.info(ValveLogging.getLogRespMsg(exchangeID,
+                    "Log with uid " + uid + " already in store, aborting log create",
+                    response));
+            throw new ValveException("Log already in store", (short) -405);
+        }
+
+        // success for adding channelSet is 201...
+        if (201 == status) {/*
          // cache the channelSet - null pointer exception now
          try {
             ChannelSetCache.putInCache(getUuid(witsmlObj, uid, client, username, password),
@@ -787,72 +1146,70 @@ public class DotDelegator {
                   witsmlObj));
          }
 */
-			// ********************************** Channels ********************************** //
-			// add channels to an existing ChannelSet
-			if (!(allPayloads[CHANNELS_IDX_4_PAYLOADS].isEmpty())) {
+            // ********************************** Channels ********************************** //
+            // add channels to an existing ChannelSet
+            if (!(allPayloads[CHANNELS_IDX_4_PAYLOADS].isEmpty())) {
 
-				// build the channels Request...
-				// endpoint: .../channels/metadata?channelSetUuid={channelSetUuid}
+                // build the channels Request...
+                // endpoint: .../channels/metadata?channelSetUuid={channelSetUuid}
 
-				//endpoint = this.getEndpoint(objectType + "Channel");
-				//endpoint = endpoint + "/metadata";
-				endpoint = this.getEndpoint("channels");
-				// get the uuid for the channelSet just created from the response
-				String uuid4CS = new JsonNode(response.getBody())
-						.getObject()
-						.getString("uuid");
+                //endpoint = this.getEndpoint(objectType + "Channel");
+                //endpoint = endpoint + "/metadata";
+                endpoint = this.getEndpoint("channels");
+                // get the uuid for the channelSet just created from the response
+                String uuid4CS = new JsonNode(response.getBody())
+                        .getObject()
+                        .getString("uuid");
 
-				requestParams = new HashMap<>();
-				requestParams.put("channelSetUuid", uuid4CS);
-				// call a central method to finish the REST set-up
-				// and execute the rest call for ChannelSet
-				response = performPost( allPayloads[CHANNELS_IDX_4_PAYLOADS],
-						endpoint,
-						requestParams,
-						client,
-						username,
-						password,
-						witsmlObj,
-						exchangeID );
+                requestParams = new HashMap<>();
+                requestParams.put("channelSetUuid", uuid4CS);
+                // call a central method to finish the REST set-up
+                // and execute the rest call for ChannelSet
+                response = performPost( allPayloads[CHANNELS_IDX_4_PAYLOADS],
+                        endpoint,
+                        requestParams,
+                        client,
+                        username,
+                        password,
+                        exchangeID );
 
-				// check response status
-				status = response.getStatus();
-				if (200 == status) {
-					//LOG.info(ValveLogging.getLogRespMsg(exchangeID, "Successfully added channel metadata to the ChannelSet in DoT with uuid " + uuid4CS, response));
-					// TODO: cache the channels
+                // check response status
+                status = response.getStatus();
+                if (200 == status) {
+                    //LOG.info(ValveLogging.getLogRespMsg(exchangeID, "Successfully added channel metadata to the ChannelSet in DoT with uuid " + uuid4CS, response));
+                    // TODO: cache the channels
 
-					// ************************************ Data ************************************ //
-					// .../channels/data?channelSetUuid={channelSetUuid}
-					endpoint = this.getEndpoint("channelData");
-					requestParams = new HashMap<>();
-					requestParams.put("channelSetUuid", uuid4CS);
+                    // ************************************ Data ************************************ //
+                    // .../channels/data?channelSetUuid={channelSetUuid}
+                    endpoint = this.getEndpoint("channelData");
+                    requestParams = new HashMap<>();
+                    requestParams.put("channelSetUuid", uuid4CS);
 
-					response = performPost( allPayloads[DATA_IDX_4_PAYLOADS],
-							endpoint,
-							requestParams,
-							client,
-							username,
-							password,
-							witsmlObj,
-							exchangeID );
-					// check response status
-					if(response != null){
-						status = response.getStatus();
-						// actually this requires a 200...
-						if (200 != status) {
-							throw new ValveException("Failed to add channel data to the ChannelSet");
-						}
-					}
-				}
+                        response = performPost( allPayloads[DATA_IDX_4_PAYLOADS],
+                            endpoint,
+                            requestParams,
+                            client,
+                            username,
+                            password,
+                            exchangeID );
+                    // check response status
+                    if(response != null){
+                        status = response.getStatus();
+                        // actually this requires a 200...
+                        if (200 != status) {
+                            throw new ValveException("Failed to add channel data to the ChannelSet");
+                        }
+                    }
+                }
 
-			}
-			return (null == uid || uid.isEmpty()) ? new JsonNode(response.getBody()).getObject().getString("uid") :
-					uid;
-		} else {
-			//LOG.info(ValveLogging.getLogRespMsg(exchangeID, "Failed to add ChannelSet to the DoT", response));
-			throw new ValveException(response.getBody());
-		}
-	}
+            }
+            return (null == uid || uid.isEmpty()) ? new JsonNode(response.getBody()).getObject().getString("uid") :
+                    uid;
+        } else {
+            //LOG.info(ValveLogging.getLogRespMsg(exchangeID, "Failed to add ChannelSet to the DoT", response));
+            throw new ValveException(response.getBody());
+        }
+    }
 
 	/**
 	 * Before any REST calls are performed, validate that the payloads provided
@@ -1026,7 +1383,6 @@ public class DotDelegator {
 												 DotClient client,
 												 String username,
 												 String password,
-												 AbstractWitsmlObject witsmlObj,
 												 String exchangeID )
 			throws ValveAuthException,
 			UnirestException,
@@ -1182,6 +1538,11 @@ public class DotDelegator {
 		String uuid = "";
 		String finalResponse = null;
 
+		String fluidsReportEndpoint = "";
+		HttpRequest fluidsReportRequest;
+		HttpResponse<String> fluidsReportResponse=null;
+
+
 		endpoint = this.getEndpoint(objectType) + uid; // add uid for rest call
 		String version = witsmlObject.getVersion();
 		// build request
@@ -1228,6 +1589,31 @@ public class DotDelegator {
 			finalResponse =  getFromStoreRestCalls(witsmlObject,client,uuid,username,password,exchangeID,shouldGetData, getAllChannels);
 			return DotTranslator.translateQueryResponse(witsmlObject, finalResponse, optionsIn);
 
+		}else if("fluidsreport".equals(objectType)){
+			uuid = getUUIDFR(uid,witsmlObject,client,username,password, exchangeID);
+
+			//uuid = "3629e871-87cd-472f-8823-e00a9996e482";
+
+			if (uuid == null)
+				return null;
+			// get object as payload string
+			String payload;
+			if ("1.4.1.1".equals(witsmlObject.getVersion())) {
+				payload = witsmlObject.getJSONString("1.4.1.1");
+			} else {
+				payload = witsmlObject.getJSONString("1.3.1.1");
+			}
+			payload = JsonUtil.removeEmpties(new JSONObject(payload));
+
+			// Build Request for Get ChannelSet Metadata
+			fluidsReportEndpoint = this.getEndpoint(FLUIDSREPORT_OBJECT);
+			fluidsReportEndpoint = fluidsReportEndpoint + "/" + uuid;
+			fluidsReportRequest = Unirest.get(fluidsReportEndpoint);
+			fluidsReportRequest.header("accept", "application/json");
+			// get response
+			fluidsReportResponse = client.makeRequest(fluidsReportRequest, username, password, exchangeID);
+			//ObjFluidsReport finalResponse = FluidsReportConverter.convertTo1411(fluidsReportResponse.getBody());
+			return DotTranslator.translateQueryResponse(witsmlObject, fluidsReportResponse.getBody(), optionsIn);
 		}else{
 			// get response
 			HttpResponse<String> response = client.makeRequest(request, username, password, exchangeID);
@@ -1698,7 +2084,9 @@ public class DotDelegator {
 	) throws ValveException, ValveAuthException, UnirestException {
 		// validate wmlObject
 		String objectType = wmlObject.getObjectType();
-		if (!("log".equals(objectType) || "trajectory".equals(objectType)))
+		if ( !( "log".equals(objectType) ||
+                "trajectory".equals(objectType) ||
+                "fluidsreport".equals(objectType)))
 			throw new ValveException("object type <" + objectType + "> does not have a parent wellbore");
 
 		// see if the uuid is stored in the uid/uuid cache
@@ -1780,6 +2168,57 @@ public class DotDelegator {
 		logRequest.queryString("uid", uid);
 		logRequest.queryString("uidWellbore", uidWellbore);
 		logRequest.queryString("uidWell", uidWellLog);
+		HttpResponse<String> response;
+		response = client.makeRequest(logRequest, username, password, exchangeID);
+		if (response.getBody().isEmpty()) {
+			throw new ValveException("No log found.");
+		}
+		JSONObject responseJson = new JSONObject(response.getBody());
+		if (!responseJson.has("uuid"))
+			return null;
+		uuid = responseJson.getString("uuid");
+		return uuid;
+	}
+
+	/**
+	 * Requests uuid associated with the uid & client
+	 * @param uid
+	 * @param witsmlObj
+	 * @param client
+	 * @param username
+	 * @param password
+	 * @return uuid
+	 */
+	private String getUUIDFR( String uid,
+							AbstractWitsmlObject witsmlObj,
+							DotClient client,
+							String username,
+							String password,
+							String exchangeID)
+			throws ValveException,
+			UnirestException,
+			ValveAuthException
+	{
+
+		String uidWellbore;
+		String uidWellfr;
+		String uuid = "";
+		String endpoint = "";
+		HttpRequest logRequest = null;
+
+		endpoint = this.getEndpoint("fluidsreportidentities");
+		logRequest = Unirest.get(endpoint);
+		logRequest.header("accept", "application/json");
+		if ("1.4.1.1".equals(witsmlObj.getVersion())) {
+			uidWellbore = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjFluidsReport) witsmlObj).getUidWellbore();
+			uidWellfr = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjFluidsReport) witsmlObj).getUidWell();
+		} else {
+			uidWellbore = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjFluidsReport) witsmlObj).getUidWellbore();
+			uidWellfr = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjFluidsReport) witsmlObj).getUidWell();
+		}
+		logRequest.queryString("uid", uid);
+		logRequest.queryString("uidWellbore", uidWellbore);
+		logRequest.queryString("uidWell", uidWellfr);
 		HttpResponse<String> response;
 		response = client.makeRequest(logRequest, username, password, exchangeID);
 		if (response.getBody().isEmpty()) {

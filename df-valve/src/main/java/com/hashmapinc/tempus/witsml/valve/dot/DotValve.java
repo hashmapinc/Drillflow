@@ -303,7 +303,7 @@ public class DotValve implements IValve {
 				throw new ValveException("Delete cannot have more than one singular object per query", (short)-415);
 			}
 
-			if (!isObjectDelete(wmlObject.getObjectType(), qc.QUERY_XML)){
+			if (!isObjectDelete(wmlObject.getObjectType().toLowerCase(), qc.QUERY_XML.toLowerCase())){
 				// This is an element delete so re-route to delegator update
 				this.DELEGATOR.performElementDelete(wmlObject, qc.USERNAME, qc.PASSWORD, qc.EXCHANGE_ID, this.CLIENT);
 				result = true;
@@ -390,12 +390,13 @@ public class DotValve implements IValve {
 		AbstractWitsmlObject trajectory = new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory();
 		// choice of 1311 is arbitrary
 		AbstractWitsmlObject log = new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog();
-
+		// choice of 1311 is arbitrary
+		AbstractWitsmlObject fluidsReport = new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjFluidsReport();
 		AbstractWitsmlObject[][] supportedObjects = {
-				{ well, wellbore, trajectory, log }, // ADD TO STORE OBJECTS
-				{ well, wellbore, trajectory, log }, // GET FROM STORE OBJECTS
-				{ well, wellbore, trajectory, log }, // DELETE FROM STORE OBJECTS
-				{ well, wellbore, trajectory, log},  // UPDATE IN STORE OBJECTS
+				{ well, wellbore, trajectory, log, fluidsReport }, // ADD TO STORE OBJECTS
+				{ well, wellbore, trajectory, log, fluidsReport }, // GET FROM STORE OBJECTS
+				{ well, wellbore, trajectory, log, fluidsReport }, // DELETE FROM STORE OBJECTS
+				{ well, wellbore, trajectory, log, fluidsReport},  // UPDATE IN STORE OBJECTS
 		};
 
 		// populate cap
