@@ -363,18 +363,18 @@ public class DotDelegator {
 
 		}else if("fluidsreport".equals(objectType)){
 			uuid = getUUIDFR(uid,witsmlObj,client,username,password, exchangeID);
-			//uuid = "8e1b3429-80d7-450d-8684-ccdb827e4ec6";
 			if (uuid == null){
 				throw new ValveException("Not Found", (short)-433);
 			}
 			String fluidsReportElementDeletEndpoint = this.getEndpoint(FLUIDSREPORT_OBJECT);
 			fluidsReportElementDeletEndpoint = fluidsReportElementDeletEndpoint + "/" + uuid;
-			HttpRequest fluidsReportElementDeleteRequest = Unirest.patch(fluidsReportElementDeletEndpoint).header("Content-Type",
-					"application/json");
-			HttpResponse<String> fluidsReportElementDeleteResponse = client.makeRequest(fluidsReportElementDeleteRequest, username, password, exchangeID);
-			int deleteStatus = fluidsReportElementDeleteResponse.getStatus();
-			if (204 != deleteStatus) {
-				throw new ValveException("DELETE DoT REST call failed with status code: " + deleteStatus);
+			request = Unirest.patch(fluidsReportElementDeletEndpoint).header("Content-Type", "application/json");
+			payload = JsonUtil.removeEmptyArrays(new JSONObject(payload));
+			request.body(payload);
+			response = client.makeRequest(request, username, password, exchangeID);
+			int elementDeleteStatus = response.getStatus();
+			if (201 != elementDeleteStatus && 200 != elementDeleteStatus && 204 != elementDeleteStatus) {
+				throw new ValveException("DELETE DoT REST call failed with status code: " + elementDeleteStatus);
 			}
 		} else {
 			request = Unirest.patch(endpoint).header("Content-Type", "application/json");
@@ -2221,8 +2221,8 @@ public class DotDelegator {
 		logRequest.queryString("uidWell", uidWellfr);
 		HttpResponse<String> response;
 		response = client.makeRequest(logRequest, username, password, exchangeID);
-		if (response.getBody().isEmpty()) {
-			throw new ValveException("No log found.");
+		if (response.getBody().isEmpty() || response.getStatus() == 404) {
+			throw new ValveException("No fluids report date found.");
 		}
 		JSONObject responseJson = new JSONObject(response.getBody());
 		if (!responseJson.has("uuid"))

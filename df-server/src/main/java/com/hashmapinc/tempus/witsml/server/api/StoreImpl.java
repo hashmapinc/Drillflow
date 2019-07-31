@@ -478,8 +478,8 @@ public class StoreImpl implements IStore {
             resp.setResult((short) 1);
             resp.setXMLout(xmlOut);
         } else {
-            resp.setSuppMsgOut("Unhandled error from REST backend.");
-            resp.setResult((short) -1);
+            resp.setSuppMsgOut("No Data Found.");
+            resp.setResult((short) 1);
         }
 
         // return response
