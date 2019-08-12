@@ -490,7 +490,7 @@ public class DotDelegator {
 	 * @param exchangeID
 	 * @param client
 	 *
-	 * @return String
+	 * @return String representing uid
 	 *
 	 * @throws ValveException
 	 * @throws ValveAuthException
