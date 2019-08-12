@@ -26,6 +26,7 @@ import com.hashmapinc.tempus.witsml.valve.ValveException;
 import org.junit.Test;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.datatype.DatatypeConfigurationException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -87,7 +88,8 @@ public class DotTranslatorTest {
     }
 
     @Test
-    public void stationLocationOnlyTrajectoryTest() throws JAXBException, IOException, ValveException {
+    public void stationLocationOnlyTrajectoryTest()
+            throws JAXBException, IOException, ValveException, DatatypeConfigurationException {
         // Load the strings from the test resources
         String dotResponse = TestUtilities.getResourceAsString("trajectory1411.xml");
         String soapQuery = TestUtilities.getResourceAsString("trajectoryGraphql/FullTrajectoryQuery1411.xml");
@@ -135,7 +137,8 @@ public class DotTranslatorTest {
     }
 
     @Test
-    public void headerOnlyTrajectoryTests() throws JAXBException, IOException, ValveException {
+    public void headerOnlyTrajectoryTests()
+            throws JAXBException, IOException, ValveException, DatatypeConfigurationException {
         // Load the strings from the test resources
         String dotResponse = TestUtilities.getResourceAsString("trajectory1411.xml");
         String soapQuery = TestUtilities.getResourceAsString("trajectoryGraphql/FullTrajectoryQuery1411.xml");

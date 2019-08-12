@@ -193,7 +193,7 @@ public class WitsmlObjectParser {
     }
 
     /**
-     * this method parses trajectory objects
+     * this method parses fluids report objects
      *
      * @param rawXML - string value with the raw xml to parse
      * @param version - string value with witsml version of rawXML: 1.3.1.1 or 1.4.1.1

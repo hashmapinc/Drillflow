@@ -18,10 +18,12 @@ package com.hashmapinc.tempus.witsml.valve.dot;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.WitsmlObjects.Util.*;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.*;
+import com.hashmapinc.tempus.WitsmlObjects.v20.FluidsReport;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
 import org.json.JSONObject;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.datatype.DatatypeConfigurationException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
@@ -32,11 +34,13 @@ public class DotTranslator {
 
     /**
      * returns a valid 1311 AbstractWitsmlObject
+     *
      * @param wmlObj - AbstractWitsmlObject to convert
+     *
+     * @return AbstractWitsmlObject
      */
-    public static AbstractWitsmlObject get1311WitsmlObject(
-        AbstractWitsmlObject wmlObj
-    ) throws ValveException {
+    public static AbstractWitsmlObject get1311WitsmlObject(AbstractWitsmlObject wmlObj)
+                                                                        throws ValveException {
         try {
             switch (wmlObj.getObjectType()) {
                 case "well":
@@ -51,6 +55,9 @@ public class DotTranslator {
                 case "log":
                     if (wmlObj instanceof com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog) return wmlObj;
                     return LogConverter.convertTo1311((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog) wmlObj);
+                case "fluidsreport":
+                    if (wmlObj instanceof com.hashmapinc.tempus.WitsmlObjects.v1311.ObjFluidsReport) return wmlObj;
+                    return FluidsReportConverter.convertTo1311((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjFluidsReport) wmlObj);
                 default:
                     throw new ValveException("unsupported object type: " + wmlObj.getObjectType());
             }
@@ -60,30 +67,37 @@ public class DotTranslator {
     }
 
     /**
-     * merges response 1.4.1.1 object
+     * merges 1.4.1.1 response object as required
      * 
-     * @param wmlObject - object queried for
-     * @param jsonResponseString - json string response from request
-     * @return obj - parsed abstract object
+     * @param wmlObject          - query object
+     * @param jsonResponseString - JSON response from DoT
+     * @param optionsIn          - options provided by the query
+     *
+     * @return AbstractWitsmlObject -
      */
-    public static AbstractWitsmlObject translateQueryResponse(
-            // One of the properties is Object Type.
-        AbstractWitsmlObject wmlObject,
-        String jsonResponseString,
-        Map<String, String> optionsIn
-    ) throws ValveException {
-        // get JSON objects
-        JSONObject queryJson = new JSONObject(wmlObject.getJSONString("1.4.1.1"));
+    public static AbstractWitsmlObject translateQueryResponse( AbstractWitsmlObject wmlObject,
+                                                               String jsonResponseString,
+                                                               Map<String, String> optionsIn )
+                                                                        throws ValveException,
+                                                                               DatatypeConfigurationException
+    {
+        // Client is also 1.4.1.1
+        JSONObject queryJson = new JSONObject( wmlObject.getJSONString("1.4.1.1") );
+
+        // ********************* manipulate JSON response string from DoT ********************* //
         JSONObject responseJson = new JSONObject(jsonResponseString);
 
         String result = responseJson.toString();
 
-        if ("requested".equals(optionsIn.get("returnElements") )|| "id-only".equals(optionsIn.get("returnElements"))) {
+        if ( "requested".equals(optionsIn.get("returnElements")) ||
+             "id-only".equals(optionsIn.get("returnElements")) )
+        {
             // Check if the "id-only" case needs to be handled...
             if ("id-only".equals(optionsIn.get("returnElements"))) {
                 queryJson = QueryTemplateProvider.getIDOnly(wmlObject.getObjectType());
             }
-            result = JsonUtil.merge(queryJson, responseJson).toString();   // WARNING: this method modifies query internally
+            // WARNING: this method modifies the query internally
+            result = JsonUtil.merge(queryJson, responseJson).toString();
         }
 
         // doctor some commonly-butchered json keys
@@ -91,16 +105,20 @@ public class DotTranslator {
         result = result.replaceAll("\"dtimTrajStart\":","\"dTimTrajStart\":");
         result = result.replaceAll("\"dtimTrajEnd\":","\"dTimTrajEnd\":");
         result = result.replaceAll("\"dtimStn\":","\"dTimStn\":");
-        // convert the queryJSON back to valid xml
-        LOG.finest("Converting merged query JSON to valid XML string");
+        // *********************************************************************************** //
+
+        // convert the JSON response back to valid xml (it is already in the correct version)
+        LOG.finest("Converting DoT JSON 1.4.1.1 response to valid XML string");
+
         try {
-            switch (wmlObject.getObjectType()) {
+            switch ( wmlObject.getObjectType() )
+            {
                 case "well":
-                    return WitsmlMarshal.deserializeFromJSON(
-                        result, ObjWell.class);
+                    return WitsmlMarshal.deserializeFromJSON( result, ObjWell.class);
+
                 case "wellbore":
-                    return WitsmlMarshal.deserializeFromJSON(
-                        result, ObjWellbore.class);
+                    return WitsmlMarshal.deserializeFromJSON( result, ObjWellbore.class);
+
                 case "trajectory":
                     ObjTrajectory traj = WitsmlMarshal.deserializeFromJSON(result, ObjTrajectory.class);
 
@@ -112,17 +130,45 @@ public class DotTranslator {
                         return traj;
                     }
                     return traj;
+
                 case "log":
-                    return WitsmlMarshal.deserializeFromJSON(
-                            result, ObjLog.class);
+                    return WitsmlMarshal.deserializeFromJSON(result, ObjLog.class);
+
                 case "fluidsreport":
-                    ObjFluidsReport fluidFr = WitsmlMarshal.deserializeFromJSON(result, ObjFluidsReport.class);
-                    return fluidFr;
-/*                    return WitsmlMarshal.deserializeFromJSON(
-                            result, ObjFluidsReport.class);*/
+                    // all responses from DoT for Fluids Reports are 2.0
+                    FluidsReport fluidsReport = WitsmlMarshal.deserializeFromJSON(jsonResponseString, FluidsReport.class);
+                    AbstractWitsmlObject convertedFluidsReport = FluidsReportConverter.convertTo1411(fluidsReport);
+                    return convertedFluidsReport;
                 default:
                     throw new ValveException("unsupported object type");
             }
+
+        } catch (IOException ioe) {
+            throw new ValveException(ioe.getMessage());
+        }
+    }
+
+    /**
+     * creates 2.0 response object as required\
+     *
+     * @param jsonResponseString - JSON response from DoT
+     *
+     * @return AbstractWitsmlObject -
+     */
+    public static AbstractWitsmlObject createFsRQueryResponse( String jsonResponseString )
+                                                                            throws  ValveException,
+                                                                                    DatatypeConfigurationException
+    {
+        // convert the JSON response back to valid xml (it is already in the correct version)
+        LOG.finest("Converting DoT JSON 1.4.1.1 response to valid XML string");
+        try {
+            // all responses from DoT for Fluids Reports are 2.0
+            FluidsReport fluidsReport = WitsmlMarshal.deserializeFromJSON(jsonResponseString, FluidsReport.class);
+            AbstractWitsmlObject convertedFluidsReport = FluidsReportConverter.convertTo1411(fluidsReport);
+            return convertedFluidsReport;
+            //return FluidsReportConverter.convertTo1411(fluidsReport);
+            //return WitsmlMarshal.deserializeFromJSON(jsonResponseString, FluidsReport.class);
+
         } catch (IOException ioe) {
             throw new ValveException(ioe.getMessage());
         }
@@ -307,7 +353,7 @@ public class DotTranslator {
 
 
     /**
-     * converts witsmlObjects list of wellbores to valid
+     * converts witsmlObjects list of fluidsreports to valid
      * witsml XML string based on version and whether
      * the list is empty or not
      * @param witsmlObjects - list of objects to serialize
