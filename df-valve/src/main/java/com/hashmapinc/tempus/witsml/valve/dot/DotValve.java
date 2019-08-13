@@ -23,7 +23,8 @@ import com.hashmapinc.tempus.witsml.valve.ObjectSelectionConstants;
 import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
 import com.hashmapinc.tempus.witsml.valve.dot.client.DotClient;
-import org.apache.commons.lang3.StringUtils;
+//import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.json.JSONObject;
 import org.springframework.scheduling.annotation.Async;
 

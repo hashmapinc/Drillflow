@@ -40,7 +40,7 @@ public class DotTranslator {
      * @return AbstractWitsmlObject
      */
     public static AbstractWitsmlObject get1311WitsmlObject(AbstractWitsmlObject wmlObj)
-                                                                        throws ValveException {
+            throws ValveException {
         try {
             switch (wmlObj.getObjectType()) {
                 case "well":
@@ -68,7 +68,7 @@ public class DotTranslator {
 
     /**
      * merges 1.4.1.1 response object as required
-     * 
+     *
      * @param wmlObject          - query object
      * @param jsonResponseString - JSON response from DoT
      * @param optionsIn          - options provided by the query
@@ -78,8 +78,8 @@ public class DotTranslator {
     public static AbstractWitsmlObject translateQueryResponse( AbstractWitsmlObject wmlObject,
                                                                String jsonResponseString,
                                                                Map<String, String> optionsIn )
-                                                                        throws ValveException,
-                                                                               DatatypeConfigurationException
+            throws ValveException,
+            DatatypeConfigurationException
     {
         // Client is also 1.4.1.1
         JSONObject queryJson = new JSONObject( wmlObject.getJSONString("1.4.1.1") );
@@ -90,7 +90,7 @@ public class DotTranslator {
         String result = responseJson.toString();
 
         if ( "requested".equals(optionsIn.get("returnElements")) ||
-             "id-only".equals(optionsIn.get("returnElements")) )
+                "id-only".equals(optionsIn.get("returnElements")) )
         {
             // Check if the "id-only" case needs to be handled...
             if ("id-only".equals(optionsIn.get("returnElements"))) {
@@ -105,7 +105,7 @@ public class DotTranslator {
         result = result.replaceAll("\"dtimTrajStart\":","\"dTimTrajStart\":");
         result = result.replaceAll("\"dtimTrajEnd\":","\"dTimTrajEnd\":");
         result = result.replaceAll("\"dtimStn\":","\"dTimStn\":");
-        // *********************************************************************************** //
+        // ************************************************************************************ //
 
         // convert the JSON response back to valid xml (it is already in the correct version)
         LOG.finest("Converting DoT JSON 1.4.1.1 response to valid XML string");
@@ -134,11 +134,6 @@ public class DotTranslator {
                 case "log":
                     return WitsmlMarshal.deserializeFromJSON(result, ObjLog.class);
 
-                case "fluidsreport":
-                    // all responses from DoT for Fluids Reports are 2.0
-                    FluidsReport fluidsReport = WitsmlMarshal.deserializeFromJSON(jsonResponseString, FluidsReport.class);
-                    AbstractWitsmlObject convertedFluidsReport = FluidsReportConverter.convertTo1411(fluidsReport);
-                    return convertedFluidsReport;
                 default:
                     throw new ValveException("unsupported object type");
             }
@@ -149,29 +144,51 @@ public class DotTranslator {
     }
 
     /**
-     * creates 2.0 response object as required\
+     * creates 2.0 response object as required
      *
      * @param jsonResponseString - JSON response from DoT
      *
-     * @return AbstractWitsmlObject -
+     * @return AbstractWitsmlObject - converted FluidsReport object to either 1.3.1.1
+     *                                or 1.4.1.1 (null if not one of these versions)
      */
-    public static AbstractWitsmlObject createFsRQueryResponse( String jsonResponseString )
+    public static AbstractWitsmlObject createFsRQueryResponse( String jsonResponseString,
+                                                               AbstractWitsmlObject witsmlObject )
                                                                             throws  ValveException,
                                                                                     DatatypeConfigurationException
     {
-        // convert the JSON response back to valid xml (it is already in the correct version)
-        LOG.finest("Converting DoT JSON 1.4.1.1 response to valid XML string");
+        String version = witsmlObject.getVersion();
+        String wellUID = witsmlObject.getParentUid();
+        String wellBoreUID = witsmlObject.getGrandParentUid();
+
+        // convert the JSON response back to valid xml
+        LOG.finest("Converting DoT JSON 2.0 response to valid XML string");
         try {
             // all responses from DoT for Fluids Reports are 2.0
+            // TODO --
+            // jsonResponseString has: "hardnessCA":{"uom":"ppm","value":3200.0}
+            // why doesn't WitsmlMarshal.deserializeFromJSON put hardnessCA into fluidsReport (it is null after the marshal)
             FluidsReport fluidsReport = WitsmlMarshal.deserializeFromJSON(jsonResponseString, FluidsReport.class);
-            AbstractWitsmlObject convertedFluidsReport = FluidsReportConverter.convertTo1411(fluidsReport);
-            return convertedFluidsReport;
-            //return FluidsReportConverter.convertTo1411(fluidsReport);
-            //return WitsmlMarshal.deserializeFromJSON(jsonResponseString, FluidsReport.class);
+            AbstractWitsmlObject convertedFluidsReport;
+            if ("1.4.1.1".equals(version)) {
+                convertedFluidsReport = FluidsReportConverter.convertTo1411(fluidsReport);
+                ((ObjFluidsReport) convertedFluidsReport).setUidWell(wellUID);
+                ((ObjFluidsReport) convertedFluidsReport).setUidWellbore(wellBoreUID);
+                return convertedFluidsReport;
+            } else if ("1.3.1.1".equals(version)) {
+                convertedFluidsReport = FluidsReportConverter.convertTo1311(fluidsReport);
+                ((ObjFluidsReport) convertedFluidsReport).setUidWell(wellUID);
+                ((ObjFluidsReport) convertedFluidsReport).setUidWellbore(wellBoreUID);
+                return convertedFluidsReport;
+            } else {
+                // no conversion is required for 2.0
+                // TODO but 2.0 needs well & wellBore UID's; trace to the caller to set these values
+                return null;
+            }
 
         } catch (IOException ioe) {
             throw new ValveException(ioe.getMessage());
         }
+
     }
 
     /**
@@ -219,8 +236,8 @@ public class DotTranslator {
      * @throws ValveException
      */
     private static String consolidateWellsToXML(
-        ArrayList<AbstractWitsmlObject> witsmlObjects,
-        String version
+            ArrayList<AbstractWitsmlObject> witsmlObjects,
+            String version
     ) throws ValveException {
         String xml;
         boolean is1411 = "1.4.1.1".equals(version);
@@ -229,16 +246,16 @@ public class DotTranslator {
         if (witsmlObjects == null || 0 == witsmlObjects.size()) {
             try {
                 xml = is1411 ?
-                    WitsmlMarshal.serialize(new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWells()) :
-                    WitsmlMarshal.serialize(new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells());
+                        WitsmlMarshal.serialize(new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWells()) :
+                        WitsmlMarshal.serialize(new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWells());
             } catch (JAXBException jxbe) {
                 throw new ValveException("Could not serialize empty wells object");
             }
         } else {
             // handle non empty well list
-            xml = is1411 ? 
-                consolidate1411WellsToXML(witsmlObjects) : 
-                consolidate1311WellsToXML(witsmlObjects);
+            xml = is1411 ?
+                    consolidate1411WellsToXML(witsmlObjects) :
+                    consolidate1311WellsToXML(witsmlObjects);
         }
 
         return xml;
@@ -254,8 +271,8 @@ public class DotTranslator {
      * @throws ValveException
      */
     private static String consolidateWellboresToXML(
-        ArrayList<AbstractWitsmlObject> witsmlObjects,
-        String version
+            ArrayList<AbstractWitsmlObject> witsmlObjects,
+            String version
     ) throws ValveException {
         String xml;
         boolean is1411 = "1.4.1.1".equals(version);
@@ -264,16 +281,16 @@ public class DotTranslator {
         if (witsmlObjects == null || 0 == witsmlObjects.size()) {
             try {
                 xml = is1411 ?
-                    WitsmlMarshal.serialize(new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbores()):
-                    WitsmlMarshal.serialize(new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores());
+                        WitsmlMarshal.serialize(new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbores()):
+                        WitsmlMarshal.serialize(new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores());
             } catch (JAXBException jxbe) {
                 throw new ValveException("Could not serialize empty wellbores object");
             }
         } else {
             // handle non empty list
             xml = is1411 ?
-                consolidate1411WellboresToXML(witsmlObjects) :
-                consolidate1311WellboresToXML(witsmlObjects);
+                    consolidate1411WellboresToXML(witsmlObjects) :
+                    consolidate1311WellboresToXML(witsmlObjects);
         }
 
         return xml;
@@ -299,8 +316,8 @@ public class DotTranslator {
         if (witsmlObjects == null || 0 == witsmlObjects.size()) {
             try {
                 xml = is1411 ?
-                    WitsmlMarshal.serialize(new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys()):
-                    WitsmlMarshal.serialize(new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectorys());
+                        WitsmlMarshal.serialize(new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectorys()):
+                        WitsmlMarshal.serialize(new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectorys());
             } catch (JAXBException jxbe) {
                 throw new ValveException("Could not serialize empty trajectories object");
             }
@@ -399,9 +416,9 @@ public class DotTranslator {
      * @throws ValveException
      */
     public static String consolidateObjectsToXML(
-        ArrayList<AbstractWitsmlObject> witsmlObjects,
-        String version,
-        String objectType
+            ArrayList<AbstractWitsmlObject> witsmlObjects,
+            String version,
+            String objectType
     ) throws ValveException {
         // validate version
         if(!"1.3.1.1".equals(version) && !"1.4.1.1".equals(version)) {
@@ -434,7 +451,7 @@ public class DotTranslator {
     }
 
     private static String consolidate1311TrajectoriesToXML(
-        ArrayList<AbstractWitsmlObject> witsmlObjects
+            ArrayList<AbstractWitsmlObject> witsmlObjects
     ) throws ValveException {
         try {
             // get parent object from first child
@@ -444,7 +461,7 @@ public class DotTranslator {
             // consolidate children
             for (AbstractWitsmlObject child : witsmlObjects) {
                 parent.addTrajectory(
-                    (com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory) get1311WitsmlObject(child)
+                        (com.hashmapinc.tempus.WitsmlObjects.v1311.ObjTrajectory) get1311WitsmlObject(child)
                 );
             }
 
@@ -502,7 +519,7 @@ public class DotTranslator {
     }
 
     private static String consolidate1411TrajectoriesToXML(
-        ArrayList<AbstractWitsmlObject> witsmlObjects
+            ArrayList<AbstractWitsmlObject> witsmlObjects
     ) throws ValveException {
         try {
             // get parent object from first child
@@ -570,7 +587,7 @@ public class DotTranslator {
     }
 
     private static String consolidate1311WellsToXML(
-        ArrayList<AbstractWitsmlObject> witsmlObjects
+            ArrayList<AbstractWitsmlObject> witsmlObjects
     ) throws ValveException {
         try {
             // get parent object from first child
@@ -592,17 +609,17 @@ public class DotTranslator {
     }
 
     private static String consolidate1411WellsToXML(
-        ArrayList<AbstractWitsmlObject> witsmlObjects
+            ArrayList<AbstractWitsmlObject> witsmlObjects
     ) throws ValveException {
         try {
             // get parent object from first child
             com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWells parent =
-                new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWells();
+                    new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWells();
 
             // consolidate children
             for (AbstractWitsmlObject child : witsmlObjects) {
                 parent.addWell(
-                    (com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) child
+                        (com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWell) child
                 );
             }
 
@@ -614,17 +631,17 @@ public class DotTranslator {
     }
 
     private static String consolidate1311WellboresToXML(
-        ArrayList<AbstractWitsmlObject> witsmlObjects
+            ArrayList<AbstractWitsmlObject> witsmlObjects
     ) throws ValveException {
         try {
             // get parent object from first child
-            com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores parent = 
-                new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores();
+            com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores parent =
+                    new com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbores();
 
             // consolidate children
             for (AbstractWitsmlObject child : witsmlObjects) {
                 parent.addWellbore(
-                    (com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore) get1311WitsmlObject(child)
+                        (com.hashmapinc.tempus.WitsmlObjects.v1311.ObjWellbore) get1311WitsmlObject(child)
                 );
             }
 
@@ -636,17 +653,17 @@ public class DotTranslator {
     }
 
     private static String consolidate1411WellboresToXML(
-        ArrayList<AbstractWitsmlObject> witsmlObjects
+            ArrayList<AbstractWitsmlObject> witsmlObjects
     ) throws ValveException {
         try {
             // get parent object from first child
-            com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbores parent = 
-                new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbores();
+            com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbores parent =
+                    new com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbores();
 
             // consolidate children
             for (AbstractWitsmlObject child : witsmlObjects) {
                 parent.addWellbore(
-                    (com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) child
+                        (com.hashmapinc.tempus.WitsmlObjects.v1411.ObjWellbore) child
                 );
             }
 
@@ -657,3 +674,4 @@ public class DotTranslator {
         }
     }
 }
+
