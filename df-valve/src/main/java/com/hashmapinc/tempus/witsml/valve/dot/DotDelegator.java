@@ -83,7 +83,7 @@ public class DotDelegator {
 	private final String LOG_DEPTH_BOUNDARY_DATA_PATH;
 	private final String LOG_TIME_BOUNDARY_DATA_PATH;
 	private final String FLUIDS_REPORT_PATH;
-	private final String FLUIDS_REPORT_IDENTITIES;
+	private final String FLUIDS_REPORT_IDENTITIES_PATH;
 
 	/**
 	 * Map based constructor
@@ -108,7 +108,7 @@ public class DotDelegator {
 		this.LOG_DEPTH_BOUNDARY_DATA_PATH = config.get("log.channel.depthBoundaryData.path");
 		this.LOG_TIME_BOUNDARY_DATA_PATH = config.get("log.channel.timeBoundaryData.path");
 		this.FLUIDS_REPORT_PATH = config.get("fluids.report.path");
-		this.FLUIDS_REPORT_IDENTITIES = config.get("fluids.report.identities");
+		this.FLUIDS_REPORT_IDENTITIES_PATH = config.get("fluids.report.identities");
 	}
 
 	/**
@@ -174,7 +174,7 @@ public class DotDelegator {
 				endpoint = this.FLUIDS_REPORT_PATH;
 				break;
 			case "fluidsreportidentities":
-				endpoint = this.FLUIDS_REPORT_IDENTITIES;
+				endpoint = this.FLUIDS_REPORT_IDENTITIES_PATH;
 				break;
 			default:
 				throw new ValveException("Unsupported object type<" + objectType + ">");
