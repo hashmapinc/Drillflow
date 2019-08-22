@@ -48,8 +48,6 @@ public class DotClient {
     private static final Logger LOG = Logger.getLogger(DotClient.class.getName());
     //private final String URL;
     private final String TOKEN_PATH;
-    private final String API_KEY;
-    // changed to ConcurrentHashMap to make thread safe
     private ConcurrentHashMap<String, DecodedJWT> cache;
 
     /**
@@ -58,8 +56,7 @@ public class DotClient {
      * @param API_KEY
      * @throws ValveAuthException
      */
-    public DotClient(String API_KEY, String tokenPath)  throws ValveAuthException{
-        this.API_KEY = API_KEY;
+    public DotClient(String tokenPath)  throws ValveAuthException{
         this.TOKEN_PATH = tokenPath;
         // changed to ConcurrentHashMap to make thread safe
         this.cache = new ConcurrentHashMap<String, DecodedJWT>();
@@ -83,7 +80,6 @@ public class DotClient {
             // build request
             HttpRequestWithBody req = Unirest.post(this.TOKEN_PATH);
             req.header("Content-Type", "application/json")
-                .header("X-Api-Key", this.API_KEY)
                 .body(payload);
 
             // send request
