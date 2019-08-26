@@ -404,6 +404,7 @@ public class DotDelegator {
 	 * @throws ValveException
 	 * @throws ValveAuthException
 	 * @throws UnirestException
+	 * @throws JsonProcessingException
 	 */
 	public void updateObject(AbstractWitsmlObject witsmlObj,
 							 String username,
@@ -974,6 +975,8 @@ public class DotDelegator {
 				username,
 				password );
 
+		// TODO check if no wellboreUuid
+
 		HashMap<String,String> requestParams;
 		String endpoint;
 		String payload;
@@ -988,6 +991,7 @@ public class DotDelegator {
 					(com.hashmapinc.tempus.WitsmlObjects.v1311.ObjFluidsReport)witsmlObj);
 			payload = om.writer().writeValueAsString(fluidsReport);
 		} else {
+			// 2.0, so no conversion is required
 			payload = om.writer().writeValueAsString(witsmlObj);
 		}
 
@@ -1069,12 +1073,10 @@ public class DotDelegator {
 				witsmlObj );
 
 		// all "Client should ..." checks will be performed in this method
-		// this method will throw the correct valve exception if the payload is non-conforming
+		// this method will throw the correct valve exception
+		// if the payload is non-conforming
 		payloadCheck( allPayloads, true );
-      /*
-      payloadCheck(allPayloads, true,
-            null, null, null, null, null, null);
-      */
+
 		// ********************************* ChannelSet ********************************* //
 		// endpoint:
 		//        .../channelSets?uid={uid}&uidWellbore={uidWellbore}&uidWell={uidWell}
@@ -1129,9 +1131,6 @@ public class DotDelegator {
 
 				// build the channels Request...
 				// endpoint: .../channels/metadata?channelSetUuid={channelSetUuid}
-
-				//endpoint = this.getEndpoint(objectType + "Channel");
-				//endpoint = endpoint + "/metadata";
 				endpoint = this.getEndpoint("channels");
 				// get the uuid for the channelSet just created from the response
 				String uuid4CS = new JsonNode(response.getBody())
@@ -1425,9 +1424,9 @@ public class DotDelegator {
 			// ****************************************** CHANNEL SET ******************************************
 			// even if there is no "name" element provided by the Client,
 			// Drillflow sometimes provides a "name" equal to the String "null"
-			if ( payloadJSON.has("name") &&
-					payloadJSON.getString("name") != null &&
-					payloadJSON.getString("name").length() > 0) {
+			if ( payloadJSON.has("uid") &&
+					payloadJSON.getString("uid") != null &&
+					payloadJSON.getString("uid").length() > 0) {
 				switch (version) {
 					case "1.3.1.1":
 						payloads[CS_IDX_4_PAYLOADS] = ChannelSet.from1311(
@@ -2179,7 +2178,7 @@ public class DotDelegator {
 
 		// check response status
 		int status = response.getStatus();
-		if (201 == status || 200 == status || 400 == status) {
+		if (201 == status || 200 == status) {
 
 			// get the UUID of the first wellbore in the response
 			String wellboreUUID = GraphQLRespConverter.getWellboreUuidFromGraphqlResponse(new JSONObject(response.getBody()));
