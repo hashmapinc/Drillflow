@@ -539,6 +539,7 @@ public class DotDelegator {
 		} else {
 			payload = om.writer().writeValueAsString(witsmlObj);
 		}
+		payload = JsonUtil.removeEmpties(new JSONObject(payload));
 
 		// **************************** Payload Rest Call **************************** //
 		// PATCH is used to make partial changes to an existing resource.              //
@@ -2336,7 +2337,8 @@ public class DotDelegator {
 		response = client.makeRequest(
 				request,
 				username,
-				password, exchangeID );
+				password,
+				exchangeID );
 		int status = response.getStatus();
 		if (201 != status && 200 != status && 202 != status) {
 			throw new ValveException(response.getBody());
