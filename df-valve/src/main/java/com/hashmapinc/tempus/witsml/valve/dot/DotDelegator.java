@@ -446,7 +446,7 @@ public class DotDelegator {
 						client,
 						payload);
 
-				/* ********************* All Other Objects ******************* */
+			/* ********************* All Other Objects ******************* */
 			} else {
 				String uid = witsmlObj.getUid();
 				String endpoint = this.getEndpoint(objectType) + uid;
@@ -673,11 +673,6 @@ public class DotDelegator {
 			channelPayload = channelPayloadAsJSON.toString();
 		}
 
-		// TODO Did I handle Channel Sets correctly
-		//      (do NOT update CS if there are no Channels)
-		//    (what if I injected the Index Channel in payloadCheck -- is
-		//    the injection wrong?)
-		// TODO channelSetPayload will never be null or empty due to payload checking!!!
 		if (channelSetPayload != null && channelSetPayload.length() > 0) {
 			// ************************* CHANNELSET *************************
 			// check if channelSet is in cache (not a granular search, but
@@ -1060,7 +1055,7 @@ public class DotDelegator {
 		HashMap<String,String> requestParams;
 		String endpoint;
 
-		// get WITSML abstract object as JSON string
+		// get WITSML abstract object as 1.4.1.1 JSON string
 		String payload = ("1.4.1.1".equals(version) ?
 				witsmlObj.getJSONString("1.4.1.1") :
 				witsmlObj.getJSONString("1.3.1.1") );
@@ -1584,6 +1579,27 @@ public class DotDelegator {
 					shouldGetData,
 					getAllChannels );
 
+			/*
+			TODO This is the fix for logs, but it still needs work.
+			int status = finalResponse.getStatus();
+			if (201 == status || 200 == status) {
+				if ( version.equals("1.4.1.1") ) {
+					return DotTranslator.createFsRQueryResponse( finalResponse.getBody(), witsmlObject );
+				} else if ( version.equals("1.3.1.1") )
+					return DotTranslator.createFsRQueryResponse( finalResponse.getBody(), witsmlObject);
+				else
+					// version 2.0, so no transaction is required; however, still need to go from JSON to
+					// an AbstractWitsmlObject
+					return WitsmlMarshal.deserializeFromJSON(finalResponse.getBody(),
+							com.hashmapinc.tempus.WitsmlObjects.v20.FluidsReport.class);
+			} else if (404 == status) {
+				// handle not found. This is a valid response
+				return null;
+			} else {
+				throw new ValveException(finalResponse.getBody());
+			}
+			*/
+
 			if ( version.equals("1.4.1.1") )
 				return DotTranslator.translateQueryResponse( witsmlObject,
 						finalResponse,
@@ -1593,7 +1609,7 @@ public class DotDelegator {
 			else
 				return null;
 
-			// **************************** FLUIDS REPORT **************************** //
+		// **************************** FLUIDS REPORT **************************** //
 		} else if("fluidsreport".equals(objectType)) {
 
 			String fluidsReportEndpoint;
@@ -1620,15 +1636,23 @@ public class DotDelegator {
 					password,
 					exchangeID);
 
-			if ( version.equals("1.4.1.1") ) {
-				return DotTranslator.createFsRQueryResponse( fluidsReportResponse.getBody(), witsmlObject );
-			} else if ( version.equals("1.3.1.1") )
-				return DotTranslator.createFsRQueryResponse( fluidsReportResponse.getBody(), witsmlObject);
-			else
-				// version 2.0, so no transaction is required; however, still need to go from JSON to
-				// an AbstractWitsmlObject
-				return WitsmlMarshal.deserializeFromJSON(fluidsReportResponse.getBody(),
-						com.hashmapinc.tempus.WitsmlObjects.v20.FluidsReport.class);
+			int status = fluidsReportResponse.getStatus();
+			if (201 == status || 200 == status) {
+				if ( version.equals("1.4.1.1") ) {
+					return DotTranslator.createFsRQueryResponse( fluidsReportResponse.getBody(), witsmlObject );
+				} else if ( version.equals("1.3.1.1") )
+					return DotTranslator.createFsRQueryResponse( fluidsReportResponse.getBody(), witsmlObject);
+				else
+					// version 2.0, so no transaction is required; however, still need to go from JSON to
+					// an AbstractWitsmlObject
+					return WitsmlMarshal.deserializeFromJSON(fluidsReportResponse.getBody(),
+							com.hashmapinc.tempus.WitsmlObjects.v20.FluidsReport.class);
+			} else if (404 == status) {
+				// handle not found. This is a valid response
+				return null;
+			} else {
+				throw new ValveException(fluidsReportResponse.getBody());
+			}
 		}
 
 		// **************************** ALL OTHER OBJECTS **************************** //
@@ -1677,6 +1701,8 @@ public class DotDelegator {
 	 * @throws ValveException
 	 * @throws ValveAuthException
 	 * @throws UnirestException
+	 *
+	 * @returns String
 	 */
 	private String getFromStoreRestCalls( AbstractWitsmlObject witsmlObject,
 										  DotClient client,
@@ -1838,7 +1864,8 @@ public class DotDelegator {
 				throw new ValveException("Could not convert DOT log response to JSON " + e.getMessage());
 			}
 		} else {
-			throw new ValveException(channelsResponse.getBody());
+			// throw new ValveException(channelsResponse.getBody());
+			return null;
 		}
 		if (finalResponse != null)
 			return finalResponse.getJSONString("1.4.1.1");
@@ -2259,7 +2286,8 @@ public class DotDelegator {
 	 * @param password
 	 * @param exchangeID
 	 *
-	 * @return String uuid
+	 * @return String uuid NULL if a UUID can be obtained;
+	 * 					   otherwise, it is the UUID
 	 */
 	private String getUUIDFR( String uid,
 							  AbstractWitsmlObject witsmlObj,
@@ -2294,7 +2322,8 @@ public class DotDelegator {
 		HttpResponse<String> response;
 		response = client.makeRequest(logRequest, username, password, exchangeID);
 		if (response.getBody().isEmpty() || response.getStatus() == 404) {
-			throw new ValveException("No fluids report data found.");
+			//throw new ValveException("No fluids report data found.");
+			return null;
 		}
 		JSONObject responseJson = new JSONObject(response.getBody());
 		if (!responseJson.has("uuid"))
