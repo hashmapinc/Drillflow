@@ -1773,7 +1773,7 @@ public class DotDelegator {
 		channelsRequest = Unirest.get(channelsEndPoint);
 		channelsRequest.header("accept", "application/json");
 		channelsRequest.queryString("channelSetUuid", uuid);
-		// get response
+
 		channelsResponse = client.makeRequest(channelsRequest, username, password, exchangeID);
 		List<Channel> channels = Channel.jsonToChannelList(channelsResponse.getBody());
 
