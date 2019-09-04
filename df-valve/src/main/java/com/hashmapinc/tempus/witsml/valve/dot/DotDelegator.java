@@ -404,6 +404,7 @@ public class DotDelegator {
 	 * @throws ValveException
 	 * @throws ValveAuthException
 	 * @throws UnirestException
+	 * @throws JsonProcessingException
 	 */
 	public void updateObject(AbstractWitsmlObject witsmlObj,
 							 String username,
@@ -445,7 +446,7 @@ public class DotDelegator {
 						client,
 						payload);
 
-				/* ********************* All Other Objects ******************* */
+			/* ********************* All Other Objects ******************* */
 			} else {
 				String uid = witsmlObj.getUid();
 				String endpoint = this.getEndpoint(objectType) + uid;
@@ -538,6 +539,7 @@ public class DotDelegator {
 		} else {
 			payload = om.writer().writeValueAsString(witsmlObj);
 		}
+		payload = JsonUtil.removeEmpties(new JSONObject(payload));
 
 		// **************************** Payload Rest Call **************************** //
 		// PATCH is used to make partial changes to an existing resource.              //
@@ -671,11 +673,6 @@ public class DotDelegator {
 			channelPayload = channelPayloadAsJSON.toString();
 		}
 
-		// TODO Did I handle Channel Sets correctly
-		//      (do NOT update CS if there are no Channels)
-		//    (what if I injected the Index Channel in payloadCheck -- is
-		//    the injection wrong?)
-		// TODO channelSetPayload will never be null or empty due to payload checking!!!
 		if (channelSetPayload != null && channelSetPayload.length() > 0) {
 			// ************************* CHANNELSET *************************
 			// check if channelSet is in cache (not a granular search, but
@@ -974,6 +971,8 @@ public class DotDelegator {
 				username,
 				password );
 
+		// TODO check if no wellboreUuid
+
 		HashMap<String,String> requestParams;
 		String endpoint;
 		String payload;
@@ -988,6 +987,7 @@ public class DotDelegator {
 					(com.hashmapinc.tempus.WitsmlObjects.v1311.ObjFluidsReport)witsmlObj);
 			payload = om.writer().writeValueAsString(fluidsReport);
 		} else {
+			// 2.0, so no conversion is required
 			payload = om.writer().writeValueAsString(witsmlObj);
 		}
 
@@ -1055,7 +1055,7 @@ public class DotDelegator {
 		HashMap<String,String> requestParams;
 		String endpoint;
 
-		// get WITSML abstract object as JSON string
+		// get WITSML abstract object as 1.4.1.1 JSON string
 		String payload = ("1.4.1.1".equals(version) ?
 				witsmlObj.getJSONString("1.4.1.1") :
 				witsmlObj.getJSONString("1.3.1.1") );
@@ -1069,12 +1069,10 @@ public class DotDelegator {
 				witsmlObj );
 
 		// all "Client should ..." checks will be performed in this method
-		// this method will throw the correct valve exception if the payload is non-conforming
+		// this method will throw the correct valve exception
+		// if the payload is non-conforming
 		payloadCheck( allPayloads, true );
-      /*
-      payloadCheck(allPayloads, true,
-            null, null, null, null, null, null);
-      */
+
 		// ********************************* ChannelSet ********************************* //
 		// endpoint:
 		//        .../channelSets?uid={uid}&uidWellbore={uidWellbore}&uidWell={uidWell}
@@ -1129,9 +1127,6 @@ public class DotDelegator {
 
 				// build the channels Request...
 				// endpoint: .../channels/metadata?channelSetUuid={channelSetUuid}
-
-				//endpoint = this.getEndpoint(objectType + "Channel");
-				//endpoint = endpoint + "/metadata";
 				endpoint = this.getEndpoint("channels");
 				// get the uuid for the channelSet just created from the response
 				String uuid4CS = new JsonNode(response.getBody())
@@ -1425,9 +1420,9 @@ public class DotDelegator {
 			// ****************************************** CHANNEL SET ******************************************
 			// even if there is no "name" element provided by the Client,
 			// Drillflow sometimes provides a "name" equal to the String "null"
-			if ( payloadJSON.has("name") &&
-					payloadJSON.getString("name") != null &&
-					payloadJSON.getString("name").length() > 0) {
+			if ( payloadJSON.has("uid") &&
+					payloadJSON.getString("uid") != null &&
+					payloadJSON.getString("uid").length() > 0) {
 				switch (version) {
 					case "1.3.1.1":
 						payloads[CS_IDX_4_PAYLOADS] = ChannelSet.from1311(
@@ -1584,6 +1579,27 @@ public class DotDelegator {
 					shouldGetData,
 					getAllChannels );
 
+			/*
+			TODO This is the fix for logs, but it still needs work.
+			int status = finalResponse.getStatus();
+			if (201 == status || 200 == status) {
+				if ( version.equals("1.4.1.1") ) {
+					return DotTranslator.createFsRQueryResponse( finalResponse.getBody(), witsmlObject );
+				} else if ( version.equals("1.3.1.1") )
+					return DotTranslator.createFsRQueryResponse( finalResponse.getBody(), witsmlObject);
+				else
+					// version 2.0, so no transaction is required; however, still need to go from JSON to
+					// an AbstractWitsmlObject
+					return WitsmlMarshal.deserializeFromJSON(finalResponse.getBody(),
+							com.hashmapinc.tempus.WitsmlObjects.v20.FluidsReport.class);
+			} else if (404 == status) {
+				// handle not found. This is a valid response
+				return null;
+			} else {
+				throw new ValveException(finalResponse.getBody());
+			}
+			*/
+
 			if ( version.equals("1.4.1.1") )
 				return DotTranslator.translateQueryResponse( witsmlObject,
 						finalResponse,
@@ -1593,7 +1609,7 @@ public class DotDelegator {
 			else
 				return null;
 
-			// **************************** FLUIDS REPORT **************************** //
+		// **************************** FLUIDS REPORT **************************** //
 		} else if("fluidsreport".equals(objectType)) {
 
 			String fluidsReportEndpoint;
@@ -1620,15 +1636,23 @@ public class DotDelegator {
 					password,
 					exchangeID);
 
-			if ( version.equals("1.4.1.1") ) {
-				return DotTranslator.createFsRQueryResponse( fluidsReportResponse.getBody(), witsmlObject );
-			} else if ( version.equals("1.3.1.1") )
-				return DotTranslator.createFsRQueryResponse( fluidsReportResponse.getBody(), witsmlObject);
-			else
-				// version 2.0, so no transaction is required; however, still need to go from JSON to
-				// an AbstractWitsmlObject
-				return WitsmlMarshal.deserializeFromJSON(fluidsReportResponse.getBody(),
-						com.hashmapinc.tempus.WitsmlObjects.v20.FluidsReport.class);
+			int status = fluidsReportResponse.getStatus();
+			if (201 == status || 200 == status) {
+				if ( version.equals("1.4.1.1") ) {
+					return DotTranslator.createFsRQueryResponse( fluidsReportResponse.getBody(), witsmlObject );
+				} else if ( version.equals("1.3.1.1") )
+					return DotTranslator.createFsRQueryResponse( fluidsReportResponse.getBody(), witsmlObject);
+				else
+					// version 2.0, so no transaction is required; however, still need to go from JSON to
+					// an AbstractWitsmlObject
+					return WitsmlMarshal.deserializeFromJSON(fluidsReportResponse.getBody(),
+							com.hashmapinc.tempus.WitsmlObjects.v20.FluidsReport.class);
+			} else if (404 == status) {
+				// handle not found. This is a valid response
+				return null;
+			} else {
+				throw new ValveException(fluidsReportResponse.getBody());
+			}
 		}
 
 		// **************************** ALL OTHER OBJECTS **************************** //
@@ -1677,6 +1701,8 @@ public class DotDelegator {
 	 * @throws ValveException
 	 * @throws ValveAuthException
 	 * @throws UnirestException
+	 *
+	 * @returns String
 	 */
 	private String getFromStoreRestCalls( AbstractWitsmlObject witsmlObject,
 										  DotClient client,
@@ -1747,7 +1773,7 @@ public class DotDelegator {
 		channelsRequest = Unirest.get(channelsEndPoint);
 		channelsRequest.header("accept", "application/json");
 		channelsRequest.queryString("channelSetUuid", uuid);
-		// get response
+
 		channelsResponse = client.makeRequest(channelsRequest, username, password, exchangeID);
 		List<Channel> channels = Channel.jsonToChannelList(channelsResponse.getBody());
 
@@ -1838,7 +1864,8 @@ public class DotDelegator {
 				throw new ValveException("Could not convert DOT log response to JSON " + e.getMessage());
 			}
 		} else {
-			throw new ValveException(channelsResponse.getBody());
+			// throw new ValveException(channelsResponse.getBody());
+			return null;
 		}
 		if (finalResponse != null)
 			return finalResponse.getJSONString("1.4.1.1");
@@ -2179,7 +2206,7 @@ public class DotDelegator {
 
 		// check response status
 		int status = response.getStatus();
-		if (201 == status || 200 == status || 400 == status) {
+		if (201 == status || 200 == status) {
 
 			// get the UUID of the first wellbore in the response
 			String wellboreUUID = GraphQLRespConverter.getWellboreUuidFromGraphqlResponse(new JSONObject(response.getBody()));
@@ -2259,7 +2286,8 @@ public class DotDelegator {
 	 * @param password
 	 * @param exchangeID
 	 *
-	 * @return String uuid
+	 * @return String uuid NULL if a UUID can be obtained;
+	 * 					   otherwise, it is the UUID
 	 */
 	private String getUUIDFR( String uid,
 							  AbstractWitsmlObject witsmlObj,
@@ -2294,7 +2322,8 @@ public class DotDelegator {
 		HttpResponse<String> response;
 		response = client.makeRequest(logRequest, username, password, exchangeID);
 		if (response.getBody().isEmpty() || response.getStatus() == 404) {
-			throw new ValveException("No fluids report data found.");
+			//throw new ValveException("No fluids report data found.");
+			return null;
 		}
 		JSONObject responseJson = new JSONObject(response.getBody());
 		if (!responseJson.has("uuid"))
@@ -2337,7 +2366,8 @@ public class DotDelegator {
 		response = client.makeRequest(
 				request,
 				username,
-				password, exchangeID );
+				password,
+				exchangeID );
 		int status = response.getStatus();
 		if (201 != status && 200 != status && 202 != status) {
 			throw new ValveException(response.getBody());
