@@ -611,7 +611,7 @@ public class ChannelSet {
         }
 
         cs.setNullValue(witsmlObj.getNullValue());
-        cs.setObjectGrowing(witsmlObj.isObjectGrowing());
+        cs.setObjectGrowing(witsmlObj.getObjectGrowing());
         if (StepIncrement.from1411(witsmlObj.getStepIncrement())!=null)
             cs.setStepIncrement(StepIncrement.from1411(witsmlObj.getStepIncrement()));
         cs.setIndex(Index.from1411(witsmlObj));
