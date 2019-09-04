@@ -172,7 +172,7 @@ public class StoreValidator {
         if (supportedObjs == null)
             return false;
         for (AbstractWitsmlObject awo : supportedObjs){
-            if (awo.getObjectType().equals(WMLtypeIn))
+            if (awo.getObjectType().equals(WMLtypeIn.toLowerCase()))
                 return true;
         }
         return false;

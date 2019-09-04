@@ -22,7 +22,6 @@ public class PrettyLoggingFeature extends LoggingFeature {
 
     public PrettyLoggingFeature(){
         LogEventSender sender = new SensitiveEventSender();
-        super.setPrettyLogging(false);
         super.setSender(new SoapLogEventSender(sender));
         super.setOutSender(new SoapLogEventSender(sender));
     }

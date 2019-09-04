@@ -23,11 +23,11 @@ public class SensitiveEventSender extends Slf4jEventSender {
 
     @Override
     protected String getLogMessage(LogEvent event) {
-        String message = LogMessageFormatter.format(event);
+        String message = SingleLineMessageFormatter.format(event);
         if (event.getHeaders().containsKey("Authorization")){
             return message.replace(event.getHeaders().get("Authorization"), "*****");
         }
-        return LogMessageFormatter.format(event);
+        return SingleLineMessageFormatter.format(event);
     }
 
 }

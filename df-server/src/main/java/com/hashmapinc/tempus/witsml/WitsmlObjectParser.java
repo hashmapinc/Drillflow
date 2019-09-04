@@ -193,10 +193,51 @@ public class WitsmlObjectParser {
     }
 
     /**
+     * this method parses fluids report objects
+     *
+     * @param rawXML - string value with the raw xml to parse
+     * @param version - string value with witsml version of rawXML: 1.3.1.1 or 1.4.1.1
+     *
+     * @return witsmlObjects - list of AbstractWitsmlObjects parsed from rawXml
+     */
+    public static List<AbstractWitsmlObject> parseFluidsReportObject(
+            String rawXML,
+            String version
+    ) throws Exception {
+        List<AbstractWitsmlObject> witsmlObjects = new ArrayList<AbstractWitsmlObject>();
+
+        // handle version 1.3.1.1
+        if ("1.3.1.1".equals(version)) {
+            com.hashmapinc.tempus.WitsmlObjects.v1311.ObjFluidsReports objs = WitsmlMarshal.deserialize(
+                    rawXML, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjFluidsReports.class
+            );
+            for (com.hashmapinc.tempus.WitsmlObjects.v1311.ObjFluidsReport obj : objs.getFluidsReport()) {
+                witsmlObjects.add(obj);
+            }
+
+            // handle version 1.4.1.1
+        } else if ("1.4.1.1".equals(version)) {
+            com.hashmapinc.tempus.WitsmlObjects.v1411.ObjFluidsReports objs = WitsmlMarshal.deserialize(
+                    rawXML, com.hashmapinc.tempus.WitsmlObjects.v1411.ObjFluidsReports.class
+            );
+            for (com.hashmapinc.tempus.WitsmlObjects.v1411.ObjFluidsReport obj : objs.getFluidsReport()) {
+                witsmlObjects.add(obj);
+            }
+
+        } else {
+            throw new Exception("unsupported witsml version " + version);
+        }
+
+        // return the objects
+        return witsmlObjects;
+    }
+
+
+    /**
      * this method parses AbstractWitsmlObjects object from the given 
      * params and returns them as a list.
-     * 
-     * @param objectType - string, one of "well", "wellbore", "log", or "trajectory"
+     *
+     * @param objectType - string, one of “well”, “wellbore”, “log”, “trajectory”, or “fluidsReport”
      * @param rawXML - string, contains the raw xml to parse
      * @param version - string, one of "1.3.1.1" or "1.4.1.1"
      */
@@ -206,7 +247,7 @@ public class WitsmlObjectParser {
         String version
     ) throws Exception {
         //parse the object
-        switch(objectType) { 
+        switch(objectType) {
             case "log": 
                 return parseLogObject(rawXML, version);
             case "trajectory": 
@@ -215,6 +256,8 @@ public class WitsmlObjectParser {
                 return parseWellObject(rawXML, version);
             case "wellbore": 
                 return parseWellboreObject(rawXML, version);
+            case "fluidsReport":
+                return parseFluidsReportObject(rawXML, version);
             default: 
                 throw new WitsmlException("unsupported witsml object type: " + objectType); 
         }

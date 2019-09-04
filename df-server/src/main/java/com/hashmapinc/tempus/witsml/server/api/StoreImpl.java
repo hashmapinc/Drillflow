@@ -140,6 +140,7 @@ public class StoreImpl implements IStore {
                 return response;
             }
             String version = WitsmlUtil.getVersionFromXML(XMLin);
+            // create the correct Object model (e.g. ObjFluidsReport) for the version from the raw XML
             witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, XMLin, version);
             ValveUser user = (ValveUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             QueryContext qc = new QueryContext(
@@ -477,8 +478,8 @@ public class StoreImpl implements IStore {
             resp.setResult((short) 1);
             resp.setXMLout(xmlOut);
         } else {
-            resp.setSuppMsgOut("Unhandled error from REST backend.");
-            resp.setResult((short) -1);
+            resp.setSuppMsgOut("No Data Found.");
+            resp.setResult((short) 1);
         }
 
         // return response
