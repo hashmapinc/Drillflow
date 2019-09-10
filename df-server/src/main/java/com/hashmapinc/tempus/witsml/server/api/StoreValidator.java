@@ -121,7 +121,7 @@ public class StoreValidator {
     }
 
     /***
-     * Validate the AddToStore query from the client to see if the query flow even needs to continue.
+     * Validate the UpdateInStore query from the client to see if the query flow even needs to continue.
      *
      * @param WMLtypeIn The WITSML type in from the API query
      * @param xmlIn The XML Query template sent in
@@ -134,7 +134,7 @@ public class StoreValidator {
     }
 
     /***
-     * Validate the AddToStore query from the client to see if the query flow even needs to continue.
+     * Validate the DeleteFromStore query from the client to see if the query flow even needs to continue.
      *
      * @param WMLtypeIn The WITSML type in from the API query
      * @param xmlIn The XML Query template sent in

@@ -571,6 +571,13 @@ public class ChannelSet {
         return om.writerWithDefaultPrettyPrinter().writeValueAsString(this);
     }
 
+    /**
+     * Performs the mappings from the v1.4.1.1 Log POJO representation to the ChannelSet
+     * required by DoT.
+     *
+     * @param witsmlObj This is the v
+     * @return
+     */
     public static ChannelSet from1411(com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog witsmlObj) {
 
         ChannelSet cs = new ChannelSet();
