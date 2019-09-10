@@ -67,7 +67,7 @@ public class DotTranslator {
     }
 
     /**
-     * merges 1.4.1.1 response object as required
+     * merges response object as required
      *
      * @param wmlObject          - query object
      * @param jsonResponseString - JSON response from DoT
@@ -81,8 +81,13 @@ public class DotTranslator {
             throws ValveException,
             DatatypeConfigurationException
     {
-        // Client is also 1.4.1.1
-        JSONObject queryJson = new JSONObject( wmlObject.getJSONString("1.4.1.1") );
+        JSONObject queryJson;
+
+        if ("1.4.1.1".equals(wmlObject.getVersion())) {
+            queryJson = new JSONObject(wmlObject.getJSONString("1.4.1.1"));
+        } else {
+            queryJson = new JSONObject(wmlObject.getJSONString("1.3.1.1"));
+        }
 
         // ********************* manipulate JSON response string from DoT ********************* //
         JSONObject responseJson = new JSONObject(jsonResponseString);
@@ -108,7 +113,7 @@ public class DotTranslator {
         // ************************************************************************************ //
 
         // convert the JSON response back to valid xml (it is already in the correct version)
-        LOG.finest("Converting DoT JSON 1.4.1.1 response to valid XML string");
+        LOG.finest("Converting DoT JSON response to valid XML string");
 
         try {
             switch ( wmlObject.getObjectType() )
@@ -132,7 +137,11 @@ public class DotTranslator {
                     return traj;
 
                 case "log":
-                    return WitsmlMarshal.deserializeFromJSON(result, ObjLog.class);
+                    if ("1.3.1.1".equals(wmlObject.getVersion())) {
+                        return WitsmlMarshal.deserializeFromJSON(result, com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog.class);
+                    } else {
+                        return WitsmlMarshal.deserializeFromJSON(result, ObjLog.class);
+                    }
 
                 default:
                     throw new ValveException("unsupported object type");
