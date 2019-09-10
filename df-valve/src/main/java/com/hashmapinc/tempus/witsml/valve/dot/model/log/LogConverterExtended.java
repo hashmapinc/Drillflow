@@ -15,8 +15,6 @@
  */
 package com.hashmapinc.tempus.witsml.valve.dot.model.log;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.hashmapinc.tempus.WitsmlObjects.AbstractWitsmlObject;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog;
 import com.hashmapinc.tempus.witsml.ValveLogging;
@@ -35,7 +33,6 @@ import com.mashape.unirest.request.HttpRequestWithBody;
 import org.json.JSONObject;
 
 import javax.xml.datatype.DatatypeConfigurationException;
-import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,11 +51,25 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
      * @throws ParseException if the result cannot be parsed
      * @throws DatatypeConfigurationException if the result cannot be parsed due to a data type issue
      */
-
-    public static ObjLog convertDotResponseToWitsml(String wellSearchEndpoint,String wellBoreSearchEndpoint,DotClient client, String username,
-                                                    String password, String exchangeID,AbstractWitsmlObject witsmlObject,String channelSet,
-                                                    List<Channel> channels,String channelsDepthResponse,Boolean getAllChannels,String indexType, boolean getData) throws
-            DatatypeConfigurationException, ParseException,ValveException, ValveAuthException, UnirestException {
+    public static ObjLog convertDotResponseToWitsml( String wellSearchEndpoint,
+                                                     String wellBoreSearchEndpoint,
+                                                     DotClient client,
+                                                     String username,
+                                                     String password,
+                                                     String exchangeID,
+                                                     AbstractWitsmlObject witsmlObject,
+                                                     String channelSet,
+                                                     List<Channel> channels,
+                                                     String channelsDepthResponse,
+                                                     Boolean getAllChannels,
+                                                     String indexType,
+                                                     boolean getData)
+                                                            throws DatatypeConfigurationException,
+                                                                   ParseException,
+                                                                   ValveException,
+                                                                   ValveAuthException,
+                                                                   UnirestException
+    {
 
         ObjLog log;
 
@@ -66,21 +77,21 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
         log = ChannelSet.to1411(cs.get(0));
         log.setUidWell(witsmlObject.getGrandParentUid());
         log.setUidWellbore(witsmlObject.getParentUid());
-        log.setNameWell(getWellName( wellSearchEndpoint,client,  username,password,  exchangeID,witsmlObject));
-        log.setNameWellbore(getWelBorelName( wellBoreSearchEndpoint,client,  username, password,  exchangeID,witsmlObject));
+        log.setNameWell(getWellName( wellSearchEndpoint, client, username, password, exchangeID, witsmlObject));
+        log.setNameWellbore(getWelBorelName( wellBoreSearchEndpoint, client, username, password, exchangeID, witsmlObject));
 
         //LogData requested or not
         if (getData){
             if (channelsDepthResponse != null) {
                 JSONObject logDataJsonObject = new JSONObject(channelsDepthResponse);
                 List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData> curves = new ArrayList<>();
-                curves.add(DotLogDataHelper.convertTo1411FromDot(logDataJsonObject,indexType));
+                curves.add( DotLogDataHelper.convertTo1411FromDot(logDataJsonObject,indexType) );
                 log.setLogData(curves);
-                List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> lcis = Channel.to1411WithLogData(channels,logDataJsonObject,cs.get(0));
+                List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> lcis = Channel.to1411WithLogData( channels,logDataJsonObject,cs.get(0) );
                 log.setLogCurveInfo(lcis);
             }
         }else{
-            List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> lcis = Channel.to1411(channels,cs.get(0));
+            List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> lcis = Channel.to1411( channels, cs.get(0) );
             log.setLogCurveInfo(lcis);
         }
         return log;

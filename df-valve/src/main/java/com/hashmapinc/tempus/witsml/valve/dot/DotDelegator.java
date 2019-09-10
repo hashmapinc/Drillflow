@@ -25,7 +25,6 @@ import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjFluidsReport;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ObjTrajectory;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.ShortNameStruct;
-import com.hashmapinc.tempus.WitsmlObjects.v20.Fluid;
 import com.hashmapinc.tempus.witsml.ValveLogging;
 import com.hashmapinc.tempus.witsml.valve.ValveAuthException;
 import com.hashmapinc.tempus.witsml.valve.ValveException;
@@ -642,7 +641,7 @@ public class DotDelegator {
 		//    for the payload object with cache object
 
 		// get up to three (3) payloads for log
-		String[] payloads = getPayloads4Log( version,
+		String[] payloads = getMappedPayloads4Log( version,
 				payload,
 				witsmlObj );
 		channelSetPayload = payloads[CS_IDX_4_PAYLOADS];
@@ -1039,6 +1038,23 @@ public class DotDelegator {
 		}
 	}
 
+	/**
+	 * Creates a log object from the SOAP XML query (Witsml) represented by the AbstractWitsmlObject.
+	 *
+	 * @param witsmlObj		POJO (either 1.3.1.1 or 1.4.1.1) representing the SOAP XML query (Witsml)
+	 *                      for the Log Object Model is contained within the AbstractWitsmlObject.
+	 *                      Also contains other relevant Drillflow information.
+	 * @param username
+	 * @param password
+	 * @param exchangeID
+	 * @param client
+	 *
+	 * @return	String		Response to the creation of the Log object
+	 *
+	 * @throws ValveException
+	 * @throws ValveAuthException
+	 * @throws UnirestException
+	 */
 	public String createLogObject ( AbstractWitsmlObject witsmlObj,
 									String username,
 									String password,
@@ -1055,18 +1071,22 @@ public class DotDelegator {
 		HashMap<String,String> requestParams;
 		String endpoint;
 
-		// get WITSML abstract object as 1.4.1.1 JSON string
+		// Create the payload in JSON, in either 1.3.1.1 or 1.4.1.1 (still)
 		String payload = ("1.4.1.1".equals(version) ?
 				witsmlObj.getJSONString("1.4.1.1") :
 				witsmlObj.getJSONString("1.3.1.1") );
+		payload = JsonUtil.removeEmpties(new JSONObject(payload));
 
-		// separate out from the payload the sub-payloads for
+		// Separate out from the payload the sub-payloads for
 		//        ChannelSet (CS_IDX_4_PAYLOADS),
 		//        Channels (CHANNELS_IDX_4_PAYLOADS),
 		//        and Data (DATA_IDX_4_PAYLOADS)
-		String[] allPayloads = getPayloads4Log( version,
-				payload,
-				witsmlObj );
+		// These separate payloads are now mapped to the DoT
+		// POJOs
+		String[] allPayloads = getMappedPayloads4Log(
+												version,
+												payload,
+												witsmlObj );
 
 		// all "Client should ..." checks will be performed in this method
 		// this method will throw the correct valve exception
@@ -1178,7 +1198,6 @@ public class DotDelegator {
 			return (null == uid || uid.isEmpty()) ? new JsonNode(response.getBody()).getObject().getString("uid") :
 					uid;
 		} else {
-			//LOG.info(ValveLogging.getLogRespMsg(exchangeID, "Failed to add ChannelSet to the DoT", response));
 			throw new ValveException(response.getBody());
 		}
 	}
@@ -1197,7 +1216,7 @@ public class DotDelegator {
 			ValveAuthException,
 			UnirestException
 	{
-		// for AddToStore, I toss the returned Index Channel (it is already present
+		// for AddToStore, toss the returned Index Channel (it is already present
 		// in the payload)
 		payloadCheck(allPayloads, thisIsAdd,
 				null, null, null, null, null);
@@ -1392,25 +1411,23 @@ public class DotDelegator {
 	}
 
 	/**
-	 * creates an array of payloads:
-	 *        (1) creates the POJOs for channelSet & channels and then uses them to return
-	 *            array entries for their respective payloads based on the POJOs
-	 *        (2) for the data payload, it simply converts it accordingly for the version
-	 *            and then also returns that payload in the array
+	 * Creates an array of DoT payloads that have been correctly mapped from either the
+	 * 1.3.1.1 or 1.4.1.1 ObjLog (POJOs created from raw XML).
 	 *
 	 * @param version  either 1.4.1.1 or 1.3.1.1
 	 * @param payload  JSON String with empties removed (important since witsmlObj
 	 *                      may contain null) & correct for the version
-	 * @param witsmlObj WITSML XML in JSON format
+	 * @param witsmlObj WITSML XML
 	 *
-	 * @return String  array representing the payloads (channelSet, channels, & data);
+	 * @return String  array representing the payloads (channelSet, channels, & data)
+	 * 				   in the correct representation for DoT;
 	 *                 empty payloads are represented by the empty String
 	 *
 	 * @throws ValveException
 	 */
-	public String[] getPayloads4Log(String version,
-									String payload,
-									AbstractWitsmlObject witsmlObj)
+	public String[] getMappedPayloads4Log(String version,
+										  String payload,
+										  AbstractWitsmlObject witsmlObj)
 			throws ValveException
 	{
 		String[] payloads = new String[3];
@@ -1568,9 +1585,11 @@ public class DotDelegator {
 					exchangeID );
 
 			if (uuid == null)
+			    // let the client know that query did not return results
 				return null;
 
-			finalResponse =  getFromStoreRestCalls( witsmlObject,
+			finalResponse =  getFromStoreRestCalls(
+			        witsmlObject,
 					client,
 					uuid,
 					username,
@@ -1579,33 +1598,14 @@ public class DotDelegator {
 					shouldGetData,
 					getAllChannels );
 
-			/*
-			TODO This is the fix for logs, but it still needs work.
-			int status = finalResponse.getStatus();
-			if (201 == status || 200 == status) {
-				if ( version.equals("1.4.1.1") ) {
-					return DotTranslator.createFsRQueryResponse( finalResponse.getBody(), witsmlObject );
-				} else if ( version.equals("1.3.1.1") )
-					return DotTranslator.createFsRQueryResponse( finalResponse.getBody(), witsmlObject);
-				else
-					// version 2.0, so no transaction is required; however, still need to go from JSON to
-					// an AbstractWitsmlObject
-					return WitsmlMarshal.deserializeFromJSON(finalResponse.getBody(),
-							com.hashmapinc.tempus.WitsmlObjects.v20.FluidsReport.class);
-			} else if (404 == status) {
-				// handle not found. This is a valid response
-				return null;
-			} else {
-				throw new ValveException(finalResponse.getBody());
-			}
-			*/
-
 			if ( version.equals("1.4.1.1") )
 				return DotTranslator.translateQueryResponse( witsmlObject,
 						finalResponse,
 						optionsIn );
 			else if ( version.equals("1.3.1.1") )
-				return DotTranslator.get1311WitsmlObject( witsmlObject );
+				return DotTranslator.translateQueryResponse( witsmlObject,
+                        finalResponse,
+                        optionsIn );
 			else
 				return null;
 
@@ -1717,133 +1717,144 @@ public class DotDelegator {
 			UnirestException
 	{
 
-		String channelsetmetadataEndpoint;
-		HttpResponse<String> channelsetmetadataResponse;
-		HttpRequest channelsetmetadataRequest;
-		String channelsetuuidEndpoint;
-		HttpRequest channelsetuuidRequest;
-		HttpResponse<String> allChannelSet;
-		String channelsEndPoint;
-		HttpRequest channelsRequest;
-		HttpResponse<String> channelsResponse;
-		String channelsDepthEndPoint;
-		HttpRequestWithBody channelsDepthRequest;
-		HttpResponse<String> channelsDepthResponse=null;
-		ObjLog finalResponse = null;
-		String data ="";
+		String endpoint;
+		HttpRequest request;
+		HttpResponse<String> allChannelSets;
 		String indexType="";
 
-		// get object as payload string
-		String payload;
-		if ("1.4.1.1".equals(witsmlObject.getVersion())) {
-			payload = witsmlObject.getJSONString("1.4.1.1");
-		} else {
-			payload = witsmlObject.getJSONString("1.3.1.1");
-		}
-		payload = JsonUtil.removeEmpties(new JSONObject(payload));
+		// Query a list of ChannelSets by Query Criteria (in this case, by UUID)
+		// *********************************************************************
+		// LOG_CHANNELSET_PATH
+		// ...channelSets?containerId={containerId}[&indexType][&name][&lastChange][&objectGrowing]
+		endpoint = this.getEndpoint(LOG_OBJECT);
+		request = Unirest.get(endpoint);
+		request.header("accept", "application/json");
+		request.queryString("containerId", uuid);
+		allChannelSets = client.makeRequest(request, username, password, exchangeID);
 
-		// Build Request for Get ChannelSet Metadata
-		channelsetmetadataEndpoint = this.getEndpoint(LOG_OBJECT);
-		channelsetmetadataEndpoint = channelsetmetadataEndpoint + "/" + uuid;
-		channelsetmetadataRequest = Unirest.get(channelsetmetadataEndpoint);
-		channelsetmetadataRequest.header("accept", "application/json");
-		// get response
-		channelsetmetadataResponse = client.makeRequest(channelsetmetadataRequest, username, password, exchangeID);
-		// Build Request for Get All ChannelSet
-		channelsetuuidEndpoint = this.getEndpoint("log");
-		channelsetuuidRequest = Unirest.get(channelsetuuidEndpoint);
-		channelsetuuidRequest.header("accept", "application/json");
-		channelsetuuidRequest.queryString("containerId", uuid);
-		// get response
-		allChannelSet = client.makeRequest(channelsetuuidRequest, username, password, exchangeID);
-		List<ChannelSet> cs = ChannelSet.jsonToChannelSetList(allChannelSet.getBody());
+		if ( allChannelSets.getStatus() != 200 ) {
+			// if a 400 (Bad Request), 401 (Unauthorized), or 500 (Internal Server Error),
+			// let the Client know the get was not successful
+			return null;
+		}
+
+		// this puts the JSON response body into the ChannelSet object's ChannelSet list...
+		List<ChannelSet> cs = ChannelSet.jsonToChannelSetList(allChannelSets.getBody());
 		for (ChannelSet channelSet : cs) {
 			try{
+				// trying to find which ChannelSet has the Index Channel, specifying
+				// whether it is "depth" or "time"; only need 1 "hit" to determine (then
+				// end the search)
 				if (channelSet.getTimeDepth().toLowerCase().contains("depth")) {
 					indexType = "depth";
-				}else{
+					break;
+				} else {
 					indexType = "time";
+					break;
 				}
 			} catch (Exception ex){
 				continue;
 			}
 		}
-		// Build Request for Get Channels
-		channelsEndPoint = this.getEndpoint("channels");
-		channelsRequest = Unirest.get(channelsEndPoint);
-		channelsRequest.header("accept", "application/json");
-		channelsRequest.queryString("channelSetUuid", uuid);
 
-		channelsResponse = client.makeRequest(channelsRequest, username, password, exchangeID);
-		List<Channel> channels = Channel.jsonToChannelList(channelsResponse.getBody());
+		// Query Channel Metadata
+		// **********************
+		// Query channel metadata by container (well, wellbore, relog or BHA run) ID and other conditions.
+		// The channel metadata is to describe the nature of the channel (name, data type, mnemonic, unit of measure, etc.)
+		// and roughly corresponds to the LogCurveInfo structure in WITSML.
+		//
+		// There are 2 scenarios for the usage of this API:
+		// 1) query what channels exist under one container.
+		// 2) query whole index range for given channel under one container.
+		//
+		// LOG_CHANNELS_PATH
+		// ...channels/metadata?containerId={containerId}[&deepSearch][&indexType][&channels]
+		endpoint = this.getEndpoint("channels");
+		request = Unirest.get(endpoint);
+		request.header("accept", "application/json");
+		// TODO Check out if the parameter is really named "containerId" as above
+		request.queryString("channelSetUuid", uuid);
 
-		String startIndex = null;
-		String endIndex = null;
+		HttpResponse<String> channelsResponse = client.makeRequest(request, username, password, exchangeID);
 
-		if ("1.3.1.1".equals(witsmlObject.getVersion())){
-			if (((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getStartDateTimeIndex() != null){
-				startIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getStartDateTimeIndex();
-			} else if (((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getStartIndex() != null &&
-					((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getStartIndex().getValue() != null){
-				startIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getStartIndex().getValue().toString();
-			}
-			if (((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getEndDateTimeIndex() != null){
-				endIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getEndDateTimeIndex();
-			} else if (((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getEndIndex() != null&&
-					((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getEndIndex().getValue() != null){
-				endIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getEndIndex().getValue().toString();
-			}
-		} else if ("1.4.1.1".equals(witsmlObject.getVersion())) {
-			if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getStartDateTimeIndex() != null){
-				startIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getStartDateTimeIndex();
-			} else if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getStartIndex() != null &&
-					((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getStartIndex().getValue() != null){
-				startIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getStartIndex().getValue().toString();
-			}
-			if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getEndDateTimeIndex() != null){
-				endIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getEndDateTimeIndex();
-			} else if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getEndIndex() != null &&
-					((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getEndIndex().getValue() != null){
-				endIndex = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getEndIndex().getValue().toString();
-			}
+		if (channelsResponse.getStatus() != 200) {
+			// let the client know that there was a failure to obtain channel metadata
+			return null;
 		}
 
+		List<Channel> channels = Channel.jsonToChannelList(channelsResponse.getBody());
+		String[] startAndEndIndices = getStartEndIndices(witsmlObject);
+
+		String startIndex = startAndEndIndices[0];
+		String endIndex = startAndEndIndices[1];
+
 		if (!getAllChannels)
-			channels = filterChannelsBasedOnRequest(channels, witsmlObject,cs.get(0));
+			channels = filterChannelsBasedOnRequest(channels, witsmlObject, cs.get(0));
+
+		// At this point, channels contains the channels to work with
+		// (either ALL or SELECTED channels).
+		String channelsDepthEndPoint;
+		HttpRequestWithBody channelsDepthRequest;
+		HttpResponse<String> channelsDepthResponse;
+		ObjLog finalResponse;
+		String data;
+
 		// Build Request for Get Channels Depth
 		String channelData = null;
 		if (getData) {
-			if(getAllChannels || channels != null) {
+			if( getAllChannels || channels != null ) {
 				if (indexType.equals("depth")) {
-					JSONObject payloadJSON = new JSONObject(payload);
-					if (((witsmlObject.getVersion().equals("1.4.1.1") && ((ObjLog)witsmlObject).getLogData() != null) || getAllChannels) ||
-							(witsmlObject.getVersion().equals("1.3.1.1") && ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getLogData() != null)){
-						//if (((ObjLog) witsmlObject).getLogData().size() > 0 || getAllChannels) {
+					// if getAllChannels has been specified
+					//                 OR
+					// data has been requested within the query (either a 1.3.1.1 or 1.4.1.1 query)...
+					if ( getAllChannels ||
+							( witsmlObject.getVersion().equals("1.4.1.1") && ((ObjLog)witsmlObject).getLogData() != null)  ||
+							( witsmlObject.getVersion().equals("1.3.1.1") && ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getLogData() != null) ){
 						String sortDesc = "true";
+						// map the data to the format required by DoT
 						data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
-						// create with POST
+
+						// LOG_DEPTHDATA_PATH
+						// .../channels/depthdata
 						channelsDepthEndPoint = this.getEndpoint("logDepthPath");
 						channelsDepthRequest = Unirest.post(channelsDepthEndPoint);
 						channelsDepthRequest.header("Content-Type", "application/json");
+						// data is secure within the body of the HTTP request
 						channelsDepthRequest.body(data);
-						// get the request response.
 						channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password, exchangeID);
+
+						if (channelsDepthResponse.getStatus() != 200) {
+							// let the client know that there was a failure to obtain channel metadata
+							return null;
+						}
+						// otherwise, get the Channel data
 						channelData = channelsDepthResponse.getBody();
 					}
+
+				// if getAllChannels has been specified
+				//                 OR
+				// data has been requested within the query (either a 1.3.1.1 or 1.4.1.1 query)...
 				} else {
-					JSONObject payloadJSON = new JSONObject(payload);
-					if (((witsmlObject.getVersion().equals("1.4.1.1") && ((ObjLog)witsmlObject).getLogData() != null) || getAllChannels) ||
-							(witsmlObject.getVersion().equals("1.3.1.1") && ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getLogData() != null)){
-						//if (((ObjLog)witsmlObject).getLogData().size() > 0 || getAllChannels) {
+					if ( getAllChannels ||
+							( witsmlObject.getVersion().equals("1.4.1.1") && ((ObjLog)witsmlObject).getLogData() != null )  ||
+							( witsmlObject.getVersion().equals("1.3.1.1") && ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getLogData() != null ) ) {
 						String sortDesc = "true";
+						// map the data to the format required by DoT
 						data = DotLogDataHelper.convertChannelDepthDataToDotFrom(channels, uuid, sortDesc, startIndex, endIndex);
-						// create with POST
+
+						// LOG_TIMEDATA_PATH
+						// .../channels/timedata
 						channelsDepthEndPoint = this.getEndpoint("logTimePath");
 						channelsDepthRequest = Unirest.post(channelsDepthEndPoint);
 						channelsDepthRequest.header("Content-Type", "application/json");
 						channelsDepthRequest.body(data);
-						// get the request response.
 						channelsDepthResponse = client.makeRequest(channelsDepthRequest, username, password, exchangeID);
+
+						if (channelsDepthResponse.getStatus() != 200) {
+							// let the client know that there was a failure to obtain channel metadata
+							return null;
+						}
+						// otherwise, get the Channel data
 						channelData = channelsDepthResponse.getBody();
 					}
 				}
@@ -1851,26 +1862,76 @@ public class DotDelegator {
 
 		}
 
-		if (201 == channelsetmetadataResponse.getStatus() || 200 == channelsetmetadataResponse.getStatus()
-				|| 200 == allChannelSet.getStatus() || 201 == allChannelSet.getStatus()
-				|| 200 == channelsResponse.getStatus() || 201 == channelsResponse.getStatus()) {
-			try {
-				String wellSearchEndpoint = this.getEndpoint("wellsearch");
-				String wellBoreSearchEndpoint = this.getEndpoint("wellboresearch");
-				finalResponse = LogConverterExtended.convertDotResponseToWitsml
-						(wellSearchEndpoint,wellBoreSearchEndpoint,client,username,password,exchangeID, witsmlObject,allChannelSet.getBody(),
-								channels,channelData,getAllChannels,indexType, getData);
-			} catch (Exception e) {
-				throw new ValveException("Could not convert DOT log response to JSON " + e.getMessage());
-			}
-		} else {
-			// throw new ValveException(channelsResponse.getBody());
-			return null;
+		try {
+			finalResponse = LogConverterExtended.convertDotResponseToWitsml(
+													this.getEndpoint("wellsearch"),
+													this.getEndpoint("wellboresearch"),
+													client,
+													username,
+													password,
+													exchangeID,
+													witsmlObject,
+													allChannelSets.getBody(),
+													channels,
+													channelData,
+													getAllChannels,
+													indexType,
+													getData);
+		} catch (Exception e) {
+			throw new ValveException("Could not convert DOT log response " + e.getMessage());
 		}
+
 		if (finalResponse != null)
-			return finalResponse.getJSONString("1.4.1.1");
+			if (witsmlObject.getVersion().equals("1.4.1.1")) {
+				return finalResponse.getJSONString("1.4.1.1");
+			} else {
+				return finalResponse.getJSONString("1.3.1.1");
+			}
 		else
 			return null;
+	}
+
+	/**
+	 * Return the startIndex and endIndex, respectively, from the witsmlObject (based on version).
+	 *
+	 * @param witsmlObject
+	 *
+	 * @return String[] startIndex in position 0, endIndex in position 1
+	 */
+	private String[] getStartEndIndices( AbstractWitsmlObject witsmlObject ) {
+		String[] startEndIndices = new String[2];
+		int startIndex = 0;
+		int endIndex = 1;
+
+		if ("1.3.1.1".equals(witsmlObject.getVersion())){
+			if (((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getStartDateTimeIndex() != null){
+				startEndIndices[startIndex] = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getStartDateTimeIndex();
+			} else if (((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getStartIndex() != null &&
+					((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getStartIndex().getValue() != null){
+				startEndIndices[startIndex] = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getStartIndex().getValue().toString();
+			}
+			if (((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getEndDateTimeIndex() != null){
+				startEndIndices[endIndex] = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getEndDateTimeIndex();
+			} else if (((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getEndIndex() != null&&
+					((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getEndIndex().getValue() != null){
+				startEndIndices[endIndex] = ((com.hashmapinc.tempus.WitsmlObjects.v1311.ObjLog)witsmlObject).getEndIndex().getValue().toString();
+			}
+		} else if ("1.4.1.1".equals(witsmlObject.getVersion())) {
+			if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getStartDateTimeIndex() != null){
+				startEndIndices[startIndex] = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getStartDateTimeIndex();
+			} else if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getStartIndex() != null &&
+					((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getStartIndex().getValue() != null){
+				startEndIndices[startIndex] = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getStartIndex().getValue().toString();
+			}
+			if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getEndDateTimeIndex() != null){
+				startEndIndices[endIndex] = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getEndDateTimeIndex();
+			} else if (((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getEndIndex() != null &&
+					((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getEndIndex().getValue() != null){
+				startEndIndices[endIndex] = ((com.hashmapinc.tempus.WitsmlObjects.v1411.ObjLog)witsmlObject).getEndIndex().getValue().toString();
+			}
+		}
+
+		return startEndIndices;
 	}
 
 	private List<Channel> filterChannelsBasedOnRequest(List<Channel> allChannels,
@@ -2247,10 +2308,14 @@ public class DotDelegator {
 
 		String uidWellbore;
 		String uidWellLog;
-		String uuid = "";
-		String endpoint = "";
-		HttpRequest logRequest = null;
+		String uuid;
+		String endpoint;
+		HttpRequest logRequest;
 
+		// Get ChannelSet Identity by Well UID, Wellbore UID, UID or ChannelSet UUID
+        // *************************************************************************
+		// LOG_CHANNELSET_UUID_PATH
+		// .../identities
 		endpoint = this.getEndpoint("channelsetuuid");
 		logRequest = Unirest.get(endpoint);
 		logRequest.header("accept", "application/json");

@@ -28,19 +28,19 @@ public interface IStore {
     @WebMethod(action = "http://www.witsml.org/action/120/Store.WMLS_AddToStore", operationName = "WMLS_AddToStore")
     @SOAPBinding(style = SOAPBinding.Style.RPC, parameterStyle= SOAPBinding.ParameterStyle.BARE, use = SOAPBinding.Use.ENCODED)
     WMLS_AddToStoreResponse addToStore(
-        @WebParam(partName = "WMLtypeIn") String WMLtypeIn,
-        @WebParam(partName = "XMLin") String XMLin,
-        @WebParam(partName = "OptionsIn") String OptionsIn,
-        @WebParam(partName = "CapabilitiesIn") String CapabilitiesIn
+            @WebParam(partName = "WMLtypeIn") String WMLtypeIn,
+            @WebParam(partName = "XMLin") String XMLin,
+            @WebParam(partName = "OptionsIn") String OptionsIn,
+            @WebParam(partName = "CapabilitiesIn") String CapabilitiesIn
     );
 
     @WebMethod(action = "http://www.witsml.org/action/120/Store.WMLS_UpdateInStore", operationName = "WMLS_UpdateInStore")
     @SOAPBinding(style = SOAPBinding.Style.RPC, parameterStyle= SOAPBinding.ParameterStyle.BARE, use = SOAPBinding.Use.ENCODED)
     WMLS_UpdateInStoreResponse updateInStore(
-        @WebParam(partName = "WMLtypeIn") String WMLtypeIn,
-        @WebParam(partName = "XMLin") String XMLin,
-        @WebParam(partName = "OptionsIn") String OptionsIn,
-        @WebParam(partName = "CapabilitiesIn") String CapabilitiesIn
+            @WebParam(partName = "WMLtypeIn") String WMLtypeIn,
+            @WebParam(partName = "XMLin") String XMLin,
+            @WebParam(partName = "OptionsIn") String OptionsIn,
+            @WebParam(partName = "CapabilitiesIn") String CapabilitiesIn
     );
 
     @WebMethod(action = "http://www.witsml.org/action/120/Store.WMLS_DeleteFromStore", operationName = "WMLS_DeleteFromStore")

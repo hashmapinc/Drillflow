@@ -153,8 +153,7 @@ public class StoreImpl implements IStore {
                 user.getPassword(),
                 getExchangeId()
             );
-
-            // handle each object
+            // handle each object asynchronously
             uid = valve.createObject(qc).get();
         } catch (ValveException ve) {
             //TODO: handle exception
@@ -172,13 +171,13 @@ public class StoreImpl implements IStore {
             LOG.warning(ValveLogging.getLogMsg(getExchangeId(), "Could not add WITSML object to store: \n" + "Error: " + e));
             response.setSuppMsgOut("Error adding to store: " + e.getMessage());
             response.setResult((short)-1);
+
             return response;
         }
 
-        // TODO This is just passing back what was already there from the client &
-        //      not the API response.
         response.setSuppMsgOut(uid);
         response.setResult((short)1);
+
         return response;
     }
 
@@ -203,6 +202,7 @@ public class StoreImpl implements IStore {
                 return response;
             }
             String version = WitsmlUtil.getVersionFromXML(XMLin);
+            // create the correct Object model (e.g. ObjFluidsReport) for the version from the raw XML
             witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, XMLin, version);
             ValveUser user = (ValveUser)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             QueryContext qc = new QueryContext(
@@ -263,6 +263,7 @@ public class StoreImpl implements IStore {
         List<AbstractWitsmlObject> witsmlObjects;
         try {
             String clientVersion = WitsmlUtil.getVersionFromXML(QueryIn);
+            // create the correct Object model (e.g. ObjFluidsReport) for the version from the raw XML
             witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, QueryIn, clientVersion);
         } catch (Exception e) {
             // TODO: handle exception
@@ -411,6 +412,7 @@ public class StoreImpl implements IStore {
             String clientVersion;
             try {
                 clientVersion = WitsmlUtil.getVersionFromXML(QueryIn);
+                // create the correct Object model (e.g. ObjFluidsReport) for the version from the raw XML
                 witsmlObjects = WitsmlObjectParser.parse(WMLtypeIn, QueryIn, clientVersion);
             } catch (Exception e) {
                 // TODO: handle exception
