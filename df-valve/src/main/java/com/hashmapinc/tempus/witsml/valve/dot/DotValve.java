@@ -49,10 +49,9 @@ public class DotValve implements IValve {
 	 * @throws ValveAuthException
 	 */
 	public DotValve(Map<String, String> config) throws ValveAuthException  {
-		String apikey = config.get("apikey");
 		String tokenPath = config.get("token.path");
 
-		this.CLIENT = new DotClient(apikey, tokenPath);
+		this.CLIENT = new DotClient(tokenPath);
 		this.DELEGATOR = new DotDelegator(config);
 
 		LOG.info(ValveLogging.getLogMsg("Creating valve pointing to url: " + tokenPath));
@@ -274,7 +273,7 @@ public class DotValve implements IValve {
 			LOG.warning(ValveLogging.getLogMsg(qc.EXCHANGE_ID,"Exception in DotValve createObject: " + e.getMessage()));
 			throw new ValveException(e.getMessage());
 		}
-		// return the uids created
+		// return the uids created, comma separated
 		return CompletableFuture.completedFuture(StringUtils.join(uids, ','));
 	}
 

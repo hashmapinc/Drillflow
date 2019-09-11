@@ -10,17 +10,6 @@ Introduction
 
 There are several environment variables that are used in configuring the DrillFlow DoT Valve.
 
-:Variable:
-    VALVE_API_KEY
-:Description:
-    The API key to be used to authenticate against the API gateway.
-:Default:
-    No Default
-:Required:
-    YES
-:Example Environmental Switch in Docker:
-    To set to xyz : -e VALVE_API_KEY='xyz'
-
 ==============
 Path Variables
 ==============

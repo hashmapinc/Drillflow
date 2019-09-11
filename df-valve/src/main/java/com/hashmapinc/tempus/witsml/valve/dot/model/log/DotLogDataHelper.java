@@ -90,7 +90,11 @@ public class DotLogDataHelper extends LogDataHelper {
 
     // Code added to build log data request
 
-    public static String convertChannelDepthDataToDotFrom(List<Channel> channels , String containerId, String sortDesc, String startIndex, String endIndex){
+    public static String
+
+
+
+        convertChannelDepthDataToDotFrom(List<Channel> channels , String containerId, String sortDesc, String startIndex, String endIndex){
 
         JSONObject dotDataObject = new JSONObject();
         dotDataObject.put("sortDesc", true);
@@ -143,7 +147,7 @@ public class DotLogDataHelper extends LogDataHelper {
 
     //code added for logData Transformation
 
-    public static CsLogData convertTo1411FromDot(JSONObject object,String indexType){
+    public static CsLogData convertTo1411FromDot( JSONObject object, String indexType ){
         JSONArray jsonValues = (JSONArray)object.get("value");
         String[] mnems = new String[jsonValues.length()];
         String[] units = new String[jsonValues.length()];

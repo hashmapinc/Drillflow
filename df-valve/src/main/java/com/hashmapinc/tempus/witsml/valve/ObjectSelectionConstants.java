@@ -16,11 +16,12 @@
 package com.hashmapinc.tempus.witsml.valve;
 
 public class ObjectSelectionConstants {
+    
     //=========================================================================
     // WELL_OBJ_SELECTION variable
     //=========================================================================
     public static final String WELL_OBJ_SELECTION =
-            "<wells xmlns=\"http://www.witsml.org/schemas/1series \"" +
+            "<wells xmlns=\"http://www.witsml.org/schemas/1series\" " +
                     "version=\"1.4.1.1\">" +
                     "<well uid=\"uid_dfTestWell1\">" +
                     "<name>dfTestWell1</name>" +
