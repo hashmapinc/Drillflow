@@ -50,6 +50,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class DotDelegator {
 	private static final Logger LOG = Logger.getLogger(DotDelegator.class.getName());
@@ -654,7 +655,8 @@ public class DotDelegator {
 				uuid,
 				username,
 				password,
-				exchangeID );
+				exchangeID,
+				version );
 
 		// if an index channel needed to be found and was,
 		// now I must take the uom from that channel and stuff it
@@ -1219,7 +1221,7 @@ public class DotDelegator {
 		// for AddToStore, toss the returned Index Channel (it is already present
 		// in the payload)
 		payloadCheck(allPayloads, thisIsAdd,
-				null, null, null, null, null);
+				null, null, null, null, null, null);
 	}
 
 	// overload this method for Update, that requires more parameters
@@ -1229,7 +1231,8 @@ public class DotDelegator {
 								  String uuid,
 								  String username,
 								  String password,
-								  String exchangeID )
+								  String exchangeID,
+								  String version )
 			throws ValveException,
 			ValveAuthException,
 			UnirestException
@@ -1257,6 +1260,13 @@ public class DotDelegator {
 			// on an Add
 			throw new ValveException(CSErrorMsg, (short) -453);
 		}
+
+		// if there are duplicate mnemonics in the <logCurveInfo> element(s) OR
+		// if there are duplicate mnemonics in the <mnemonicList> in <logData> (v1.4.1.1 ONLY),
+		// then fail this request
+		short errorCode = mnemonicsChecks( allPayloads[CHANNELS_IDX_4_PAYLOADS],
+										   allPayloads[DATA_IDX_4_PAYLOADS],
+										   version );
 
 		String mnemonicForIdxChannel = findIdxChannelIdentity(allPayloads,
 				thisIsAdd,
@@ -1314,6 +1324,91 @@ public class DotDelegator {
 			}
 		}
 		return idxChannel;
+	}
+
+	/**
+	 *  checks that mnemonics as provided within the Client request
+	 *  correctly conforms to the WITSML specification
+	 *
+	 * @param  channelPayload JSON channel set payload
+	 * @param  dataPayload    JSON data payload
+	 * @param  version        1.3.1.1 or 1.4.1.1
+	 *
+	 * @return short        1 = all OK
+	 *                      not 1 = failure
+	 */
+	// TODO Create a JUnit test
+	public static short mnemonicsChecks( String channelPayload,
+										 String dataPayload,
+										 String version )
+	{
+
+		// create a mnemonicList from the lci's:
+		JSONArray channelJSONarray = new JSONArray(channelPayload);
+		String[] channelMnemonicList = new String[channelJSONarray.length()];
+		for (int n = 0; n < channelJSONarray.length(); n++) {
+			JSONObject channelObject = channelJSONarray.getJSONObject(n);
+			channelMnemonicList[n] = channelObject.getString("mnemonic");
+		}
+		// FIRST: are there any duplicates within this mnemonicList?
+		if (duplicates(channelMnemonicList)) {
+			// When adding or updating curves, a client MUST specify
+			// unique column-identifiers.
+			return (short)-447;
+		}
+
+		// v1.3.1.1 does not have a mnemonicList within the data, so bypass
+		// this section of code.
+		if ( "1.4.1.1".equals(version) &&
+				!dataPayload.equals("") ) {
+			// obtain the mnemonicList from the data payload
+			JSONObject dataObject = new JSONObject(dataPayload);
+			String[] dataMnemonicList = dataObject.getString("mnemonicList")
+					.split(",");
+			// SECOND: are there any duplicates within this mnemonicList?
+			if (duplicates(dataMnemonicList)) {
+				// When adding or updating curves, a client MUST specify
+				// unique column-identifiers.
+				return (short)-447;
+			}
+
+			// if the channelMnemonicList is empty, then bypass this check.
+			if ( channelMnemonicList.length > 0 ) {
+
+				// FINALLY: is there a 1-1 correlation between the two arrays?
+				if (channelMnemonicList.length == dataMnemonicList.length) {
+					for (int i = 0; i < channelMnemonicList.length - 1; i++) {
+						if (!channelMnemonicList[i].equals(dataMnemonicList[i])) {
+							return (short) -460;
+						}
+					}
+				} else {
+					//
+					return (short) -460;
+				}
+			}
+		}
+
+		return (short)1;
+	}
+
+	/**
+	 * Returns true if there are duplicates in the input list; else false.
+	 *
+	 * @param inputArray	List of objects to check for duplicates.
+	 * @return	boolean		true = there is a duplicate
+	 * 					    false = no duplicate found
+	 */
+	private static boolean duplicates(String[] inputArray) {
+		Set<String> uniqueElements = new HashSet<>();
+
+		Set<String> duplicateElements =  Arrays.stream(inputArray)
+				.filter(i -> !uniqueElements.add(i))
+				//.boxed()
+				.collect(Collectors.toSet());
+		if ( duplicateElements.isEmpty() )
+			return false;
+		return true;
 	}
 
 	/**
