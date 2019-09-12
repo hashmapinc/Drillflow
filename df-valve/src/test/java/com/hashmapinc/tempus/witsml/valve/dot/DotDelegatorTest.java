@@ -64,8 +64,7 @@ public class DotDelegatorTest {
     private String logChannelsetPath;
     private String logChannelsPath;
     private String logDataPath;
-
-
+    
     @Before
     public void init() {
         // instantiate strings
@@ -104,6 +103,15 @@ public class DotDelegatorTest {
         this.mockClient = mock(DotClient.class);
     }
 
+
+    @Test
+    public void shouldCheckDuplicateMnemonicsInRequest() throws Exception{
+        String channelPayload=TestUtilities.getResourceAsString("updateTest/DuplicateMnemonicsChannelPayload.json");
+        String dataPayload=TestUtilities.getResourceAsString("updateTest/DuplicateMnemonicsDataPayload.json");
+        String version="1.4.1.1";
+        int resultCode=DotDelegator.mnemonicsChecks(channelPayload, dataPayload, version);
+        assertEquals(-447, resultCode);
+    }
 
     @Test
     public void shouldCreateAnUpdateInStoreQueryWithoutEmptyArrays() throws Exception{

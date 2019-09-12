@@ -1,0 +1,157 @@
+[
+    {
+        "uid": "lci-1",
+        "nullValue": "-999.25",
+        "mnemAlias": {
+            "value": "md"
+        },
+        "sensorOffset": {
+            "uom": "m",
+            "value": "0.0"
+        },
+        "traceState": "raw",
+        "mnemonic": "Mdepth",
+        "dataType": "double",
+        "uom": "m",
+        "axisDefinition": [],
+        "timeDepth": "Depth",
+        "classWitsml": "measured depth of hole",
+        "index": [
+            {
+                "indexType": "measured depth",
+                "uom": "m",
+                "direction": "increasing",
+                "mnemonic": "Mdepth"
+            }
+        ],
+        "citation": {
+            "title": "Mdepth",
+            "description": "Measured depth"
+        },
+        "extensionNameValue": []
+    },
+    {
+        "uid": "lci-2",
+        "nullValue": "-999.25",
+        "mnemAlias": {
+            "value": "tvd"
+        },
+        "sensorOffset": {
+            "uom": "m",
+            "value": "0.0"
+        },
+        "traceState": "raw",
+        "mnemonic": "Vdepth",
+        "dataType": "double",
+        "uom": "m",
+        "axisDefinition": [],
+        "timeDepth": "Depth",
+        "classWitsml": "TVD of hole",
+        "index": [
+            {
+                "indexType": "measured depth",
+                "uom": "m",
+                "direction": "increasing",
+                "mnemonic": "Mdepth"
+            }
+        ],
+        "citation": {
+            "title": "Vdepth",
+            "description": "Vertical depth"
+        },
+        "extensionNameValue": []
+    },
+    {
+        "uid": "lci-3",
+        "nullValue": "-999.25",
+        "mnemAlias": {
+            "value": "distBit"
+        },
+        "sensorOffset": {
+            "uom": "m",
+            "value": "0.0"
+        },
+        "traceState": "raw",
+        "mnemonic": "Bit Dist",
+        "dataType": "double",
+        "uom": "m",
+        "axisDefinition": [],
+        "timeDepth": "Depth",
+        "classWitsml": "measured depth of DST bottom",
+        "index": [
+            {
+                "indexType": "measured depth",
+                "uom": "m",
+                "direction": "increasing",
+                "mnemonic": "Mdepth"
+            }
+        ],
+        "citation": {
+            "title": "Bit Dist",
+            "description": "Distance drilled by bit"
+        },
+        "extensionNameValue": []
+    },
+    {
+        "uid": "lci-4",
+        "nullValue": "-999.25",
+        "mnemAlias": {
+            "value": "tqOnBot"
+        },
+        "sensorOffset": {
+            "uom": "m",
+            "value": "0.0"
+        },
+        "traceState": "raw",
+        "mnemonic": "TQ on btm",
+        "dataType": "double",
+        "uom": "kft.lbf",
+        "axisDefinition": [],
+        "timeDepth": "Depth",
+        "classWitsml": "torque (average)",
+        "index": [
+            {
+                "indexType": "measured depth",
+                "uom": "m",
+                "direction": "increasing",
+                "mnemonic": "Mdepth"
+            }
+        ],
+        "citation": {
+            "title": "TQ on btm",
+            "description": "On bottom torque"
+        },
+        "extensionNameValue": []
+    },
+    {
+        "uid": "lci-5",
+        "nullValue": "-999.25",
+        "mnemAlias": {
+            "value": "tqOnBot"
+        },
+        "sensorOffset": {
+            "uom": "m",
+            "value": "0.0"
+        },
+        "traceState": "raw",
+        "mnemonic": "TQ on btm",
+        "dataType": "double",
+        "uom": "kft.lbf",
+        "axisDefinition": [],
+        "timeDepth": "Depth",
+        "classWitsml": "torque (average)",
+        "index": [
+            {
+                "indexType": "measured depth",
+                "uom": "m",
+                "direction": "increasing",
+                "mnemonic": "Mdepth"
+            }
+        ],
+        "citation": {
+            "title": "TQ on btm",
+            "description": "On bottom torque"
+        },
+        "extensionNameValue": []
+    }
+]

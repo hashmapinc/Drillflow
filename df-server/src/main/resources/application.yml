@@ -21,25 +21,25 @@ server:
 valve : 
     name: DoT
     configuration :
-        token.path: ${TOKEN_PATH:https://api-demo.nam.drillops.slb.com/democore/BasicAuth/v1/token/}
-        well.path: ${WELL_PATH:https://api-demo.nam.drillops.slb.com/democore/well/v2/witsml/wells/}
-        well.gql.path: ${WELL_GQL_PATH:https://api-demo.nam.drillops.slb.com/democore/well/v2/graphql/}
-        wellbore.path: ${WB_PATH:https://api-demo.nam.drillops.slb.com/democore/wellbore/v1/witsml/wellbores/}
-        wellbore.gql.path: ${WB_GQL_PATH:https://api-demo.nam.drillops.slb.com/democore/wellbore/v1/graphql/}
-        trajectory.path: ${TRAJ_PATH:https://api-demo.nam.drillops.slb.com/democore/trajectoryreader/v1/witsml/trajectories/}
-        trajectory.gql.path: ${TRAJ_GQL_PATH:https://api-demo.nam.drillops.slb.com/democore/trajectoryreader/v1/graphql/}
-        log.channelset.path: ${LOG_CHANNELSET_PATH:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/witsml/channelSets}
-        log.channel.path: ${LOG_CHANNEL_PATH:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/witsml/channels}
-        log.channelset.uuid.path: ${LOG_CHANNELSET_UUID_PATH:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/identities}
-        log.channels.path: ${LOG_CHANNELS_PATH:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/witsml/channels/metadata}
-        log.channels.data.path: ${LOG_CHANNELS_DATA_PATH:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/witsml/channels/data}
-        log.mnemonic.data.path: ${LOG_MNEMONIC_PATH:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/witsml/channels/:mnemonic}
-        log.channel.depthData.path: ${LOG_DEPTHDATA_PATH:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/channels/depthdata}
-        log.channel.timeData.path: ${LOG_TIMEDATA_PATH:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/channels/timedata}
-        log.channel.depthBoundaryData.path: ${LOG_DEPTH_BOUNDARY_DATA_PATH:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/channels/depthboundary}
-        log.channel.timeBoundaryData.path: ${LOG_TIME_BOUNDARY_DATA_PATH:https://api-demo.nam.drillops.slb.com/democore/channelreader/v4/channels/timeboundary}
-        fluids.report.path: ${FLUIDS_REPORT_PATH:https://api-demo.nam.drillops.slb.com/democore/fluidsreport/v1/witsml/fluidsReports}
-        fluids.report.identities: ${FLUIDS_REPORT_IDENTITIES_PATH:https://api-demo.nam.drillops.slb.com/democore/fluidsreport/v1/identities}
+        token.path: ${TOKEN_PATH:https://int-dmz-api.azure-api.net/cointcore/BasicAuth/v1/token/}
+        well.path: ${WELL_PATH:https://int-dmz-api.azure-api.net/cointcore/well/v2/witsml/wells/}
+        well.gql.path: ${WELL_GQL_PATH:https://int-dmz-api.azure-api.net/cointcore/well/v2/graphql/}
+        wellbore.path: ${WB_PATH:https://int-dmz-api.azure-api.net/cointcore/wellbore/v1/witsml/wellbores/}
+        wellbore.gql.path: ${WB_GQL_PATH:https://int-dmz-api.azure-api.net/cointcore/wellbore/v1/graphql/}
+        trajectory.path: ${TRAJ_PATH:https://int-dmz-api.azure-api.net/cointcore/trajectoryreader/v1/witsml/trajectories/}
+        trajectory.gql.path: ${TRAJ_GQL_PATH:https://int-dmz-api.azure-api.net/cointcore/trajectoryreader/v1/graphql/}
+        log.channelset.path: ${LOG_CHANNELSET_PATH:https://int-dmz-api.azure-api.net/cointcore/channelreader/v4/witsml/channelSets}
+        log.channel.path: ${LOG_CHANNEL_PATH:https://int-dmz-api.azure-api.net/cointcore/channelreader/v4/witsml/channels}
+        log.channelset.uuid.path: ${LOG_CHANNELSET_UUID_PATH:https://int-dmz-api.azure-api.net/cointcore/channelreader/v4/identities}
+        log.channels.path: ${LOG_CHANNELS_PATH:https://int-dmz-api.azure-api.net/cointcore/channelreader/v4/witsml/channels/metadata}
+        log.channels.data.path: ${LOG_CHANNELS_DATA_PATH:https://int-dmz-api.azure-api.net/cointcore/channelreader/v4/witsml/channels/data}
+        log.mnemonic.data.path: ${LOG_MNEMONIC_PATH:https://int-dmz-api.azure-api.net/cointcore/channelreader/v4/witsml/channels/:mnemonic}
+        log.channel.depthData.path: ${LOG_DEPTHDATA_PATH:https://int-dmz-api.azure-api.net/cointcore/channelreader/v4/channels/depthdata}
+        log.channel.timeData.path: ${LOG_TIMEDATA_PATH:https://int-dmz-api.azure-api.net/cointcore/channelreader/v4/channels/timedata}
+        log.channel.depthBoundaryData.path: ${LOG_DEPTH_BOUNDARY_DATA_PATH:https://int-dmz-api.azure-api.net/cointcore/channelreader/v4/channels/depthboundary}
+        log.channel.timeBoundaryData.path: ${LOG_TIME_BOUNDARY_DATA_PATH:https://int-dmz-api.azure-api.net/cointcore/channelreader/v4/channels/timeboundary}
+        fluids.report.path: ${FLUIDS_REPORT_PATH:https://int-dmz-api.azure-api.net/cointcore/fluidsreport/v1/witsml/fluidsReports}
+        fluids.report.identities: ${FLUIDS_REPORT_IDENTITIES_PATH:https://int-dmz-api.azure-api.net/cointcore/fluidsreport/v1/identities}
 
 
 wmls:

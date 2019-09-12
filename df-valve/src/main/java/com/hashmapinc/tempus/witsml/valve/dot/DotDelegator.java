@@ -1093,7 +1093,7 @@ public class DotDelegator {
 		// all "Client should ..." checks will be performed in this method
 		// this method will throw the correct valve exception
 		// if the payload is non-conforming
-		payloadCheck( allPayloads, true );
+		payloadCheck( allPayloads, true, version );
 
 		// ********************************* ChannelSet ********************************* //
 		// endpoint:
@@ -1213,7 +1213,7 @@ public class DotDelegator {
 	 * @param allPayloads
 	 * @param thisIsAdd		boolean flag for detecting Add (=true) vs Update (=false)
 	 */
-	private void payloadCheck( String[] allPayloads, boolean thisIsAdd )
+	private void payloadCheck( String[] allPayloads, boolean thisIsAdd, String version )
 			throws ValveException,
 			ValveAuthException,
 			UnirestException
@@ -1221,7 +1221,7 @@ public class DotDelegator {
 		// for AddToStore, toss the returned Index Channel (it is already present
 		// in the payload)
 		payloadCheck(allPayloads, thisIsAdd,
-				null, null, null, null, null, null);
+				null, null, null, null, null, version);
 	}
 
 	// overload this method for Update, that requires more parameters
@@ -1243,7 +1243,8 @@ public class DotDelegator {
 				"channels is missing (so unit of measure cannot be obtained).";
 		String CH_NoIndexChannelErrorMsg = "Client must provide valid payload: " +
 				"no index channel matching <indexCurve/> was found.";
-
+		String MNErrorMsg="Client must provide valid payload: " +
+		"There are duplicate mnemonics in the payload";		
 		// if there is no channel set payload, fail this request
 		// (both Add and Update must specify Channel Set)
 		if ( allPayloads[CS_IDX_4_PAYLOADS].equals("") &&
@@ -1267,7 +1268,9 @@ public class DotDelegator {
 		short errorCode = mnemonicsChecks( allPayloads[CHANNELS_IDX_4_PAYLOADS],
 										   allPayloads[DATA_IDX_4_PAYLOADS],
 										   version );
-
+		if (errorCode!=1){
+			throw new ValveException(MNErrorMsg,errorCode);
+		}
 		String mnemonicForIdxChannel = findIdxChannelIdentity(allPayloads,
 				thisIsAdd,
 				CH_NoIndexChannelErrorMsg);
@@ -1376,9 +1379,9 @@ public class DotDelegator {
 			if ( channelMnemonicList.length > 0 ) {
 
 				// FINALLY: is there a 1-1 correlation between the two arrays?
-				if (channelMnemonicList.length == dataMnemonicList.length) {
-					for (int i = 0; i < channelMnemonicList.length - 1; i++) {
-						if (!channelMnemonicList[i].equals(dataMnemonicList[i])) {
+				if (channelMnemonicList.length == dataMnemonicList.length+1) {
+					for (int i = 0; i < channelMnemonicList.length - 2; i++) {
+						if (!channelMnemonicList[i+1].equals(dataMnemonicList[i])) {
 							return (short) -460;
 						}
 					}
