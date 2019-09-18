@@ -51,25 +51,11 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
      * @throws ParseException if the result cannot be parsed
      * @throws DatatypeConfigurationException if the result cannot be parsed due to a data type issue
      */
-    public static ObjLog convertDotResponseToWitsml( String wellSearchEndpoint,
-                                                     String wellBoreSearchEndpoint,
-                                                     DotClient client,
-                                                     String username,
-                                                     String password,
-                                                     String exchangeID,
-                                                     AbstractWitsmlObject witsmlObject,
-                                                     String channelSet,
-                                                     List<Channel> channels,
-                                                     String channelsDepthResponse,
-                                                     Boolean getAllChannels,
-                                                     String indexType,
-                                                     boolean getData)
-                                                            throws DatatypeConfigurationException,
-                                                                   ParseException,
-                                                                   ValveException,
-                                                                   ValveAuthException,
-                                                                   UnirestException
-    {
+
+    public static ObjLog convertDotResponseToWitsml(String wellSearchEndpoint,String wellBoreSearchEndpoint,DotClient client, String username,
+                                                    String password, String exchangeID,AbstractWitsmlObject witsmlObject,String channelSet,
+                                                    List<Channel> channels,String channelsDepthResponse,Boolean getAllChannels,String indexType, boolean getData) throws
+            DatatypeConfigurationException, ParseException,ValveException, ValveAuthException, UnirestException {
 
         ObjLog log;
 
@@ -77,21 +63,22 @@ public class LogConverterExtended extends com.hashmapinc.tempus.WitsmlObjects.Ut
         log = ChannelSet.to1411(cs.get(0));
         log.setUidWell(witsmlObject.getGrandParentUid());
         log.setUidWellbore(witsmlObject.getParentUid());
-        log.setNameWell(getWellName( wellSearchEndpoint, client, username, password, exchangeID, witsmlObject));
-        log.setNameWellbore(getWelBorelName( wellBoreSearchEndpoint, client, username, password, exchangeID, witsmlObject));
+        log.setNameWell(getWellName( wellSearchEndpoint,client,  username,password,  exchangeID,witsmlObject));
+        log.setNameWellbore(getWelBorelName( wellBoreSearchEndpoint,client,  username, password,  exchangeID,witsmlObject));
 
         //LogData requested or not
         if (getData){
             if (channelsDepthResponse != null) {
                 JSONObject logDataJsonObject = new JSONObject(channelsDepthResponse);
                 List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData> curves = new ArrayList<>();
-                curves.add( DotLogDataHelper.convertTo1411FromDot(logDataJsonObject,indexType) );
+                var channelIndex = cs.get(0).getIndex().get(0);
+                curves.add(DotLogDataHelper.convertTo1411FromDot(logDataJsonObject,indexType, channelIndex.getMnemonic(), channelIndex.getUom()));
                 log.setLogData(curves);
-                List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> lcis = Channel.to1411WithLogData( channels,logDataJsonObject,cs.get(0) );
+                List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> lcis = Channel.to1411WithLogData(channels,logDataJsonObject,cs.get(0));
                 log.setLogCurveInfo(lcis);
             }
         }else{
-            List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> lcis = Channel.to1411( channels, cs.get(0) );
+            List<com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo> lcis = Channel.to1411(channels,cs.get(0));
             log.setLogCurveInfo(lcis);
         }
         return log;

@@ -16,6 +16,7 @@
 package com.hashmapinc.tempus.witsml.valve.dot.model.log;
 
 import com.hashmapinc.tempus.WitsmlObjects.Util.log.LogDataHelper;
+import com.hashmapinc.tempus.WitsmlObjects.v1311.IndexCurve;
 import com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogData;
 import com.hashmapinc.tempus.witsml.valve.dot.model.log.channel.Channel;
 import org.json.JSONArray;
@@ -90,11 +91,7 @@ public class DotLogDataHelper extends LogDataHelper {
 
     // Code added to build log data request
 
-    public static String
-
-
-
-        convertChannelDepthDataToDotFrom(List<Channel> channels , String containerId, String sortDesc, String startIndex, String endIndex){
+    public static String convertChannelDepthDataToDotFrom(List<Channel> channels , String containerId, String sortDesc, String startIndex, String endIndex){
 
         JSONObject dotDataObject = new JSONObject();
         dotDataObject.put("sortDesc", true);
@@ -147,35 +144,68 @@ public class DotLogDataHelper extends LogDataHelper {
 
     //code added for logData Transformation
 
-    public static CsLogData convertTo1411FromDot( JSONObject object, String indexType ){
+    public static CsLogData convertTo1411FromDot(JSONObject object,String indexType, String indexCurve, String indexUnit ){
         JSONArray jsonValues = (JSONArray)object.get("value");
-        String[] mnems = new String[jsonValues.length()];
-        String[] units = new String[jsonValues.length()];
-        Arrays.fill(units,"unitless");
+        ArrayList<String> mnems = new ArrayList<String>();
+        ArrayList<String> units = new ArrayList<String>();
+        mnems.add(indexCurve);
+        units.add(indexUnit);
         SortedMap<String, String[]> values = new TreeMap<>();
-
-        //Iterate through and get values
-        for (int i = 0; i < jsonValues.length(); i++){
-            if (i == 0) {
-                JSONObject index = (JSONObject)jsonValues.get(i);
-                mnems[i] = (index.get("name").toString());
-                units[i] = (index.get("unit").toString());
-            } else {
-                JSONObject currentValue = (JSONObject)jsonValues.get(i);
-                mnems[i] = (currentValue.get("name").toString());
-                units[i] = (currentValue.get("unit").toString());
-                JSONArray dataPoints = currentValue.getJSONArray("values");
-                for (int j = 0; j < dataPoints.length(); j++){
-                    JSONObject dataPoint = (JSONObject)dataPoints.get(j);
-                    String index = dataPoint.keys().next().toString();
-                    String value = dataPoint.get(index).toString();
-                    if (!values.containsKey(index))
-                        values.put(index, new String[jsonValues.length()-1]);
-                    values.get(index)[i-1] = value;
-                }
+        Boolean indexCurveExists = false;
+        //Check if values contains index Channel
+        for(int i = 0; i < jsonValues.length(); i ++)
+        {
+            JSONObject currentValue = (JSONObject)jsonValues.get(i);
+            var mnemonic = currentValue.get("name").toString();
+            if(mnemonic.equalsIgnoreCase(indexCurve))
+            {
+                indexCurveExists = true;
+                break;
             }
         }
 
+        //Iterate through and get values
+        Boolean indexCurvePassed = false;
+        for(int i = 0; i < jsonValues.length(); i ++)
+        {
+            JSONObject currentValue = (JSONObject)jsonValues.get(i);
+            var mnemonic = currentValue.get("name").toString();
+            var unit = currentValue.get("unit").toString();
+            if(mnemonic.equalsIgnoreCase(indexCurve))
+            {
+                indexCurvePassed = true;
+                continue;
+            }
+            mnems.add(mnemonic);
+            units.add(unit);
+            JSONArray dataPoints = currentValue.getJSONArray("values");
+            for(int j = 0; j < dataPoints.length(); j ++)
+            {
+                JSONObject dataPoint = (JSONObject)dataPoints.get(j);
+                String index = dataPoint.keys().next().toString();
+                String value = dataPoint.get(index).toString();
+                if(!values.containsKey(index))
+                {
+                    if(indexCurveExists.booleanValue())
+                    {
+                        values.put(index, new String[jsonValues.length() - 1]);
+                    }
+                    else
+                    {
+                        values.put(index, new String[jsonValues.length()]);
+                    }
+                }
+                if(indexCurvePassed.booleanValue())
+                {
+                    values.get(index)[i - 1] = value;
+                }
+                else
+                {
+                    values.get(index)[i] = value;
+                }
+            }
+        }
+        
         //sorting
         CsLogData data = new CsLogData();
         List<String> dataRows = new ArrayList<>();
@@ -219,31 +249,56 @@ public class DotLogDataHelper extends LogDataHelper {
         return data;
     }
 
-    public static com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogData convertTo1311FromDot(JSONObject object){
+    public static com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogData convertTo1311FromDot(JSONObject object, String indexCurve){
         JSONArray jsonValues = (JSONArray)object.get("value");
-        String[] mnems = new String[jsonValues.length()];
-        String[] units = new String[jsonValues.length()];
-        Arrays.fill(units,"unitless");
         SortedMap<String, String[]> values = new TreeMap<>();
+        Boolean indexCurveExists = false;
+        for(int i = 0; i < jsonValues.length(); i ++)
+        {
+            JSONObject currentValue = (JSONObject)jsonValues.get(i);
+            var mnemonic = currentValue.get("name").toString();
+            if(mnemonic.equalsIgnoreCase(indexCurve))
+            {
+                indexCurveExists = true;
+                break;
+            }
+        }
 
-        //Iterate through and get values
-        for (int i = 0; i < jsonValues.length(); i++){
-            if (i == 0) {
-                JSONObject index = (JSONObject)jsonValues.get(i);
-                mnems[i] = (index.get("name").toString());
-                units[i] = (index.get("unit").toString());
-            } else {
-                JSONObject currentValue = (JSONObject)jsonValues.get(i);
-                mnems[i] = (currentValue.get("name").toString());
-                units[i] = (currentValue.get("unit").toString());
-                JSONArray dataPoints = currentValue.getJSONArray("values");
-                for (int j = 0; j < dataPoints.length(); j++){
-                    JSONObject dataPoint = (JSONObject)dataPoints.get(j);
-                    String index = dataPoint.keys().next().toString();
-                    String value = dataPoint.get(index).toString();
-                    if (!values.containsKey(index))
-                        values.put(index, new String[jsonValues.length()-1]);
-                    values.get(index)[i-1] = value;
+        Boolean indexCurvePassed = false;
+        for(int i = 0; i < jsonValues.length(); i ++)
+        {
+            JSONObject currentValue = (JSONObject)jsonValues.get(i);
+            var mnemonic = currentValue.get("name").toString();
+            if(mnemonic.equalsIgnoreCase(indexCurve))
+            {
+                indexCurvePassed = true;
+                continue;
+            }
+            JSONArray dataPoints = currentValue.getJSONArray("values");
+            //Iterate through and get values
+            for(int j = 0; j < dataPoints.length(); j ++)
+            {
+                JSONObject dataPoint = (JSONObject)dataPoints.get(j);
+                String index = dataPoint.keys().next().toString();
+                String value = dataPoint.get(index).toString();
+                if (!values.containsKey(index))
+                {
+                    if(indexCurveExists.booleanValue())
+                    {
+                        values.put(index, new String[jsonValues.length() - 1]);
+                    }
+                    else
+                    {
+                        values.put(index, new String[jsonValues.length()]);
+                    }
+                }
+                if(indexCurvePassed.booleanValue())
+                {
+                    values.get(index)[i - 1] = value;
+                }
+                else
+                {
+                    values.get(index)[i] = value;
                 }
             }
         }

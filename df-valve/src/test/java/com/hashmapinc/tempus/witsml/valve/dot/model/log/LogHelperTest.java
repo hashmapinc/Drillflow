@@ -89,7 +89,9 @@ public class LogHelperTest {
         String dotLogData = TestUtilities.getResourceAsString("dotConversion/dotLogData.json");
         String csvLogData = TestUtilities.getResourceAsString("dotConversion/sourceLogCsv.csv");
         String indexType = "depth";
-        CsLogData data = DotLogDataHelper.convertTo1411FromDot(new JSONObject(dotLogData),indexType);
+        String indexCurve = "Mdepth";
+        String indexUnit = "m";
+        CsLogData data = DotLogDataHelper.convertTo1411FromDot(new JSONObject(dotLogData),indexType, indexCurve, indexUnit);
         assertNotNull(data);
     }
 
@@ -97,7 +99,8 @@ public class LogHelperTest {
     public void shouldConvertDotTo1311() throws IOException {
         String dotLogData = TestUtilities.getResourceAsString("dotConversion/dotLogData.json");
         String csvLogData = TestUtilities.getResourceAsString("dotConversion/sourceLogCsv.csv");
-        com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogData data = DotLogDataHelper.convertTo1311FromDot(new JSONObject(dotLogData));
+        String indexCurve = "Mdepth";
+        com.hashmapinc.tempus.WitsmlObjects.v1311.CsLogData data = DotLogDataHelper.convertTo1311FromDot(new JSONObject(dotLogData), indexCurve);
         assertNotNull(data);
     }
 
