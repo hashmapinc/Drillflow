@@ -103,7 +103,7 @@ Navigate to the docker directory
 
 Execute `docker build . -t hashmapinc/drillflow:latest` to build the image
 
-Once completed execute `docker run -p 7070:7070 hashmapinc/witsmlapi-server:latest` 
+Once completed execute `docker run -p 7070:7070 hashmapinc/drillflow:latest` 
 
 ## Getting Help
 You can also submit issues or questions via GitHub Issues [here](https://github.com/hashmapinc/WitsmlApi-Server/issues)
