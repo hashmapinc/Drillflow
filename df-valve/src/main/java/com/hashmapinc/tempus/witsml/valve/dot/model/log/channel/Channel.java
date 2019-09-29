@@ -736,7 +736,7 @@ public class Channel {
 
         for (Channel c : channels) {
             try {
-                if (c.getMnemonic() == channelSetIndex.getMnemonic()) {
+                if (c.getMnemonic().equals(channelSetIndex.getMnemonic())) {
                     hasIndexChannel = true;
                 }
                 com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo lci = new com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo();
@@ -843,7 +843,7 @@ public class Channel {
         var hasIndexChannel = false;
         for (Channel c : channels) {
             try {
-                if (c.getMnemonic() == channelSetIndex.getMnemonic()) {
+                if (c.getMnemonic().equals(channelSetIndex.getMnemonic())) {
                     hasIndexChannel = true;
                 }
                 com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo lci = new com.hashmapinc.tempus.WitsmlObjects.v1411.CsLogCurveInfo();
