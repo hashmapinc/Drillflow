@@ -74,7 +74,10 @@ public class JsonUtil {
             if (!resp.has(key)) {
                 if (isEmpty(req.get(key)))
                     keysToRemove.add(key); // remove this key if it's empty
-                continue;
+                if (key.equals("customData")) {
+                    keysToRemove.add(key); // temporary fix for RTC to read 1311 wells
+                }
+                    continue;
             }
 
             // get values in resp and req as objects for this key
