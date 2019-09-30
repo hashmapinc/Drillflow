@@ -725,11 +725,15 @@ public class Channel {
             indexLci.setTypeLogData("double");
             com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure minMeasure = new com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure();
             minMeasure.setUom("m");
-            minMeasure.setValue(Double.parseDouble(channelSet.getStartIndex()));
+            if (channelSet.getStartIndex()!=null) {
+                minMeasure.setValue(Double.parseDouble(channelSet.getStartIndex()));
+            }
             indexLci.setMinIndex(minMeasure);
             com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure maxMeasure = new com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure();
             maxMeasure.setUom("m");
-            maxMeasure.setValue(Double.parseDouble(channelSet.getEndIndex()));
+            if (channelSet.getEndIndex()!=null) {
+                maxMeasure.setValue(Double.parseDouble(channelSet.getEndIndex()));
+            }
             indexLci.setMaxIndex(maxMeasure);
         }
         var hasIndexChannel = false;
@@ -833,11 +837,15 @@ public class Channel {
             indexLci.setTypeLogData("double");
             com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure minMeasure = new com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure();
             minMeasure.setUom("m");
-            minMeasure.setValue(Double.parseDouble(channelSet.getStartIndex()));
+            if (channelSet.getStartIndex()!=null) {
+                minMeasure.setValue(Double.parseDouble(channelSet.getStartIndex()));
+            }
             indexLci.setMinIndex(minMeasure);
             com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure maxMeasure = new com.hashmapinc.tempus.WitsmlObjects.v1411.GenericMeasure();
             maxMeasure.setUom("m");
-            maxMeasure.setValue(Double.parseDouble(channelSet.getEndIndex()));
+            if (channelSet.getEndIndex()!=null) {
+                maxMeasure.setValue(Double.parseDouble(channelSet.getEndIndex()));
+            }
             indexLci.setMaxIndex(maxMeasure);
         }
         var hasIndexChannel = false;
