@@ -23,7 +23,7 @@
         <logCurveInfo uid="lci-1">
             <mnemonic>Time</mnemonic>
             <classWitsml>time</classWitsml>
-            <unit>m</unit>
+            <unit>s</unit>
             <mnemAlias>md</mnemAlias>
             <nullValue>-999.25</nullValue>
             <minDateTimeIndex>2001-06-18T13:20:00Z</minDateTimeIndex>
@@ -295,7 +295,7 @@
         </logCurveInfo>
         <logData>
             <mnemonicList>Time,DVER,DBTM,DTOR_RT,TQLS,ROP,SWOB,HKLD,RPM,TRPM,TQA,TQX,TQBX,TQMX,MFOP,SPPA,BEDC,MTOA,IMSA,DXC,ECD_RT</mnemonicList>
-            <unitList>m,m,m,kft.lbf,kft.lbf,m/h,klbf,klbf,rpm,rpm,kft.lbf,kft.lbf,kft.lbf,kft.lbf,galUS/min,galUS/min,g/cm3,degC,rpm,unitless,g/cm3</unitList>
+            <unitList>s,m,m,kft.lbf,kft.lbf,m/h,klbf,klbf,rpm,rpm,kft.lbf,kft.lbf,kft.lbf,kft.lbf,galUS/min,galUS/min,g/cm3,degC,rpm,unitless,g/cm3</unitList>
             <data>2001-06-18T13:20:00Z,498.99,1.25,0,1.45,3.67,11.02,187.66,0.29,116.24,0.01,0.05,0.01,0,886.03,1089.99,1.11,14.67,0.29,1.12,1.11</data>
             <data>2001-06-18T13:30:00.01Z,500,1.9,0.01,1.42,9.94,11.32,185.7,0.29,116.24,0.01,0.01,0.01,0,795.19,973.48,1.11,14.67,0.29,0.95,1.11</data>
             <data>2001-06-18T13:40:00.03Z,501.02,2.92,0.02,1.41,20.46,11.62,184.23,0.29,120,0.01,0.01,0.01,0,796.68,956.25,1.11,14.67,0.29,0.83,1.11</data>
